@@ -4,12 +4,7 @@ from wtforms.validators import DataRequired, Length, Email, ValidationError, Equ
 
 from app.models import Utilisateur
 
-
-class LoginForm(FlaskForm):
-    pseudo = StringField('Pseudo', validators=[DataRequired(), Length(min=4, max=50)])
-    password = PasswordField('Mot de passe', validators=[DataRequired(), Length(min=6)])
-    submit = SubmitField('Se connecter')
-
+# Formulaire pour créer un compte
 class RegistrationForm(FlaskForm):
     pseudo = StringField('Pseudo', validators=[DataRequired(), Length(min=4, max=50)])
     email = StringField('Email', validators=[DataRequired(), Email()])
@@ -28,3 +23,15 @@ class RegistrationForm(FlaskForm):
         user = Utilisateur.query.filter_by(email=email.data).first()
         if user:
             raise ValidationError('Cet email est déjà utilisé. Veuillez en choisir un autre.')
+
+# Formulaire pour se connecter
+class LoginForm(FlaskForm):
+    pseudo = StringField('Pseudo', validators=[DataRequired(), Length(min=4, max=50)])
+    password = PasswordField('Mot de passe', validators=[DataRequired(), Length(min=6)])
+    submit = SubmitField('Se connecter')
+
+# Formulaire pour proposer un nouvel établissement
+
+# Formulaire pour proposer un flan
+
+# Formulaire pour évaluer un flan

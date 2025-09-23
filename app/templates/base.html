@@ -1,9 +1,39 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-    <title>PlanFlan</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}PlanFlan{% endblock %}</title>
+    <!-- Lien vers le fichier CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    {% block content %}{% endblock %}
+    <header>
+        <h1>PlanFlan</h1>
+    </header>
+    <nav>
+        <a href="{{ url_for('main.index') }}">Accueil</a>
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('main.dashboard') }}">Tableau de bord</a>
+            <a href="{{ url_for('auth.logout') }}">Déconnexion</a>
+        {% else %}
+            <a href="{{ url_for('auth.login') }}">Connexion</a>
+            <a href="{{ url_for('auth.register') }}">Inscription</a>
+        {% endif %}
+    </nav>
+    <main class="container">
+        <!-- Affichage des messages flash (succès/erreur) -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </main>
+    <footer>
+        <p>&copy; 2025 PlanFlan. Tous droits réservés.</p>
+    </footer>
 </body>
 </html>
