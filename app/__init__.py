@@ -6,6 +6,9 @@ from app.config import Config
 
 db = SQLAlchemy()
 login_manager = LoginManager()
+login_manager.login_view = 'auth.login'
+
+
 bcrypt = Bcrypt()
 
 def create_app():

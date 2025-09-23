@@ -9,6 +9,9 @@ class Utilisateur(db.Model, UserMixin):
     password = db.Column(db.String(100), nullable=False)
     is_admin = db.Column(db.Boolean, default=False)
 
+    def get_id(self): # Pour que get_id de Flask Login utilise l'id_user'
+        return str(self.id_user)
+
     def set_password(self, password):
         self.password = bcrypt.generate_password_hash(password).decode('utf-8')
 

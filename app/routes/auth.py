@@ -1,8 +1,12 @@
 from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required
+from flask_bcrypt import check_password_hash, generate_password_hash
+
+
+from app import db
 from app.models import Utilisateur
 from app.forms import LoginForm, RegistrationForm
-from werkzeug.security import check_password_hash, generate_password_hash
+
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -10,12 +14,12 @@ auth_bp = Blueprint('auth', __name__)
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
-        hashed_password = generate_password_hash(form.password.data, method='scrypt')
+        hashed_password = generate_password_hash(form.password.data)
         new_user = Utilisateur(
             pseudo=form.pseudo.data,
             email=form.email.data,
             password=hashed_password,
-            is_admin=form.is_admin.data
+            is_admin=False,
         )
         db.session.add(new_user)
         db.session.commit()
@@ -33,6 +37,9 @@ def login():
             return redirect(url_for('main.dashboard'))
         flash('Pseudo ou mot de passe incorrect.', 'danger')
     return render_template('login.html', form=form)
+
+
+
 
 @auth_bp.route('/logout')
 @login_required
