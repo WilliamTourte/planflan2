@@ -1,44 +1,13 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from enum import Enum
-
+from app.models import  TypeEtab, Etablissement, Flan, db
 # Configuration minimale de Flask et SQLAlchemy
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:@localhost/planflan_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
 
-db = SQLAlchemy(app)
-
-# Définition des modèles (à copier depuis ton projet)
-class TypeEtab(Enum):
-    BOULANGERIE = 'Boulangerie'
-    RESTAURANT = 'Restaurant'
-    CAFE = 'Café'
-
-class Etablissement(db.Model):
-    __tablename__ = 'etablissements'
-    id_etab = db.Column(db.Integer, primary_key=True)
-    type_etab = db.Column(db.Enum(TypeEtab), nullable=False, default=TypeEtab.BOULANGERIE)
-    nom = db.Column(db.String(100), nullable=False)
-    adresse = db.Column(db.String(200), nullable=False)
-    code_postal = db.Column(db.String(5), nullable=False)
-    ville = db.Column(db.String(100), nullable=False)
-    latitude = db.Column(db.Numeric(10, 8), nullable=True)
-    longitude = db.Column(db.Numeric(11, 8), nullable=True)
-    telephone = db.Column(db.String(20), nullable=True)
-    site_web = db.Column(db.String(255), nullable=True)
-    description = db.Column(db.Text, nullable=True)
-    label = db.Column(db.Boolean, nullable=True, default=False)
-    visite = db.Column(db.Boolean, nullable=True, default=False)
-    flans = db.relationship('Flan', backref='etablissement', lazy=True)
-
-class Flan(db.Model):
-    __tablename__ = 'flans'
-    id_flan = db.Column(db.Integer, primary_key=True)
-    id_etab = db.Column(db.Integer, db.ForeignKey('etablissements.id_etab'), nullable=False)
-    nom = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.Text, nullable=True)
 
 def inserer_jeu_de_donnees():
     with app.app_context():  # Crée un contexte d'application

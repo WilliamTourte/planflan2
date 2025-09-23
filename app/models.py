@@ -1,10 +1,8 @@
 from enum import Enum
 
-from app import login_manager, bcrypt
+from app import login_manager, bcrypt, db # import la base de données
 from flask_login import UserMixin
-from flask_sqlalchemy import SQLAlchemy
 
-db = SQLAlchemy()
 
 class Utilisateur(db.Model, UserMixin):
     __tablename__ = 'utilisateurs'

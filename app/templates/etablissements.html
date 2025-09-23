@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+ <h1>liste des établissements</h1>
+<ul>
+    {% for établissement in établissements %}
+    <li>{{ établissement.nom }}</li>
+    {% endfor %}
+</ul>
+{% endblock %}
