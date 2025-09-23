@@ -1,10 +1,27 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required
 from app.models import Utilisateur
-from app.forms import LoginForm
-from werkzeug.security import check_password_hash
+from app.forms import LoginForm, RegistrationForm
+from werkzeug.security import check_password_hash, generate_password_hash
 
 auth_bp = Blueprint('auth', __name__)
+
+@auth_bp.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        hashed_password = generate_password_hash(form.password.data, method='scrypt')
+        new_user = Utilisateur(
+            pseudo=form.pseudo.data,
+            email=form.email.data,
+            password=hashed_password,
+            is_admin=form.is_admin.data
+        )
+        db.session.add(new_user)
+        db.session.commit()
+        flash('Compte créé avec succès ! Vous pouvez maintenant vous connecter.', 'success')
+        return redirect(url_for('auth.login'))
+    return render_template('creation_utilisateur.html', form=form)
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
