@@ -20,24 +20,34 @@
     <h2 class="section-title">Nos flans</h2>
     {% if etablissement.flans %}
         <div class="flans-grid">
-            {% for flan in etablissement.flans %}
-            <div class="flan-card">
-                {% if flan.photos %}
-                    <img src="{{ url_for('static', filename='uploads/' + flan.photos[0].path) }}" alt="{{ flan.nom }}" class="card-image">
-                {% else %}
-                    <div class="card-image placeholder">
-                        <span>Pas de photo</span>
-                    </div>
-                {% endif %}
-                <div class="card-content">
-                    <h3>{{ flan.nom }}</h3>
-                    <p class="flan-description">{{ flan.description or "Un délicieux flan maison" }}</p>
-                    <div class="flan-actions">
-                        <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}" class="btn-details">Voir les détails</a>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
+           {% for flan in etablissement.flans %}
+<div class="flan-card">
+    {% if flan.photos %}
+        <img src="{{ url_for('static', filename='uploads/' + flan.photos[0].path) }}" alt="{{ flan.nom }}" class="card-image">
+    {% else %}
+        <div class="card-image placeholder">
+            <span>Pas de photo</span>
+        </div>
+    {% endif %}
+    <div class="card-content">
+        <div class="flan-header">
+            <h3>{{ flan.nom }}</h3>
+            <!-- Affichage du prix -->
+            {% if flan.evaluations %}
+                {% set dernier_prix = flan.evaluations|sort(attribute='date_creation', reverse=true)|first %}
+                <span class="flan-price">{{ "%.2f"|format(dernier_prix.prix) }} €</span>
+            {% else %}
+                <span class="flan-price">Prix non renseigné</span>
+            {% endif %}
+        </div>
+        <p class="flan-description">{{ flan.description or "Un délicieux flan maison" }}</p>
+        <div class="flan-actions">
+            <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}" class="btn-details">Voir les détails</a>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
         </div>
     {% else %}
         <div class="no-results">
