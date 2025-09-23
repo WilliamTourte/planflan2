@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Tableau de bord</h1>
+<p>Bienvenue, {{ current_user.pseudo }} !</p>
+<a href="{{ url_for('auth.logout') }}">Se déconnecter</a>
+{% endblock %}
