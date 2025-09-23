@@ -100,3 +100,369 @@ form {
     background-color: #f44336;
     color: white;
 }
+/* ===== Reset et base ===== */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    background-color: #f8f9fa;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+h1 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* ===== Grille des établissements ===== */
+.etablissements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+}
+
+/* ===== Cartes cliquables ===== */
+.etablissement-card {
+    text-decoration: none;
+    color: inherit;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    background: white;
+    display: block;
+    height: 100%;
+}
+
+.etablissement-card:hover {
+    transform: translateY(-7px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+    color: inherit;
+}
+
+.card-image {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.card-image.placeholder {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #7f8c8d;
+    font-style: italic;
+}
+
+.card-content {
+    padding: 20px;
+    position: relative;
+    min-height: 160px;
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.etablissement-card h2 {
+    margin: 0 0 8px 0;
+    color: #2c3e50;
+    font-size: 1.3rem;
+}
+
+.type {
+    color: #7f8c8d;
+    font-style: italic;
+    font-size: 0.9rem;
+    margin: 5px 0;
+}
+
+.adresse {
+    color: #34495e;
+    font-size: 0.9rem;
+    margin: 10px 0;
+    line-height: 1.4;
+}
+
+.description {
+    color: #555;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin: 10px 0;
+}
+
+.flans-count {
+    color: #e74c3c;
+    font-weight: bold;
+    font-size: 0.9rem;
+    margin: 10px 0;
+}
+
+.arrow {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    font-size: 1.5em;
+    color: #3498db;
+    transition: all 0.2s;
+}
+
+.etablissement-card:hover .arrow {
+    transform: translateX(5px);
+}
+
+/* ===== Badge "Label La Flanterie" ===== */
+.badge {
+    background: #f39c12;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+/* ===== Filtres ===== */
+.filters {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 25px 0;
+    flex-wrap: wrap;
+}
+
+.filter-btn {
+    padding: 8px 18px;
+    background: #ecf0f1;
+    border-radius: 25px;
+    text-decoration: none;
+    color: #2c3e50;
+    transition: all 0.2s;
+    font-weight: 500;
+}
+
+.filter-btn:hover {
+    background: #d6eaf8;
+}
+
+.filter-btn.active {
+    background: #3498db;
+    color: white;
+}
+
+/* ===== Message "Aucun résultat" ===== */
+.no-results {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.no-results p {
+    margin-bottom: 15px;
+    color: #7f8c8d;
+}
+
+.btn {
+    display: inline-block;
+    padding: 8px 16px;
+    background: #3498db;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.btn:hover {
+    background: #2980b9;
+}
+
+/* ===== Animation ===== */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+    100% { transform: scale(1); }
+}
+
+.etablissement-card:hover {
+    animation: pulse 0.3s ease;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    .etablissements-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .card-content {
+        min-height: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 10px;
+    }
+
+    .etablissement-card {
+        border-radius: 8px;
+    }
+
+    .card-content {
+        padding: 15px;
+    }
+}
+/* ===== En-tête de l'établissement ===== */
+.etablissement-header {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.etablissement-header h1 {
+    margin: 0 0 10px 0;
+    color: #2c3e50;
+}
+
+.type-badge {
+    display: inline-block;
+    background: #e74c3c;
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+
+.etablissement-info {
+    text-align: left;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.etablissement-info p {
+    margin: 8px 0;
+}
+
+.section-title {
+    color: #2c3e50;
+    margin: 30px 0 20px 0;
+    text-align: center;
+    position: relative;
+}
+
+.section-title:after {
+    content: "";
+    display: block;
+    width: 80px;
+    height: 3px;
+    background: #3498db;
+    margin: 10px auto;
+}
+
+/* ===== Grille des flans ===== */
+.flans-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.flan-card {
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.flan-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.flan-card .card-content {
+    padding: 20px;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+}
+
+.flan-card h3 {
+    margin: 0 0 10px 0;
+    color: #e74c3c;
+    font-size: 1.2rem;
+}
+
+.flan-description {
+    color: #555;
+    flex-grow: 1;
+    margin: 10px 0;
+    line-height: 1.5;
+}
+
+.flan-actions {
+    margin-top: auto;
+    text-align: right;
+}
+
+.btn-details {
+    display: inline-block;
+    padding: 8px 15px;
+    background: #3498db;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+.btn-details:hover {
+    background: #2980b9;
+}
+
+/* ===== Bouton retour ===== */
+.btn-back {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #7f8c8d;
+    color: white;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: background 0.2s;
+    margin-top: 20px;
+}
+
+.btn-back:hover {
+    background: #6c7a7d;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    .flans-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .flan-card .card-content {
+        min-height: auto;
+    }
+}

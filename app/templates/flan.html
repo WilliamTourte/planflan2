@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div class="flan-header">
+        <h1>{{ flan.nom }}</h1>
+        <p class="etablissement-link">
+            Proposé par <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=flan.etablissement.id_etab) }}">{{ flan.etablissement.nom }}</a>
+        </p>
+
+        {% if flan.photos %}
+            <img src="{{ url_for('static', filename='uploads/' + flan.photos[0].path) }}" alt="{{ flan.nom }}" class="flan-main-image">
+        {% endif %}
+
+        <div class="flan-details">
+            <p class="description">{{ flan.description or "Aucune description disponible" }}</p>
+
+            <h2>Évaluations</h2>
+            {% if flan.evaluations %}
+                <div class="evaluations-list">
+                    {% for evaluation in flan.evaluations %}
+                        <div class="evaluation-card">
+                            <p><strong>Note globale :</strong> {{ evaluation.moyenne }}/5</p>
+                            <p>{{ evaluation.description }}</p>
+                            <p class="evaluation-date">Évalué le {{ evaluation.date_creation.strftime('%d/%m/%Y') }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>Aucune évaluation pour ce flan.</p>
+            {% endif %}
+        </div>
+
+        <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=flan.etablissement.id_etab) }}" class="btn-back">← Retour à l'établissement</a>
+    </div>
+</div>
+{% endblock %}

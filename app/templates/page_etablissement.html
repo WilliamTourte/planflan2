@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <!-- Détails de l'établissement -->
+    <div class="etablissement-header">
+        <h1>{{ etablissement.nom }}</h1>
+        <p class="type-badge">{{ etablissement.type_etab.value }}</p>
+        <div class="etablissement-info">
+            <p><strong>Adresse :</strong> {{ etablissement.adresse }}, {{ etablissement.code_postal }} {{ etablissement.ville }}</p>
+            {% if etablissement.telephone %}
+                <p><strong>Téléphone :</strong> {{ etablissement.telephone }}</p>
+            {% endif %}
+            {% if etablissement.description %}
+                <p class="description">{{ etablissement.description }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Grille des flans -->
+    <h2 class="section-title">Nos flans</h2>
+    {% if etablissement.flans %}
+        <div class="flans-grid">
+            {% for flan in etablissement.flans %}
+            <div class="flan-card">
+                {% if flan.photos %}
+                    <img src="{{ url_for('static', filename='uploads/' + flan.photos[0].path) }}" alt="{{ flan.nom }}" class="card-image">
+                {% else %}
+                    <div class="card-image placeholder">
+                        <span>Pas de photo</span>
+                    </div>
+                {% endif %}
+                <div class="card-content">
+                    <h3>{{ flan.nom }}</h3>
+                    <p class="flan-description">{{ flan.description or "Un délicieux flan maison" }}</p>
+                    <div class="flan-actions">
+                        <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}" class="btn-details">Voir les détails</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="no-results">
+            <p>Aucun flan proposé pour cet établissement.</p>
+            {% if current_user.is_authenticated and current_user.type_user == 'admin' %}
+                <a href="{{ url_for('main.ajouter_flan', id_etab=etablissement.id_etab) }}" class="btn">Ajouter un flan</a>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <a href="{{ url_for('main.afficher_etablissements') }}" class="btn-back">← Retour à la liste</a>
+</div>
+{% endblock %}
