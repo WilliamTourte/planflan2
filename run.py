@@ -1,4 +1,4 @@
-from app import create_app
+from app import create_app # dans __init__.py
 
 app = create_app() # Pendant le développement
 
