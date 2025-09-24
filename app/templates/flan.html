@@ -5,9 +5,13 @@
     <h1>{{ flan.nom }}</h1>
     <p>{{ flan.description or "Un délicieux flan maison" }}</p>
     <p>Prix : {{ "%.2f"|format(flan.prix) }} €</p>
-
+<!-- Bouton pour revenir à l'établissement -->
+<div class="back-to-etablissement">
+    <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=flan.etablissement.id_etab) }}" class="btn-etablissement">
+        ← Retour à l'établissement : {{ flan.etablissement.nom }}
+    </a>
+</div>
     <div class="evaluations-section">
-    {%  print "evaluation" %}
         {% for evaluation in flan.evaluations if evaluation.statut.value == 'Validé' %}
         <div class="evaluation-card">
             <div class="evaluation-left">
