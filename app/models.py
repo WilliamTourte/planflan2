@@ -1,19 +1,20 @@
 from enum import Enum
 
-from app import login_manager, bcrypt, db # import la base de données
+from app import login_manager, bcrypt, db # importe la base de données
 from flask_login import UserMixin
 
 
-class Utilisateur(db.Model, UserMixin):
+class Utilisateur(db.Model):
     __tablename__ = 'utilisateurs'
     id_user = db.Column(db.Integer, primary_key=True)
-    pseudo = db.Column(db.String(50), unique=True, nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
+    pseudo = db.Column(db.String(50), nullable=False)
     password = db.Column(db.String(100), nullable=False)
-    is_admin = db.Column(db.Boolean, default=False) # par défaut un utilisateur n'est pas administrateur'
-
+    email = db.Column(db.String(100), nullable=False)
+    is_admin = db.Column(db.Boolean, nullable=True, default=False)
     # Relation avec les évaluations
-    evaluations = db.relationship('Evaluation', backref='utilisateur', lazy=True)
+    evaluations = db.relationship('Evaluation', back_populates='user')
+
+
 
     def get_id(self): # Pour que get_id de Flask Login utilise l'id_user' plutôt que 'id' par défaut
         return str(self.id_user)
@@ -50,7 +51,7 @@ class Etablissement(db.Model):
     visite = db.Column(db.Boolean, nullable=True, default=False)
 
     # Relation avec les flans
-    flans = db.relationship('Flan', backref='etablissement', lazy=True)
+    flans = db.relationship('Flan', back_populates='etablissement', lazy=True)
     # Relation avec les photos
     photos = db.relationship('Photo', backref='etablissement_photo', lazy=True, foreign_keys='Photo.id_etab')
 
@@ -60,11 +61,14 @@ class Flan(db.Model):
     id_etab = db.Column(db.Integer, db.ForeignKey('etablissements.id_etab'), nullable=False)
     nom = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=True)
-
+    prix = db.Column(db.Float, nullable=True)
     # Relation avec les évaluations
-    evaluations = db.relationship('Evaluation', backref='flan', lazy=True)
+    evaluations = db.relationship('Evaluation', back_populates='flan', lazy=True)
     # Relation avec les photos
     photos = db.relationship('Photo', backref='flan_photo', lazy=True, foreign_keys='Photo.id_flan')
+    # Relation avec Etablissement
+    etablissement = db.relationship('Etablissement', back_populates='flans')
+
 
 class StatutEval(Enum):
     EN_ATTENTE = 'En attente'
@@ -80,12 +84,17 @@ class Evaluation(db.Model):
     texture = db.Column(db.Numeric(2, 1), nullable=False)
     pate = db.Column(db.Numeric(2, 1), nullable=False)
     gout = db.Column(db.Numeric(2, 1), nullable=False)
-    prix = db.Column(db.Float, nullable=False)
     description = db.Column(db.Text, nullable=True)
     photo = db.Column(db.String(255), nullable=True)
     statut = db.Column(db.Enum(StatutEval), nullable=False, default=StatutEval.EN_ATTENTE)
     date_creation = db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
     moyenne = db.Column(db.Numeric(2, 1), nullable=True)
+
+    # Relation avec Utilisateur
+    user = db.relationship('Utilisateur', back_populates='evaluations')
+    # Relation avec Flan
+    flan = db.relationship('Flan', back_populates='evaluations')
+
 
 class TypeCible(Enum):
     FLAN = 'Flan'

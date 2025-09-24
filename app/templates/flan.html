@@ -1,36 +1,41 @@
 {% extends "base.html" %}
+
 {% block content %}
-<div class="container">
-    <div class="flan-header">
-        <h1>{{ flan.nom }}</h1>
-        <p class="etablissement-link">
-            Proposé par <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=flan.etablissement.id_etab) }}">{{ flan.etablissement.nom }}</a>
-        </p>
+<div class="flan-detail-container">
+    <h1>{{ flan.nom }}</h1>
+    <p>{{ flan.description or "Un délicieux flan maison" }}</p>
+    <p>Prix : {{ "%.2f"|format(flan.prix) }} €</p>
 
-        {% if flan.photos %}
-            <img src="{{ url_for('static', filename='uploads/' + flan.photos[0].path) }}" alt="{{ flan.nom }}" class="flan-main-image">
-        {% endif %}
-
-        <div class="flan-details">
-            <p class="description">{{ flan.description or "Aucune description disponible" }}</p>
-
-            <h2>Évaluations</h2>
-            {% if flan.evaluations %}
-                <div class="evaluations-list">
-                    {% for evaluation in flan.evaluations %}
-                        <div class="evaluation-card">
-                            <p><strong>Note globale :</strong> {{ evaluation.moyenne }}/5</p>
-                            <p>{{ evaluation.description }}</p>
-                            <p class="evaluation-date">Évalué le {{ evaluation.date_creation.strftime('%d/%m/%Y') }}</p>
-                        </div>
-                    {% endfor %}
+    <div class="evaluations-section">
+    {%  print "evaluation" %}
+        {% for evaluation in flan.evaluations if evaluation.statut.value == 'Validé' %}
+        <div class="evaluation-card">
+            <div class="evaluation-left">
+                <h3>Évaluation par {{ evaluation.user.pseudo }}</h3>
+                <div class="evaluation-notes">
+                    <p>Visuel : {{ evaluation.visuel }}/5</p>
+                    <p>Texture : {{ evaluation.texture }}/5</p>
+                    <p>Pâte : {{ evaluation.pate }}/5</p>
+                    <p>Goût : {{ evaluation.gout }}/5</p>
                 </div>
-            {% else %}
-                <p>Aucune évaluation pour ce flan.</p>
-            {% endif %}
+                <div class="evaluation-moyenne">
+                    <strong>Moyenne : {{ "%.1f"|format(evaluation.moyenne) }}/5</strong>
+                </div>
+                <div class="evaluation-comment">
+                    <p>{{ evaluation.description or "Aucun commentaire" }}</p>
+                </div>
+            </div>
+            <div class="evaluation-right">
+                {% if evaluation.photo %}
+                <img src="{{ url_for('static', filename='uploads/' + evaluation.photo) }}" alt="Photo de l'évaluation" class="evaluation-photo">
+                {% else %}
+                <p>Aucune photo disponible</p>
+                {% endif %}
+            </div>
         </div>
-
-        <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=flan.etablissement.id_etab) }}" class="btn-back">← Retour à l'établissement</a>
+        {% else %}
+        <p>Aucune évaluation validée pour ce flan.</p>
+        {% endfor %}
     </div>
 </div>
 {% endblock %}
