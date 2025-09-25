@@ -1,6 +1,6 @@
 from enum import Enum
 
-from app import login_manager, bcrypt, db # importe la base de données
+from app import login_manager, db, bcrypt # importe la base de données
 from flask_login import UserMixin
 
 
@@ -15,19 +15,16 @@ class Utilisateur(db.Model, UserMixin):
     evaluations = db.relationship('Evaluation', back_populates='user')
 
 
-
-    def get_id(self): # Pour que get_id de Flask Login utilise l'id_user' plutôt que 'id' par défaut
+    def get_id(self):
         return str(self.id_user)
 
-    def set_password(self, password): # Hache le mot de passe
+    def set_password(self, password, bcrypt):
         self.password = bcrypt.generate_password_hash(password).decode('utf-8')
 
-    def check_password(self, password): # Vérifie que le mot de passe est correct
+    def check_password(self, password, bcrypt):
         return bcrypt.check_password_hash(self.password, password)
 
-@login_manager.user_loader
-def load_user(user_id): # Prend un user_id pour charger un utilisateur
-    return Utilisateur.query.get(int(user_id))
+
 
 class TypeEtab(Enum):
     BOULANGERIE = 'Boulangerie'

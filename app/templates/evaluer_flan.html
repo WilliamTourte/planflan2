@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flan-detail-container">
+    <h1>{{ flan.nom }}</h1>
+    <p>{{ flan.description or "Un délicieux flan maison" }}</p>
+    <p>Prix : {{ "%.2f"|format(flan.prix) }} €</p>
+
+    <h1>Évaluez ce flan</h1>
+    <form method="POST" action="{{ url_for('main.evaluer_flan', id_flan=flan.id_flan) }}">
+        {{ form.hidden_tag() }}  <!-- Champ CSRF obligatoire -->
+        <div>
+            {{ form.visuel.label }}<br>
+            {{ form.visuel() }}  <!-- Affiche le menu déroulant -->
+        </div>
+        <div>
+            {{ form.texture.label }}<br>
+            {{ form.texture() }}
+        </div>
+        <div>
+            {{ form.pate.label }}<br>
+            {{ form.pate() }}
+        </div>
+        <div>
+            {{ form.gout.label }}<br>
+            {{ form.gout() }}
+        </div>
+        <div>
+            {{ form.description.label }}<br>
+            {{ form.description() }}
+        </div>
+        <button type="submit">Envoyer</button>
+    </form>
+{% endblock %}

@@ -14,7 +14,9 @@ auth_bp = Blueprint('auth', __name__)
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
-        hashed_password = generate_password_hash(form.password.data)
+        # Hache le mot de passe directement avec bcrypt
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+
         new_user = Utilisateur(
             pseudo=form.pseudo.data,
             email=form.email.data,
@@ -23,8 +25,10 @@ def register():
         )
         db.session.add(new_user)
         db.session.commit()
-        flash('Compte créé avec succès ! Vous pouvez maintenant vous connecter.', 'success')
+
+        flash('Compte créé avec succès !', 'success')
         return redirect(url_for('auth.login'))
+
     return render_template('creation_utilisateur.html', form=form)
 
 @auth_bp.route('/login', methods=['GET', 'POST'])

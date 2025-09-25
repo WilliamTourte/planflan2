@@ -9,6 +9,11 @@ db = SQLAlchemy() # Doit être la SEULE instance de SQLAlchemy
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'  # Route pour la page de login
 login_manager.login_message = "Veuillez vous connecter pour accéder à cette page."
+
+
+
+
+
 bcrypt = Bcrypt()
 
 def create_app():
@@ -17,6 +22,12 @@ def create_app():
     # initialisation des extensions
     db.init_app(app)
     login_manager.init_app(app)
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        from app.models import Utilisateur
+        return Utilisateur.query.get(int(user_id))
+
     bcrypt.init_app(app)
 
     # Enregistre les blueprints dans l'application

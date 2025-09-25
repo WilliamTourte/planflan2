@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for
 from flask_login import login_required, current_user
 from app.forms import EvalForm, EtabForm
-from app.models import Etablissement, Flan, Evaluation
+from app.models import Etablissement, Flan, Evaluation, Utilisateur
 from app import db
 
 main_bp = Blueprint('main', __name__)
@@ -38,17 +38,26 @@ def evaluer_flan(id_flan):
 
     form=EvalForm()
     if form.validate_on_submit():  # Si le formulaire est soumis et valide
+        # Calcul de la moyenne
+        moyenne = (
+            float(form.visuel.data) +
+            float(form.texture.data) +
+            float(form.pate.data) +
+            float(form.gout.data)
+        ) / 4
         evaluation=Evaluation(
             visuel = form.visuel.data,
             texture = form.texture.data,
             pate = form.pate.data,
             gout = form.gout.data,
-        description = form.description.data,
-        id_user=current_user.id # récupère l'id par Flask Login
+            description = form.description.data,
+            id_flan=id_flan,
+            id_user=current_user.id_user, # récupère l'id par Flask Login (current_user)
+            moyenne=moyenne
         )
         db.session.add(evaluation)
         db.session.commit()
 
-        return redirect(url_for('main.flan_detail', id_flan=id_flan))  # Redirige vers la page du flan
+        return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))  # Redirige vers la page du flan
     # Affiche le formulaire (GET)
-    return render_template('evaluer_flan.html', form=form, flan=flan)
+    return render_template('evaluer_flan.html', form=form, flan=flan_unique)

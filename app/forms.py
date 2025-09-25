@@ -1,9 +1,9 @@
-from tkinter.ttk import Combobox
+
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, RadioField
 from wtforms.validators import DataRequired, Length, Email, ValidationError, EqualTo
-from models import TypeEtab
+from app.models import TypeEtab
 
 from app.models import Utilisateur
 
