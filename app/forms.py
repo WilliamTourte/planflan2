@@ -1,6 +1,9 @@
+from tkinter.ttk import Combobox
+
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, RadioField
 from wtforms.validators import DataRequired, Length, Email, ValidationError, EqualTo
+from models import TypeEtab
 
 from app.models import Utilisateur
 
@@ -20,8 +23,8 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('Ce pseudo est déjà pris. Veuillez en choisir un autre.')
 
     def validate_email(self, email):
-        user = Utilisateur.query.filter_by(email=email.data).first()
-        if user:
+        email = Utilisateur.query.filter_by(email=email.data).first()
+        if email:
             raise ValidationError('Cet email est déjà utilisé. Veuillez en choisir un autre.')
 
 # Formulaire pour se connecter
@@ -31,7 +34,26 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Se connecter')
 
 # Formulaire pour proposer un nouvel établissement
+class EtabForm(FlaskForm):
+    type_etab = SelectField("Type d'établissement", choices=TypeEtab, validators=[DataRequired()]  )
+    nom = StringField('Nom', validators=[DataRequired(), Length(min=3, max=50)])
+    adresse = StringField('Adresse', validators=[DataRequired(), Length(min=3, max=50)])
+    code_postal = StringField('Code Postal', validators=[DataRequired(), Length(min=5, max=5)])
+    ville = StringField('Ville', validators=[DataRequired(), Length(min=3, max=50)])
+
+    description = StringField('Description', validators=[ Length(min=3, max=255)]) #Vérifier si obligatoire dans base de données
+    label = RadioField('Labellisé', choices=[('Oui','Labellisé par la Flanterie'),('Non','Non labellisé')])
+    visite = RadioField('Visité', choices=[('Oui','Visité par la Flanterie'),('Non','Non visité')])
+    submit = SubmitField('Proposer un établissement')
+
 
 # Formulaire pour proposer un flan
 
 # Formulaire pour évaluer un flan
+class EvalForm(FlaskForm):
+    visuel = SelectField("Visuel", choices=[(0.5,0.5), (1,1),(1.5,1.5),(2,2),(2.5,2.5),(3,3),(3.5,3.5),(4,4),(4.5,4.5),(5,5)], validators=[DataRequired()] )
+    texture =SelectField("Texture", choices=[(0.5,0.5), (1,1),(1.5,1.5),(2,2),(2.5,2.5),(3,3),(3.5,3.5),(4,4),(4.5,4.5),(5,5)], validators=[DataRequired()] )
+    pate = SelectField("Pâte", choices=[(0.5,0.5), (1,1),(1.5,1.5),(2,2),(2.5,2.5),(3,3),(3.5,3.5),(4,4),(4.5,4.5),(5,5)], validators=[DataRequired()] )
+    gout = SelectField("Goût", choices=[(0.5,0.5), (1,1),(1.5,1.5),(2,2),(2.5,2.5),(3,3),(3.5,3.5),(4,4),(4.5,4.5),(5,5)], validators=[DataRequired()] )
+    description = StringField('Description', validators=[Length(min=3, max=255)]) #Vérifier si obligatoire dans base de données
+

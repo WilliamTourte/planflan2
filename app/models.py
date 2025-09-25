@@ -31,8 +31,9 @@ def load_user(user_id): # Prend un user_id pour charger un utilisateur
 
 class TypeEtab(Enum):
     BOULANGERIE = 'Boulangerie'
+    PATISSERIE = "Pâtisserie"
     RESTAURANT = 'Restaurant'
-    CAFE = 'Café'
+    CAFE = "Coffee Shop"
 
 class Etablissement(db.Model):
     __tablename__ = 'etablissements'
