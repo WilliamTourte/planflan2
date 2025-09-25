@@ -4,12 +4,12 @@ from app import login_manager, bcrypt, db # importe la base de données
 from flask_login import UserMixin
 
 
-class Utilisateur(db.Model):
+class Utilisateur(db.Model, UserMixin):
     __tablename__ = 'utilisateurs'
     id_user = db.Column(db.Integer, primary_key=True)
-    pseudo = db.Column(db.String(50), nullable=False)
+    pseudo = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=False)
     is_admin = db.Column(db.Boolean, nullable=True, default=False)
     # Relation avec les évaluations
     evaluations = db.relationship('Evaluation', back_populates='user')

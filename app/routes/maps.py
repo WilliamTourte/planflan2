@@ -1,5 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for
-
+from flask import Blueprint, render_template
 
 maps_bp = Blueprint('maps', __name__)
 

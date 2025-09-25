@@ -29,3 +29,8 @@ def afficher_flan_unique(id_flan):
     flan_unique = Flan.query.get_or_404(id_flan) # Récupère le flan par son ID ou 404 si l'id n'existe pas
     return render_template('flan.html', flan=flan_unique)  # Passe le flan au template
 
+@main_bp.route('/flan/<int:id_flan>/evaluer')
+@login_required
+def evaluer_flan(id_flan):
+    flan_unique = Flan.query.get_or_404(id_flan)  # Récupère le flan par son ID ou 404 si l'id n'existe pas
+    return render_template('evaluer.html', flan=flan_unique)
