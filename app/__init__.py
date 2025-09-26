@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from app.config import Config
+from app.outils import enlever_accents
 
 # Initialisation des extensions (une seule fois)
 db = SQLAlchemy() # Doit être la SEULE instance de SQLAlchemy
@@ -27,6 +28,10 @@ def create_app():
     def load_user(user_id):
         from app.models import Utilisateur
         return Utilisateur.query.get(int(user_id))
+
+    @app.template_filter('enlever_accents') # filtre Jinja2 pour enlever les accents
+    def filtre_enlever_accents(text):
+        return enlever_accents(text)
 
     bcrypt.init_app(app)
 

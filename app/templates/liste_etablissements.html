@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="container">
-    <h1>Les etablissements</h1>
+    <h1>{{ "Les établissements" | enlever_accents }}</h1>
 
     <div class="etablissements-grid">
         {% for etablissement in etablissements %}
@@ -16,7 +16,7 @@
 
             <div class="card-content">
                 <div class="card-header">
-                    <h2>{{ etablissement.nom }}</h2>
+                    <h2>{{ etablissement.nom  | enlever_accents }}</h2>
                     {% if etablissement.label %}
                         <span class="badge">⭐ Labellisé </span>
                     {% endif %}
