@@ -6,6 +6,13 @@
     <p>{{ flan.description or "Un délicieux flan maison" }}</p>
     <p>Prix : {{ "%.2f"|format(flan.prix) }} €</p>
 
+    <!-- Bouton pour revenir au flan -->
+    <div class="back-to-flan">
+        <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}" class="btn-flan">
+            ← Retour au flan : {{ flan.nom }}
+        </a>
+    </div>
+
     <h1>Évaluez ce flan</h1>
     <form method="POST" action="{{ url_for('main.evaluer_flan', id_flan=flan.id_flan) }}">
         {{ form.hidden_tag() }}  <!-- Champ CSRF obligatoire -->
