@@ -18,6 +18,7 @@
                 <div class="d-grid gap-2">
                     {{ form.submit(class="btn btn-primary") }}
                 </div>
+                 {{ form.next() }}  <!-- Affiche le champ caché 'next' / optionnel si déjà hidden tag -->
                 <div class="mt-3 text-center">
                     <p>Pas encore de compte ? <a href="{{ url_for('auth.register') }}">S'inscrire</a></p>
                 </div>

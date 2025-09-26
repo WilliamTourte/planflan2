@@ -19,9 +19,9 @@
                 Évaluer ce flan
             </a>
         {% else %}
-            <a href="{{ url_for('auth.login', next=url_for('main.evaluer_flan', id_flan=flan.id_flan)) }}" class="btn-evaluate"> <!-- next=url_for pour bien continuer sur l'évaluation du flan demandé -->
-                Évaluer ce flan (connectez-vous)
-            </a>
+            <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-evaluate">
+    Évaluer ce flan (connectez-vous)
+</a>
         {% endif %}
     </div>
 
