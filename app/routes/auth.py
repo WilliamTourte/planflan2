@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash
+from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required
 from flask_bcrypt import check_password_hash, generate_password_hash
 
@@ -38,7 +38,14 @@ def login():
         user = Utilisateur.query.filter_by(pseudo=form.pseudo.data).first()
         if user and check_password_hash(user.password, form.password.data):
             login_user(user)
-            return redirect(url_for('main.dashboard'))
+            # Redirige vers la page stockée dans 'next', ou vers une page par défaut
+            next_page = request.args.get('next', url_for('main.index'))
+            print("Redirection vers :", next_page)  # Vérifie dans la console serveur
+
+
+
+            return redirect(next_page)
+
         flash('Pseudo ou mot de passe incorrect.', 'danger')
     return render_template('login.html', form=form)
 

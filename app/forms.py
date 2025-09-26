@@ -1,7 +1,7 @@
 
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, RadioField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, RadioField, HiddenField
 from wtforms.validators import DataRequired, Length, Email, ValidationError, EqualTo
 from app.models import TypeEtab
 
@@ -31,6 +31,7 @@ class RegistrationForm(FlaskForm):
 class LoginForm(FlaskForm):
     pseudo = StringField('Pseudo', validators=[DataRequired(), Length(min=4, max=50)])
     password = PasswordField('Mot de passe', validators=[DataRequired(), Length(min=6)])
+    next = HiddenField()  # Champ caché pour stocker l'URL de redirection
     submit = SubmitField('Se connecter')
 
 # Formulaire pour proposer un nouvel établissement
