@@ -7,7 +7,7 @@
 
     <!-- Bouton pour revenir à l'établissement -->
     <div class="back-to-etablissement">
-        <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=flan.etablissement.id_etab) }}" class="btn-etablissement">
+        <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=flan.etablissement.id_etab) }}" class="btn-back">
             ← Retour à l'établissement : {{ flan.etablissement.nom }}
         </a>
     </div>
