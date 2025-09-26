@@ -1,44 +1,45 @@
+/* Déclaration de la police personnalisée */
+@font-face {
+    font-family: 'Bubblegum';
+    src: url('/static/fonts/Bubblegum.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
 /* Reset basique et styles globaux */
 body {
     font-family: 'Arial', sans-serif;
     line-height: 1.6;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f9;
+    background-color: #799dcb;
     color: #333;
 }
-
 .container {
     width: 90%;
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
 }
-
 header {
-    background-color: #6200ea;
+    background-color: #799dcb;
     color: white;
     padding: 1rem;
     text-align: center;
 }
-
 nav {
-    background-color: #7e57c2;
+    background-color: orange;
     padding: 0.5rem;
 }
-
 nav a {
     color: white;
     text-decoration: none;
     margin: 0 10px;
 }
-
 main {
     padding: 20px 0;
 }
-
 footer {
-    background-color: #6200ea;
+    background-color: #799dcb;
     color: white;
     text-align: center;
     padding: 1rem;
@@ -46,10 +47,9 @@ footer {
     bottom: 0;
     width: 100%;
 }
-
 .btn {
     display: inline-block;
-    background-color: #6200ea;
+    background-color: #799dcb;
     color: white;
     padding: 10px 20px;
     text-decoration: none;
@@ -57,45 +57,37 @@ footer {
     border: none;
     cursor: pointer;
 }
-
 .btn:hover {
-    background-color: #7e57c2;
+    background-color: #799dcb;
 }
-
 form {
     background: white;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
-
 .form-group {
     margin-bottom: 1rem;
 }
-
 .form-group label {
     display: block;
     margin-bottom: 5px;
 }
-
 .form-group input {
     width: 100%;
     padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
 }
-
 .flash-message {
     padding: 10px;
     margin: 10px 0;
     border-radius: 4px;
 }
-
 .flash-message.success {
     background-color: #4caf50;
     color: white;
 }
-
 .flash-message.danger {
     background-color: #f44336;
     color: white;
@@ -107,21 +99,21 @@ body {
     color: #333;
     margin: 0;
     padding: 0;
-    background-color: #f8f9fa;
+    background-color: #799dcb;
 }
-
 .container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
 }
-
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Bubblegum', cursive !important;
+    color: white; /* Couleur par défaut pour les titres sur fond bleu */
+}
 h1 {
-    color: #2c3e50;
     text-align: center;
     margin-bottom: 30px;
 }
-
 /* ===== Grille des établissements ===== */
 .etablissements-grid {
     display: grid;
@@ -129,7 +121,6 @@ h1 {
     gap: 25px;
     margin-top: 20px;
 }
-
 /* ===== Cartes cliquables ===== */
 .etablissement-card {
     text-decoration: none;
@@ -142,19 +133,16 @@ h1 {
     display: block;
     height: 100%;
 }
-
 .etablissement-card:hover {
     transform: translateY(-7px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
     color: inherit;
 }
-
 .card-image {
     width: 100%;
     height: 180px;
     object-fit: cover;
 }
-
 .card-image.placeholder {
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     display: flex;
@@ -163,54 +151,46 @@ h1 {
     color: #7f8c8d;
     font-style: italic;
 }
-
 .card-content {
     padding: 20px;
     position: relative;
     min-height: 160px;
 }
-
 .card-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 10px;
 }
-
 .etablissement-card h2 {
     margin: 0 0 8px 0;
-    color: #2c3e50;
     font-size: 1.3rem;
+    color: #333 !important; /* Noir pour les noms des établissements */
 }
-
 .type {
     color: #7f8c8d;
     font-style: italic;
     font-size: 0.9rem;
     margin: 5px 0;
 }
-
 .adresse {
     color: #34495e;
     font-size: 0.9rem;
     margin: 10px 0;
     line-height: 1.4;
 }
-
 .description {
     color: #555;
     font-size: 0.9rem;
     line-height: 1.4;
     margin: 10px 0;
 }
-
 .flans-count {
     color: #e74c3c;
     font-weight: bold;
     font-size: 0.9rem;
     margin: 10px 0;
 }
-
 .arrow {
     position: absolute;
     bottom: 20px;
@@ -219,11 +199,9 @@ h1 {
     color: #3498db;
     transition: all 0.2s;
 }
-
 .etablissement-card:hover .arrow {
     transform: translateX(5px);
 }
-
 /* ===== Badge "Label La Flanterie" ===== */
 .badge {
     background: #f39c12;
@@ -234,7 +212,6 @@ h1 {
     font-weight: bold;
     margin-left: 10px;
 }
-
 /* ===== Filtres ===== */
 .filters {
     display: flex;
@@ -243,7 +220,6 @@ h1 {
     margin: 25px 0;
     flex-wrap: wrap;
 }
-
 .filter-btn {
     padding: 8px 18px;
     background: #ecf0f1;
@@ -253,16 +229,13 @@ h1 {
     transition: all 0.2s;
     font-weight: 500;
 }
-
 .filter-btn:hover {
     background: #d6eaf8;
 }
-
 .filter-btn.active {
     background: #3498db;
     color: white;
 }
-
 /* ===== Message "Aucun résultat" ===== */
 .no-results {
     grid-column: 1 / -1;
@@ -272,12 +245,10 @@ h1 {
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
-
 .no-results p {
     margin-bottom: 15px;
     color: #7f8c8d;
 }
-
 .btn {
     display: inline-block;
     padding: 8px 16px;
@@ -287,43 +258,35 @@ h1 {
     text-decoration: none;
     transition: background 0.2s;
 }
-
 .btn:hover {
     background: #2980b9;
 }
-
 /* ===== Animation ===== */
 @keyframes pulse {
     0% { transform: scale(1); }
     50% { transform: scale(1.02); }
     100% { transform: scale(1); }
 }
-
 .etablissement-card:hover {
     animation: pulse 0.3s ease;
 }
-
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
     .etablissements-grid {
         grid-template-columns: 1fr;
         gap: 20px;
     }
-
     .card-content {
         min-height: auto;
     }
 }
-
 @media (max-width: 480px) {
     .container {
         padding: 10px;
     }
-
     .etablissement-card {
         border-radius: 8px;
     }
-
     .card-content {
         padding: 15px;
     }
@@ -337,12 +300,10 @@ h1 {
     margin-bottom: 30px;
     text-align: center;
 }
-
 .etablissement-header h1 {
     margin: 0 0 10px 0;
-    color: #2c3e50;
+    color: #333 !important; /* Noir pour le titre de l'en-tête de l'établissement */
 }
-
 .type-badge {
     display: inline-block;
     background: #e74c3c;
@@ -352,24 +313,20 @@ h1 {
     font-size: 0.9rem;
     margin-bottom: 15px;
 }
-
 .etablissement-info {
     text-align: left;
     max-width: 600px;
     margin: 0 auto;
 }
-
 .etablissement-info p {
     margin: 8px 0;
 }
-
 .section-title {
     color: #2c3e50;
     margin: 30px 0 20px 0;
     text-align: center;
     position: relative;
 }
-
 .section-title:after {
     content: "";
     display: block;
@@ -378,7 +335,6 @@ h1 {
     background: #3498db;
     margin: 10px auto;
 }
-
 /* ===== Grille des flans ===== */
 .flans-grid {
     display: grid;
@@ -386,7 +342,6 @@ h1 {
     gap: 25px;
     margin-bottom: 30px;
 }
-
 .flan-card {
     background: white;
     border-radius: 10px;
@@ -394,37 +349,31 @@ h1 {
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
 }
-
 .flan-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
 }
-
 .flan-card .card-content {
     padding: 20px;
     min-height: 150px;
     display: flex;
     flex-direction: column;
 }
-
 .flan-card h3 {
     margin: 0 0 10px 0;
-    color: #e74c3c;
     font-size: 1.2rem;
+    color: black !important; /* Noir pour les titres des évaluations/flans */
 }
-
 .flan-description {
     color: #555;
     flex-grow: 1;
     margin: 10px 0;
     line-height: 1.5;
 }
-
 .flan-actions {
     margin-top: auto;
     text-align: right;
 }
-
 .btn-details {
     display: inline-block;
     padding: 8px 15px;
@@ -435,7 +384,6 @@ h1 {
     font-weight: bold;
     transition: background 0.2s;
 }
-
 .btn-details:hover {
     background: #2980b9;
 }
@@ -448,34 +396,33 @@ h1 {
     margin-bottom: 15px;
     background-color: #f9f9f9;
 }
-
 .evaluation-left {
     flex: 2;
     padding-right: 15px;
 }
-
+.evaluation-left h3 {
+    color: #333 !important; /* Noir pour "Évaluation par [pseudo]" */
+    font-family: 'Bubblegum', cursive !important;
+    margin-top: 0;
+}
 .evaluation-right {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
 }
-
 .evaluation-notes p {
     margin: 5px 0;
 }
-
 .evaluation-moyenne {
     font-size: 1.2em;
     margin: 10px 0;
 }
-
 .evaluation-photo {
     max-width: 100%;
     max-height: 200px;
     border-radius: 4px;
 }
-
 
 /* ===== Bouton retour ===== */
 .btn-back {
@@ -488,17 +435,14 @@ h1 {
     transition: background 0.2s;
     margin-top: 20px;
 }
-
 .btn-back:hover {
     background: #6c7a7d;
 }
-
 /* ===== Responsive ===== */
 @media (max-width: 768px) {
     .flans-grid {
         grid-template-columns: 1fr;
     }
-
     .flan-card .card-content {
         min-height: auto;
     }
