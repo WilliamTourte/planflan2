@@ -69,9 +69,9 @@ class Flan(db.Model):
 
 
 class StatutEval(Enum):
-    EN_ATTENTE = 'En attente'
-    VALIDE = 'Validé'
-    SUPPRIME = 'Supprimé'
+    EN_ATTENTE = 'EN_ATTENTE'
+    VALIDE = 'VALIDE'
+    SUPPRIME = 'SUPPRIME'
 
 class Evaluation(db.Model):
     __tablename__ = 'evaluations'
@@ -84,7 +84,7 @@ class Evaluation(db.Model):
     gout = db.Column(db.Numeric(2, 1), nullable=False)
     description = db.Column(db.Text, nullable=True)
     photo = db.Column(db.String(255), nullable=True)
-    statut = db.Column(db.Enum(StatutEval), nullable=False, default=StatutEval.EN_ATTENTE)
+    statut = db.Column(db.Enum(StatutEval), nullable=False, server_default='EN_ATTENTE')
     date_creation = db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
     moyenne = db.Column(db.Numeric(2, 1), nullable=True)
 

@@ -29,6 +29,9 @@ def afficher_etablissement_unique(id_etab):
 @main_bp.route('/flan/<int:id_flan>')
 def afficher_flan_unique(id_flan):
     flan_unique = Flan.query.get_or_404(id_flan) # Récupère le flan par son ID ou 404 si l'id n'existe pas
+    evaluations = flan_unique.evaluations # Pour que les évaluations soient transmises
+    for eval in evaluations:
+        print(f"ID: {eval.id_eval}, Statut: {eval.statut}")
     return render_template('flan.html', flan=flan_unique)  # Passe le flan au template
 
 @main_bp.route('/flan/<int:id_flan>/evaluer', methods=['GET', 'POST'])

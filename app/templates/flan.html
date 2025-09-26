@@ -12,7 +12,7 @@
     </a>
 </div>
     <div class="evaluations-section">
-        {% for evaluation in flan.evaluations if evaluation.statut.value == 'Validé' %}
+        {% for evaluation in flan.evaluations if evaluation.statut.value == "VALIDE" %}
         <div class="evaluation-card">
             <div class="evaluation-left">
                 <h3>Évaluation par {{ evaluation.user.pseudo }}</h3>
