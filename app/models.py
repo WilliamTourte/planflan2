@@ -68,7 +68,7 @@ class Flan(db.Model):
     etablissement = db.relationship('Etablissement', back_populates='flans')
 
 
-class StatutEval(Enum):
+class StatutEval(Enum): # Avantage de Enum : vérification des valeurs
     EN_ATTENTE = 'EN_ATTENTE'
     VALIDE = 'VALIDE'
     SUPPRIME = 'SUPPRIME'

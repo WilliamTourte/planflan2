@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for
+from flask import Blueprint, render_template, redirect, url_for, request
 from flask_login import login_required, current_user
 from app.forms import EvalForm, EtabForm
 from app.models import Etablissement, Flan, Evaluation, Utilisateur
@@ -32,7 +32,7 @@ def afficher_flan_unique(id_flan):
     evaluations = flan_unique.evaluations # Pour que les évaluations soient transmises
     for eval in evaluations:
         print(f"ID: {eval.id_eval}, Statut: {eval.statut}")
-    return render_template('flan.html', flan=flan_unique)  # Passe le flan au template
+    return render_template('flan.html', flan=flan_unique, request=request) # request pour se souvenir du endpoint  # Passe le flan au template
 
 @main_bp.route('/flan/<int:id_flan>/evaluer', methods=['GET', 'POST'])
 @login_required

@@ -1,16 +1,30 @@
 {% extends "base.html" %}
-
 {% block content %}
 <div class="flan-detail-container">
     <h1>{{ flan.nom }}</h1>
     <p>{{ flan.description or "Un délicieux flan maison" }}</p>
     <p>Prix : {{ "%.2f"|format(flan.prix) }} €</p>
-<!-- Bouton pour revenir à l'établissement -->
-<div class="back-to-etablissement">
-    <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=flan.etablissement.id_etab) }}" class="btn-etablissement">
-        ← Retour à l'établissement : {{ flan.etablissement.nom }}
-    </a>
-</div>
+
+    <!-- Bouton pour revenir à l'établissement -->
+    <div class="back-to-etablissement">
+        <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=flan.etablissement.id_etab) }}" class="btn-etablissement">
+            ← Retour à l'établissement : {{ flan.etablissement.nom }}
+        </a>
+    </div>
+
+    <!-- Bouton pour évaluer le flan -->
+    <div class="evaluate-flan">
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('main.evaluer_flan', id_flan=flan.id_flan) }}" class="btn-evaluate">
+                Évaluer ce flan
+            </a>
+        {% else %}
+            <a href="{{ url_for('auth.login', next=request.url) }}" class="btn-evaluate">
+                Évaluer ce flan (connectez-vous)
+            </a>
+        {% endif %}
+    </div>
+
     <div class="evaluations-section">
         {% for evaluation in flan.evaluations if evaluation.statut.value == "VALIDE" %}
         <div class="evaluation-card">
@@ -42,4 +56,24 @@
         {% endfor %}
     </div>
 </div>
+
+<!-- Style CSS pour le bouton -->
+<style>
+    .btn-evaluate {
+        display: inline-block;
+        padding: 10px 15px;
+        background-color: #4CAF50;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        font-weight: bold;
+    }
+    .btn-evaluate:hover {
+        background-color: #45a049;
+    }
+    .evaluate-flan {
+        margin: 20px 0;
+    }
+</style>
 {% endblock %}
