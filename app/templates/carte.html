@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Carte des Flans</title>
+    <style>
+        #map { height: 600px; width: 100%; }
+    </style>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8lo7V-ciL8oVwYXUiW00gb6O1_1K-JQ8&callback=initMap" async defer></script>
+    <script>
+        let map;
+        let markers = [];
+
+        function initMap() {
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: { lat: 48.8566, lng: 2.3522 }, // Paris par défaut
+                zoom: 12,
+            });
+            // Charger les lieux depuis Flask
+            fetch('/api/lieux')
+                .then(response => response.json())
+                .then(lieux => {
+                    lieux.forEach(lieu => {
+                        const marker = new google.maps.Marker({
+                            position: { lat: lieu.latitude, lng: lieu.longitude },
+                            map: map,
+                            title: lieu.nom,
+                        });
+                        markers.push(marker);
+                    });
+                });
+        }
+    </script>
+</head>
+<body>
+    <h1>Carte des établissements</h1>
+    <div id="map"></div>
+</body>
+</html>

@@ -3,7 +3,7 @@ from flask_login import login_user, logout_user, login_required
 from flask_bcrypt import check_password_hash, generate_password_hash
 
 
-from app import db
+from app import db, bcrypt
 from app.models import Utilisateur
 from app.forms import LoginForm, RegistrationForm
 
@@ -44,7 +44,7 @@ def login():
             login_user(user)
             # Redirige vers la page stockée dans 'next', ou vers une page par défaut
             next_page = form.next.data or request.args.get('next', url_for('main.index'))
-            print("Redirection vers :", next_page)  # Vérifie dans la console serveur
+
 
 
 
