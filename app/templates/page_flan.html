@@ -15,11 +15,11 @@
     <!-- Bouton pour évaluer le flan -->
     <div class="evaluate-flan">
         {% if current_user.is_authenticated %}
-            <a href="{{ url_for('main.evaluer_flan', id_flan=flan.id_flan) }}" class="btn-evaluate">
+            <a href="{{ url_for('main.evaluer_flan', id_flan=flan.id_flan) }}" class="btn-proposer">
                 Évaluer ce flan
             </a>
         {% else %}
-            <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-evaluate">
+            <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
     Évaluer ce flan (connectez-vous)
 </a>
         {% endif %}
@@ -57,23 +57,4 @@
     </div>
 </div>
 
-<!-- Style CSS pour le bouton -->
-<style>
-    .btn-evaluate {
-        display: inline-block;
-        padding: 10px 15px;
-        background-color: #4CAF50;
-        color: white;
-        text-decoration: none;
-        border-radius: 5px;
-        margin-bottom: 20px;
-        font-weight: bold;
-    }
-    .btn-evaluate:hover {
-        background-color: #45a049;
-    }
-    .evaluate-flan {
-        margin: 20px 0;
-    }
-</style>
 {% endblock %}

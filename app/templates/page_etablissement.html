@@ -50,41 +50,48 @@
             <p>Aucun flan proposé pour cet établissement.</p>
         </div>
     {% endif %}
-<!-- Bouton pour ajouter un flan (toujours visible) -->
-<div class="ajouter-flan-section">
-    {% if current_user.is_authenticated %}
-        <!-- Si connecté : affiche le formulaire -->
+
+    <!-- Section pour ajouter un flan -->
+    <div class="ajouter-flan-section">
         <h3>Ajouter un flan</h3>
-        <!-- Formulaire d'ajout de flan (simplifié) -->
-        <form method="POST">
-            {{ form.hidden_tag() }}  <!-- Champ caché pour id_etab -->
-            <div class="form-group">
-                {{ form.nom.label }} {{ form.nom(class="form-control") }}
-                {% if form.nom.errors %}<div class="error">{{ form.nom.errors[0] }}</div>{% endif %}
-            </div>
-            <div class="form-group">
-                {{ form.description.label }} {{ form.description(class="form-control") }}
-                {% if form.description.errors %}<div class="error">{{ form.description.errors[0] }}</div>{% endif %}
-            </div>
-            <div class="form-group">
-                {{ form.prix.label }} {{ form.prix(class="form-control") }}
-                {% if form.prix.errors %}<div class="error">{{ form.prix.errors[0] }}</div>{% endif %}
-            </div>
-            <div class="form-group">
-                {{ form.submit(class="btn btn-submit") }}
-            </div>
-        </form>
+        {% if current_user.is_authenticated %}
+            <!-- Formulaire d'ajout de flan -->
+            <form method="POST" class="form-container">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {{ form.nom.label(class="form-label") }}
+                    {{ form.nom(class="form-control") }}
+                    {% if form.nom.errors %}
+                        <div class="error-message">{{ form.nom.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.description.label(class="form-label") }}
+                    {{ form.description(class="form-control") }}
+                    {% if form.description.errors %}
+                        <div class="error-message">{{ form.description.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.prix.label(class="form-label") }}
+                    {{ form.prix(class="form-control") }}
+                    {% if form.prix.errors %}
+                        <div class="error-message">{{ form.prix.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.submit(class="btn btn-proposer") }}
+                </div>
+            </form>
+        {% else %}
+            <!-- Bouton de connexion -->
+            <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
+                Ajouter un flan (connectez-vous)
+            </a>
+        {% endif %}
+    </div>
 
-    {% else %}
-        <!-- Si non connecté : bouton vers la page de connexion -->
-        <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-ajouter">
-            Ajouter un flan (connectez-vous)
-        </a>
-    {% endif %}
-</div>
-
-
-
+    <!-- Bouton retour -->
     <a href="{{ url_for('main.afficher_etablissements') }}" class="btn-back">← Retour à la liste</a>
 </div>
 {% endblock %}
