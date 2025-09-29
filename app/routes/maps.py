@@ -36,7 +36,3 @@ def ajouter_etablissement():
     db.session.add(nouvel_etablissement)
     db.session.commit()
     flash('Nouvel établissement ajouté', 'success')
-
-@maps_bp.route('/test-carte')
-def test_carte():
-    return render_template('test_carte.html', google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])

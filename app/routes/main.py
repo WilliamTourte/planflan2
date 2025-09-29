@@ -24,7 +24,8 @@ def afficher_etablissements():
 @main_bp.route('/etablissement/<int:id_etab>', methods=['GET', 'POST'])
 def afficher_etablissement_unique(id_etab):
     etablissement = Etablissement.query.get_or_404(id_etab)
-    form = NewFlanForm()  # Instancie un formulaire vide
+
+    form = NewFlanForm()  # Instancie un formulaire si on veut proposer un nouveau flan
     form.id_etab.data = id_etab  # Remplit le champ caché
 
     if form.validate_on_submit():  # Si le formulaire est soumis et valide
@@ -42,14 +43,7 @@ def afficher_flan_unique(id_flan):
         print(f"ID: {eval.id_eval}, Statut: {eval.statut}")
     return render_template('page_flan.html', flan=flan_unique, request=request) # request pour se souvenir du endpoint  # Passe le flan au template
 
-@main_bp.route('/etablissement/<int:id_etab>/proposer-flan', methods=['GET', 'POST'])
-def proposer_flan(id_etab):
-    form = NewFlanForm()
-    form.id_etab.data = id_etab  # Remplit le champ caché avec l'id de l'établissement
-    if form.validate_on_submit():
-        # Traiter la soumission du formulaire avec form.id_etab.data
-        pass
-    return render_template('proposer_flan.html', form=form)
+
 
 
 
