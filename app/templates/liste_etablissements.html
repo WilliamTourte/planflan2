@@ -3,7 +3,6 @@
 <script>
     let map;
     let markers = [];
-
     window.initMap = function() {
         console.log("Initialisation de la carte...");
         const mapElement = document.getElementById("map");
@@ -13,13 +12,11 @@
                 "<p style='color: red;'>Erreur : Impossible de charger la carte.</p>";
             return;
         }
-
         map = new google.maps.Map(mapElement, {
             center: { lat: 48.8566, lng: 2.3522 },
             zoom: 12,
         });
         console.log("Carte initialisée avec succès !");
-
         const etablissements = {{ etablissements_json|tojson|safe }};
         etablissements.forEach(etablissement => {
             const marker = new google.maps.Marker({
@@ -27,26 +24,27 @@
                 map: map,
                 title: etablissement.nom,
             });
-
             const infowindow = new google.maps.InfoWindow({
                 content: `
                     <div class="infowindow">
                         <h3>${etablissement.nom}</h3>
                         <p>${etablissement.adresse}, ${etablissement.code_postal} ${etablissement.ville}</p>
-                        <a href="${etablissement.url}" target="_blank" tabindex="-1">Voir la fiche</a>
+                        <a href="${etablissement.url}" target="_blank" tabindex="-1" style="outline: none;">Voir la fiche</a>
                     </div>
                 `,
+                pixelOffset: new google.maps.Size(0, -30),
             });
-
             marker.addListener("click", () => {
-                infowindow.open(map, marker);
-                const card = document.querySelector(`.etablissement-card[data-id="${etablissement.id_etab}"]`);
-                if (card) card.scrollIntoView({ behavior: "smooth" });
+                setTimeout(() => {
+                    infowindow.open(map, marker);
+                    const card = document.querySelector(`.etablissement-card[data-id="${etablissement.id_etab}"]`);
+                    if (card && card.scrollIntoView) {
+                        card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+                    }
+                }, 50);
             });
-
             markers.push(marker);
         });
-
         // Interaction grille/carte
         document.querySelectorAll('.etablissement-card').forEach(card => {
             card.addEventListener('mouseenter', function() {
@@ -61,20 +59,11 @@
             });
         });
     };
-
-    window.onload = function() {
-        const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap&v=weekly`;
-        script.async = true;
-        script.loading = "async"; // Ajout pour supprimer l'avertissement
-        script.defer = true;
-        script.onerror = function() {
-            console.error("Échec du chargement de Google Maps");
-            document.getElementById("map-container").innerHTML =
-                "<p style='color: red;'>Erreur : Impossible de charger Google Maps.</p>";
-        };
-        document.head.appendChild(script);
-    };
+</script>
+<!-- Script Google Maps chargé directement avec loading="async" -->
+<script
+    src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap&v=weekly"
+    async defer loading="async">
 </script>
 <style>
     #map { height: 500px; width: 100%; background-color: #f5f5f5; }
@@ -85,7 +74,6 @@
     @media (max-width: 768px) { #map { height: 300px; } }
 </style>
 {% endblock %}
-
 {% block content %}
 <div class="container">
     <h1>{{ "Les établissements" | enlever_accents }}</h1>
@@ -129,7 +117,6 @@
     </div>
 </div>
 {% endblock %}
-
 {% block scripts %}
 <!-- Ce bloc peut rester vide -->
 {% endblock %}
