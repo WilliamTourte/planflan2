@@ -1,8 +1,9 @@
 
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, RadioField, HiddenField
-from wtforms.validators import DataRequired, Length, Email, ValidationError, EqualTo
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, RadioField, HiddenField, \
+    DecimalField
+from wtforms.validators import DataRequired, Length, Email, ValidationError, EqualTo, NumberRange
 from app.models import TypeEtab
 
 from app.models import Utilisateur
@@ -48,7 +49,15 @@ class EtabForm(FlaskForm):
     submit = SubmitField('Proposer un établissement')
 
 
-# Formulaire pour proposer un flan
+# Formulaire pour proposer un flan dans un établissement déjà ajouté
+class NewFlanForm(FlaskForm):
+    id_etab = HiddenField('ID Établissement')  # Champ caché pour l'id_etab
+    nom = StringField('Nom', validators=[DataRequired(), Length(min=3, max=50)])
+    description = StringField('Description', validators=[Length(min=3, max=255)])
+    prix = DecimalField('Prix', validators=[DataRequired(), NumberRange(0,20, "Le prix doit être compris entre 0 et 20€") ])
+
+    submit = SubmitField('Proposer un flan')
+
 
 # Formulaire pour évaluer un flan
 class EvalForm(FlaskForm):

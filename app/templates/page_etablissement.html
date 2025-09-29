@@ -20,42 +20,66 @@
     <h2 class="section-title">Les flans</h2>
     {% if etablissement.flans %}
         <div class="flans-grid">
-           {% for flan in etablissement.flans %}
-<div class="flan-card">
-    {% if flan.photos %}
-        <img src="{{ url_for('static', filename='uploads/' + flan.photos[0].path) }}" alt="{{ flan.nom }}" class="card-image">
-    {% else %}
-        <div class="card-image placeholder">
-            <span>Pas de photo</span>
-        </div>
-    {% endif %}
-    <div class="card-content">
-    <div class="flan-header">
-        <h3>{{ flan.nom }}</h3>
-        <!-- Affichage du prix -->
-        {% if flan.prix is not none %}
-            <span class="flan-price">{{ "%.2f"|format(flan.prix) }} €</span>
-        {% else %}
-            <span class="flan-price">Prix non renseigné</span>
-        {% endif %}
-    </div>
-    <p class="flan-description">{{ flan.description or "Un flan flantastique" }}</p>
-    <div class="flan-actions">
-        <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}" class="btn-details">Voir les détails</a>
-    </div>
-</div>
-
-</div>
-{% endfor %}
-
+            {% for flan in etablissement.flans %}
+            <div class="flan-card">
+                {% if flan.photos %}
+                    <img src="{{ url_for('static', filename='uploads/' + flan.photos[0].path) }}" alt="{{ flan.nom }}" class="card-image">
+                {% else %}
+                    <div class="card-image placeholder">
+                        <span>Pas de photo</span>
+                    </div>
+                {% endif %}
+                <div class="card-content">
+                    <div class="flan-header">
+                        <h3>{{ flan.nom }}</h3>
+                        {% if flan.prix is not none %}
+                            <span class="flan-price">{{ "%.2f"|format(flan.prix) }} €</span>
+                        {% else %}
+                            <span class="flan-price">Prix non renseigné</span>
+                        {% endif %}
+                    </div>
+                    <p class="flan-description">{{ flan.description or "Un flan flantastique" }}</p>
+                    <div class="flan-actions">
+                        <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}" class="btn-details">Voir les détails</a>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
     {% else %}
         <div class="no-results">
             <p>Aucun flan proposé pour cet établissement.</p>
-            {% if current_user.is_authenticated and current_user.type_user == 'admin' %}
-                <a href="{{ url_for('main.ajouter_flan', id_etab=etablissement.id_etab) }}" class="btn">Ajouter un flan</a>
-            {% endif %}
         </div>
+    {% endif %}
+
+    <!-- Formulaire d'ajout de flan (affiché en bas de page) -->
+    {% if current_user.is_authenticated or current_user.type_user == 'admin' %}
+    <div class="ajouter-flan-section">
+        <h3>Ajouter un flan</h3>
+        <form method="POST" action="{{ url_for('main.proposer_flan', id_etab=etablissement.id_etab) }}">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                {{ form.nom.label }} {{ form.nom(class="form-control") }}
+                {% if form.nom.errors %}
+                    <div class="error-message">{{ form.nom.errors[0] }}</div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.description.label }} {{ form.description(class="form-control") }}
+                {% if form.description.errors %}
+                    <div class="error-message">{{ form.description.errors[0] }}</div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.prix.label }} {{ form.prix(class="form-control") }}
+                {% if form.prix.errors %}
+                    <div class="error-message">{{ form.prix.errors[0] }}</div>
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.submit(class="btn btn-submit") }}
+            </div>
+        </form>
+    </div>
     {% endif %}
 
     <a href="{{ url_for('main.afficher_etablissements') }}" class="btn-back">← Retour à la liste</a>

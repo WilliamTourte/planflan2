@@ -5,7 +5,7 @@
 <script>
     let map;
     let markers = [];
-    window.initMap = function() {  // ✅ Utilise window.initMap pour le scope global
+    window.initMap = function() {  // ✅ Utilise window.initMap pour le scope global (??)
         // Initialisation de la carte centrée sur Paris
         map = new google.maps.Map(document.getElementById("map"), {
             center: { lat: 48.8566, lng: 2.3522 },

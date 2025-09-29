@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, request
 from flask_login import login_required, current_user
-from app.forms import EvalForm, EtabForm
+from app.forms import EvalForm, EtabForm, NewFlanForm
 from app.models import Etablissement, Flan, Evaluation, Utilisateur
 from app import db
 
@@ -21,10 +21,18 @@ def afficher_etablissements():
     etablissements = Etablissement.query.all() # Prend tous les établissements
     return render_template('liste_etablissements.html', etablissements=etablissements)
 
-@main_bp.route('/etablissement/<int:id_etab>')   # Capture l'ID dans l'URL
+@main_bp.route('/etablissement/<int:id_etab>', methods=['GET', 'POST'])
 def afficher_etablissement_unique(id_etab):
-    etab_unique = Etablissement.query.get_or_404(id_etab)  # Récupère l'établissement par son ID ou 404
-    return render_template('page_etablissement.html', etablissement=etab_unique)  # Passe l'établissement au template
+    etablissement = Etablissement.query.get_or_404(id_etab)
+    form = NewFlanForm()  # Instancie un formulaire vide
+    form.id_etab.data = id_etab  # Remplit le champ caché
+
+    if form.validate_on_submit():  # Si le formulaire est soumis et valide
+        # Traiter les données ici
+        pass
+
+    # Passe toujours le formulaire au template, même en GET
+    return render_template('page_etablissement.html', etablissement=etablissement, form=form)
 
 @main_bp.route('/flan/<int:id_flan>')
 def afficher_flan_unique(id_flan):
@@ -32,7 +40,18 @@ def afficher_flan_unique(id_flan):
     evaluations = flan_unique.evaluations # Pour que les évaluations soient transmises
     for eval in evaluations:
         print(f"ID: {eval.id_eval}, Statut: {eval.statut}")
-    return render_template('flan.html', flan=flan_unique, request=request) # request pour se souvenir du endpoint  # Passe le flan au template
+    return render_template('page_flan.html', flan=flan_unique, request=request) # request pour se souvenir du endpoint  # Passe le flan au template
+
+@main_bp.route('/etablissement/<int:id_etab>/proposer-flan', methods=['GET', 'POST'])
+def proposer_flan(id_etab):
+    form = NewFlanForm()
+    form.id_etab.data = id_etab  # Remplit le champ caché avec l'id de l'établissement
+    if form.validate_on_submit():
+        # Traiter la soumission du formulaire avec form.id_etab.data
+        pass
+    return render_template('proposer_flan.html', form=form)
+
+
 
 @main_bp.route('/flan/<int:id_flan>/evaluer', methods=['GET', 'POST'])
 @login_required
