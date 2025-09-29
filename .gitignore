@@ -1,0 +1,36 @@
+# Environnement virtuel Python
+.venv/
+venv/
+
+# Variables d'environnement
+.env
+
+# Cache Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Fichiers de base de données locales (si tu en as)
+*.db
+*.sqlite
+
+# Fichiers de configuration IDE (PyCharm)
+.idea/
+
+# Fichiers système Windows
+Thumbs.db
+Desktop.ini
+
+# Fichiers de log et cache
+*.log
+*.swp
+.DS_Store
+
+# Dossier de migrations (si tu utilises Flask-Migrate)
+migrations/
+
+# Fichiers de build/distribution
+dist/
+build/
+*.egg-info/
