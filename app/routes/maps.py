@@ -1,6 +1,6 @@
 
 
-from flask import Blueprint, render_template, jsonify, request, flash, current_app
+from flask import Blueprint, render_template, jsonify, request, flash, current_app, url_for
 
 from app import db
 from app.models import Etablissement
@@ -9,15 +9,23 @@ maps_bp = Blueprint('maps', __name__, template_folder='../templates')
 
 @maps_bp.route('/carte')
 def afficher_carte():
+    # Vérifie que la clé est bien dans app.config
+    print("Clé dans config:", current_app.config['GOOGLE_MAPS_API_KEY'])  # ✅ Debug
     return render_template('carte.html', google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
 
 @maps_bp.route('/api/etablissements')
 def get_etablissements():
     etablissements = Etablissement.query.all()
     return jsonify([{
+        'id': etablissement.id_etab,
         'nom': etablissement.nom,
+        'adresse': etablissement.adresse,
+        'ville': etablissement.ville,
+        'postal_code': etablissement.code_postal,
         'latitude': float(etablissement.latitude),
         'longitude': float(etablissement.longitude),
+        'url': url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab)  #
+
     } for etablissement in etablissements])
 
 @maps_bp.route('/api/ajouter_etablissement', methods=['POST'])
@@ -28,3 +36,7 @@ def ajouter_etablissement():
     db.session.add(nouvel_etablissement)
     db.session.commit()
     flash('Nouvel établissement ajouté', 'success')
+
+@maps_bp.route('/test-carte')
+def test_carte():
+    return render_template('test_carte.html', google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])

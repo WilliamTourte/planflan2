@@ -1,38 +1,72 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Carte des Flans</title>
-    <style>
-        #map { height: 600px; width: 100%; }
-    </style>
-    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA8lo7V-ciL8oVwYXUiW00gb6O1_1K-JQ8&callback=initMap" async defer></script>
-    <script>
-        let map;
-        let markers = [];
+{% extends "base.html" %}
 
-        function initMap() {
-            map = new google.maps.Map(document.getElementById("map"), {
-                center: { lat: 48.8566, lng: 2.3522 }, // Paris par défaut
-                zoom: 12,
-            });
-            // Charger les lieux depuis Flask
-            fetch('/api/lieux')
-                .then(response => response.json())
-                .then(lieux => {
-                    lieux.forEach(lieu => {
-                        const marker = new google.maps.Marker({
-                            position: { lat: lieu.latitude, lng: lieu.longitude },
-                            map: map,
-                            title: lieu.nom,
-                        });
-                        markers.push(marker);
+{% block scripts_head %}
+<!-- Déclare initMap() dans le scope global AVANT de charger l'API -->
+<script>
+    let map;
+    let markers = [];
+    window.initMap = function() {  // ✅ Utilise window.initMap pour le scope global
+        // Initialisation de la carte centrée sur Paris
+        map = new google.maps.Map(document.getElementById("map"), {
+            center: { lat: 48.8566, lng: 2.3522 },
+            zoom: 12,
+        });
+        console.log("Carte initialisée !");
+
+        // Chargement des établissements
+        fetch('/api/etablissements')
+            .then(response => {
+                if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
+                return response.json();
+            })
+            .then(etablissements => {
+                console.log("Établissements chargés:", etablissements);
+                etablissements.forEach(etablissement => {
+                    const marker = new google.maps.Marker({
+                        position: { lat: etablissement.latitude, lng: etablissement.longitude },
+                        map: map,
+                        title: etablissement.nom,
                     });
+
+                    // Infobulle avec lien vers la page détaillée
+                    const infowindow = new google.maps.InfoWindow({
+                        content: `
+                            <div class="infowindow">
+                                <h3>${etablissement.nom}</h3>
+                                <p>${etablissement.adresse}, ${etablissement.postal_code} ${etablissement.ville}</p>
+                                <a href="${etablissement.url}" target="_blank">Voir la fiche</a>
+                            </div>
+                        `,
+                    });
+
+                    // Affichage de l'infobulle au clic
+                    marker.addListener("click", () => {
+                        infowindow.open(map, marker);
+                    });
+                    markers.push(marker);
                 });
-        }
-    </script>
-</head>
-<body>
-    <h1>Carte des établissements</h1>
-    <div id="map"></div>
-</body>
-</html>
+            })
+            .catch(error => {
+                console.error("Erreur lors du chargement des établissements:", error);
+                alert("Erreur lors du chargement de la carte. Voir la console pour plus de détails.");
+            });
+    };
+</script>
+<!-- Charge l'API APRES avoir déclaré initMap() -->
+<script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap" async defer></script>
+<style>
+    #map { height: 600px; width: 100%; }
+    .infowindow { font-family: Arial, sans-serif; }
+    .infowindow h3 { margin: 0 0 5px 0; color: #333; }
+    .infowindow a { color: #1a73e8; text-decoration: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+<h1>Carte des établissements</h1>
+<div id="map" style="height: 600px; width: 100%;"></div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Ce bloc peut rester vide ou contenir d'autres scripts -->
+{% endblock %}
