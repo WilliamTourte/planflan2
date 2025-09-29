@@ -71,20 +71,39 @@ h1 {
     color: white; /* Pour les titres sur fond bleu */
 }
 
-/* Boutons */
-.btn {
-    display: inline-block;
-    padding: 10px 20px;
+/* Boutons - Version standard */
+.btn, .btn-primary, .btn-success, .btn-info, .btn-back,
+.btn-details, .btn-proposer, .btn-evaluate, .btn-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 25px;
     text-decoration: none;
-    border-radius: 5px;
+    border-radius: 25px;
     border: none;
     cursor: pointer;
     font-weight: bold;
-    transition: background 0.2s;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    min-width: 120px;
+    height: 44px;
+    margin: 8px 0;
 }
 
-.btn:hover {
-    opacity: 0.9;
+.btn:hover, .btn-primary:hover, .btn-success:hover,
+.btn-info:hover, .btn-back:hover, .btn-details:hover,
+.btn-proposer:hover, .btn-evaluate:hover, .btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active, .btn-primary:active, .btn-success:active,
+.btn-info:active, .btn-back:active, .btn-details:active,
+.btn-proposer:active, .btn-evaluate:active, .btn-submit:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
 }
 
 .btn-primary {
@@ -92,9 +111,17 @@ h1 {
     color: white;
 }
 
+.btn-primary:hover {
+    background-color: #6a8bc0;
+}
+
 .btn-success {
     background-color: #4CAF50;
     color: white;
+}
+
+.btn-success:hover {
+    background-color: #45a049;
 }
 
 .btn-info {
@@ -102,15 +129,60 @@ h1 {
     color: white;
 }
 
+.btn-info:hover {
+    background-color: #2980b9;
+}
+
 .btn-back {
     background-color: #7f8c8d;
     color: white;
-    margin-top: 20px;
 }
 
 .btn-back:hover {
     background-color: #6c7a7d;
 }
+
+.btn-details {
+    background-color: #3498db;
+    color: white;
+    padding: 8px 18px;
+    min-width: 100px;
+}
+
+.btn-proposer, .btn-evaluate {
+    background-color: #4CAF50;
+    color: white;
+    min-width: 200px;
+}
+
+.btn-submit {
+    background-color: #4CAF50;
+    color: white;
+    width: 100%;
+    max-width: 200px;
+    margin: 20px auto 0;
+}
+
+.filter-btn {
+    padding: 8px 18px;
+    background-color: #ecf0f1;
+    color: #2c3e50;
+    border-radius: 25px;
+    min-width: auto;
+    height: auto;
+    box-shadow: none;
+}
+
+.filter-btn:hover {
+    background-color: #d6eaf8;
+    transform: none;
+}
+
+.filter-btn.active {
+    background-color: #3498db;
+    color: white;
+}
+
 
 /* Formulaires */
 form {
@@ -428,6 +500,155 @@ form {
 
 .btn-details:hover {
     background: #2980b9;
+}
+
+/* ===== Page Flan ===== */
+/* Conteneur principal du flan */
+.flan-detail-container {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+}
+
+/* En-tête du flan */
+.flan-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.flan-title {
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.flan-description {
+    color: #555;
+    font-size: 1.1em;
+    margin-bottom: 10px;
+}
+
+.flan-price {
+    color: #e74c3c;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+/* Section des boutons */
+.flan-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+/* Section des évaluations */
+.evaluations-section {
+    margin-top: 30px;
+}
+
+.evaluations-title {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-family: 'Bubblegum', cursive !important;
+    text-align: center;
+}
+
+.evaluation-card {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    background: #f9f9f9;
+}
+
+.evaluation-content {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.evaluation-left {
+    flex: 1;
+}
+
+.evaluation-right {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.evaluation-notes {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.note-item {
+    background: #f0f8ff;
+    padding: 8px;
+    border-radius: 5px;
+}
+
+.note-item p {
+    margin: 0;
+    color: #3498db;
+}
+
+.evaluation-moyenne {
+    background: #e8f5e9;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.evaluation-moyenne strong {
+    color: #4CAF50;
+    font-size: 1.2em;
+}
+
+.evaluation-comment {
+    background: #fff;
+    padding: 15px;
+    border-radius: 5px;
+    border: 1px solid #eee;
+}
+
+.evaluation-photo {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.no-evaluations {
+    text-align: center;
+    padding: 30px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    color: #7f8c8d;
+}
+
+.no-evaluations i {
+    font-size: 2em;
+    color: #ccc;
+    margin-bottom: 10px;
+}
+
+/* Boutons avec icônes */
+.btn-with-icon i {
+    margin-right: 8px;
+}
+
+.btn-with-icon small {
+    display: block;
+    font-size: 0.7em;
+    font-weight: normal;
+    margin-top: 2px;
+    opacity: 0.9;
 }
 
 /* Message "Aucun résultat" */
