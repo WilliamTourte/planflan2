@@ -1,34 +1,120 @@
 {% extends "base.html" %}
+{% block scripts_head %}
+<script>
+    let map;
+    let markers = [];
+
+    window.initMap = function() {
+        console.log("Initialisation de la carte...");
+        const mapElement = document.getElementById("map");
+        if (!mapElement) {
+            console.error("Élément #map introuvable !");
+            document.getElementById("map-container").innerHTML =
+                "<p style='color: red;'>Erreur : Impossible de charger la carte.</p>";
+            return;
+        }
+
+        map = new google.maps.Map(mapElement, {
+            center: { lat: 48.8566, lng: 2.3522 },
+            zoom: 12,
+        });
+        console.log("Carte initialisée avec succès !");
+
+        const etablissements = {{ etablissements_json|tojson|safe }};
+        etablissements.forEach(etablissement => {
+            const marker = new google.maps.Marker({
+                position: { lat: etablissement.latitude, lng: etablissement.longitude },
+                map: map,
+                title: etablissement.nom,
+            });
+
+            const infowindow = new google.maps.InfoWindow({
+                content: `
+                    <div class="infowindow">
+                        <h3>${etablissement.nom}</h3>
+                        <p>${etablissement.adresse}, ${etablissement.code_postal} ${etablissement.ville}</p>
+                        <a href="${etablissement.url}" target="_blank" tabindex="-1">Voir la fiche</a>
+                    </div>
+                `,
+            });
+
+            marker.addListener("click", () => {
+                infowindow.open(map, marker);
+                const card = document.querySelector(`.etablissement-card[data-id="${etablissement.id_etab}"]`);
+                if (card) card.scrollIntoView({ behavior: "smooth" });
+            });
+
+            markers.push(marker);
+        });
+
+        // Interaction grille/carte
+        document.querySelectorAll('.etablissement-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                const lat = parseFloat(this.dataset.lat);
+                const lng = parseFloat(this.dataset.lng);
+                markers.forEach(marker => {
+                    if (marker.getPosition().lat() === lat && marker.getPosition().lng() === lng) {
+                        marker.setAnimation(google.maps.Animation.BOUNCE);
+                        setTimeout(() => marker.setAnimation(null), 1500);
+                    }
+                });
+            });
+        });
+    };
+
+    window.onload = function() {
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap&v=weekly`;
+        script.async = true;
+        script.loading = "async"; // Ajout pour supprimer l'avertissement
+        script.defer = true;
+        script.onerror = function() {
+            console.error("Échec du chargement de Google Maps");
+            document.getElementById("map-container").innerHTML =
+                "<p style='color: red;'>Erreur : Impossible de charger Google Maps.</p>";
+        };
+        document.head.appendChild(script);
+    };
+</script>
+<style>
+    #map { height: 500px; width: 100%; background-color: #f5f5f5; }
+    .infowindow { font-family: Arial, sans-serif; }
+    .infowindow h3 { margin: 0 0 5px 0; color: #333; }
+    .infowindow a { color: #1a73e8; text-decoration: none; }
+    .map-container { margin-bottom: 2rem; }
+    @media (max-width: 768px) { #map { height: 300px; } }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container">
     <h1>{{ "Les établissements" | enlever_accents }}</h1>
-
+    <div id="map-container" class="map-container">
+        <h2>Carte interactive</h2>
+        <div id="map"></div>
+    </div>
     <div class="etablissements-grid">
         {% for etablissement in etablissements %}
-        <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}" class="etablissement-card">
+        <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}"
+           class="etablissement-card"
+           data-id="{{ etablissement.id_etab }}"
+           data-lat="{{ etablissement.latitude }}"
+           data-lng="{{ etablissement.longitude }}">
             {% if etablissement.photos %}
                 <img src="{{ url_for('static', filename='uploads/' + etablissement.photos[0].path) }}" alt="{{ etablissement.nom }}" class="card-image">
             {% else %}
-                <div class="card-image placeholder">
-                    <span>Pas de photo</span>
-                </div>
+                <div class="card-image placeholder"><span>Pas de photo</span></div>
             {% endif %}
-
             <div class="card-content">
                 <div class="card-header">
-                    <h2>{{ etablissement.nom  | enlever_accents }}</h2>
-                    {% if etablissement.label %}
-                        <span class="badge">⭐ Labellisé </span>
-                    {% endif %}
+                    <h2>{{ etablissement.nom | enlever_accents }}</h2>
+                    {% if etablissement.label %}<span class="badge">⭐ Labellisé</span>{% endif %}
                 </div>
-
                 <p class="type">{{ etablissement.type_etab.value }}</p>
                 <p class="adresse">{{ etablissement.adresse }}, {{ etablissement.ville }}</p>
-
                 {% if etablissement.flans %}
                     <p class="flans-count">{{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}</p>
                 {% endif %}
-
                 <span class="arrow">→</span>
             </div>
         </a>
@@ -42,4 +128,8 @@
         {% endfor %}
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Ce bloc peut rester vide -->
 {% endblock %}
