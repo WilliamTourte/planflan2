@@ -9,8 +9,11 @@ class Utilisateur(db.Model, UserMixin):
     id_user = db.Column(db.Integer, primary_key=True)
     pseudo = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(100), nullable=False)
-    email = db.Column(db.String(100), unique=True, nullable=False)
+
+    email = db.Column('email', db.String(100), unique=True, nullable=False)
     is_admin = db.Column(db.Boolean, nullable=True, default=False)
+    is_ambad = db.Column(db.Boolean, nullable=True, default=False)
+    is_ambadx = db.Column(db.Boolean, nullable=True, default=False)
     # Relation avec les évaluations
     evaluations = db.relationship('Evaluation', back_populates='user')
 
@@ -24,6 +27,16 @@ class Utilisateur(db.Model, UserMixin):
     def check_password(self, password, bcrypt):
         return bcrypt.check_password_hash(self.password, password)
 
+    @property
+    def email(self):
+        return self.email
+    @email.setter
+    def email(self, value):
+        if "@" not in value:
+            raise ValueError("L'adresse email doit contenir un @.")
+        self._email = value # Stocke dans un attribut privé
+
+
 
 
 class TypeEtab(Enum):
@@ -31,6 +44,15 @@ class TypeEtab(Enum):
     PATISSERIE = "Pâtisserie"
     RESTAURANT = 'Restaurant'
     CAFE = "Coffee Shop"
+
+from app import db
+from enum import Enum
+import re
+
+class TypeEtab(Enum):
+    BOULANGERIE = "Boulangerie"
+    RESTAURANT = "Restaurant"
+    CAFE = "Café"
 
 class Etablissement(db.Model):
     __tablename__ = 'etablissements'
@@ -42,16 +64,46 @@ class Etablissement(db.Model):
     ville = db.Column(db.String(100), nullable=False)
     latitude = db.Column(db.Numeric(10, 8), nullable=True)
     longitude = db.Column(db.Numeric(11, 8), nullable=True)
-    telephone = db.Column(db.String(20), nullable=True)
-    site_web = db.Column(db.String(255), nullable=True)
+    telephone = db.Column('telephone', db.String(20), nullable=True)
+    site_web = db.Column('site_web', db.String(255), nullable=True)
     description = db.Column(db.Text, nullable=True)
     label = db.Column(db.Boolean, nullable=True, default=False)
     visite = db.Column(db.Boolean, nullable=True, default=False)
-
-    # Relation avec les flans
     flans = db.relationship('Flan', back_populates='etablissement', lazy=True)
-    # Relation avec les photos
     photos = db.relationship('Photo', backref='etablissement_photo', lazy=True, foreign_keys='Photo.id_etab')
+
+    @property
+    def telephone(self):
+        return self._telephone
+
+    @telephone.setter
+    def telephone(self, value):
+        if value is not None and not re.match(r'^\+?[0-9\s\-\(\)]{10,}$', value):
+            raise ValueError("Numéro de téléphone invalide")
+        self._telephone = value # Stocke dans un attribut privé
+
+    @property
+    def site_web(self):
+        return self._site_web
+
+    @site_web.setter
+    def site_web(self, value):
+        if value is not None and not re.match(r'^https?://.+', value):
+            raise ValueError("L'URL du site web doit commencer par http:// ou https://")
+        self._site_web = value # Stocke dans un attribut privé
+
+    @property
+    def code_postal(self):
+        return self._code_postal
+
+    @code_postal.setter
+    def code_postal(self, value):
+        if not re.match(r'^\d{5}$', value):
+            raise ValueError("Le code postal doit être composé de 5 chiffres")
+        self._code_postal = value # Stocke dans un attribut privé
+
+    _code_postal = db.Column('code_postal', db.String(5), nullable=False)
+
 
 class Flan(db.Model):
     __tablename__ = 'flans'
@@ -66,6 +118,16 @@ class Flan(db.Model):
     photos = db.relationship('Photo', backref='flan_photo', lazy=True, foreign_keys='Photo.id_flan')
     # Relation avec Etablissement
     etablissement = db.relationship('Etablissement', back_populates='flans')
+
+    @property
+    def prix(self):
+        return self._prix
+
+    @prix.setter
+    def prix(self, value):
+        if value is not None and value < 0:
+            raise ValueError("Le prix ne peut pas être négatif")
+        self._prix = value
 
 
 class StatutEval(Enum): # Avantage de Enum : vérification des valeurs
