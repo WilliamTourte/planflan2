@@ -3,7 +3,7 @@ from app import login_manager, db, bcrypt
 from flask_login import UserMixin
 import re
 
-# --- Classes d'énumération ---
+# --- Enums ---
 class TypeEtab(Enum):
     BOULANGERIE = "Boulangerie"
     PATISSERIE = "Pâtisserie"
@@ -19,7 +19,7 @@ class TypeCible(Enum):
     FLAN = 'Flan'
     ETABLISSEMENT = 'Etablissement'
 
-# --- Classes ---
+# --- Modèles ---
 class Utilisateur(db.Model, UserMixin):
     __tablename__ = 'utilisateurs'
     id_user = db.Column(db.Integer, primary_key=True)
@@ -29,7 +29,6 @@ class Utilisateur(db.Model, UserMixin):
     is_admin = db.Column(db.Boolean, nullable=True, default=False)
     is_ambad = db.Column(db.Boolean, nullable=True, default=False)
     is_ambadx = db.Column(db.Boolean, nullable=True, default=False)
-    # Relations avec les autres tables
     evaluations = db.relationship('Evaluation', back_populates='user')
 
     def get_id(self):
@@ -66,7 +65,6 @@ class Etablissement(db.Model):
     description = db.Column(db.Text, nullable=True)
     label = db.Column(db.Boolean, nullable=True, default=False)
     visite = db.Column(db.Boolean, nullable=True, default=False)
-    # Relations avec les autres tables
     flans = db.relationship('Flan', back_populates='etablissement', lazy=True)
     photos = db.relationship('Photo', backref='etablissement_photo', lazy=True, foreign_keys='Photo.id_etab')
 
@@ -107,7 +105,6 @@ class Flan(db.Model):
     nom = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=True)
     prix = db.Column(db.Float, nullable=True)
-    # Relations avec les autres tables
     evaluations = db.relationship('Evaluation', back_populates='flan', lazy=True)
     photos = db.relationship('Photo', backref='flan_photo', lazy=True, foreign_keys='Photo.id_flan')
     etablissement = db.relationship('Etablissement', back_populates='flans')
@@ -134,8 +131,7 @@ class Evaluation(db.Model):
     description = db.Column(db.Text, nullable=True)
     photo = db.Column(db.String(255), nullable=True)
     statut = db.Column(db.Enum(StatutEval), nullable=False, server_default='EN_ATTENTE')
-    date_creation = db.Column(db.DateTime, nullable=False, se
-    # Relations avec les autres tablesrver_default=db.func.current_timestamp())
+    date_creation = db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
     moyenne = db.Column(db.Numeric(2, 1), nullable=True)
     user = db.relationship('Utilisateur', back_populates='evaluations')
     flan = db.relationship('Flan', back_populates='evaluations')
