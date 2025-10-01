@@ -27,8 +27,6 @@ class Utilisateur(db.Model, UserMixin):
     password = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     is_admin = db.Column(db.Boolean, nullable=True, default=False)
-    is_ambad = db.Column(db.Boolean, nullable=True, default=False)
-    is_ambadx = db.Column(db.Boolean, nullable=True, default=False)
     evaluations = db.relationship('Evaluation', back_populates='user')
 
     def get_id(self):
