@@ -62,7 +62,6 @@ def afficher_flan_unique(id_flan):
 @main_bp.route('/etablissement/<int:id_etab>/proposer_flan', methods=['GET', 'POST'])
 @login_required
 def proposer_flan(id_etab):
-    print("Route proposer_flan appelée !")  # Debug
     etablissement = Etablissement.query.get_or_404(id_etab)
     form = NewFlanForm()
 
@@ -83,7 +82,6 @@ def proposer_flan(id_etab):
         return redirect(url_for('main.afficher_etablissement_unique', id_etab=id_etab))
 
     return render_template('page_etablissement.html', form=form, etablissement=etablissement)
-
 
 
 @main_bp.route('/flan/<int:id_flan>/evaluer', methods=['GET', 'POST'])
