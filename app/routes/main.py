@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, request, current_app
+from flask import Blueprint, render_template, redirect, url_for, request, current_app, flash
 from flask_login import login_required, current_user
 from app.forms import EvalForm, EtabForm, NewFlanForm
 from app.models import Etablissement, Flan, Evaluation, Utilisateur
@@ -58,6 +58,31 @@ def afficher_flan_unique(id_flan):
     return render_template('page_flan.html', flan=flan_unique, request=request) # request pour se souvenir du endpoint  # Passe le flan au template
 
 
+
+@main_bp.route('/etablissement/<int:id_etab>/proposer_flan', methods=['GET', 'POST'])
+@login_required
+def proposer_flan(id_etab):
+    print("Route proposer_flan appelée !")  # Debug
+    etablissement = Etablissement.query.get_or_404(id_etab)
+    form = NewFlanForm()
+
+    # Pré-remplir le champ caché id_etab
+    form.id_etab.data = id_etab
+
+    if form.validate_on_submit():
+        flan = Flan(
+            nom=form.nom.data,
+            description=form.description.data,
+            prix=form.prix.data,
+            id_etab=id_etab,
+
+        )
+        db.session.add(flan)
+        db.session.commit()
+        flash('Votre flan a été proposé avec succès !', 'success')
+        return redirect(url_for('main.afficher_etablissement_unique', id_etab=id_etab))
+
+    return render_template('page_etablissement.html', form=form, etablissement=etablissement)
 
 
 

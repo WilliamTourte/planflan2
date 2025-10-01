@@ -56,7 +56,8 @@
         <h3>Ajouter un flan</h3>
         {% if current_user.is_authenticated %}
             <!-- Formulaire d'ajout de flan -->
-            <form method="POST" class="form-container">
+            <form method="POST" action="{{ url_for('main.proposer_flan', id_etab=etablissement.id_etab) }}" class="form-container">
+
                 {{ form.hidden_tag() }}
                 <div class="form-group">
                     {{ form.nom.label(class="form-label") }}
