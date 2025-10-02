@@ -25,13 +25,13 @@ body {
 header {
     background-color: #799dcb;
     color: white;
-    padding: 1rem;
+    padding: 0.25rem 0;
     text-align: center;
 }
 
 nav {
-    background-color: orange; /* Couleur orange réintégrée */
-    padding: 0.5rem;
+    background-color: lightsalmon;
+    padding: 0.25rem 0;
 }
 
 nav a {
@@ -44,7 +44,7 @@ nav a {
     width: 90%;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 10px;
 }
 
 main {
@@ -55,7 +55,7 @@ footer {
     background-color: #799dcb;
     color: white;
     text-align: center;
-    padding: 1rem;
+    padding: 0.5rem;
     position: fixed;
     bottom: 0;
     width: 100%;
@@ -193,7 +193,7 @@ form {
 }
 
 .form-group {
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
 }
 
 .form-group label {

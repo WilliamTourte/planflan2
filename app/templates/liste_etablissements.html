@@ -13,8 +13,8 @@
             return;
         }
         map = new google.maps.Map(mapElement, {
-            center: { lat: 48.8566, lng: 2.3522 },
-            zoom: 12,
+            center: { lat: 46.2276, lng: 2.2137 }, // Coordonnées approximatives du centre de la France
+            zoom: 6, // Niveau de zoom pour afficher toute la France
         });
         console.log("Carte initialisée avec succès !");
         const etablissements = {{ etablissements_json|tojson|safe }};
@@ -38,26 +38,11 @@
                 setTimeout(() => {
                     infowindow.open(map, marker);
                     const card = document.querySelector(`.etablissement-card[data-id="${etablissement.id_etab}"]`);
-                    if (card && card.scrollIntoView) {
-                        card.scrollIntoView({ behavior: "smooth", block: "nearest" });
-                    }
                 }, 50);
             });
             markers.push(marker);
         });
-        // Interaction grille/carte
-        document.querySelectorAll('.etablissement-card').forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                const lat = parseFloat(this.dataset.lat);
-                const lng = parseFloat(this.dataset.lng);
-                markers.forEach(marker => {
-                    if (marker.getPosition().lat() === lat && marker.getPosition().lng() === lng) {
-                        marker.setAnimation(google.maps.Animation.BOUNCE);
-                        setTimeout(() => marker.setAnimation(null), 1500);
-                    }
-                });
-            });
-        });
+
     };
 </script>
 <!-- Script Google Maps chargé directement avec loading="async" -->
@@ -66,19 +51,17 @@
     async defer loading="async">
 </script>
 <style>
-    #map { height: 500px; width: 100%; background-color: #f5f5f5; }
+    #map { height: 80vh; width: 100%; background-color: #f5f5f5; }
     .infowindow { font-family: Arial, sans-serif; }
     .infowindow h3 { margin: 0 0 5px 0; color: #333; }
     .infowindow a { color: #1a73e8; text-decoration: none; }
-    .map-container { margin-bottom: 2rem; }
-    @media (max-width: 768px) { #map { height: 300px; } }
+    .map-container { margin-bottom: 2rem; width: 100%; padding: 0; }
+    @media (max-width: 768px) { #map { height: 60vh; } }
 </style>
 {% endblock %}
 {% block content %}
 <div class="container">
-    <h1>{{ "Les établissements" | enlever_accents }}</h1>
     <div id="map-container" class="map-container">
-        <h2>Carte interactive</h2>
         <div id="map"></div>
     </div>
     <div class="etablissements-grid">
