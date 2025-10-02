@@ -61,9 +61,9 @@ class NewFlanForm(FlaskForm):
 
 # Formulaire pour évaluer un flan
 class EvalForm(FlaskForm):
-    visuel = SelectField("Visuel", choices=[(0.5,0.5), (1,1),(1.5,1.5),(2,2),(2.5,2.5),(3,3),(3.5,3.5),(4,4),(4.5,4.5),(5,5)], validators=[DataRequired()] )
-    texture =SelectField("Texture", choices=[(0.5,0.5), (1,1),(1.5,1.5),(2,2),(2.5,2.5),(3,3),(3.5,3.5),(4,4),(4.5,4.5),(5,5)], validators=[DataRequired()] )
-    pate = SelectField("Pâte", choices=[(0.5,0.5), (1,1),(1.5,1.5),(2,2),(2.5,2.5),(3,3),(3.5,3.5),(4,4),(4.5,4.5),(5,5)], validators=[DataRequired()] )
-    gout = SelectField("Goût", choices=[(0.5,0.5), (1,1),(1.5,1.5),(2,2),(2.5,2.5),(3,3),(3.5,3.5),(4,4),(4.5,4.5),(5,5)], validators=[DataRequired()] )
+    visuel = SelectField("Visuel", choices=[(0,0), (0.5,0.5), (1,1),(1.5,1.5),(2,2),(2.5,2.5),(3,3),(3.5,3.5),(4,4),(4.5,4.5),(5,5)], validators=[DataRequired()] )
+    texture =SelectField("Texture", choices=[(0,0), (0.5,0.5), (1,1),(1.5,1.5),(2,2),(2.5,2.5),(3,3),(3.5,3.5),(4,4),(4.5,4.5),(5,5)], validators=[DataRequired()] )
+    pate = SelectField("Pâte", choices=[(0,0), (0.5,0.5), (1,1),(1.5,1.5),(2,2),(2.5,2.5),(3,3),(3.5,3.5),(4,4),(4.5,4.5),(5,5)], validators=[DataRequired()] )
+    gout = SelectField("Goût", choices=[(0,0), (0.5,0.5), (1,1),(1.5,1.5),(2,2),(2.5,2.5),(3,3),(3.5,3.5),(4,4),(4.5,4.5),(5,5)], validators=[DataRequired()] )
     description = StringField('Description', validators=[Length(min=3, max=255)]) #Vérifier si obligatoire dans base de données
 

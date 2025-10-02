@@ -40,7 +40,7 @@
 
         <!-- Section des évaluations -->
         <div class="evaluations-section">
-            <h2 class="evaluations-title">Évaluations</h2>
+            <h2 class="evaluations-title">Evaluations</h2>
 
             {% if flan.evaluations|selectattr('statut.value', 'equalto', 'VALIDE')|list %}
                 {% for evaluation in flan.evaluations if evaluation.statut.value == "VALIDE" %}
@@ -48,7 +48,7 @@
                     <div class="evaluation-content">
                         <div class="evaluation-left">
                             <h3 style="color: #333; margin-bottom: 10px; font-family: 'Bubblegum', cursive !important;">
-                                Évaluation par {{ evaluation.user.pseudo }}
+                                Evaluation par {{ evaluation.user.pseudo }}
                                 <small style="color: #7f8c8d; font-size: 0.9em; font-weight: normal;">
                                     {{ evaluation.date_creation.strftime('%d/%m/%Y') }}
                                 </small>
@@ -93,7 +93,7 @@
             {% else %}
                 <div class="no-evaluations">
                     <i class="fas fa-comment-slash"></i>
-                    <p>Aucune évaluation validée pour ce flan.</p>
+                    <p>Aucune evaluation validée pour ce flan.</p>
                 </div>
             {% endif %}
         </div>
