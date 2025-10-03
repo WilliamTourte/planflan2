@@ -21,11 +21,15 @@ def rechercher():
     from app.outils import afficher_etablissements
     form = ChercheEtabForm()
     if form.validate_on_submit():
-        resultats = form.nom.data
-        afficher_etablissements(resultats)
-        return render_template('/liste_etablissements', form=form, etablissements=resultats)
 
 
+        resultats = Etablissement.query.filter(Etablissement.nom.ilike(f'%{form.nom.data}%')).all()
+        etablissements, etablissements_json = afficher_etablissements(resultats)
+
+        return render_template('liste_etablissements.html',
+                               etablissements=resultats,  # Pour la grille
+                               etablissements_json=etablissements_json,  # Pour la carte
+                               google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
 
     return render_template('rechercher.html', form=form)
 
