@@ -21,38 +21,15 @@ def rechercher():
     from app.outils import afficher_etablissements
     form = ChercheEtabForm()
     if form.validate_on_submit():
-
-
         resultats = Etablissement.query.filter(Etablissement.nom.ilike(f'%{form.nom.data}%')).all()
         etablissements, etablissements_json = afficher_etablissements(resultats)
-
         return render_template('liste_etablissements.html',
-                               etablissements=resultats,  # Pour la grille
+                               etablissements=etablissements,  # Pour la grille
                                etablissements_json=etablissements_json,  # Pour la carte
                                google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
-
     return render_template('rechercher.html', form=form)
 
 
-@main_bp.route('/etablissements')
-def afficher_etablissements():
-    etablissements = Etablissement.query.all()
-    etablissements_json = [{
-        'id_etab': etab.id_etab,
-        'nom': etab.nom,
-        'adresse': etab.adresse,
-        'ville': etab.ville,
-        'code_postal': etab.code_postal,
-        'latitude': float(etab.latitude),
-        'longitude': float(etab.longitude),
-        'url': url_for('main.afficher_etablissement_unique', id_etab=etab.id_etab)
-    } for etab in etablissements]
-
-
-    return render_template('liste_etablissements.html',
-                           etablissements=etablissements,  # Pour la grille
-                           etablissements_json=etablissements_json,  # Pour la carte
-                           google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
 
 @main_bp.route('/etablissement/<int:id_etab>', methods=['GET', 'POST'])
 def afficher_etablissement_unique(id_etab):

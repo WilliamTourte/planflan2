@@ -3,13 +3,19 @@
 <script>
     let map;
     let markers = [];
+
+    // Définissez la fonction initMap au niveau global
     window.initMap = function() {
         console.log("Initialisation de la carte...");
         const mapElement = document.getElementById("map");
         if (!mapElement) {
             console.error("Élément #map introuvable !");
-            document.getElementById("map-container").innerHTML =
-                "<p style='color: red;'>Erreur : Impossible de charger la carte.</p>";
+            const mapContainer = document.getElementById("map-container");
+            if (mapContainer) {
+                mapContainer.innerHTML = "<p style='color: red;'>Erreur : Impossible de charger la carte.</p>";
+            } else {
+                console.error("Élément #map-container introuvable !");
+            }
             return;
         }
         map = new google.maps.Map(mapElement, {
@@ -47,7 +53,7 @@
 <!-- Script Google Maps chargé directement avec loading="async" -->
 <script
     src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap&v=weekly"
-    async defer loading="async">
+    async defer>
 </script>
 <style>
     #map { height: 80vh; width: 100%; background-color: #f5f5f5; }
