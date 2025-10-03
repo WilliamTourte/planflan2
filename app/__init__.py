@@ -19,7 +19,7 @@ def create_app():
     # initialisation des extensions
     db.init_app(app)
     login_manager.init_app(app)
-
+    bcrypt.init_app(app)
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -29,8 +29,6 @@ def create_app():
     @app.template_filter('enlever_accents') # filtre Jinja2 pour enlever les accents
     def filtre_enlever_accents(text):
         return enlever_accents(text)
-
-    bcrypt.init_app(app)
 
     # Enregistre les blueprints dans l'application
     from app.routes.auth import auth_bp

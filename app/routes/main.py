@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, request, current_app, flash
 from flask_login import login_required, current_user
-from app.forms import EvalForm, EtabForm, NewFlanForm
-from app.models import Etablissement, Flan, Evaluation, Utilisateur
+from app.forms import EvalForm, NewFlanForm
+from app.models import Etablissement, Flan, Evaluation
 from app import db
 
 main_bp = Blueprint('main', __name__)

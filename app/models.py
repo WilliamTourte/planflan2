@@ -1,6 +1,6 @@
 from enum import Enum
 
-from app import login_manager, db, bcrypt # importe la base de données
+from app import db # importe la base de données
 from flask_login import UserMixin
 
 
