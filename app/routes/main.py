@@ -38,6 +38,7 @@ def afficher_etablissements():
         'url': url_for('main.afficher_etablissement_unique', id_etab=etab.id_etab)
     } for etab in etablissements]
 
+
     return render_template('liste_etablissements.html',
                            etablissements=etablissements,  # Pour la grille
                            etablissements_json=etablissements_json,  # Pour la carte
