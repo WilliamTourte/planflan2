@@ -67,3 +67,8 @@ class EvalForm(FlaskForm):
     gout = SelectField("Goût", choices=[(0,0), (0.5,0.5), (1,1),(1.5,1.5),(2,2),(2.5,2.5),(3,3),(3.5,3.5),(4,4),(4.5,4.5),(5,5)], validators=[DataRequired()] )
     description = StringField('Description', validators=[Length(min=3, max=255)]) #Vérifier si obligatoire dans base de données
 
+# Formulaire pour rechercher un établissement
+class ChercheEtabForm(FlaskForm):
+    nom = StringField('Nom', validators=[DataRequired(), Length(min=3, max=50)])
+    submit = SubmitField('Rechercher')
+

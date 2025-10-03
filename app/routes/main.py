@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, request, current_app, flash
 from flask_login import login_required, current_user
-from app.forms import EvalForm, NewFlanForm
+from app.forms import EvalForm, NewFlanForm, ChercheEtabForm
 from app.models import Etablissement, Flan, Evaluation
 from app import db
 
@@ -15,6 +15,13 @@ def index():
 @login_required
 def dashboard():
     return render_template('dashboard.html')
+
+@main_bp.route('/rechercher',  methods=['GET', 'POST'])
+def rechercher():
+    form = ChercheEtabForm()
+    if form.validate_on_submit():
+        pass
+    return render_template('rechercher.html', form=form)
 
 @main_bp.route('/etablissements')
 def afficher_etablissements():
