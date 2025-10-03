@@ -1,0 +1,46 @@
+services:
+  # Création du service BDD
+  mysqldb:
+    # Sous-dossier contenant le Dockerfile 
+    # build: ./db
+    # Nom de l'image créée à partir du Dockerfile
+    image: mysql:lts
+    # Le nom du conteneur instancié
+    container_name: mysql-db
+    restart: always
+    env_file: .env
+    # Montage du volume permettant de paser les scripts de création dans le conteneur
+    volumes:
+      - ${MYSQL_DUMP_DIR}:/docker-entrypoint-initdb.d
+    environment:
+      # Configuration du mot de passe de l'utilisateur "root"
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      # MYSQL_ROOT_PASSWORD: supersecuredpassword
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "9806:3306"
+
+# Décommenter les services "phpmyadmin" pour bénéficier de phpmyadmin
+  phpmyadmin:
+    # Dépendance du conteur "phpmyadmin" au conteneur "mysql" déclaré au préalable
+    depends_on:
+      - mysqldb
+    # Image docker sur laquelle se base le conteneur nommé "phpmyadmin"
+    image: phpmyadmin
+    # Démarrage automatique au lancement du moteur docker + redémarrage automatique en cas de crash
+    restart: always
+    # Nom du conteneur qui sera instancié (attention, il s'agit du même nom, ne soyez pas bernés)
+    container_name: phpmyadmin
+    # Redirection de port pour pouvoir accéder au service "phpmyadmin" en requêtant sur "localhost"
+    ports:
+      - "8080:80"
+    # Variables d'envirionnement diverses permettant d'assurer le bon fonctionnement de phpMyAdmin
+    environment:
+      # Adresse de la machine hebergeant la base de données
+      # IMPORTANT : il est possible de mettre un nom de conteneur !! Par défaut les conteneurs d'un docker compose peuvent communiquer entre eux via leur nom !
+      PMA_HOST: mysqldb
+      # Mot de passe par défaut de la base de données
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+  
