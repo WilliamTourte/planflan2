@@ -23,6 +23,7 @@ def rechercher():
         pass
     return render_template('rechercher.html', form=form)
 
+
 @main_bp.route('/etablissements')
 def afficher_etablissements():
     etablissements = Etablissement.query.all()
