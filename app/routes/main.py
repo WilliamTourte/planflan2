@@ -8,8 +8,14 @@ main_bp = Blueprint('main', __name__)
 
 @main_bp.route('/')
 def index():
+    from app.outils import afficher_etablissements
     # Redirection automatique vers la liste des établissements
-    return redirect(url_for('main.afficher_etablissements'))
+    resultats = Etablissement.query.all()
+    etablissements, etablissements_json = afficher_etablissements(resultats)
+    return render_template('liste_etablissements.html',
+                           etablissements=etablissements,  # Pour la grille
+                           etablissements_json=etablissements_json,  # Pour la carte
+                           google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
 
 @main_bp.route('/dashboard')
 @login_required
