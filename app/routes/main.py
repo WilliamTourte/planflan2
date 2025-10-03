@@ -18,9 +18,15 @@ def dashboard():
 
 @main_bp.route('/rechercher',  methods=['GET', 'POST'])
 def rechercher():
+    from app.outils import afficher_etablissements
     form = ChercheEtabForm()
     if form.validate_on_submit():
-        pass
+        resultats = form.nom.data
+        afficher_etablissements(resultats)
+        return render_template('/liste_etablissements', form=form, etablissements=resultats)
+
+
+
     return render_template('rechercher.html', form=form)
 
 

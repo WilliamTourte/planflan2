@@ -30,6 +30,8 @@ def create_app():
     def filtre_enlever_accents(text):
         return enlever_accents(text)
 
+
+
     # Enregistre les blueprints dans l'application
     from app.routes.auth import auth_bp
     from app.routes.main import main_bp
