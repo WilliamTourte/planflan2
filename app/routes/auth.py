@@ -55,7 +55,6 @@ def login():
 
 
 
-
 @auth_bp.route('/logout')
 @login_required
 def logout():
@@ -69,4 +68,4 @@ def supprimer_compte():
     db.session.delete(user)
     db.session.commit()
     flash('Votre compte a été supprimé!', 'success')
-    return redirect(url_for('index'))
+    return redirect(url_for('main.index'))
