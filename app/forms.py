@@ -80,7 +80,7 @@ class ChercheEtabForm(FlaskForm):
 class UpdateProfileForm(FlaskForm):
     pseudo = StringField('Pseudo', validators=[Optional(), Length(min=4, max=50)])
     email = StringField('Email', validators=[Optional(), Email()])
-    current_password = PasswordField('Mot de passe actuel', validators=[DataRequired()])
+    current_password = PasswordField('Mot de passe actuel *', validators=[DataRequired()])
     new_password = PasswordField('Nouveau mot de passe', validators=[Optional(), EqualTo('confirm_password'), Length(min=6)])
     confirm_password = PasswordField('Confirmer mot de passe', validators=[Optional()])
     submit = SubmitField('Mettre à jour le profil')
