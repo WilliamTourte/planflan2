@@ -3,85 +3,93 @@
 <script>
     let map;
     let markers = [];
-// Définissez la fonction initMap au niveau global
-window.initMap = function() {
-    console.log("Initialisation de la carte...");
-    const mapElement = document.getElementById("map");
-    if (!mapElement) {
-        console.error("Élément #map introuvable !");
-        const mapContainer = document.getElementById("map-container");
-        if (mapContainer) {
-            mapContainer.innerHTML = "<p style='color: red;'>Erreur : Impossible de charger la carte.</p>";
-        } else {
-            console.error("Élément #map-container introuvable !");
+
+    // Définissez la fonction initMap au niveau global
+    window.initMap = function() {
+        console.log("Initialisation de la carte...");
+        const mapElement = document.getElementById("map");
+        if (!mapElement) {
+            console.error("Élément #map introuvable !");
+            const mapContainer = document.getElementById("map-container");
+            if (mapContainer) {
+                mapContainer.innerHTML = "<p style='color: red;'>Erreur : Impossible de charger la carte.</p>";
+            } else {
+                console.error("Élément #map-container introuvable !");
+            }
+            return;
         }
-        return;
-    }
-    map = new google.maps.Map(mapElement, {
-        center: { lat: 46.2276, lng: 2.2137 }, // Coordonnées approximatives du centre de la France
-        zoom: 6, // Niveau de zoom pour afficher toute la France
-    });
-    console.log("Carte initialisée avec succès !");
-    const etablissements = {{ etablissements_json|tojson|safe }};
-    etablissements.forEach(etablissement => {
-        // L'icône change selon que le lieu a éré visité et/ou labellisé
-        let icon;
-        if (etablissement.visite && etablissement.label) {
-            icon = "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
-        } else if (etablissement.visite) {
-            icon = "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
+        map = new google.maps.Map(mapElement, {
+            center: { lat: 46.2276, lng: 2.2137 }, // Coordonnées approximatives du centre de la France
+            zoom: 6, // Niveau de zoom pour afficher toute la France
+        });
+        console.log("Carte initialisée avec succès !");
+        const etablissements = {{ etablissements_json|tojson|safe }};
+        etablissements.forEach(etablissement => {
+            // L'icône change selon que le lieu a été visité et/ou labellisé
+            let icon;
+            if (etablissement.visite && etablissement.label) {
+                icon = "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
+            } else if (etablissement.visite) {
+                icon = "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
+            } else {
+                icon = "http://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+            }
+            const marker = new google.maps.Marker({
+                position: { lat: etablissement.latitude, lng: etablissement.longitude },
+                map: map,
+                title: etablissement.nom,
+                icon: icon // Ajoutez l'icône appropriée
+            });
+            const infowindow = new google.maps.InfoWindow({
+                content: `
+                    <div class="infowindow">
+                        <h3>${etablissement.nom}</h3>
+                        <p>${etablissement.adresse}, ${etablissement.code_postal} ${etablissement.ville}</p>
+                        <a href="${etablissement.url}" target="_blank" tabindex="-1" style="outline: none;">Voir la fiche</a>
+                    </div>
+                `,
+                pixelOffset: new google.maps.Size(0, -30),
+            });
+            marker.addListener("click", () => {
+                setTimeout(() => {
+                    infowindow.open(map, marker);
+                    const card = document.querySelector(`.carte[data-id="${etablissement.id_etab}"]`);
+                }, 50);
+            });
+            markers.push(marker);
+        });
+        // Créer un élément div pour la légende
+        const legend = document.createElement('div');
+        legend.style.backgroundColor = 'white';
+        legend.style.padding = '10px';
+        legend.style.margin = '10px';
+        legend.style.border = '1px solid #ccc';
+        // Ajouter le contenu de la légende
+        legend.innerHTML = `
+            <h3>Légende</h3>
+            <p><img src="http://maps.google.com/mapfiles/ms/icons/blue-dot.png" alt="Non visité">Non visité</p>
+            <p><img src="http://maps.google.com/mapfiles/ms/icons/red-dot.png" alt="Visité"> Visité</p>
+            <p><img src="http://maps.google.com/mapfiles/ms/icons/yellow-dot.png" alt="Labellisé">Labellisé</p>
+        `;
+        // Ajouter la légende à la carte
+        map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(legend);
+    };
+
+    // Ajouter un écouteur d'événement pour DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("DOM complètement chargé et analysé");
+        const mapElement = document.getElementById("map");
+        if (mapElement) {
+            console.log("Élément #map trouvé, chargement du script Google Maps...");
+            const script = document.createElement('script');
+            script.src = `https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap&v=weekly`;
+            script.async = true;
+            script.defer = true;
+            document.head.appendChild(script);
         } else {
-            icon = "http://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+            console.error("Élément #map introuvable même après le chargement du DOM !");
         }
-        const marker = new google.maps.Marker({
-            position: { lat: etablissement.latitude, lng: etablissement.longitude },
-            map: map,
-            title: etablissement.nom,
-            icon: icon // Ajoutez l'icône appropriée
-        });
-        const infowindow = new google.maps.InfoWindow({
-            content: `
-                <div class="infowindow">
-                    <h3>${etablissement.nom}</h3>
-                    <p>${etablissement.adresse}, ${etablissement.code_postal} ${etablissement.ville}</p>
-                    <a href="${etablissement.url}" target="_blank" tabindex="-1" style="outline: none;">Voir la fiche</a>
-                </div>
-            `,
-            pixelOffset: new google.maps.Size(0, -30),
-        });
-        marker.addListener("click", () => {
-            setTimeout(() => {
-                infowindow.open(map, marker);
-                const card = document.querySelector(`.carte[data-id="${etablissement.id_etab}"]`);
-            }, 50);
-        });
-        markers.push(marker);
     });
-       // Créer un élément div pour la légende
-    const legend = document.createElement('div');
-    legend.style.backgroundColor = 'white';
-    legend.style.padding = '10px';
-    legend.style.margin = '10px';
-    legend.style.border = '1px solid #ccc';
-
-    // Ajouter le contenu de la légende
-    legend.innerHTML = `
-        <h3>Légende</h3>
-        <p><img src="http://maps.google.com/mapfiles/ms/icons/blue-dot.png" alt="Non visité">Non visité</p>
-        <p><img src="http://maps.google.com/mapfiles/ms/icons/red-dot.png" alt="Visité"> Visité</p>
-        <p><img src="http://maps.google.com/mapfiles/ms/icons/yellow-dot.png" alt="Labellisé">Labellisé</p>
-
-    `;
-
-    // Ajouter la légende à la carte
-    map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(legend);
-};
-
-</script>
-<!-- Script Google Maps chargé directement avec loading="async" -->
-<script
-    src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap&v=weekly"
-    async defer>
 </script>
 <style>
     #map { height: 80vh; width: 100%; background-color: #f5f5f5; }
@@ -97,45 +105,44 @@ window.initMap = function() {
     <div id="map-container" class="map-container">
         <div id="map"></div>
     </div>
-<div class="grille">
-    {% for etablissement in etablissements %}
-    <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}"
-       class="carte"
-       data-id="{{ etablissement.id_etab }}"
-       data-lat="{{ etablissement.latitude }}"
-       data-lng="{{ etablissement.longitude }}">
-        <div class="card-image-container">
-            {% if etablissement.photos %}
-                <img src="{{ url_for('static', filename='uploads/' + etablissement.photos[0].path) }}" alt="{{ etablissement.nom }}" class="card-image">
-            {% else %}
-                <div class="card-image placeholder"><span>Pas de photo</span></div>
-            {% endif %}
-            {% if etablissement.label %}
-                <span class="badge">⭐ Labellisé</span>
-            {% endif %}
-        </div>
-        <div class="card-content">
-            <div class="card-header">
-                <h2>{{ etablissement.nom | enlever_accents }}</h2>
+    <!-- Grille des établissements -->
+    <div class="grille">
+        {% for etablissement in etablissements %}
+        <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}"
+           class="carte"
+           data-id="{{ etablissement.id_etab }}"
+           data-lat="{{ etablissement.latitude }}"
+           data-lng="{{ etablissement.longitude }}">
+            <div class="card-image-container">
+                {% if etablissement.photos %}
+                    <img src="{{ url_for('static', filename='uploads/' + etablissement.photos[0].path) }}" alt="{{ etablissement.nom }}" class="card-image">
+                {% else %}
+                    <div class="card-image placeholder"><span>Pas de photo</span></div>
+                {% endif %}
+                {% if etablissement.label %}
+                    <span class="badge">⭐ Labellisé</span>
+                {% endif %}
             </div>
-            <p class="type">{{ etablissement.type_etab.value }}</p>
-            <p class="adresse">{{ etablissement.adresse }}, {{ etablissement.ville }}</p>
-            {% if etablissement.flans %}
-                <p class="flans-count">{{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}</p>
+            <div class="card-content">
+                <div class="card-header">
+                    <h2>{{ etablissement.nom | enlever_accents }}</h2>
+                </div>
+                <p class="type">{{ etablissement.type_etab.value }}</p>
+                <p class="adresse">{{ etablissement.adresse }}, {{ etablissement.ville }}</p>
+                {% if etablissement.flans %}
+                    <p class="flans-count">{{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}</p>
+                {% endif %}
+                <span class="arrow">→</span>
+            </div>
+        </a>
+        {% else %}
+        <div class="no-results">
+            <p>Aucun établissement trouvé.</p>
+            {% if current_user.is_authenticated and current_user.type_user == 'admin' %}
+                <a href="{{ url_for('main.ajouter_etablissement') }}" class="btn">Ajouter un établissement</a>
             {% endif %}
-            <span class="arrow">→</span>
         </div>
-    </a>
-    {% else %}
-    <div class="no-results">
-        <p>Aucun établissement trouvé.</p>
-        {% if current_user.is_authenticated and current_user.type_user == 'admin' %}
-            <a href="{{ url_for('main.ajouter_etablissement') }}" class="btn">Ajouter un établissement</a>
-        {% endif %}
+        {% endfor %}
     </div>
-    {% endfor %}
-</div>
-
-
 </div>
 {% endblock %}
