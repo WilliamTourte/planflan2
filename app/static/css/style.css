@@ -28,6 +28,10 @@ header {
 nav {
     background-color: #fee10d;
     padding: 0.25rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
 }
 nav a {
     color: white;
@@ -630,4 +634,23 @@ form {
     .container {
         padding: 10px;
     }
+}
+/* Style pour le formulaire de recherche dans la barre de navigation */
+.navbar-search {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+.search-input {
+    padding: 5px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+}
+.search-button {
+    padding: 5px 10px;
+    background-color: #799dcb;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    margin-left: 5px;
 }

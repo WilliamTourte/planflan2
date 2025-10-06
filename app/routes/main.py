@@ -49,14 +49,33 @@ def dashboard():
         form.email.data = current_user.email
     return render_template('dashboard.html', title='Tableau de bord', form=form)
 
-
-
 @main_bp.route('/rechercher', methods=['GET', 'POST'])
 def rechercher():
     from app.outils import afficher_etablissements
     form = ChercheEtabForm()
-    if form.validate_on_submit():
-        query = Etablissement.query
+    query = Etablissement.query
+    # Vérifier si c'est une requête GET avec des paramètres de recherche
+    if request.method == 'GET':
+        # Vérifier si au moins un paramètre a une valeur non vide
+        has_search_params = any(request.args.get(k) for k in ['nom', 'visite', 'labellise'])
+        if not has_search_params:
+            return render_template('rechercher.html', form=form)
+        if 'nom' in request.args and request.args['nom']:
+            query = query.filter(Etablissement.nom.ilike(f'%{request.args["nom"]}%'))
+        if 'visite' in request.args:
+            visite = request.args.get('visite')
+            if visite == 'oui':
+                query = query.filter(Etablissement.visite == 1)
+            elif visite == 'non':
+                query = query.filter(Etablissement.visite == 0)
+        if 'labellise' in request.args:
+            labellise = request.args.get('labellise')
+            if labellise == 'oui':
+                query = query.filter(Etablissement.label == 1)
+            elif labellise == 'non':
+                query = query.filter(Etablissement.label == 0)
+    # Vérifier si c'est une requête POST avec des données de formulaire
+    elif form.validate_on_submit():
         if form.nom.data:
             query = query.filter(Etablissement.nom.ilike(f'%{form.nom.data}%'))
         if form.visite.data == 'oui':
@@ -67,15 +86,15 @@ def rechercher():
             query = query.filter(Etablissement.label == 1)
         elif form.labellise.data == 'non':
             query = query.filter(Etablissement.label == 0)
-        resultats = query.all()
-        etablissements, etablissements_json = afficher_etablissements(resultats)
-        return render_template('liste_etablissements.html',
-                               etablissements=etablissements,
-                               etablissements_json=etablissements_json,
-                               google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
-    return render_template('rechercher.html', form=form)
-
-
+    else:
+        # Si aucune recherche n'est effectuée, afficher le formulaire de recherche
+        return render_template('rechercher.html', form=form)
+    resultats = query.all()
+    etablissements, etablissements_json = afficher_etablissements(resultats)
+    return render_template('liste_etablissements.html',
+                           etablissements=etablissements,
+                           etablissements_json=etablissements_json,
+                           google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
 
 
 

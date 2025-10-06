@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}PlanFlan{% endblock %}</title>
     {% block scripts_head %}{% endblock %}
-
     <!-- Lien vers le fichier CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
@@ -16,7 +15,6 @@
     <nav>
         <a href="{{ url_for('main.index') }}">Accueil</a>
         <a href="{{ url_for('main.rechercher') }}">Recherche</a>
-
         {% if current_user.is_authenticated %}
             <a href="{{ url_for('main.dashboard') }}">Tableau de bord</a>
             <a href="{{ url_for('auth.logout') }}">Déconnexion</a>
@@ -24,6 +22,11 @@
             <a href="{{ url_for('auth.login') }}">Connexion</a>
             <a href="{{ url_for('auth.register') }}">Inscription</a>
         {% endif %}
+        <!-- Ajout du formulaire de recherche -->
+        <form action="{{ url_for('main.rechercher') }}" method="GET" class="navbar-search">
+            <input type="text" name="nom" placeholder="Rechercher..." class="search-input">
+            <button type="submit" class="search-button">Rechercher</button>
+        </form>
     </nav>
     <main class="container">
         <!-- Affichage des messages flash (succès/erreur) -->
