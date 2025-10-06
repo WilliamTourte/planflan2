@@ -1,8 +1,10 @@
+from argparse import OPTIONAL
+
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, RadioField, HiddenField, \
     DecimalField
-from wtforms.validators import DataRequired, Length, Email, ValidationError, EqualTo, NumberRange
+from wtforms.validators import DataRequired, Length, Email, ValidationError, EqualTo, NumberRange, Optional
 
 from app import bcrypt
 from app.models import TypeEtab
@@ -75,11 +77,12 @@ class ChercheEtabForm(FlaskForm):
 
 
 
-class UpdateProfileForm(RegistrationForm):
-    pseudo = StringField('Pseudo', validators=[DataRequired(), Length(min=4, max=50)])
+class UpdateProfileForm(FlaskForm):
+    pseudo = StringField('Pseudo', validators=[Optional(), Length(min=4, max=50)])
+    email = StringField('Email', validators=[Optional(), Email()])
     current_password = PasswordField('Mot de passe actuel', validators=[DataRequired()])
-    new_password = PasswordField('Nouveau mot de passe', validators=[DataRequired(), EqualTo('confirm_password'), Length(min=6)])
-    confirm_password = PasswordField('Confirmer mot de passe', validators=[DataRequired()])
+    new_password = PasswordField('Nouveau mot de passe', validators=[Optional(), EqualTo('confirm_password'), Length(min=6)])
+    confirm_password = PasswordField('Confirmer mot de passe', validators=[Optional()])
     submit = SubmitField('Mettre à jour le profil')
 
     def validate_current_password(self, current_password):

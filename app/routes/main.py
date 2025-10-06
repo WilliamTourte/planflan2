@@ -1,7 +1,9 @@
 from flask import Blueprint, render_template, redirect, url_for, request, current_app, flash
 from flask_login import login_required, current_user
+from sqlalchemy.exc import IntegrityError
+
 from app.forms import EvalForm, NewFlanForm, ChercheEtabForm, UpdateProfileForm
-from app.models import Etablissement, Flan, Evaluation
+from app.models import Etablissement, Flan, Evaluation, Utilisateur
 from app import db, bcrypt
 
 main_bp = Blueprint('main', __name__)
@@ -17,22 +19,37 @@ def index():
                            etablissements_json=etablissements_json,  # Pour la carte
                            google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
 
+
+
 @main_bp.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
     form = UpdateProfileForm()
     if form.validate_on_submit():
+        # Vérifiez si l'email a été modifié
+        if form.email.data and form.email.data != current_user.email:
+            existing_user = Utilisateur.query.filter(Utilisateur.email == form.email.data).first()
+            if existing_user and existing_user.id_user != current_user.id_user:
+                flash('Cet email est déjà utilisé par un autre utilisateur.', 'danger')
+                return redirect(url_for('main.dashboard'))
         current_user.pseudo = form.pseudo.data
-        current_user.email = form.email.data
-        if form.password.data:
-            current_user.password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
-        db.session.commit()
-        flash('Votre profil a été mis à jour!', 'success')
-        return redirect(url_for('dashboard'))
+        if form.email.data:  # Mettre à jour l'email uniquement s'il a été soumis
+            current_user.email = form.email.data
+        if form.new_password.data:
+            current_user.password = bcrypt.generate_password_hash(form.new_password.data).decode('utf-8')
+        try:
+            db.session.commit()
+            flash('Votre profil a été mis à jour!', 'success')
+        except IntegrityError:
+            db.session.rollback()
+            flash('Une erreur est survenue lors de la mise à jour de votre profil.', 'danger')
+        return redirect(url_for('main.dashboard'))
     elif request.method == 'GET':
         form.pseudo.data = current_user.pseudo
         form.email.data = current_user.email
     return render_template('dashboard.html', title='Tableau de bord', form=form)
+
+
 
 @main_bp.route('/rechercher',  methods=['GET', 'POST'])
 def rechercher():
