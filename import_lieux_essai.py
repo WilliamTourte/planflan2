@@ -1,4 +1,3 @@
-
 import re
 import json
 import os
@@ -7,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 # Configuration de l'application Flask en standalone
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///planflan.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost/planflan_db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialisation de SQLAlchemy
@@ -38,28 +37,25 @@ def nettoyer_adresse(adresse):
 
 def importer_lieux(fichier_json):
     print("🚀 Début de l'import...")
-
     if not os.path.exists(fichier_json):
         print(f"❌ Fichier introuvable : {fichier_json}")
         return
-
     with app.app_context():
         try:
+            # Créer toutes les tables si elles n'existent pas
+            db.create_all()
             with open(fichier_json, 'r', encoding='utf-8') as f:
                 data = json.load(f)
                 print(f"📊 Nombre de lieux : {len(data.get('features', []))}")
-
                 for feature in data['features']:
                     try:
                         nom = feature['properties']['location']['name']
                         adresse_complete = feature['properties']['location']['address']
                         longitude = feature['geometry']['coordinates'][0]
                         latitude = feature['geometry']['coordinates'][1]
-
                         adresse = nettoyer_adresse(adresse_complete)
                         code_postal = extraire_code_postal(adresse_complete)
                         ville = extraire_ville(adresse_complete)
-
                         if not Etablissement.query.filter_by(nom=nom, adresse=adresse).first():
                             lieu = Etablissement(
                                 nom=nom,
@@ -76,7 +72,6 @@ def importer_lieux(fichier_json):
                             print(f"⚠️ Déjà présent : {nom}")
                     except Exception as e:
                         print(f"❌ Erreur sur {feature.get('properties', {}).get('location', {}).get('name', 'inconnu')}: {e}")
-
             db.session.commit()
             print("🎉 Import terminé !")
         except Exception as e:
