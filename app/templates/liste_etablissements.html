@@ -3,52 +3,62 @@
 <script>
     let map;
     let markers = [];
-
-    // Définissez la fonction initMap au niveau global
-    window.initMap = function() {
-        console.log("Initialisation de la carte...");
-        const mapElement = document.getElementById("map");
-        if (!mapElement) {
-            console.error("Élément #map introuvable !");
-            const mapContainer = document.getElementById("map-container");
-            if (mapContainer) {
-                mapContainer.innerHTML = "<p style='color: red;'>Erreur : Impossible de charger la carte.</p>";
-            } else {
-                console.error("Élément #map-container introuvable !");
-            }
-            return;
+// Définissez la fonction initMap au niveau global
+window.initMap = function() {
+    console.log("Initialisation de la carte...");
+    const mapElement = document.getElementById("map");
+    if (!mapElement) {
+        console.error("Élément #map introuvable !");
+        const mapContainer = document.getElementById("map-container");
+        if (mapContainer) {
+            mapContainer.innerHTML = "<p style='color: red;'>Erreur : Impossible de charger la carte.</p>";
+        } else {
+            console.error("Élément #map-container introuvable !");
         }
-        map = new google.maps.Map(mapElement, {
-            center: { lat: 46.2276, lng: 2.2137 }, // Coordonnées approximatives du centre de la France
-            zoom: 6, // Niveau de zoom pour afficher toute la France
+        return;
+    }
+    map = new google.maps.Map(mapElement, {
+        center: { lat: 46.2276, lng: 2.2137 }, // Coordonnées approximatives du centre de la France
+        zoom: 6, // Niveau de zoom pour afficher toute la France
+    });
+    console.log("Carte initialisée avec succès !");
+    const etablissements = {{ etablissements_json|tojson|safe }};
+    etablissements.forEach(etablissement => {
+        // L'icône change selon que le lieu a éré visité et/ou labellisé
+        let icon;
+        if (etablissement.visite && etablissement.label) {
+            icon = "http://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+        } else if (etablissement.visite) {
+            icon = "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
+        } else {
+            icon = "http://maps.google.com/mapfiles/ms/icons/orange-dot.png";
+        }
+        const marker = new google.maps.Marker({
+            position: { lat: etablissement.latitude, lng: etablissement.longitude },
+            map: map,
+            title: etablissement.nom,
+            icon: icon // Ajoutez l'icône appropriée
         });
-        console.log("Carte initialisée avec succès !");
-        const etablissements = {{ etablissements_json|tojson|safe }};
-        etablissements.forEach(etablissement => {
-            const marker = new google.maps.Marker({
-                position: { lat: etablissement.latitude, lng: etablissement.longitude },
-                map: map,
-                title: etablissement.nom,
-            });
-            const infowindow = new google.maps.InfoWindow({
-                content: `
-                    <div class="infowindow">
-                        <h3>${etablissement.nom}</h3>
-                        <p>${etablissement.adresse}, ${etablissement.code_postal} ${etablissement.ville}</p>
-                        <a href="${etablissement.url}" target="_blank" tabindex="-1" style="outline: none;">Voir la fiche</a>
-                    </div>
-                `,
-                pixelOffset: new google.maps.Size(0, -30),
-            });
-            marker.addListener("click", () => {
-                setTimeout(() => {
-                    infowindow.open(map, marker);
-                    const card = document.querySelector(`.etablissement-card[data-id="${etablissement.id_etab}"]`);
-                }, 50);
-            });
-            markers.push(marker);
+        const infowindow = new google.maps.InfoWindow({
+            content: `
+                <div class="infowindow">
+                    <h3>${etablissement.nom}</h3>
+                    <p>${etablissement.adresse}, ${etablissement.code_postal} ${etablissement.ville}</p>
+                    <a href="${etablissement.url}" target="_blank" tabindex="-1" style="outline: none;">Voir la fiche</a>
+                </div>
+            `,
+            pixelOffset: new google.maps.Size(0, -30),
         });
-    };
+        marker.addListener("click", () => {
+            setTimeout(() => {
+                infowindow.open(map, marker);
+                const card = document.querySelector(`.etablissement-card[data-id="${etablissement.id_etab}"]`);
+            }, 50);
+        });
+        markers.push(marker);
+    });
+};
+
 </script>
 <!-- Script Google Maps chargé directement avec loading="async" -->
 <script

@@ -9,8 +9,6 @@ maps_bp = Blueprint('maps', __name__, template_folder='../templates')
 
 
 
-
-
 @maps_bp.route('/api/etablissements')
 def get_etablissements():
     etablissements = Etablissement.query.all()
