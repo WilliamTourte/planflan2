@@ -38,6 +38,15 @@ nav a {
     text-decoration: none;
     margin: 0 10px;
 }
+/* Ajouts pour styliser les liens de la barre de navigation comme des h2 */
+.nav-link {
+    font-family: 'Bubblegum', cursive !important;
+    font-size: 1.5em; /* Taille typique pour h2 */
+    font-weight: bold;
+    color: white;
+    text-decoration: none;
+    margin: 0 10px;
+}
 .container {
     width: 90%;
     max-width: 1200px;
@@ -640,17 +649,35 @@ form {
     display: flex;
     align-items: center;
     margin-left: auto;
+    background-color: #fee10d;
+    padding: 5px 10px;
+    border-radius: 20px;
 }
 .search-input {
-    padding: 5px;
-    border-radius: 4px;
+    padding: 8px 12px;
+    border-radius: 20px;
     border: 1px solid #ddd;
+    background-color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 1em;
+    min-width: 200px;
+}
+.search-input:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
 }
 .search-button {
-    padding: 5px 10px;
-    background-color: #799dcb;
+    padding: 8px 16px;
+    background-color: #3498db;
     color: white;
     border: none;
-    border-radius: 4px;
+    border-radius: 20px;
     margin-left: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+.search-button:hover {
+    background-color: #2980b9;
 }

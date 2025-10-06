@@ -13,14 +13,14 @@
         <h1>PLANFLAN</h1>
     </header>
     <nav>
-        <a href="{{ url_for('main.index') }}">Accueil</a>
-        <a href="{{ url_for('main.rechercher') }}">Recherche</a>
+        <a href="{{ url_for('main.index') }}" class="nav-link">Accueil</a>
+        <a href="{{ url_for('main.rechercher') }}" class="nav-link">Recherche</a>
         {% if current_user.is_authenticated %}
-            <a href="{{ url_for('main.dashboard') }}">Tableau de bord</a>
-            <a href="{{ url_for('auth.logout') }}">Déconnexion</a>
+            <a href="{{ url_for('main.dashboard') }}" class="nav-link">Tableau de bord</a>
+            <a href="{{ url_for('auth.logout') }}" class="nav-link">Déconnexion</a>
         {% else %}
-            <a href="{{ url_for('auth.login') }}">Connexion</a>
-            <a href="{{ url_for('auth.register') }}">Inscription</a>
+            <a href="{{ url_for('auth.login') }}" class="nav-link">Connexion</a>
+            <a href="{{ url_for('auth.register') }}" class="nav-link">Inscription</a>
         {% endif %}
         <!-- Ajout du formulaire de recherche -->
         <form action="{{ url_for('main.rechercher') }}" method="GET" class="navbar-search">
