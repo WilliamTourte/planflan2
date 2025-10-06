@@ -52,7 +52,7 @@ window.initMap = function() {
         marker.addListener("click", () => {
             setTimeout(() => {
                 infowindow.open(map, marker);
-                const card = document.querySelector(`.etablissement-card[data-id="${etablissement.id_etab}"]`);
+                const card = document.querySelector(`.carte[data-id="${etablissement.id_etab}"]`);
             }, 50);
         });
         markers.push(marker);
@@ -97,10 +97,10 @@ window.initMap = function() {
     <div id="map-container" class="map-container">
         <div id="map"></div>
     </div>
-    <div class="etablissements-grid">
+    <div class="grille">
         {% for etablissement in etablissements %}
         <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}"
-           class="etablissement-card"
+           class="carte"
            data-id="{{ etablissement.id_etab }}"
            data-lat="{{ etablissement.latitude }}"
            data-lng="{{ etablissement.longitude }}">

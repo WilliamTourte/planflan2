@@ -297,7 +297,7 @@ form {
 }
 
 /* Grille des établissements */
-.etablissements-grid {
+.grille {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 25px;
@@ -305,7 +305,7 @@ form {
 }
 
 /* Cartes cliquables */
-.etablissement-card {
+.carte {
     text-decoration: none;
     color: inherit;
     border-radius: 10px;
@@ -317,7 +317,7 @@ form {
     height: 100%;
 }
 
-.etablissement-card:hover {
+.carte:hover {
     transform: translateY(-7px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
     color: inherit;
@@ -351,7 +351,7 @@ form {
     margin-bottom: 10px;
 }
 
-.etablissement-card h2 {
+.carte h2 {
     margin: 0 0 8px 0;
     font-size: 1.3rem;
     color: #333 !important;
@@ -394,7 +394,7 @@ form {
     transition: all 0.2s;
 }
 
-.etablissement-card:hover .arrow {
+.carte:hover .arrow {
     transform: translateX(5px);
 }
 
@@ -681,7 +681,7 @@ form {
     100% { transform: scale(1); }
 }
 
-.etablissement-card:hover {
+.carte:hover {
     animation: pulse 0.3s ease;
 }
 
@@ -703,12 +703,12 @@ form {
 
 /* Responsive */
 @media (max-width: 768px) {
-    .etablissements-grid,
+    .grille,
     .flans-grid {
         grid-template-columns: 1fr;
     }
 
-    .etablissement-card,
+    .carte,
     .flan-card .card-content {
         min-height: auto;
     }
@@ -717,7 +717,7 @@ form {
         padding: 10px;
     }
 
-    .etablissement-card {
+    .carte {
         border-radius: 8px;
     }
 

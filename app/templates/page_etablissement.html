@@ -16,40 +16,38 @@
         </div>
     </div>
 
-    <!-- Grille des flans -->
-    <h2 class="section-title">Les flans</h2>
-    {% if etablissement.flans %}
-        <div class="flans-grid">
-            {% for flan in etablissement.flans %}
-            <div class="flan-card">
-                {% if flan.photos %}
-                    <img src="{{ url_for('static', filename='uploads/' + flan.photos[0].path) }}" alt="{{ flan.nom }}" class="card-image">
-                {% else %}
-                    <div class="card-image placeholder">
-                        <span>Pas de photo</span>
-                    </div>
-                {% endif %}
-                <div class="card-content">
-                    <div class="flan-header">
-                        <h3>{{ flan.nom  | enlever_accents  }}</h3>
-                        {% if flan.prix is not none %}
-                            <span class="flan-price">{{ "%.2f"|format(flan.prix) }} €</span>
-                        {% else %}
-                            <span class="flan-price">Prix non renseigné</span>
-                        {% endif %}
-                    </div>
-                    <p class="flan-description">{{ flan.description or "Un flan flantastique" }}</p>
-                    <div class="flan-actions">
-                        <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}" class="btn-details">Voir les détails</a>
-                    </div>
+<!-- Grille des flans -->
+<h2 class="section-title">Les flans</h2>
+{% if etablissement.flans %}
+    <div class="grille">
+        {% for flan in etablissement.flans %}
+        <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}" class="carte">
+            {% if flan.photos %}
+                <img src="{{ url_for('static', filename='uploads/' + flan.photos[0].path) }}" alt="{{ flan.nom }}" class="card-image">
+            {% else %}
+                <div class="card-image placeholder"><span>Pas de photo</span></div>
+            {% endif %}
+            <div class="card-content">
+                <div class="card-header">
+                    <h3>{{ flan.nom | enlever_accents }}</h3>
+                    {% if flan.prix is not none %}
+                        <span class="badge">{{ "%.2f"|format(flan.prix) }} €</span>
+                    {% else %}
+                        <span class="badge">Prix non renseigné</span>
+                    {% endif %}
                 </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <div class="no-results">
-            <p>Aucun flan propose pour cet établissement.</p>
-        </div>
-    {% endif %}
+                <p class="type">{{ flan.description or "Un flan flantastique" }}</p>
+                <span class="arrow">→</span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="no-results">
+        <p>Aucun flan propose pour cet établissement.</p>
+    </div>
+{% endif %}
+
 
     <!-- Section pour ajouter un flan -->
     <div class="ajouter-flan-section">
