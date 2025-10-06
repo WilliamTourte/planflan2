@@ -30,7 +30,7 @@ header {
 }
 
 nav {
-    background-color: lightsalmon;
+    background-color: #fee10d;
     padding: 0.25rem 0;
 }
 
@@ -400,7 +400,7 @@ form {
 
 /* Badge "Label La Flanterie" */
 .badge {
-    background: #f39c12;
+    background: #fee10d;
     color: white;
     padding: 4px 10px;
     border-radius: 12px;
