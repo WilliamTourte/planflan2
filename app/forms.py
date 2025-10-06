@@ -72,7 +72,9 @@ class EvalForm(FlaskForm):
 
 # Formulaire pour rechercher un établissement
 class ChercheEtabForm(FlaskForm):
-    nom = StringField('Nom', validators=[DataRequired(), Length(min=3, max=50)])
+    nom = StringField('Nom', validators=[Optional(), Length(min=3, max=50)])
+    visite = RadioField('Visité', choices=[('tous', 'Tous'), ('oui', 'Oui'), ('non', 'Non')], default='tous')
+    labellise = RadioField('Labellisé', choices=[('tous', 'Tous'), ('oui', 'Oui'), ('non', 'Non')], default='tous')
     submit = SubmitField('Rechercher')
 
 

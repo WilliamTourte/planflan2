@@ -51,18 +51,31 @@ def dashboard():
 
 
 
-@main_bp.route('/rechercher',  methods=['GET', 'POST'])
+@main_bp.route('/rechercher', methods=['GET', 'POST'])
 def rechercher():
     from app.outils import afficher_etablissements
     form = ChercheEtabForm()
     if form.validate_on_submit():
-        resultats = Etablissement.query.filter(Etablissement.nom.ilike(f'%{form.nom.data}%')).all()
+        query = Etablissement.query
+        if form.nom.data:
+            query = query.filter(Etablissement.nom.ilike(f'%{form.nom.data}%'))
+        if form.visite.data == 'oui':
+            query = query.filter(Etablissement.visite == 1)
+        elif form.visite.data == 'non':
+            query = query.filter(Etablissement.visite == 0)
+        if form.labellise.data == 'oui':
+            query = query.filter(Etablissement.label == 1)
+        elif form.labellise.data == 'non':
+            query = query.filter(Etablissement.label == 0)
+        resultats = query.all()
         etablissements, etablissements_json = afficher_etablissements(resultats)
         return render_template('liste_etablissements.html',
-                               etablissements=etablissements,  # Pour la grille
-                               etablissements_json=etablissements_json,  # Pour la carte
+                               etablissements=etablissements,
+                               etablissements_json=etablissements_json,
                                google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
     return render_template('rechercher.html', form=form)
+
+
 
 
 
