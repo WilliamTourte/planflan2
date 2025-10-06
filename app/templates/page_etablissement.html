@@ -3,7 +3,7 @@
 <div class="container">
     <!-- Détails de l'établissement -->
     <div class="etablissement-header">
-        <h1>{{ etablissement.nom }}</h1>
+        <h1>{{ etablissement.nom | enlever_accents }}</h1>
         <p class="type-badge">{{ etablissement.type_etab.value }}</p>
         <div class="etablissement-info">
             <p><strong>Adresse :</strong> {{ etablissement.adresse }}, {{ etablissement.code_postal }} {{ etablissement.ville }}</p>
@@ -31,7 +31,7 @@
                 {% endif %}
                 <div class="card-content">
                     <div class="flan-header">
-                        <h3>{{ flan.nom }}</h3>
+                        <h3>{{ flan.nom  | enlever_accents  }}</h3>
                         {% if flan.prix is not none %}
                             <span class="flan-price">{{ "%.2f"|format(flan.prix) }} €</span>
                         {% else %}
@@ -47,7 +47,7 @@
         </div>
     {% else %}
         <div class="no-results">
-            <p>Aucun flan proposé pour cet établissement.</p>
+            <p>Aucun flan propose pour cet établissement.</p>
         </div>
     {% endif %}
 
