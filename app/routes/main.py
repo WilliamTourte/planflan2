@@ -1,8 +1,8 @@
 from flask import Blueprint, render_template, redirect, url_for, request, current_app, flash
 from flask_login import login_required, current_user
-from app.forms import EvalForm, NewFlanForm, ChercheEtabForm
+from app.forms import EvalForm, NewFlanForm, ChercheEtabForm, UpdateProfileForm
 from app.models import Etablissement, Flan, Evaluation
-from app import db
+from app import db, bcrypt
 
 main_bp = Blueprint('main', __name__)
 
@@ -17,10 +17,22 @@ def index():
                            etablissements_json=etablissements_json,  # Pour la carte
                            google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
 
-@main_bp.route('/dashboard')
+@main_bp.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    return render_template('dashboard.html')
+    form = UpdateProfileForm()
+    if form.validate_on_submit():
+        current_user.pseudo = form.pseudo.data
+        current_user.email = form.email.data
+        if form.password.data:
+            current_user.password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        db.session.commit()
+        flash('Votre profil a été mis à jour!', 'success')
+        return redirect(url_for('dashboard'))
+    elif request.method == 'GET':
+        form.pseudo.data = current_user.pseudo
+        form.email.data = current_user.email
+    return render_template('dashboard.html', title='Tableau de bord', form=form)
 
 @main_bp.route('/rechercher',  methods=['GET', 'POST'])
 def rechercher():

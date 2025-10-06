@@ -1,9 +1,10 @@
-
-
+from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, RadioField, HiddenField, \
     DecimalField
 from wtforms.validators import DataRequired, Length, Email, ValidationError, EqualTo, NumberRange
+
+from app import bcrypt
 from app.models import TypeEtab
 
 from app.models import Utilisateur
@@ -71,4 +72,17 @@ class EvalForm(FlaskForm):
 class ChercheEtabForm(FlaskForm):
     nom = StringField('Nom', validators=[DataRequired(), Length(min=3, max=50)])
     submit = SubmitField('Rechercher')
+
+
+
+class UpdateProfileForm(RegistrationForm):
+    pseudo = StringField('Pseudo', validators=[DataRequired(), Length(min=4, max=50)])
+    current_password = PasswordField('Mot de passe actuel', validators=[DataRequired()])
+    new_password = PasswordField('Nouveau mot de passe', validators=[DataRequired(), EqualTo('confirm_password'), Length(min=6)])
+    confirm_password = PasswordField('Confirmer mot de passe', validators=[DataRequired()])
+    submit = SubmitField('Mettre à jour le profil')
+
+    def validate_current_password(self, current_password):
+        if not bcrypt.check_password_hash(current_user.password, current_password.data):
+            raise ValidationError('Current password is incorrect.')
 
