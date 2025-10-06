@@ -4,36 +4,36 @@
     <div class="row justify-content-center">
         <div class="col-md-6">
             <h2 class="text-center mb-4">Rechercher</h2>
-            <form method="POST" action="{{ url_for('main.rechercher') }}">
+            <form method="POST" action="{{ url_for('main.rechercher') }}" style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
                 {{ form.hidden_tag() }}
                 <div class="form-group">
                     {{ form.nom.label(class="form-label") }}
-                    {{ form.nom(placeholder="Nom") }}
+                    {{ form.nom(placeholder="Nom", class="form-control") }}
                     {% for error in form.nom.errors %}
                         <span class="error-message">{{ error }}</span>
                     {% endfor %}
                 </div>
                 <div class="form-group">
                     {{ form.visite.label(class="form-label") }}
-                    {% for subfield in form.visite %}
-                        <div class="form-check">
-                            {{ subfield(class="form-check-input") }}
-                            <label class="form-check-label" for="{{ subfield.id }}">
-                                {{ subfield.label.text }}
-                            </label>
-                        </div>
-                    {% endfor %}
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        {% for subfield in form.visite %}
+                            <div style="display: flex; align-items: center;">
+                                {{ subfield(style="margin-right: 5px;") }}
+                                <label style="font-weight: normal;">{{ subfield.label.text }}</label>
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
                 <div class="form-group">
                     {{ form.labellise.label(class="form-label") }}
-                    {% for subfield in form.labellise %}
-                        <div class="form-check">
-                            {{ subfield(class="form-check-input") }}
-                            <label class="form-check-label" for="{{ subfield.id }}">
-                                {{ subfield.label.text }}
-                            </label>
-                        </div>
-                    {% endfor %}
+                    <div style="display: flex; align-items: center; gap: 20px;">
+                        {% for subfield in form.labellise %}
+                            <div style="display: flex; align-items: center;">
+                                {{ subfield(style="margin-right: 5px;") }}
+                                <label style="font-weight: normal;">{{ subfield.label.text }}</label>
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
                 <div class="d-grid gap-2">
                     {{ form.submit(class="btn btn-primary") }}
