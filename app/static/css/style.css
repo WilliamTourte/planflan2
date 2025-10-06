@@ -5,14 +5,12 @@
     font-weight: bold;
     font-style: normal;
 }
-
 /* Reset basique et styles globaux */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
-
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
@@ -21,36 +19,30 @@ body {
     background-color: #799dcb;
     color: #333;
 }
-
 header {
     background-color: #799dcb;
     color: white;
     padding: 0.25rem 0;
     text-align: center;
 }
-
 nav {
     background-color: #fee10d;
     padding: 0.25rem 0;
 }
-
 nav a {
     color: white;
     text-decoration: none;
     margin: 0 10px;
 }
-
 .container {
     width: 90%;
     max-width: 1200px;
     margin: 0 auto;
     padding: 10px;
 }
-
 main {
     padding: 20px 0;
 }
-
 footer {
     background-color: #799dcb;
     color: white;
@@ -60,17 +52,14 @@ footer {
     bottom: 0;
     width: 100%;
 }
-
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Bubblegum', cursive !important;
 }
-
 h1 {
     text-align: center;
     margin-bottom: 30px;
     color: white; /* Pour les titres sur fond bleu */
 }
-
 /* Boutons - Version standard */
 .btn, .btn-primary, .btn-success, .btn-info, .btn-back,
 .btn-details, .btn-proposer, .btn-evaluate, .btn-submit {
@@ -91,70 +80,57 @@ h1 {
     height: 44px;
     margin: 8px 0;
 }
-
 .btn:hover, .btn-primary:hover, .btn-success:hover,
 .btn-info:hover, .btn-back:hover, .btn-details:hover,
 .btn-proposer:hover, .btn-evaluate:hover, .btn-submit:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
 }
-
 .btn:active, .btn-primary:active, .btn-success:active,
 .btn-info:active, .btn-back:active, .btn-details:active,
 .btn-proposer:active, .btn-evaluate:active, .btn-submit:active {
     transform: translateY(0);
     box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
 }
-
 .btn-primary {
     background-color: #799dcb;
     color: white;
 }
-
 .btn-primary:hover {
     background-color: #6a8bc0;
 }
-
 .btn-success {
     background-color: #4CAF50;
     color: white;
 }
-
 .btn-success:hover {
     background-color: #45a049;
 }
-
 .btn-info {
     background-color: #3498db;
     color: white;
 }
-
 .btn-info:hover {
     background-color: #2980b9;
 }
-
 .btn-back {
     background-color: #7f8c8d;
     color: white;
 }
-
 .btn-back:hover {
     background-color: #6c7a7d;
 }
-
 .btn-details {
     background-color: #3498db;
     color: white;
     padding: 8px 18px;
     min-width: 100px;
 }
-
 .btn-proposer, .btn-evaluate {
     background-color: #4CAF50;
     color: white;
     min-width: 200px;
 }
-
 .btn-submit {
     background-color: #4CAF50;
     color: white;
@@ -162,7 +138,6 @@ h1 {
     max-width: 200px;
     margin: 20px auto 0;
 }
-
 .filter-btn {
     padding: 8px 18px;
     background-color: #ecf0f1;
@@ -172,17 +147,14 @@ h1 {
     height: auto;
     box-shadow: none;
 }
-
 .filter-btn:hover {
     background-color: #d6eaf8;
     transform: none;
 }
-
 .filter-btn.active {
     background-color: #3498db;
     color: white;
 }
-
 .btn-danger {
     background-color: #e74c3c;
     color: white;
@@ -190,8 +162,6 @@ h1 {
 .btn-danger:hover {
     background-color: #c0392b;
 }
-
-
 /* Formulaires */
 form {
     background: white;
@@ -199,18 +169,15 @@ form {
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
-
 .form-group {
     margin-bottom: 0.5rem;
 }
-
 .form-group label {
     display: block;
     margin-bottom: 5px;
     color: #333;
     font-weight: bold;
 }
-
 .form-group input,
 .form-group textarea {
     width: 100%;
@@ -219,30 +186,25 @@ form {
     border-radius: 4px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
-
 .error-message {
     color: #e74c36;
     font-size: 0.9rem;
     margin-top: 5px;
 }
-
 /* Flash messages */
 .flash-message {
     padding: 10px;
     margin: 10px 0;
     border-radius: 4px;
 }
-
 .flash-message.success {
     background-color: #4caf50;
     color: white;
 }
-
 .flash-message.danger {
     background-color: #f44336;
     color: white;
 }
-
 /* En-tête de l'établissement */
 .etablissement-header {
     background: white;
@@ -252,12 +214,10 @@ form {
     margin-bottom: 30px;
     text-align: center;
 }
-
 .etablissement-header h1 {
     color: #333 !important;
     margin: 0 0 10px 0;
 }
-
 .type-badge {
     display: inline-block;
     background: #e74c3c;
@@ -267,18 +227,15 @@ form {
     font-size: 0.9rem;
     margin-bottom: 15px;
 }
-
 .etablissement-info {
     text-align: left;
     max-width: 600px;
     margin: 0 auto;
 }
-
 .etablissement-info p {
     margin: 8px 0;
     color: #333;
 }
-
 /* Section title */
 .section-title {
     color: #2c3e50;
@@ -286,7 +243,6 @@ form {
     text-align: center;
     position: relative;
 }
-
 .section-title:after {
     content: "";
     display: block;
@@ -295,7 +251,6 @@ form {
     background: #3498db;
     margin: 10px auto;
 }
-
 /* Grille des établissements */
 .grille {
     display: grid;
@@ -303,7 +258,6 @@ form {
     gap: 25px;
     margin-top: 20px;
 }
-
 /* Cartes cliquables */
 .carte {
     text-decoration: none;
@@ -316,19 +270,16 @@ form {
     display: block;
     height: 100%;
 }
-
 .carte:hover {
     transform: translateY(-7px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
     color: inherit;
 }
-
 .card-image {
     width: 100%;
     height: 180px;
     object-fit: cover;
 }
-
 .card-image.placeholder {
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     display: flex;
@@ -337,54 +288,46 @@ form {
     color: #7f8c8d;
     font-style: italic;
 }
-
 .card-content {
     padding: 20px;
     position: relative;
     min-height: 160px;
 }
-
 .card-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 10px;
 }
-
 .carte h2 {
     margin: 0 0 8px 0;
     font-size: 1.3rem;
     color: #333 !important;
 }
-
 .type {
     color: #7f8c8d;
     font-style: italic;
     font-size: 0.9rem;
     margin: 5px 0;
 }
-
 .adresse {
     color: #34495e;
     font-size: 0.9rem;
     margin: 10px 0;
     line-height: 1.4;
 }
-
 .description {
     color: #555;
     font-size: 0.9rem;
     line-height: 1.4;
     margin: 10px 0;
 }
-
 .flans-count {
     color: #e74c3c;
     font-weight: bold;
     font-size: 0.9rem;
     margin: 10px 0;
 }
-
 .arrow {
     position: absolute;
     bottom: 20px;
@@ -393,13 +336,14 @@ form {
     color: #3498db;
     transition: all 0.2s;
 }
-
 .carte:hover .arrow {
     transform: translateX(5px);
 }
-
 /* Badge "Label La Flanterie" */
 .badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
     background: #fee10d;
     color: white;
     padding: 4px 10px;
@@ -407,8 +351,13 @@ form {
     font-size: 0.8rem;
     font-weight: bold;
     margin-left: 10px;
+    z-index: 10; /* Assure que le badge est au-dessus de l'image */
 }
-
+/* Conteneur de l'image pour positionner le badge */
+.card-image-container {
+    position: relative;
+    display: block;
+}
 /* Filtres */
 .filters {
     display: flex;
@@ -417,7 +366,6 @@ form {
     margin: 25px 0;
     flex-wrap: wrap;
 }
-
 .filter-btn {
     padding: 8px 18px;
     background: #ecf0f1;
@@ -427,16 +375,13 @@ form {
     transition: all 0.2s;
     font-weight: 500;
 }
-
 .filter-btn:hover {
     background: #d6eaf8;
 }
-
 .filter-btn.active {
     background: #3498db;
     color: white;
 }
-
 /* Grille des flans */
 .flans-grid {
     display: grid;
@@ -444,7 +389,6 @@ form {
     gap: 25px;
     margin-bottom: 30px;
 }
-
 .flan-card {
     background: white;
     border-radius: 10px;
@@ -452,49 +396,41 @@ form {
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
 }
-
 .flan-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
 }
-
 .flan-card .card-content {
     padding: 20px;
     min-height: 150px;
     display: flex;
     flex-direction: column;
 }
-
 .flan-card h3 {
     margin: 0 0 10px 0;
     font-size: 1.2rem;
     color: #333 !important;
 }
-
 .flan-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
 }
-
 .flan-price {
     color: #e74c3c;
     font-weight: bold;
 }
-
 .flan-description {
     color: #555;
     flex-grow: 1;
     margin: 10px 0;
     line-height: 1.5;
 }
-
 .flan-actions {
     margin-top: auto;
     text-align: right;
 }
-
 .btn-details {
     display: inline-block;
     padding: 8px 15px;
@@ -505,11 +441,9 @@ form {
     font-weight: bold;
     transition: background 0.2s;
 }
-
 .btn-details:hover {
     background: #2980b9;
 }
-
 /* ===== Page Flan ===== */
 /* Conteneur principal du flan */
 .flan-detail-container {
@@ -519,30 +453,25 @@ form {
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
     margin-bottom: 30px;
 }
-
 /* En-tête du flan */
 .flan-header {
     text-align: center;
     margin-bottom: 30px;
 }
-
 .flan-title {
     color: #2c3e50;
     margin-bottom: 15px;
 }
-
 .flan-description {
     color: #555;
     font-size: 1.1em;
     margin-bottom: 10px;
 }
-
 .flan-price {
     color: #e74c3c;
     font-weight: bold;
     font-size: 1.2em;
 }
-
 /* Section des boutons */
 .flan-actions {
     display: flex;
@@ -551,19 +480,16 @@ form {
     flex-wrap: wrap;
     gap: 15px;
 }
-
 /* Section des évaluations */
 .evaluations-section {
     margin-top: 30px;
 }
-
 .evaluations-title {
     color: #2c3e50;
     margin-bottom: 20px;
     font-family: 'Bubblegum', cursive !important;
     text-align: center;
 }
-
 .evaluation-card {
     border: 1px solid #eee;
     border-radius: 8px;
@@ -571,40 +497,33 @@ form {
     margin-bottom: 20px;
     background: #f9f9f9;
 }
-
 .evaluation-content {
     display: flex;
     flex-direction: column;
     gap: 15px;
 }
-
 .evaluation-left {
     flex: 1;
 }
-
 .evaluation-right {
     text-align: center;
     margin-top: 15px;
 }
-
 .evaluation-notes {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
     margin-bottom: 15px;
 }
-
 .note-item {
     background: #f0f8ff;
     padding: 8px;
     border-radius: 5px;
 }
-
 .note-item p {
     margin: 0;
     color: #3498db;
 }
-
 .evaluation-moyenne {
     background: #e8f5e9;
     padding: 10px;
@@ -612,26 +531,22 @@ form {
     text-align: center;
     margin-bottom: 15px;
 }
-
 .evaluation-moyenne strong {
     color: #4CAF50;
     font-size: 1.2em;
 }
-
 .evaluation-comment {
     background: #fff;
     padding: 15px;
     border-radius: 5px;
     border: 1px solid #eee;
 }
-
 .evaluation-photo {
     max-width: 100%;
     max-height: 200px;
     border-radius: 5px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
-
 .no-evaluations {
     text-align: center;
     padding: 30px;
@@ -639,18 +554,15 @@ form {
     border-radius: 8px;
     color: #7f8c8d;
 }
-
 .no-evaluations i {
     font-size: 2em;
     color: #ccc;
     margin-bottom: 10px;
 }
-
 /* Boutons avec icônes */
 .btn-with-icon i {
     margin-right: 8px;
 }
-
 .btn-with-icon small {
     display: block;
     font-size: 0.7em;
@@ -658,7 +570,6 @@ form {
     margin-top: 2px;
     opacity: 0.9;
 }
-
 /* Message "Aucun résultat" */
 .no-results {
     grid-column: 1 / -1;
@@ -668,23 +579,19 @@ form {
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
-
 .no-results p {
     margin-bottom: 15px;
     color: #7f8c8d;
 }
-
 /* Animation */
 @keyframes pulse {
     0% { transform: scale(1); }
     50% { transform: scale(1.02); }
     100% { transform: scale(1); }
 }
-
 .carte:hover {
     animation: pulse 0.3s ease;
 }
-
 /* Section "Ajouter un flan" */
 .ajouter-flan-section {
     background: white;
@@ -693,39 +600,32 @@ form {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     margin-top: 20px;
 }
-
 .ajouter-flan-section h3 {
     color: #2c3e50;
     text-align: center;
     margin-bottom: 20px;
     font-family: 'Bubblegum', cursive !important;
 }
-
 /* Responsive */
 @media (max-width: 768px) {
     .grille,
     .flans-grid {
         grid-template-columns: 1fr;
     }
-
     .carte,
     .flan-card .card-content {
         min-height: auto;
     }
-
     .container {
         padding: 10px;
     }
-
     .carte {
         border-radius: 8px;
     }
-
     .card-content {
         padding: 15px;
     }
 }
-
 @media (max-width: 480px) {
     .container {
         padding: 10px;
