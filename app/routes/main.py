@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, request, current_app, flash
+from flask import Blueprint, session, render_template, redirect, url_for, request, current_app, flash
 from flask_login import login_required, current_user
 from sqlalchemy.exc import IntegrityError
 
@@ -91,6 +91,9 @@ def rechercher():
         return render_template('rechercher.html', form=form)
     resultats = query.all()
     etablissements, etablissements_json = afficher_etablissements(resultats)
+    # Stocker les résultats dans la session
+    session['resultats_recherche'] = etablissements_json
+
     return render_template('liste_etablissements.html',
                            etablissements=etablissements,
                            etablissements_json=etablissements_json,

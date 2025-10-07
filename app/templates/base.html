@@ -17,7 +17,7 @@
         <a href="{{ url_for('main.rechercher') }}" class="nav-link">Recherche</a>
         {% if current_user.is_authenticated %}
             <a href="{{ url_for('main.dashboard') }}" class="nav-link">Tableau de bord</a>
-            <a href="{{ url_for('auth.logout') }}" class="nav-link">Déconnexion</a>
+            <a href="{{ url_for('auth.logout') }}" class="nav-link">Deconnexion</a>
         {% else %}
             <a href="{{ url_for('auth.login') }}" class="nav-link">Connexion</a>
             <a href="{{ url_for('auth.register') }}" class="nav-link">Inscription</a>

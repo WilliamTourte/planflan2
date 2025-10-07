@@ -11,7 +11,7 @@ def afficher_etablissements(resultats):
     etablissements = resultats
     etablissements_json = [{
         'id_etab': etab.id_etab,
-        'nom': etab.nom,
+        'nom': enlever_accents(etab.nom), # On enlève les accents car la police Bubblegum ne les gère pas
         'adresse': etab.adresse,
         'ville': etab.ville,
         'code_postal': etab.code_postal,
