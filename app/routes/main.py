@@ -27,7 +27,8 @@ def index():
 @login_required
 def dashboard():
     form = UpdateProfileForm()
-    pending_evaluations = None
+
+    # L'administrateur peut voir les évaluations en attente
     if current_user.is_admin:
         pending_evaluations = Evaluation.query.filter_by(statut='EN_ATTENTE').all()
 
