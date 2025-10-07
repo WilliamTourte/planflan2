@@ -21,11 +21,17 @@ def index():
 
 
 
+
+
 @main_bp.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
     form = UpdateProfileForm()
-    if form.validate_on_submit():
+    pending_evaluations = None
+    if current_user.is_admin:
+        pending_evaluations = Evaluation.query.filter_by(statut='EN_ATTENTE').all()
+
+    if request.method == 'POST' and form.validate_on_submit():
         # Vérifiez si l'email a été modifié
         if form.email.data and form.email.data != current_user.email:
             existing_user = Utilisateur.query.filter(Utilisateur.email == form.email.data).first()
@@ -44,10 +50,13 @@ def dashboard():
             db.session.rollback()
             flash('Une erreur est survenue lors de la mise à jour de votre profil.', 'danger')
         return redirect(url_for('main.dashboard'))
+
     elif request.method == 'GET':
         form.pseudo.data = current_user.pseudo
         form.email.data = current_user.email
-    return render_template('dashboard.html', title='Tableau de bord', form=form)
+
+    return render_template('dashboard.html', title='Tableau de bord', form=form, pending_evaluations=pending_evaluations)
+
 
 @main_bp.route('/rechercher', methods=['GET', 'POST'])
 def rechercher():
