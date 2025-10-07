@@ -27,11 +27,9 @@ def index():
 @login_required
 def dashboard():
     form = UpdateProfileForm()
-
     # L'administrateur peut voir les évaluations en attente
     if current_user.is_admin:
         pending_evaluations = Evaluation.query.filter_by(statut='EN_ATTENTE').all()
-
     if request.method == 'POST' and form.validate_on_submit():
         # Vérifiez si l'email a été modifié
         if form.email.data and form.email.data != current_user.email:
@@ -51,12 +49,42 @@ def dashboard():
             db.session.rollback()
             flash('Une erreur est survenue lors de la mise à jour de votre profil.', 'danger')
         return redirect(url_for('main.dashboard'))
-
     elif request.method == 'GET':
         form.pseudo.data = current_user.pseudo
         form.email.data = current_user.email
-
     return render_template('dashboard.html', title='Tableau de bord', form=form, pending_evaluations=pending_evaluations)
+
+@main_bp.route('/valider_evaluation/<int:evaluation_id>', methods=['POST'])
+@login_required
+def valider_evaluation(evaluation_id):
+    if not current_user.is_admin:
+        flash('Vous n\'avez pas le droit d\'accéder à cette page.', 'danger')
+        return redirect(url_for('main.dashboard'))
+    evaluation = Evaluation.query.get_or_404(evaluation_id)
+    evaluation.statut = 'VALIDE'
+    try:
+        db.session.commit()
+        flash('L\'évaluation a été validée avec succès!', 'success')
+    except IntegrityError:
+        db.session.rollback()
+        flash('Une erreur est survenue lors de la validation de l\'évaluation.', 'danger')
+    return redirect(url_for('main.dashboard'))
+
+@main_bp.route('/supprimer_evaluation/<int:evaluation_id>', methods=['POST'])
+@login_required
+def supprimer_evaluation(evaluation_id):
+    if not current_user.is_admin:
+        flash('Vous n\'avez pas le droit d\'accéder à cette page.', 'danger')
+        return redirect(url_for('main.dashboard'))
+    evaluation = Evaluation.query.get_or_404(evaluation_id)
+    db.session.delete(evaluation)
+    try:
+        db.session.commit()
+        flash('L\'évaluation a été supprimée avec succès!', 'success')
+    except IntegrityError:
+        db.session.rollback()
+        flash('Une erreur est survenue lors de la suppression de l\'évaluation.', 'danger')
+    return redirect(url_for('main.dashboard'))
 
 
 @main_bp.route('/rechercher', methods=['GET', 'POST'])
