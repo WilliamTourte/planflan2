@@ -1,14 +1,13 @@
 from flask import url_for
 
 
-
-
 def enlever_accents(text): # Enlève les accents parce que la police ne les gère pas bien
     import unicodedata
     return unicodedata.normalize('NFD', text).encode('ascii', 'ignore').decode('utf-8')
 
 def afficher_etablissements(resultats):
     etablissements = resultats
+
     etablissements_json = [{
         'id_etab': etab.id_etab,
         'nom': enlever_accents(etab.nom), # On enlève les accents car la police Bubblegum ne les gère pas

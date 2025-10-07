@@ -46,7 +46,7 @@
                     </div>
                     <div class="card-content">
                         <div class="card-header">
-                            <h2>{{ etablissement.nom }}</h2>
+                            <h2>{{ etablissement.nom | enlever_accents }}</h2>
                         </div>
                         <p class="type">{{ etablissement.type_etab.value }}</p>
                         <p class="adresse">{{ etablissement.adresse }}, {{ etablissement.ville }}</p>
