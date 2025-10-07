@@ -22,5 +22,4 @@ def afficher_etablissements(resultats):
         'label' : bool(etab.label)
     } for etab in etablissements]
 
-
     return(etablissements, etablissements_json)
