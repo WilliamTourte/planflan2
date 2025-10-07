@@ -61,10 +61,14 @@
       <!-- Section des évaluations -->
       <div class="evaluations-section">
           <h2 class="evaluations-title">Mes evaluations</h2>
-
           {% if current_user.evaluations|list %}
               {% for evaluation in current_user.evaluations %}
               <div class="evaluation-card">
+                  <div class="evaluation-badge">
+                      <span class="badge {{ evaluation.statut.value }}">
+                          {{ evaluation.statut.value }}
+                      </span>
+                  </div>
                   <div class="evaluation-content">
                       <div class="evaluation-left">
                           <h3 style="color: #333; margin-bottom: 10px; font-family: 'Bubblegum', cursive !important;">
@@ -125,4 +129,34 @@
           document.getElementById('edit-profile-form').style.display = 'block';
       });
   </script>
+
+  <style>
+      .evaluation-card {
+          position: relative;
+      }
+      .evaluation-badge {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+      }
+      .badge {
+          display: inline-block;
+          padding: 4px 8px;
+          border-radius: 12px;
+          font-size: 0.8em;
+          font-weight: bold;
+      }
+      .badge-EN_ATTENTE {
+          background-color: orange;
+          color: white;
+      }
+      .badge-VALIDE {
+          background-color: green;
+          color: white;
+      }
+      .badge-SUPPRIME {
+          background-color: red;
+          color: white;
+      }
+  </style>
 {% endblock %}
