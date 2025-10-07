@@ -1,3 +1,33 @@
+{% macro afficher_image_ou_placeholder(item, classe='card-image') %}
+    {% if item.photos %}
+        <img src="{{ url_for('static', filename='uploads/' + item.photos[0].path) }}" alt="{{ item.nom }}" class="{{ classe }}">
+    {% else %}
+        <div class="{{ classe }} placeholder"><span>Pas de photo</span></div>
+    {% endif %}
+{% endmacro %}
+
+{% macro afficher_badge_etablissement(etablissement) %}
+    {% if etablissement.label %}
+        <span class="badge">⭐ Labellisé</span>
+    {% endif %}
+{% endmacro %}
+
+{% macro afficher_badge_flan(flan) %}
+    {% if flan.prix is not none %}
+        <span class="badge">{{ "%.2f"|format(flan.prix) }} €</span>
+    {% else %}
+        <span class="badge">Prix non renseigné</span>
+    {% endif %}
+{% endmacro %}
+
+{% macro afficher_badge_evaluation(evaluation) %}
+    {% if evaluation.gout is not none and evaluation.texture is not none and evaluation.visuel is not none and evaluation.pate is not none %}
+        <span class="badge">{{ (evaluation.gout + evaluation.texture + evaluation.visuel + evaluation.pate) / 4 }}/5</span>
+    {% else %}
+        <span class="badge">N/A</span>
+    {% endif %}
+{% endmacro %}
+
 {% macro afficher_grille_etablissements(etablissements) %}
     {% if not etablissements %}
         <div class="no-results">
@@ -11,14 +41,8 @@
             {% for etablissement in etablissements %}
                 <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}" class="carte" data-id="{{ etablissement.id_etab }}" data-lat="{{ etablissement.latitude }}" data-lng="{{ etablissement.longitude }}">
                     <div class="card-image-container">
-                        {% if etablissement.photos %}
-                            <img src="{{ url_for('static', filename='uploads/' + etablissement.photos[0].path) }}" alt="{{ etablissement.nom }}" class="card-image">
-                        {% else %}
-                            <div class="card-image placeholder"><span>Pas de photo</span></div>
-                        {% endif %}
-                        {% if etablissement.label %}
-                            <span class="badge">⭐ Labellisé</span>
-                        {% endif %}
+                        {{ afficher_image_ou_placeholder(etablissement) }}
+                        {{ afficher_badge_etablissement(etablissement) }}
                     </div>
                     <div class="card-content">
                         <div class="card-header">
@@ -35,6 +59,7 @@
         </div>
     {% endif %}
 {% endmacro %}
+
 {% macro afficher_grille_flans(flans, etablissement_id=None) %}
     {% if not flans %}
         <div class="no-results">
@@ -44,25 +69,16 @@
         <div class="grille">
             {% for flan in flans %}
                 <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}" class="carte">
-                    {% if flan.photos %}
-                        <img src="{{ url_for('static', filename='uploads/' + flan.photos[0].path) }}" alt="{{ flan.nom }}" class="card-image">
-                    {% else %}
-                        <div class="card-image placeholder"><span>Pas de photo</span></div>
-                    {% endif %}
+                    {{ afficher_image_ou_placeholder(flan) }}
                     <div class="card-content">
                         <div class="card-header">
                             <h3>{{ flan.nom }}</h3>
-                            {% if flan.prix is not none %}
-                                <span class="badge">{{ "%.2f"|format(flan.prix) }} €</span>
-                            {% else %}
-                                <span class="badge">Prix non renseigné</span>
-                            {% endif %}
+                            {{ afficher_badge_flan(flan) }}
                         </div>
                         <p class="type">{{ flan.description or "Un flan flantastique" }}</p>
                     </div>
                 </a>
             {% endfor %}
-            <!-- Carte pour ajouter un flan -->
             {% if etablissement_id is not none %}
                 <div class="carte ajouter-flan-carte">
                     <div class="card-content">
@@ -83,7 +99,6 @@
     {% endif %}
 {% endmacro %}
 
-
 {% macro afficher_grille_evaluations(evaluations) %}
     {% if not evaluations %}
         <div class="no-results">
@@ -96,7 +111,38 @@
                     <div class="card-content">
                         <div class="card-header">
                             <h3>{{ evaluation.utilisateur.pseudo }}</h3>
-                            <span class="badge">{{ evaluation.note }}/5</span>
+                            {{ afficher_badge_evaluation(evaluation) }}
+                        </div>
+                        <div class="evaluation-date-container">
+                            <small class="evaluation-date">
+                                laissee le {{ evaluation.date_creation.strftime('%d/%m/%Y') }}
+                            </small>
+                        </div>
+                        <div class="criteria">
+                            {% if evaluation.gout is not none %}
+                                <div class="criterion">
+                                    <span class="criterion-name">Goût :</span>
+                                    <span class="criterion-value">{{ evaluation.gout }}/5</span>
+                                </div>
+                            {% endif %}
+                            {% if evaluation.texture is not none %}
+                                <div class="criterion">
+                                    <span class="criterion-name">Texture :</span>
+                                    <span class="criterion-value">{{ evaluation.texture }}/5</span>
+                                </div>
+                            {% endif %}
+                            {% if evaluation.visuel is not none %}
+                                <div class="criterion">
+                                    <span class="criterion-name">Visuel :</span>
+                                    <span class="criterion-value">{{ evaluation.visuel }}/5</span>
+                                </div>
+                            {% endif %}
+                            {% if evaluation.pate is not none %}
+                                <div class="criterion">
+                                    <span class="criterion-name">Pâte :</span>
+                                    <span class="criterion-value">{{ evaluation.pate }}/5</span>
+                                </div>
+                            {% endif %}
                         </div>
                         <p class="type">{{ evaluation.commentaire }}</p>
                     </div>
@@ -105,3 +151,4 @@
         </div>
     {% endif %}
 {% endmacro %}
+

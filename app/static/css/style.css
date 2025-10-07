@@ -502,40 +502,51 @@ form {
     font-family: 'Bubblegum', cursive !important;
     text-align: center;
 }
+/* Style pour les cartes d'évaluation */
 .evaluation-card {
-    border: 1px solid #eee;
-    border-radius: 8px;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
     padding: 20px;
     margin-bottom: 20px;
-    background: #f9f9f9;
-    position: relative;
 }
-.evaluation-content {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+
+.evaluation-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
 }
-.evaluation-left {
-    flex: 1;
-}
-.evaluation-right {
-    text-align: center;
-    margin-top: 15px;
-}
-.evaluation-notes {
+
+.criteria {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 10px;
-    margin-bottom: 15px;
+    margin: 15px 0;
 }
-.note-item {
-    background: #f0f8ff;
-    padding: 8px;
-    border-radius: 5px;
+
+.criterion {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
 }
-.note-item p {
-    margin: 0;
+
+.criterion-name {
+    font-weight: bold;
+    color: #333;
+}
+
+.criterion-value {
     color: #3498db;
+    font-weight: bold;
+}
+
+.evaluation-comment {
+    margin-top: 15px;
+    color: #555;
+    line-height: 1.5;
 }
 .evaluation-moyenne {
     background: #e8f5e9;
@@ -706,4 +717,13 @@ form {
 .evaluation-statut-badge-SUPPRIME {
     background-color: red;
     color: white;
+}
+
+.evaluation-date {
+    color: #7f8c8d;
+    font-size: 0.9em;
+    font-weight: normal;
+    font-family: 'Bubblegum', cursive !important;
+    text-align: left;
+    display: block; /* Assure que le texte est aligné à gauche */
 }
