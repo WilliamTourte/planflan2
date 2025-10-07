@@ -60,8 +60,8 @@
     {% endif %}
 {% endmacro %}
 
-{% macro afficher_grille_flans(flans, current_user, etablissement_id=None) %}
 
+{% macro afficher_grille_flans(flans, current_user, etablissement_id=None) %}
     {% if not flans %}
         <div class="no-results">
             <p>Aucun flan trouvé.</p>
@@ -145,22 +145,22 @@
                                 </div>
                             {% endif %}
                         </div>
-                        <p class="type">{{ evaluation.commentaire }}</p>
+                        <p class="type">{{ evaluation.description }}</p>
                         {% if current_user.is_admin %}
                             <div class="action-buttons">
-                                <form method="POST" action="{{ url_for('main.valider_evaluation', evaluation_id=evaluation.id_eval) }}" style="display: inline-block;">
+                                <form method="POST" action="{{ url_for('main.valider_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
                                     <button type="submit" class="btn btn-success">Valider</button>
                                 </form>
-                                <form method="POST" action="{{ url_for('main.supprimer_evaluation', evaluation_id=evaluation.id_eval) }}" style="display: inline-block;">
+                                <form method="POST" action="{{ url_for('main.supprimer_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
                                     <button type="submit" class="btn btn-danger">Supprimer</button>
                                 </form>
                             </div>
-                        {% elif current_user.id_user == evaluation.utilisateur_id %}
+                        {% elif current_user.id_user == evaluation.id_user %}
                             <div class="action-buttons">
-                                <form method="POST" action="{{ url_for('main.modifier_evaluation', evaluation_id=evaluation.id_eval) }}" style="display: inline-block;">
+                                <form method="POST" action="{{ url_for('main.modifier_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
                                     <button type="submit" class="btn btn-primary">Modifier</button>
                                 </form>
-                                <form method="POST" action="{{ url_for('main.supprimer_evaluation', evaluation_id=evaluation.id_eval) }}" style="display: inline-block;">
+                                <form method="POST" action="{{ url_for('main.supprimer_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
                                     <button type="submit" class="btn btn-danger">Supprimer</button>
                                 </form>
                             </div>

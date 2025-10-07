@@ -26,6 +26,7 @@ def dashboard():
     # L'administrateur peut voir les évaluations en attente
     if current_user.is_admin:
         pending_evaluations = Evaluation.query.filter_by(statut='EN_ATTENTE').all()
+
     # Si demande de modification du profil
     if request.method == 'POST' and form.validate_on_submit():
         #  Email modifié ?
@@ -52,10 +53,47 @@ def dashboard():
     return render_template('dashboard.html', title='Tableau de bord', form=form, pending_evaluations=pending_evaluations)
 
 
-@main_bp.route('/supprimer_evaluation/<int:evaluation_id>', methods=['POST'])
+
+from flask import request
+
+@main_bp.route('/modifier_evaluation/<int:id_eval>', methods=['POST'])
 @login_required
-def supprimer_evaluation(evaluation_id):
-    evaluation = Evaluation.query.get_or_404(evaluation_id)
+def modifier_evaluation(id_eval):
+    evaluation = Evaluation.query.get_or_404(id_eval)
+    if current_user.id_user != evaluation.id_user and not current_user.is_admin:
+        flash('Vous n\'avez pas le droit de modifier cette évaluation.', 'danger')
+        return redirect(url_for('main.dashboard'))
+
+    # Mise à jour des champs de l'évaluation avec les valeurs du formulaire
+    evaluation.visuel = request.form.get('visuel', evaluation.visuel)
+    evaluation.texture = request.form.get('texture', evaluation.texture)
+    evaluation.pate = request.form.get('pate', evaluation.pate)
+    evaluation.gout = request.form.get('gout', evaluation.gout)
+    evaluation.description = request.form.get('description', evaluation.description)
+    # Recalculer la moyenne
+    moyenne = (
+        float(evaluation.visuel) +
+        float(evaluation.texture) +
+        float(evaluation.pate) +
+        float(evaluation.gout)
+    ) / 4
+    evaluation.moyenne = moyenne
+
+    try:
+        db.session.commit()
+        flash('L\'évaluation a été modifiée avec succès!', 'success')
+    except IntegrityError:
+        db.session.rollback()
+        flash('Une erreur est survenue lors de la modification de l\'évaluation.', 'danger')
+
+    # Redirige vers la route evaluer_flan avec l'ID du flan associé à cette évaluation
+    return redirect(url_for('main.evaluer_flan', id_flan=evaluation.id_flan))
+
+
+@main_bp.route('/supprimer_evaluation/<int:id_eval>', methods=['POST'])
+@login_required
+def supprimer_evaluation(id_eval):
+    evaluation = Evaluation.query.get_or_404(id_eval)
     if current_user.id_user != evaluation.id_user and not current_user.is_admin:
         flash('Vous n\'avez pas le droit de supprimer cette évaluation.', 'danger')
         return redirect(url_for('main.dashboard'))
@@ -68,13 +106,13 @@ def supprimer_evaluation(evaluation_id):
         flash('Une erreur est survenue lors de la suppression de l\'évaluation.', 'danger')
     return redirect(url_for('main.dashboard'))
 
-@main_bp.route('/valider_evaluation/<int:evaluation_id>', methods=['POST'])
+@main_bp.route('/valider_evaluation/<int:id_eval>', methods=['POST'])
 @login_required
-def valider_evaluation(evaluation_id):
+def valider_evaluation(id_eval):
     if not current_user.is_admin:
         flash('Vous n\'avez pas le droit d\'accéder à cette page.', 'danger')
         return redirect(url_for('main.dashboard'))
-    evaluation = Evaluation.query.get_or_404(evaluation_id)
+    evaluation = Evaluation.query.get_or_404(id_eval)
     evaluation.statut = 'VALIDE'
     try:
         db.session.commit()
