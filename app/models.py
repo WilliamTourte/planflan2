@@ -25,7 +25,6 @@ class Utilisateur(db.Model, UserMixin):
         return bcrypt.check_password_hash(self.password, password)
 
 
-
 class TypeEtab(Enum):
     BOULANGERIE = 'Boulangerie'
     PATISSERIE = "Pâtisserie"
