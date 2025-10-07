@@ -55,6 +55,7 @@ def dashboard():
 
 
 from flask import request
+from flask import request
 
 @main_bp.route('/modifier_evaluation/<int:id_eval>', methods=['POST'])
 @login_required
@@ -70,6 +71,7 @@ def modifier_evaluation(id_eval):
     evaluation.pate = request.form.get('pate', evaluation.pate)
     evaluation.gout = request.form.get('gout', evaluation.gout)
     evaluation.description = request.form.get('description', evaluation.description)
+
     # Recalculer la moyenne
     moyenne = (
         float(evaluation.visuel) +
@@ -210,31 +212,45 @@ def proposer_flan(id_etab):
         return redirect(url_for('main.afficher_etablissement_unique', id_etab=id_etab))
     return render_template('page_etablissement.html', form=form, etablissement=etablissement)
 
+
+
+
 @main_bp.route('/flan/<int:id_flan>/evaluer', methods=['GET', 'POST'])
 @login_required
 def evaluer_flan(id_flan):
-    flan_unique = Flan.query.get_or_404(id_flan)  # Récupère le flan par son ID ou 404 si l'id n'existe pas
-    form=EvalForm()
-    if form.validate_on_submit():  # Si le formulaire est soumis et valide
-        # Calcul de la moyenne
+    flan_unique = Flan.query.get_or_404(id_flan)
+    form = EvalForm()
+    # Vérifiez si une évaluation existe déjà pour cet utilisateur et ce flan
+    evaluation = Evaluation.query.filter_by(id_flan=id_flan, id_user=current_user.id_user).first()
+    if form.validate_on_submit():
         moyenne = (
             float(form.visuel.data) +
             float(form.texture.data) +
             float(form.pate.data) +
             float(form.gout.data)
         ) / 4
-        evaluation=Evaluation(
-            visuel = form.visuel.data,
-            texture = form.texture.data,
-            pate = form.pate.data,
-            gout = form.gout.data,
-            description = form.description.data,
-            id_flan=id_flan,
-            id_user=current_user.id_user, # récupère l'id par Flask Login (current_user)
-            moyenne=moyenne
-        )
-        db.session.add(evaluation)
+        if evaluation:
+            # Mettre à jour l'évaluation existante
+            evaluation.visuel = form.visuel.data
+            evaluation.texture = form.texture.data
+            evaluation.pate = form.pate.data
+            evaluation.gout = form.gout.data
+            evaluation.description = form.description.data
+            evaluation.moyenne = moyenne
+        else:
+            # Créer une nouvelle évaluation
+            evaluation = Evaluation(
+                visuel=form.visuel.data,
+                texture=form.texture.data,
+                pate=form.pate.data,
+                gout=form.gout.data,
+                description=form.description.data,
+                id_flan=id_flan,
+                id_user=current_user.id_user,
+                moyenne=moyenne
+            )
+            db.session.add(evaluation)
         db.session.commit()
-        return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))  # Redirige vers la page du flan
-    # Affiche le formulaire (GET)
+        return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
+    # Si c'est une requête GET ou si le formulaire n'est pas valide, affichez le formulaire
     return render_template('evaluer_flan.html', form=form, flan=flan_unique)
