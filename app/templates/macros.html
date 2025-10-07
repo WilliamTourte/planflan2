@@ -116,7 +116,7 @@
                         </div>
                         <div class="evaluation-date-container">
                             <small class="evaluation-date">
-                                laissée le {{ evaluation.date_creation.strftime('%d/%m/%Y') }}
+                                {{ evaluation.date_creation.strftime('%d/%m/%Y') }}
                             </small>
                         </div>
                         <div class="criteria">
@@ -156,14 +156,20 @@
                                 </form>
                             </div>
                         {% elif current_user.id_user == evaluation.id_user %}
-                            <div class="action-buttons">
-                                <form method="POST" action="{{ url_for('main.modifier_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
-                                    <button type="submit" class="btn btn-primary">Modifier</button>
-                                </form>
-                                <form method="POST" action="{{ url_for('main.supprimer_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
-                                    <button type="submit" class="btn btn-danger">Supprimer</button>
-                                </form>
-                            </div>
+<div class="action-buttons d-flex gap-1">
+    <form method="POST" action="{{ url_for('main.modifier_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
+        <button type="submit" class="btn btn-primary btn-sm square-btn" title="Modifier">
+            <i class="bi bi-pencil"></i>
+        </button>
+    </form>
+    <form method="POST" action="{{ url_for('main.supprimer_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
+        <button type="submit" class="btn btn-danger btn-sm square-btn" title="Supprimer">
+            <i class="bi bi-trash"></i>
+        </button>
+    </form>
+</div>
+
+
                         {% endif %}
                     </div>
                 </div>

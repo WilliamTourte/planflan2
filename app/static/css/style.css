@@ -512,19 +512,16 @@ form {
     padding: 20px;
     margin-bottom: 20px;
 }
-
 .evaluation-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
 }
-
 .criteria {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 10px;
     margin: 15px 0;
 }
-
 .criterion {
     display: flex;
     justify-content: space-between;
@@ -532,17 +529,14 @@ form {
     padding: 8px 0;
     border-bottom: 1px solid #eee;
 }
-
 .criterion-name {
     font-weight: bold;
     color: #333;
 }
-
 .criterion-value {
     color: #3498db;
     font-weight: bold;
 }
-
 .evaluation-comment {
     margin-top: 15px;
     color: #555;
@@ -594,6 +588,35 @@ form {
     margin-top: 2px;
     opacity: 0.9;
 }
+/* Boutons ""carrés"" */
+
+.square-btn {
+    width: 45%; /* Chaque bouton prend un peu moins de la moitié de la largeur */
+    height: 36px; /* Hauteur fixe pour garder une forme carrée ou rectangulaire */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border-radius: 4px;
+    font-size: 16px;
+    margin: 0; /* Supprime toute marge autour des boutons */
+}
+.square-btn i {
+    margin: 0;
+}
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: center; /* Centre les boutons horizontalement */
+    width: 100%; /* Prend toute la largeur disponible */
+    max-width: 100%; /* Limite la largeur totale des boutons à la largeur de la carte */
+    margin: 0; /* Supprime toute marge autour du conteneur des boutons */
+    padding: 0; /* Supprime tout padding autour du conteneur des boutons */
+}
+
+
+
 /* Message "Aucun résultat" */
 .no-results {
     grid-column: 1 / -1;
@@ -718,7 +741,6 @@ form {
     background-color: red;
     color: white;
 }
-
 .evaluation-date {
     color: #7f8c8d;
     font-size: 0.9em;
