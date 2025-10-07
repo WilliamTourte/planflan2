@@ -508,6 +508,7 @@ form {
     padding: 20px;
     margin-bottom: 20px;
     background: #f9f9f9;
+    position: relative;
 }
 .evaluation-content {
     display: flex;
@@ -680,4 +681,29 @@ form {
 .search-button:hover {
     background-color: #2980b9;
 }
-
+/* Styles pour les badges d'évaluation */
+.evaluation-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+.evaluation-statut-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: bold;
+    font-family: 'Bubblegum', cursive !important;
+}
+.evaluation-statut-badge-EN_ATTENTE {
+    background-color: orange;
+    color: white;
+}
+.evaluation-statut-badge-VALIDE {
+    background-color: green;
+    color: white;
+}
+.evaluation-statut-badge-SUPPRIME {
+    background-color: red;
+    color: white;
+}
