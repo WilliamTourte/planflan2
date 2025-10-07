@@ -112,43 +112,7 @@
         <div id="map"></div>
     </div>
     <!-- Grille des établissements -->
-    <div class="grille">
-        {% for etablissement in etablissements %}
-        <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}"
-           class="carte"
-           data-id="{{ etablissement.id_etab }}"
-           data-lat="{{ etablissement.latitude }}"
-           data-lng="{{ etablissement.longitude }}">
-            <div class="card-image-container">
-                {% if etablissement.photos %}
-                    <img src="{{ url_for('static', filename='uploads/' + etablissement.photos[0].path) }}" alt="{{ etablissement.nom }}" class="card-image">
-                {% else %}
-                    <div class="card-image placeholder"><span>Pas de photo</span></div>
-                {% endif %}
-                {% if etablissement.label %}
-                    <span class="badge">⭐ Labellisé</span>
-                {% endif %}
-            </div>
-            <div class="card-content">
-                <div class="card-header">
-                    <h2>{{ etablissement.nom | enlever_accents }}</h2>
-                </div>
-                <p class="type">{{ etablissement.type_etab.value }}</p>
-                <p class="adresse">{{ etablissement.adresse }}, {{ etablissement.ville }}</p>
-                {% if etablissement.flans %}
-                    <p class="flans-count">{{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}</p>
-                {% endif %}
+{% from "macros.html" import afficher_grille_etablissements %}
+{{ afficher_grille_etablissements(etablissements) }}
 
-            </div>
-        </a>
-        {% else %}
-        <div class="no-results">
-            <p>Aucun établissement trouvé.</p>
-            {% if current_user.is_authenticated and current_user.type_user == 'admin' %}
-                <a href="{{ url_for('main.ajouter_etablissement') }}" class="btn">Ajouter un établissement</a>
-            {% endif %}
-        </div>
-        {% endfor %}
-    </div>
-</div>
 {% endblock %}

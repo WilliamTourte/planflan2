@@ -1,0 +1,107 @@
+{% macro afficher_grille_etablissements(etablissements) %}
+    {% if not etablissements %}
+        <div class="no-results">
+            <p>Aucun établissement trouvé.</p>
+            {% if current_user.is_authenticated and current_user.type_user == 'admin' %}
+                <a href="{{ url_for('main.ajouter_etablissement') }}" class="btn">Ajouter un établissement</a>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="grille">
+            {% for etablissement in etablissements %}
+                <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}" class="carte" data-id="{{ etablissement.id_etab }}" data-lat="{{ etablissement.latitude }}" data-lng="{{ etablissement.longitude }}">
+                    <div class="card-image-container">
+                        {% if etablissement.photos %}
+                            <img src="{{ url_for('static', filename='uploads/' + etablissement.photos[0].path) }}" alt="{{ etablissement.nom }}" class="card-image">
+                        {% else %}
+                            <div class="card-image placeholder"><span>Pas de photo</span></div>
+                        {% endif %}
+                        {% if etablissement.label %}
+                            <span class="badge">⭐ Labellisé</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <h2>{{ etablissement.nom }}</h2>
+                        </div>
+                        <p class="type">{{ etablissement.type_etab.value }}</p>
+                        <p class="adresse">{{ etablissement.adresse }}, {{ etablissement.ville }}</p>
+                        {% if etablissement.flans %}
+                            <p class="flans-count">{{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}</p>
+                        {% endif %}
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro afficher_grille_flans(flans, etablissement_id=None) %}
+    {% if not flans %}
+        <div class="no-results">
+            <p>Aucun flan trouvé.</p>
+        </div>
+    {% else %}
+        <div class="grille">
+            {% for flan in flans %}
+                <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}" class="carte">
+                    {% if flan.photos %}
+                        <img src="{{ url_for('static', filename='uploads/' + flan.photos[0].path) }}" alt="{{ flan.nom }}" class="card-image">
+                    {% else %}
+                        <div class="card-image placeholder"><span>Pas de photo</span></div>
+                    {% endif %}
+                    <div class="card-content">
+                        <div class="card-header">
+                            <h3>{{ flan.nom }}</h3>
+                            {% if flan.prix is not none %}
+                                <span class="badge">{{ "%.2f"|format(flan.prix) }} €</span>
+                            {% else %}
+                                <span class="badge">Prix non renseigné</span>
+                            {% endif %}
+                        </div>
+                        <p class="type">{{ flan.description or "Un flan flantastique" }}</p>
+                    </div>
+                </a>
+            {% endfor %}
+            <!-- Carte pour ajouter un flan -->
+            {% if etablissement_id is not none %}
+                <div class="carte ajouter-flan-carte">
+                    <div class="card-content">
+                        <h3>Ajouter un flan</h3>
+                        {% if current_user.is_authenticated %}
+                            <a href="{{ url_for('main.ajouter_flan', id_etab=etablissement_id) }}" class="btn-proposer">
+                                Ajouter un flan
+                            </a>
+                        {% else %}
+                            <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
+                                Connectez-vous pour ajouter un flan
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro afficher_grille_evaluations(evaluations) %}
+    {% if not evaluations %}
+        <div class="no-results">
+            <p>Aucune évaluation trouvée.</p>
+        </div>
+    {% else %}
+        <div class="grille">
+            {% for evaluation in evaluations %}
+                <div class="carte">
+                    <div class="card-content">
+                        <div class="card-header">
+                            <h3>{{ evaluation.utilisateur.nom }}</h3>
+                            <span class="badge">{{ evaluation.note }}/5</span>
+                        </div>
+                        <p class="type">{{ evaluation.commentaire }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endmacro %}

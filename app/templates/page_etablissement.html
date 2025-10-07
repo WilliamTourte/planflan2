@@ -16,79 +16,14 @@
         </div>
     </div>
 
-<!-- Grille des flans -->
+{% from "macros.html" import afficher_grille_flans %}
 <h2 class="section-title">Les flans</h2>
-{% if etablissement.flans %}
-    <div class="grille">
-        {% for flan in etablissement.flans %}
-        <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}" class="carte">
-            {% if flan.photos %}
-                <img src="{{ url_for('static', filename='uploads/' + flan.photos[0].path) }}" alt="{{ flan.nom }}" class="card-image">
-            {% else %}
-                <div class="card-image placeholder"><span>Pas de photo</span></div>
-            {% endif %}
-            <div class="card-content">
-                <div class="card-header">
-                    <h3>{{ flan.nom | enlever_accents }}</h3>
-                    {% if flan.prix is not none %}
-                        <span class="badge">{{ "%.2f"|format(flan.prix) }} €</span>
-                    {% else %}
-                        <span class="badge">Prix non renseigné</span>
-                    {% endif %}
-                </div>
-                <p class="type">{{ flan.description or "Un flan flantastique" }}</p>
-
-            </div>
-        </a>
-        {% endfor %}
-    </div>
-{% else %}
-    <div class="no-results">
-        <p>Aucun flan propose pour cet établissement.</p>
-    </div>
-{% endif %}
+{{ afficher_grille_flans(etablissement.flans) }}
 
 
-    <!-- Section pour ajouter un flan -->
-    <div class="ajouter-flan-section">
-        <h3>Ajouter un flan</h3>
-        {% if current_user.is_authenticated %}
-            <!-- Formulaire d'ajout de flan -->
-            <form method="POST" action="{{ url_for('main.proposer_flan', id_etab=etablissement.id_etab) }}" class="form-container">
 
-                {{ form.hidden_tag() }}
-                <div class="form-group">
-                    {{ form.nom.label(class="form-label") }}
-                    {{ form.nom(class="form-control") }}
-                    {% if form.nom.errors %}
-                        <div class="error-message">{{ form.nom.errors[0] }}</div>
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    {{ form.description.label(class="form-label") }}
-                    {{ form.description(class="form-control") }}
-                    {% if form.description.errors %}
-                        <div class="error-message">{{ form.description.errors[0] }}</div>
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    {{ form.prix.label(class="form-label") }}
-                    {{ form.prix(class="form-control") }}
-                    {% if form.prix.errors %}
-                        <div class="error-message">{{ form.prix.errors[0] }}</div>
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    {{ form.submit(class="btn btn-proposer") }}
-                </div>
-            </form>
-        {% else %}
-            <!-- Bouton de connexion -->
-            <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
-                Ajouter un flan (connectez-vous)
-            </a>
-        {% endif %}
-    </div>
+
+
 
     <!-- Bouton retour -->
     <a href="#" onclick="window.history.back(); return false;" class="btn-back">← Retour à la liste</a>
