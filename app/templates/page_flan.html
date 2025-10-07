@@ -40,7 +40,7 @@
 
 {% from "macros.html" import afficher_grille_evaluations %}
 <h2 class="section-title">Les evaluations</h2>
-{{ afficher_grille_evaluations(flan.evaluations) }}
+{{ afficher_grille_evaluations(flan.evaluations, current_user) }}
 
 
 {% endblock %}

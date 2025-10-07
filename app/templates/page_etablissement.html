@@ -17,7 +17,7 @@
     </div>
 
 {% from "macros.html" import afficher_grille_flans %}
-{{ afficher_grille_flans(etablissement.flans, etablissement.id_etab) }}
+{{ afficher_grille_flans(etablissement.flans, etablissement.id_etab, current_user) }}
 
 
 

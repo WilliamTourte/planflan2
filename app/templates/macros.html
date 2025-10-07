@@ -60,7 +60,8 @@
     {% endif %}
 {% endmacro %}
 
-{% macro afficher_grille_flans(flans, etablissement_id=None) %}
+{% macro afficher_grille_flans(flans, current_user, etablissement_id=None) %}
+
     {% if not flans %}
         <div class="no-results">
             <p>Aucun flan trouvé.</p>
