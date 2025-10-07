@@ -22,6 +22,7 @@ def index():
 @login_required
 def dashboard():
     form = UpdateProfileForm()
+    pending_evaluations = []  # Initialisez avec une liste vide par défaut
     # L'administrateur peut voir les évaluations en attente
     if current_user.is_admin:
         pending_evaluations = Evaluation.query.filter_by(statut='EN_ATTENTE').all()
@@ -50,16 +51,6 @@ def dashboard():
         form.email.data = current_user.email
     return render_template('dashboard.html', title='Tableau de bord', form=form, pending_evaluations=pending_evaluations)
 
-@main_bp.route('/modifier_evaluation/<int:evaluation_id>', methods=['POST'])
-@login_required
-def modifier_evaluation(evaluation_id):
-    evaluation = Evaluation.query.get_or_404(evaluation_id)
-    if current_user.id_user != evaluation.utilisateur_id:
-        flash('Vous n\'avez pas le droit de modifier cette évaluation.', 'danger')
-        return redirect(url_for('main.dashboard'))
-    # Logique pour modifier l'évaluation
-    # Par exemple, rediriger vers une page de modification d'évaluation
-    return redirect(url_for('main.modifier_evaluation_page', evaluation_id=evaluation_id))
 
 @main_bp.route('/supprimer_evaluation/<int:evaluation_id>', methods=['POST'])
 @login_required
