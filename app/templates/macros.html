@@ -35,7 +35,6 @@
         </div>
     {% endif %}
 {% endmacro %}
-
 {% macro afficher_grille_flans(flans, etablissement_id=None) %}
     {% if not flans %}
         <div class="no-results">
@@ -68,7 +67,7 @@
                 <div class="carte ajouter-flan-carte">
                     <div class="card-content">
                         <h3>Ajouter un flan</h3>
-                        {% if current_user.is_authenticated %}
+                        {% if 'current_user' in _template_ctx and current_user.is_authenticated %}
                             <a href="{{ url_for('main.ajouter_flan', id_etab=etablissement_id) }}" class="btn-proposer">
                                 Ajouter un flan
                             </a>
@@ -84,6 +83,7 @@
     {% endif %}
 {% endmacro %}
 
+
 {% macro afficher_grille_evaluations(evaluations) %}
     {% if not evaluations %}
         <div class="no-results">
@@ -95,7 +95,7 @@
                 <div class="carte">
                     <div class="card-content">
                         <div class="card-header">
-                            <h3>{{ evaluation.utilisateur.nom }}</h3>
+                            <h3>{{ evaluation.utilisateur.pseudo }}</h3>
                             <span class="badge">{{ evaluation.note }}/5</span>
                         </div>
                         <p class="type">{{ evaluation.commentaire }}</p>

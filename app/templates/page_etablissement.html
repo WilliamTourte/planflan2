@@ -17,8 +17,8 @@
     </div>
 
 {% from "macros.html" import afficher_grille_flans %}
-<h2 class="section-title">Les flans</h2>
-{{ afficher_grille_flans(etablissement.flans) }}
+{{ afficher_grille_flans(etablissement.flans, etablissement.id_etab) }}
+
 
 
 

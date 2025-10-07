@@ -12,7 +12,7 @@ class Utilisateur(db.Model, UserMixin):
     email = db.Column(db.String(100), unique=True, nullable=False)
     is_admin = db.Column(db.Boolean, nullable=True, default=False)
     # Relation avec les évaluations
-    evaluations = db.relationship('Evaluation', back_populates='user')
+    evaluations = db.relationship('Evaluation', back_populates='utilisateur')
 
 
     def get_id(self):
@@ -89,7 +89,7 @@ class Evaluation(db.Model):
     moyenne = db.Column(db.Numeric(2, 1), nullable=True)
 
     # Relation avec Utilisateur
-    user = db.relationship('Utilisateur', back_populates='evaluations')
+    utilisateur = db.relationship('Utilisateur', back_populates='evaluations')
     # Relation avec Flan
     flan = db.relationship('Flan', back_populates='evaluations')
 
