@@ -154,6 +154,15 @@
                                     <button type="submit" class="btn btn-danger">Supprimer</button>
                                 </form>
                             </div>
+                        {% elif current_user.id_user == evaluation.utilisateur_id %}
+                            <div class="action-buttons">
+                                <form method="POST" action="{{ url_for('main.modifier_evaluation', evaluation_id=evaluation.id_eval) }}" style="display: inline-block;">
+                                    <button type="submit" class="btn btn-primary">Modifier</button>
+                                </form>
+                                <form method="POST" action="{{ url_for('main.supprimer_evaluation', evaluation_id=evaluation.id_eval) }}" style="display: inline-block;">
+                                    <button type="submit" class="btn btn-danger">Supprimer</button>
+                                </form>
+                            </div>
                         {% endif %}
                     </div>
                 </div>
@@ -161,3 +170,4 @@
         </div>
     {% endif %}
 {% endmacro %}
+
