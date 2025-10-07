@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-
 {% block content %}
   <div class="container">
       <h1>Tableau de bord</h1>
@@ -13,7 +12,6 @@
               </form>
           </div>
       </div>
-
       <div id="edit-profile-form" style="display: none;">
           <form method="POST" action="" class="form">
               {{ form.hidden_tag() }}
@@ -57,7 +55,6 @@
               </div>
           </form>
       </div>
-
       <!-- Section des évaluations -->
       <div class="evaluations-section">
           <h2 class="evaluations-title">Mes evaluations</h2>
@@ -77,7 +74,6 @@
                                   laissee le {{ evaluation.date_creation.strftime('%d/%m/%Y') }}
                               </small>
                           </h3>
-
                           <div class="evaluation-notes">
                               <div class="note-item">
                                   <p><strong>Visuel:</strong> {{ evaluation.visuel }}/5</p>
@@ -92,16 +88,16 @@
                                   <p><strong>Goût:</strong> {{ evaluation.gout }}/5</p>
                               </div>
                           </div>
-
                           <div class="evaluation-moyenne">
                               <strong>Moyenne : {{ "%.1f"|format(evaluation.moyenne) }}/5</strong>
                           </div>
-
                           <div class="evaluation-comment">
                               <p>{{ evaluation.description or "Aucun commentaire" }}</p>
                           </div>
+                          <div class="evaluation-actions">
+                              <a href="{{ url_for('main.evaluer_flan', id_flan=evaluation.id_flan) }}" class="btn btn-primary">Modifier l'évaluation</a>
+                          </div>
                       </div>
-
                       <div class="evaluation-right">
                           {% if evaluation.photo %}
                               <img src="{{ url_for('static', filename='uploads/' + evaluation.photo.path) }}"
@@ -122,12 +118,10 @@
           {% endif %}
       </div>
   </div>
-
   <script>
       document.getElementById('edit-profile-btn').addEventListener('click', function() {
           document.getElementById('user-info').style.display = 'none';
           document.getElementById('edit-profile-form').style.display = 'block';
       });
   </script>
-
 {% endblock %}
