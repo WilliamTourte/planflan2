@@ -22,7 +22,7 @@
             <a href="{{ url_for('auth.login') }}" class="nav-link">Connexion</a>
             <a href="{{ url_for('auth.register') }}" class="nav-link">Inscription</a>
         {% endif %}
-        <!-- Ajout du formulaire de recherche -->
+        <!-- Formulaire de recherche -->
         <form action="{{ url_for('main.rechercher') }}" method="GET" class="navbar-search">
             <input type="text" name="nom" placeholder="Rechercher..." class="search-input">
             <button type="submit" class="search-button">Rechercher</button>
