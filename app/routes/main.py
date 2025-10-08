@@ -125,45 +125,39 @@ def rechercher():
     from app.outils import afficher_etablissements
     form = ChercheEtabForm()
     query = Etablissement.query
-    # Vérifier si c'est une requête GET avec des paramètres de recherche
+
+    def apply_filters(query, params):
+        if params.get('nom'):
+            query = query.filter(Etablissement.nom.ilike(f'%{params["nom"]}%'))
+        if params.get('ville'):
+            query = query.filter(Etablissement.ville.ilike(f'%{params["ville"]}%'))
+        if params.get('visite') == 'oui':
+            query = query.filter(Etablissement.visite == 1)
+        elif params.get('visite') == 'non':
+            query = query.filter(Etablissement.visite == 0)
+        if params.get('labellise') == 'oui':
+            query = query.filter(Etablissement.label == 1)
+        elif params.get('labellise') == 'non':
+            query = query.filter(Etablissement.label == 0)
+        return query
+
     if request.method == 'GET':
         # Vérifier si au moins un paramètre a une valeur non vide
         has_search_params = any(request.args.get(k) for k in ['nom', 'visite', 'labellise'])
         if not has_search_params:
             return render_template('rechercher.html', form=form)
-        if 'nom' in request.args and request.args['nom']:
-            query = query.filter(Etablissement.nom.ilike(f'%{request.args["nom"]}%'))
-        if 'ville' in request.args and request.args['ville']:
-            query = query.filter(Etablissement.ville.ilike(f'%{request.args["ville"]}%'))
-        if 'visite' in request.args:
-            visite = request.args.get('visite')
-            if visite == 'oui':
-                query = query.filter(Etablissement.visite == 1)
-            elif visite == 'non':
-                query = query.filter(Etablissement.visite == 0)
-        if 'labellise' in request.args:
-            labellise = request.args.get('labellise')
-            if labellise == 'oui':
-                query = query.filter(Etablissement.label == 1)
-            elif labellise == 'non':
-                query = query.filter(Etablissement.label == 0)
-    # Vérifier si c'est une requête POST avec des données de formulaire
+        query = apply_filters(query, request.args)
     elif form.validate_on_submit():
-        if form.nom.data:
-            query = query.filter(Etablissement.nom.ilike(f'%{form.nom.data}%'))
-        if form.ville.data:
-            query = query.filter(Etablissement.ville.ilike(f'%{form.ville.data}%'))
-        if form.visite.data == 'oui':
-            query = query.filter(Etablissement.visite == 1)
-        elif form.visite.data == 'non':
-            query = query.filter(Etablissement.visite == 0)
-        if form.labellise.data == 'oui':
-            query = query.filter(Etablissement.label == 1)
-        elif form.labellise.data == 'non':
-            query = query.filter(Etablissement.label == 0)
+        query = apply_filters(query, {
+            'nom': form.nom.data,
+            'ville': form.ville.data,
+            'visite': form.visite.data,
+            'labellise': form.labellise.data
+        })
     else:
         # Si aucune recherche n'est effectuée, afficher le formulaire de recherche
         return render_template('rechercher.html', form=form)
+
     resultats = query.all()
     etablissements, etablissements_json = afficher_etablissements(resultats)
     # Stocker les résultats dans la session
@@ -172,6 +166,7 @@ def rechercher():
                            etablissements=etablissements,
                            etablissements_json=etablissements_json,
                            google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
+
 
 @main_bp.route('/etablissement/<int:id_etab>', methods=['GET', 'POST'])
 def afficher_etablissement_unique(id_etab):
