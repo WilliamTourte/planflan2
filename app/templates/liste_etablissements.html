@@ -31,7 +31,6 @@
     const etablissements = {{ etablissements_json|tojson|safe }};
     const infowindow = new google.maps.InfoWindow(); // Déplacez cette ligne ici
    etablissements.forEach(etablissement => {
-    console.log("Type d'établissement:", etablissement.type_etab);
     // L'icône change selon que le lieu a été visité et/ou labellisé
     let icon;
     if (etablissement.visite && etablissement.label) {
@@ -45,7 +44,7 @@
         position: { lat: etablissement.latitude, lng: etablissement.longitude },
         map: map,
         title: etablissement.nom,
-        icon: icon // Ajoutez l'icône appropriée
+        icon: icon
     });
     const detailsUrl = `/etablissement/${etablissement.id_etab}?nom=${nom}&visite=${visite}&labellise=${labellise}`;
     const content = `
