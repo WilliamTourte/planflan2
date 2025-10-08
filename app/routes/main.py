@@ -127,10 +127,12 @@ def rechercher():
     query = Etablissement.query
 
     def apply_filters(query, params):
-        if params.get('nom'):
-            query = query.filter(Etablissement.nom.ilike(f'%{params["nom"]}%'))
-        if params.get('ville'):
-            query = query.filter(Etablissement.ville.ilike(f'%{params["ville"]}%'))
+        search_term = params.get('nom')  # Supposons que le terme de recherche est passé sous le paramètre 'nom'
+        if search_term:
+            query = query.filter(
+                (Etablissement.nom.ilike(f'%{search_term}%')) |
+                (Etablissement.ville.ilike(f'%{search_term}%'))
+            )
         if params.get('visite') == 'oui':
             query = query.filter(Etablissement.visite == 1)
         elif params.get('visite') == 'non':
@@ -142,11 +144,11 @@ def rechercher():
         return query
 
     if request.method == 'GET':
-        # Vérifier si au moins un paramètre a une valeur non vide
         has_search_params = any(request.args.get(k) for k in ['nom', 'visite', 'labellise'])
-        if not has_search_params:
+        if has_search_params:
+            query = apply_filters(query, request.args)
+        else:
             return render_template('rechercher.html', form=form)
-        query = apply_filters(query, request.args)
     elif form.validate_on_submit():
         query = apply_filters(query, {
             'nom': form.nom.data,
@@ -155,17 +157,16 @@ def rechercher():
             'labellise': form.labellise.data
         })
     else:
-        # Si aucune recherche n'est effectuée, afficher le formulaire de recherche
         return render_template('rechercher.html', form=form)
 
     resultats = query.all()
     etablissements, etablissements_json = afficher_etablissements(resultats)
-    # Stocker les résultats dans la session
     session['resultats_recherche'] = etablissements_json
     return render_template('liste_etablissements.html',
                            etablissements=etablissements,
                            etablissements_json=etablissements_json,
                            google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
+
 
 
 @main_bp.route('/etablissement/<int:id_etab>', methods=['GET', 'POST'])
