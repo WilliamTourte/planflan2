@@ -182,7 +182,7 @@ def afficher_etablissement_unique(id_etab):
         # Traiter les données ici
         pass
     # Passe toujours le formulaire au template, même en GET
-    return render_template('page_etablissement.html', etablissement=etablissement, form=form)
+    return render_template('page_etablissement.html', etablissement=etablissement, form=form, current_user=current_user)
 
 @main_bp.route('/flan/<int:id_flan>')
 def afficher_flan_unique(id_flan):
