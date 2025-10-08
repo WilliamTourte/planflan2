@@ -133,6 +133,8 @@ def rechercher():
             return render_template('rechercher.html', form=form)
         if 'nom' in request.args and request.args['nom']:
             query = query.filter(Etablissement.nom.ilike(f'%{request.args["nom"]}%'))
+        if 'ville' in request.args and request.args['ville']:
+            query = query.filter(Etablissement.ville.ilike(f'%{request.args["ville"]}%'))
         if 'visite' in request.args:
             visite = request.args.get('visite')
             if visite == 'oui':
@@ -149,6 +151,8 @@ def rechercher():
     elif form.validate_on_submit():
         if form.nom.data:
             query = query.filter(Etablissement.nom.ilike(f'%{form.nom.data}%'))
+        if form.ville.data:
+            query = query.filter(Etablissement.ville.ilike(f'%{form.ville.data}%'))
         if form.visite.data == 'oui':
             query = query.filter(Etablissement.visite == 1)
         elif form.visite.data == 'non':

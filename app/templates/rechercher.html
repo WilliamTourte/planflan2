@@ -8,8 +8,15 @@
                 {{ form.hidden_tag() }}
                 <div class="form-group">
                     {{ form.nom.label(class="form-label") }}
-                    {{ form.nom(placeholder="Nom", class="form-control") }}
+                    {{ form.nom(placeholder="Nom de l'établissement", class="form-control") }}
                     {% for error in form.nom.errors %}
+                        <span class="error-message">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                            <div class="form-group">
+                    {{ form.ville.label(class="form-label") }}
+                    {{ form.ville(placeholder="Ville", class="form-control") }}
+                    {% for error in form.ville.errors %}
                         <span class="error-message">{{ error }}</span>
                     {% endfor %}
                 </div>
