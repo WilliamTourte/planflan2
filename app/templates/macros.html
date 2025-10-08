@@ -123,8 +123,6 @@
     </div>
 {% endmacro %}
 
-
-
 <!-- Grille des évaluations -->
 {% macro afficher_grille_evaluations(evaluations, current_user) %}
     {% if not evaluations %}
@@ -134,13 +132,11 @@
     {% else %}
         <div class="grille">
             {% for evaluation in evaluations %}
-                <div class="carte">
+                <a href="{{ url_for('main.afficher_flan_unique', id_flan=evaluation.flan.id_flan) }}" class="carte">
                     <div class="card-content">
                         <div class="card-header">
                             <h2>{{ evaluation.flan.etablissement.nom | enlever_accents }}</h2>
                             <h3>{{ evaluation.flan.nom | enlever_accents }}</h3>
-
-
                             {{ afficher_badge_evaluation(evaluation) }}
                         </div>
                         <div class="evaluation-date-container">
@@ -149,68 +145,54 @@
                             </small>
                         </div>
                         <div class="criteria">
-                            {% if evaluation.gout is not none %}
-                                <div class="criterion">
-                                    <span class="criterion-name">Goût :</span>
-                                    <span class="criterion-value">{{ evaluation.gout }}/5</span>
-                                </div>
-                            {% endif %}
-                            {% if evaluation.texture is not none %}
-                                <div class="criterion">
-                                    <span class="criterion-name">Texture :</span>
-                                    <span class="criterion-value">{{ evaluation.texture }}/5</span>
-                                </div>
-                            {% endif %}
-                            {% if evaluation.visuel is not none %}
-                                <div class="criterion">
-                                    <span class="criterion-name">Visuel :</span>
-                                    <span class="criterion-value">{{ evaluation.visuel }}/5</span>
-                                </div>
-                            {% endif %}
-                            {% if evaluation.pate is not none %}
-                                <div class="criterion">
-                                    <span class="criterion-name">Pâte :</span>
-                                    <span class="criterion-value">{{ evaluation.pate }}/5</span>
-                                </div>
-                            {% endif %}
+                            <div class="criterion">
+                                <span class="criterion-name">Goût :</span>
+                                <span class="criterion-value">{{ evaluation.gout }}/5</span>
+                            </div>
+                            <div class="criterion">
+                                <span class="criterion-name">Texture :</span>
+                                <span class="criterion-value">{{ evaluation.texture }}/5</span>
+                            </div>
+                            <div class="criterion">
+                                <span class="criterion-name">Visuel :</span>
+                                <span class="criterion-value">{{ evaluation.visuel }}/5</span>
+                            </div>
+                            <div class="criterion">
+                                <span class="criterion-name">Pâte :</span>
+                                <span class="criterion-value">{{ evaluation.pate }}/5</span>
+                            </div>
                         </div>
                         <p class="type">{{ evaluation.description }}</p>
-
-
-{% if current_user.id_user == evaluation.id_user %}
-<div class="action-buttons d-flex gap-1">
-    <form method="POST" action="{{ url_for('main.modifier_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
-        <button type="submit" class="btn btn-primary btn-sm square-btn" title="Modifier">
-            <i class="bi bi-pencil"></i>
-        </button>
-    </form>
-    <form method="POST" action="{{ url_for('main.supprimer_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
-        <button type="submit" class="btn btn-danger btn-sm square-btn" title="Supprimer">
-            <i class="bi bi-trash"></i>
-        </button>
-    </form>
-</div>
-
-    {% elif current_user.is_admin %}
-    <div class="action-buttons">
-        <form method="POST" action="{{ url_for('main.valider_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
-            <button type="submit" class="btn btn-success square-btn" title="Valider">
-                <i class="bi bi-check"></i>
-            </button>
-        </form>
-        <form method="POST" action="{{ url_for('main.supprimer_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
-            <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
-                <i class="bi bi-trash"></i>
-            </button>
-        </form>
-    </div>
-
-
+                        {% if current_user.id_user == evaluation.id_user %}
+                            <div class="action-buttons d-flex gap-1">
+                                <form method="POST" action="{{ url_for('main.modifier_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
+                                    <button type="submit" class="btn btn-primary btn-sm square-btn" title="Modifier">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                </form>
+                                <form method="POST" action="{{ url_for('main.supprimer_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
+                                    <button type="submit" class="btn btn-danger btn-sm square-btn" title="Supprimer">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        {% elif current_user.is_admin %}
+                            <div class="action-buttons">
+                                <form method="POST" action="{{ url_for('main.valider_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
+                                    <button type="submit" class="btn btn-success square-btn" title="Valider">
+                                        <i class="bi bi-check"></i>
+                                    </button>
+                                </form>
+                                <form method="POST" action="{{ url_for('main.supprimer_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
+                                    <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
                         {% endif %}
                     </div>
-                </div>
+                </a>
             {% endfor %}
         </div>
     {% endif %}
 {% endmacro %}
-
