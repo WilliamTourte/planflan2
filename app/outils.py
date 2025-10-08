@@ -18,6 +18,7 @@ def afficher_etablissements(resultats):
         'longitude': float(etab.longitude),
         'url': url_for('main.afficher_etablissement_unique', id_etab=etab.id_etab),
         'visite' : bool(etab.visite),
+        'type_etab': str(etab.type_etab.value),
         'label' : bool(etab.label)
     } for etab in etablissements]
 

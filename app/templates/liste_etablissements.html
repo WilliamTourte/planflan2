@@ -30,39 +30,43 @@
     console.log("Carte initialisée avec succès !");
     const etablissements = {{ etablissements_json|tojson|safe }};
     const infowindow = new google.maps.InfoWindow(); // Déplacez cette ligne ici
-    etablissements.forEach(etablissement => {
-        // L'icône change selon que le lieu a été visité et/ou labellisé
-        let icon;
-        if (etablissement.visite && etablissement.label) {
-            icon = "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
-        } else if (etablissement.visite) {
-            icon = "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
-        } else {
-            icon = "http://maps.google.com/mapfiles/ms/icons/blue-dot.png";
-        }
-        const marker = new google.maps.Marker({
-            position: { lat: etablissement.latitude, lng: etablissement.longitude },
-            map: map,
-            title: etablissement.nom,
-            icon: icon // Ajoutez l'icône appropriée
-        });
-        const detailsUrl = `/etablissement/${etablissement.id_etab}?nom=${nom}&visite=${visite}&labellise=${labellise}`;
-        const content = `
-            <div class="infowindow">
-                <h3>${etablissement.nom}</h3>
-                <p>${etablissement.adresse}, ${etablissement.code_postal} ${etablissement.ville}</p>
-                <a href="${detailsUrl}">Voir la page</a>
-            </div>
-        `;
-        marker.addListener("click", () => {
-            setTimeout(() => {
-                infowindow.setContent(content);
-                infowindow.open(map, marker);
-                const card = document.querySelector(`.carte[data-id="${etablissement.id_etab}"]`);
-            }, 50);
-        });
-        markers.push(marker);
+   etablissements.forEach(etablissement => {
+    console.log("Type d'établissement:", etablissement.type_etab);
+    // L'icône change selon que le lieu a été visité et/ou labellisé
+    let icon;
+    if (etablissement.visite && etablissement.label) {
+        icon = "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
+    } else if (etablissement.visite) {
+        icon = "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
+    } else {
+        icon = "http://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+    }
+    const marker = new google.maps.Marker({
+        position: { lat: etablissement.latitude, lng: etablissement.longitude },
+        map: map,
+        title: etablissement.nom,
+        icon: icon // Ajoutez l'icône appropriée
     });
+    const detailsUrl = `/etablissement/${etablissement.id_etab}?nom=${nom}&visite=${visite}&labellise=${labellise}`;
+    const content = `
+        <div class="infowindow">
+            <h3>${etablissement.nom}</h3>
+            <p class="type">${etablissement.type_etab}</p>
+            <p class="adresse">${etablissement.adresse}, ${etablissement.ville}</p>
+            ${etablissement.flans ? `<p class="flans-count">${etablissement.flans.length} flan${etablissement.flans.length > 1 ? 's' : ''}</p>` : ''}
+            <a href="${detailsUrl}">Voir la page</a>
+        </div>
+    `;
+    marker.addListener("click", () => {
+        setTimeout(() => {
+            infowindow.setContent(content);
+            infowindow.open(map, marker);
+            const card = document.querySelector(`.carte[data-id="${etablissement.id_etab}"]`);
+        }, 50);
+    });
+    markers.push(marker);
+});
+
     // Créer un élément div pour la légende
     const legend = document.createElement('div');
     legend.style.backgroundColor = 'white';
