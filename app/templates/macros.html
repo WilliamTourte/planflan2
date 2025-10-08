@@ -81,21 +81,13 @@
                 </a>
             {% endfor %}
         </div>
-        {%  endif %}
-        <!-- Contenu pour les utilisateurs connectés DEBUG -->
-    <p>Bienvenue, {{ current_user.pseudo }}!</p>
-
-    <p>Veuillez vous connecter pour voir ce contenu.</p>
-
-                <!-- Section pour ajouter un flan -->
-    <div class="ajouter-flan-section">
+    {% endif %}
+    <!-- Section pour ajouter un flan -->
+    <div class="card-content">
         <h3>Ajouter un flan</h3>
         {% if current_user.is_authenticated %}
-                {% if current_user.is_authenticated %}
-
             <!-- Formulaire d'ajout de flan -->
             <form method="POST" action="{{ url_for('main.proposer_flan', id_etab=etablissement.id_etab) }}" class="form-container">
-
                 {{ form.hidden_tag() }}
                 <div class="form-group">
                     {{ form.nom.label(class="form-label") }}
@@ -129,9 +121,8 @@
             </a>
         {% endif %}
     </div>
-        </div>
-    {% endif %}
 {% endmacro %}
+
 
 
 <!-- Grille des évaluations -->

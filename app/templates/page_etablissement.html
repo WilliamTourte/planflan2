@@ -1,11 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-    {% if current_user.is_authenticated %}
-    <!-- Contenu pour les utilisateurs connectés DEBUG -->
-    <p>Bienvenue, {{ current_user.pseudo }}!</p>
-{% else %}
-    <p>Veuillez vous connecter pour voir ce contenu.</p>
-{% endif %}
+
 
 <div class="container">
     <!-- Détails de l'établissement -->
