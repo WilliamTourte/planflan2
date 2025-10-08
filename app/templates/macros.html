@@ -22,11 +22,43 @@
 
 {% macro afficher_badge_evaluation(evaluation) %}
     {% if evaluation.gout is not none and evaluation.texture is not none and evaluation.visuel is not none and evaluation.pate is not none %}
-        <span class="badge">{{ (evaluation.gout + evaluation.texture + evaluation.visuel + evaluation.pate) / 4 }}/5</span>
+        {% set moyenne = (evaluation.gout + evaluation.texture + evaluation.visuel + evaluation.pate) / 4 %}
+        <span class="badge">{{ moyenne }}/5</span>
     {% else %}
         <span class="badge">N/A</span>
     {% endif %}
 {% endmacro %}
+
+{% macro afficher_boutons_actions(evaluation, current_user) %}
+    {% if current_user.id_user == evaluation.id_user %}
+        <div class="action-buttons d-flex gap-1">
+            <form method="POST" action="{{ url_for('main.modifier_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
+                <button type="submit" class="btn btn-primary btn-sm square-btn" title="Modifier">
+                    <i class="bi bi-pencil"></i>
+                </button>
+            </form>
+            <form method="POST" action="{{ url_for('main.supprimer_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
+                <button type="submit" class="btn btn-danger btn-sm square-btn" title="Supprimer">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </form>
+        </div>
+    {% elif current_user.is_admin %}
+        <div class="action-buttons">
+            <form method="POST" action="{{ url_for('main.valider_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
+                <button type="submit" class="btn btn-success square-btn" title="Valider">
+                    <i class="bi bi-check"></i>
+                </button>
+            </form>
+            <form method="POST" action="{{ url_for('main.supprimer_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
+                <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </form>
+        </div>
+    {% endif %}
+{% endmacro %}
+
 
 {% macro afficher_grille_etablissements(etablissements) %}
     {% if not etablissements %}
@@ -163,33 +195,7 @@
                             </div>
                         </div>
                         <p class="type">{{ evaluation.description }}</p>
-                        {% if current_user.id_user == evaluation.id_user %}
-                            <div class="action-buttons d-flex gap-1">
-                                <form method="POST" action="{{ url_for('main.modifier_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
-                                    <button type="submit" class="btn btn-primary btn-sm square-btn" title="Modifier">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                </form>
-                                <form method="POST" action="{{ url_for('main.supprimer_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
-                                    <button type="submit" class="btn btn-danger btn-sm square-btn" title="Supprimer">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        {% elif current_user.is_admin %}
-                            <div class="action-buttons">
-                                <form method="POST" action="{{ url_for('main.valider_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
-                                    <button type="submit" class="btn btn-success square-btn" title="Valider">
-                                        <i class="bi bi-check"></i>
-                                    </button>
-                                </form>
-                                <form method="POST" action="{{ url_for('main.supprimer_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
-                                    <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </form>
-                            </div>
-                        {% endif %}
+                        {{ afficher_boutons_actions(evaluation, current_user) }}
                     </div>
                 </a>
             {% endfor %}
