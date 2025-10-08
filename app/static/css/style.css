@@ -307,10 +307,12 @@ form {
 }
 .card-header {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    justify-content: flex-start;
     align-items: flex-start;
     margin-bottom: 10px;
 }
+
 .carte h2 {
     margin: 0 0 8px 0;
     font-size: 1.3rem;

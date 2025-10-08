@@ -20,6 +20,7 @@
     {% endif %}
 {% endmacro %}
 
+<!-- DEBUG Obsolete -->
 {% macro afficher_badge_evaluation(evaluation) %}
     {% if evaluation.gout is not none and evaluation.texture is not none and evaluation.visuel is not none and evaluation.pate is not none %}
         {% set moyenne = (evaluation.gout + evaluation.texture + evaluation.visuel + evaluation.pate) / 4 %}
@@ -28,6 +29,15 @@
         <span class="badge">N/A</span>
     {% endif %}
 {% endmacro %}
+
+{% macro afficher_badge_statut(evaluation) %}
+    {% if evaluation.statut == 'valide' %}
+        <span class="badge statut-valide">Valide</span>
+    {% else %}
+        <span class="badge statut-en-attente">En attente</span>
+    {% endif %}
+{% endmacro %}
+
 
 {% macro afficher_boutons_actions(evaluation, current_user) %}
     {% if current_user.id_user == evaluation.id_user %}
@@ -169,7 +179,11 @@
                         <div class="card-header">
                             <h2>{{ evaluation.flan.etablissement.nom | enlever_accents }}</h2>
                             <h3>{{ evaluation.flan.nom | enlever_accents }}</h3>
-                            {{ afficher_badge_evaluation(evaluation) }}
+                            {% if evaluation.statut.value == 'VALIDE' %}
+                                <span class="badge statut-valide">Valide</span>
+                            {% else %}
+                                <span class="badge statut-en-attente">En attente</span>
+                            {% endif %}
                         </div>
                         <div class="evaluation-date-container">
                             <small class="evaluation-date">
@@ -194,6 +208,16 @@
                                 <span class="criterion-value">{{ evaluation.pate }}/5</span>
                             </div>
                         </div>
+                        {% if evaluation.gout is not none and evaluation.texture is not none and evaluation.visuel is not none and evaluation.pate is not none %}
+                            {% set moyenne = (evaluation.gout + evaluation.texture + evaluation.visuel + evaluation.pate) / 4 %}
+                            <div class="moyenne">
+                                <span class="moyenne-value">{{ moyenne }}/5</span>
+                            </div>
+                        {% else %}
+                            <div class="moyenne">
+                                <span class="moyenne-value">N/A</span>
+                            </div>
+                        {% endif %}
                         <p class="type">{{ evaluation.description }}</p>
                         {{ afficher_boutons_actions(evaluation, current_user) }}
                     </div>
@@ -202,3 +226,4 @@
         </div>
     {% endif %}
 {% endmacro %}
+
