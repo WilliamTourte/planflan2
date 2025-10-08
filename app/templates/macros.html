@@ -115,7 +115,7 @@
                     {{ afficher_image_ou_placeholder(flan) }}
                     <div class="card-content">
                         <div class="card-header">
-                            <h3>{{ flan.nom }}</h3>
+                            <h3>{{ flan.nom | enlever_accents }}</h3>
                             {{ afficher_badge_flan(flan) }}
                         </div>
                         <p class="type">{{ flan.description or "Un flan flantastique" }}</p>
