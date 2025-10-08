@@ -243,8 +243,13 @@ def evaluer_flan(id_flan):
                 id_flan=id_flan,
                 id_user=current_user.id_user,
                 moyenne=moyenne
+
             )
-            db.session.add(evaluation)
+            # Les évaluations de l'admin sont validées automatiquement
+            if current_user.is_admin:
+                evaluation.statut = 'VALIDE'
+
+        db.session.add(evaluation)
         db.session.commit()
         return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
     # Si c'est une requête GET ou si le formulaire n'est pas valide, affichez le formulaire
