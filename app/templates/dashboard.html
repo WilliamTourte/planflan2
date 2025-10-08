@@ -7,7 +7,7 @@
           <p><strong>Pseudo:</strong> {{ current_user.pseudo }}</p>
           <p><strong>Email:</strong> {{ current_user.email }}</p>
           <div style="text-align: right;">
-              <button id="edit-profile-btn" class="btn btn-primary">Modifier le compte</button>
+              <button id="edit-profile-btn" class="btn btn-primary">Modifier le profil</button>
               <form method="POST" action="{{ url_for('auth.supprimer_compte') }}" style="display: inline-block;">
                   <button type="submit" class="btn btn-danger">Supprimer le compte</button>
               </form>
@@ -53,6 +53,7 @@
               </div>
               <div class="form-group">
                   {{ form.submit(class="btn btn-submit") }}
+                  <button id="cancel-edit-btn" class="btn btn-secondary">Annuler</button>
               </div>
           </form>
       </div>
@@ -60,7 +61,6 @@
       <div class="evaluations-section">
           <h2 class="evaluations-title">Mes evaluations</h2>
           {{ afficher_grille_evaluations(current_user.evaluations, current_user) }}
-
       </div>
       <!-- Section des évaluations en attente pour les administrateurs -->
       {% if current_user.is_admin %}
@@ -74,6 +74,11 @@
       document.getElementById('edit-profile-btn').addEventListener('click', function() {
           document.getElementById('user-info').style.display = 'none';
           document.getElementById('edit-profile-form').style.display = 'block';
+      });
+
+      document.getElementById('cancel-edit-btn').addEventListener('click', function() {
+          document.getElementById('user-info').style.display = 'block';
+          document.getElementById('edit-profile-form').style.display = 'none';
       });
   </script>
 {% endblock %}
