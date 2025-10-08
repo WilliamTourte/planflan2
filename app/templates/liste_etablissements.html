@@ -52,7 +52,7 @@
             <h3>${etablissement.nom}</h3>
             <p class="type">${etablissement.type_etab}</p>
             <p class="adresse">${etablissement.adresse}, ${etablissement.ville}</p>
-            ${etablissement.flans ? `<p class="flans-count">${etablissement.flans.length} flan${etablissement.flans.length > 1 ? 's' : ''}</p>` : ''}
+            ${etablissement.flans_count ? `<p class="flans-count">${etablissement.flans_count} flan${etablissement.flan_count > 1 ? 's' : ''}</p>` : ''}
             <a href="${detailsUrl}">Voir la page</a>
         </div>
     `;

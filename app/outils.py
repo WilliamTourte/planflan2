@@ -19,7 +19,8 @@ def afficher_etablissements(resultats):
         'url': url_for('main.afficher_etablissement_unique', id_etab=etab.id_etab),
         'visite' : bool(etab.visite),
         'type_etab': str(etab.type_etab.value),
-        'label' : bool(etab.label)
+        'label' : bool(etab.label),
+        'flans_count': len(etab.flans)  # Ajouter le nombre de flans
     } for etab in etablissements]
 
     return(etablissements, etablissements_json)
