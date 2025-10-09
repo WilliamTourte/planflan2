@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+{% block scripts_head %}
+<script>
+    let map;
+    let markers = [];
+    let infowindow;
+    let autocomplete;
+
+    // Définissez la fonction initMap au niveau global
+    window.initMap = function() {
+        console.log("Initialisation de la carte...");
+        const mapElement = document.getElementById("map");
+        if (!mapElement) {
+            console.error("Élément #map introuvable !");
+            const mapContainer = document.getElementById("map-container");
+            if (mapContainer) {
+                mapContainer.innerHTML = "<p style='color: red;'>Erreur : Impossible de charger la carte.</p>";
+            } else {
+                console.error("Élément #map-container introuvable !");
+            }
+            return;
+        }
+        map = new google.maps.Map(mapElement, {
+            center: { lat: 46.2276, lng: 2.2137 }, // Coordonnées approximatives du centre de la France
+            zoom: 6, // Niveau de zoom pour afficher toute la France
+        });
+        console.log("Carte initialisée avec succès !");
+
+        // Ajouter un champ de recherche pour les nouveaux établissements
+        const input = document.createElement('input');
+        input.id = 'searchInput';
+        input.type = 'text';
+        input.placeholder = 'Rechercher un nouvel établissement';
+        input.style.margin = '10px';
+        input.style.padding = '5px';
+        map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+
+        // Créer un Autocomplete pour la recherche d'établissements
+        autocomplete = new google.maps.places.Autocomplete(input);
+
+        // Écouter les changements dans l'Autocomplete
+        autocomplete.addListener('place_changed', function() {
+            const place = autocomplete.getPlace();
+            if (!place.geometry) return;
+
+            // Effacer les marqueurs de recherche précédents
+            clearSearchMarkers();
+
+            // Ajouter un nouveau marqueur pour le résultat de la recherche
+            const marker = new google.maps.Marker({
+                position: place.geometry.location,
+                map: map,
+                title: place.name,
+                icon: 'https://maps.google.com/mapfiles/ms/icons/green-dot.png'
+            });
+            const content = `
+                <div class="infowindow">
+                    <h3>${place.name}</h3>
+                    <p class="adresse">${place.vicinity}</p>
+                    <button onclick="addEstablishment('${place.name}', '${place.vicinity}', ${place.geometry.location.lat()}, ${place.geometry.location.lng()})">Ajouter cet établissement</button>
+                </div>
+            `;
+            marker.addListener("click", () => {
+                setTimeout(() => {
+                    infowindow.setContent(content);
+                    infowindow.open(map, marker);
+                }, 50);
+            });
+            markers.push(marker);
+        });
+
+        // Initialiser l'InfoWindow
+        infowindow = new google.maps.InfoWindow();
+    };
+
+    // Fonction pour effacer les marqueurs de recherche
+    function clearSearchMarkers() {
+        markers = markers.filter(marker => {
+            if (marker.getIcon() === 'https://maps.google.com/mapfiles/ms/icons/green-dot.png') {
+                marker.setMap(null);
+                return false;
+            }
+            return true;
+        });
+    }
+
+    // Fonction pour ajouter un établissement
+    function addEstablishment(nom, adresse, lat, lng) {
+        // Envoyer une requête AJAX pour ajouter l'établissement à la base de données
+        fetch('/ajouter_etablissement', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                nom: nom,
+                adresse: adresse,
+                latitude: lat,
+                longitude: lng
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('Établissement ajouté avec succès !');
+                // Rafraîchir la page pour voir le nouvel établissement
+                location.reload();
+            } else {
+                alert('Erreur lors de l\'ajout de l\'établissement : ' + data.message);
+            }
+        })
+        .catch((error) => {
+            console.error('Erreur:', error);
+            alert('Erreur lors de l\'ajout de l\'établissement.');
+        });
+    }
+
+    // Ajouter un écouteur d'événement pour DOMContentLoaded
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("DOM complètement chargé et analysé");
+        const mapElement = document.getElementById("map");
+        if (mapElement) {
+            console.log("Élément #map trouvé, chargement du script Google Maps...");
+            const script = document.createElement('script');
+            script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyA8lo7V-ciL8oVwYXUiW00gb6O1_1K-JQ8&libraries=places&callback=initMap&v=weekly`;
+            script.async = true;
+            script.defer = true;
+            document.head.appendChild(script);
+        } else {
+            console.error("Élément #map introuvable même après le chargement du DOM !");
+        }
+    });
+</script>
+<style>
+    #map { height: 80vh; width: 100%; background-color: #f5f5f5; }
+    .infowindow h3 { margin: 0 0 5px 0; color: #333; }
+    .infowindow a { color: #1a73e8; text-decoration: none; }
+    .map-container { margin-bottom: 2rem; width: 100%; padding: 0; }
+    @media (max-width: 768px) { #map { height: 60vh; } }
+</style>
+{% endblock %}
+{% block content %}
+<div class="container">
+    <h1>Ajouter un nouvel établissement</h1>
+    <div id="map-container" class="map-container">
+        <div id="map"></div>
+    </div>
+</div>
+{% endblock %}
