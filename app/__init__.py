@@ -5,21 +5,30 @@ from flask_bcrypt import Bcrypt
 from app.config import Config
 from app.outils import enlever_accents
 
+from flask_migrate import Migrate
+
 # Initialisation des extensions (une seule fois)
 db = SQLAlchemy() # Doit être la SEULE instance de SQLAlchemy
+migrate = Migrate()
+
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'  # Route pour la page de login
 login_manager.login_message = "Veuillez vous connecter pour accéder à cette page."
 
 bcrypt = Bcrypt()
 
+
+
+
 def create_app():
     app = Flask(__name__) # crée l'application
     app.config.from_object(Config) # la configure
     # initialisation des extensions
     db.init_app(app)
+    migrate.init_app(app, db)
     login_manager.init_app(app)
     bcrypt.init_app(app)
+
 
     @login_manager.user_loader
     def load_user(user_id):

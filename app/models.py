@@ -1,6 +1,5 @@
 from enum import Enum
-
-from app import db # importe la base de données
+from app import db
 from flask_login import UserMixin
 
 class TypeEtab(Enum):
@@ -9,11 +8,21 @@ class TypeEtab(Enum):
     RESTAURANT = 'Restaurant'
     CAFE = "Coffee Shop"
 
-
-class StatutModeration(Enum): # Avantage de Enum : vérification des valeurs
+class StatutModeration(Enum):
     EN_ATTENTE = 'EN_ATTENTE'
     VALIDE = 'VALIDE'
     SUPPRIME = 'SUPPRIME'
+
+class TypeCible(Enum):
+    FLAN = 'Flan'
+    ETABLISSEMENT = 'Etablissement'
+
+class TypePate(Enum):
+    FEUILLETEE = 'Feuilletée'
+    BRISEE = 'Brisée'
+    SUCREE = 'Sucrée'
+    SABLEE = 'Sablée'
+    SABLEE_DIAMANT = 'Sablée Diamant'
 
 class Utilisateur(db.Model, UserMixin):
     __tablename__ = 'utilisateurs'
@@ -22,9 +31,11 @@ class Utilisateur(db.Model, UserMixin):
     password = db.Column(db.String(100), nullable=False)
     email = db.Column(db.String(100), unique=True, nullable=False)
     is_admin = db.Column(db.Boolean, nullable=True, default=False)
-    # Relation avec les évaluations
-    evaluations = db.relationship('Evaluation', back_populates='utilisateur')
 
+    # Relations
+    etablissements = db.relationship('Etablissement', back_populates='utilisateur')
+    flans = db.relationship('Flan', back_populates='utilisateur')
+    evaluations = db.relationship('Evaluation', back_populates='utilisateur')
 
     def get_id(self):
         return str(self.id_user)
@@ -44,7 +55,7 @@ class Etablissement(db.Model):
     code_postal = db.Column(db.String(5), nullable=False)
     ville = db.Column(db.String(100), nullable=False)
     latitude = db.Column(db.Numeric(10, 8), nullable=True)
-    longitude = db.Column(db.Numeric(11, 8), nullable=True)
+    longitude = db.Column(db.Numeric(10, 8), nullable=True)
     telephone = db.Column(db.String(20), nullable=True)
     site_web = db.Column(db.String(255), nullable=True)
     description = db.Column(db.Text, nullable=True)
@@ -52,10 +63,13 @@ class Etablissement(db.Model):
     visite = db.Column(db.Boolean, nullable=True, default=False)
     statut = db.Column(db.Enum(StatutModeration), nullable=False, server_default='EN_ATTENTE')
 
-    # Relation avec les flans
+    # Clé étrangère pour l'utilisateur
+    id_user = db.Column(db.Integer, db.ForeignKey('utilisateurs.id_user'), nullable=True, index=True)  # /!\ Null temporaire !! DEBUG
+
+    # Relations
     flans = db.relationship('Flan', back_populates='etablissement', lazy=True)
-    # Relation avec les photos
-    photos = db.relationship('Photo', backref='etablissement_photo', lazy=True, foreign_keys='Photo.id_etab')
+    photos = db.relationship('Photo', back_populates='etablissement', foreign_keys='Photo.id_etab')
+    utilisateur = db.relationship('Utilisateur', back_populates='etablissements')
 
 class Flan(db.Model):
     __tablename__ = 'flans'
@@ -64,17 +78,17 @@ class Flan(db.Model):
     nom = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=True)
     prix = db.Column(db.Float, nullable=True)
+    type_pate = db.Column(db.Enum(TypePate), nullable=True)
     statut = db.Column(db.Enum(StatutModeration), nullable=False, server_default='EN_ATTENTE')
 
-    # Relation avec les évaluations
+    # Clé étrangère pour l'utilisateur
+    id_user = db.Column(db.Integer, db.ForeignKey('utilisateurs.id_user'), nullable=True, index=True) # /!\ Null temporaire !! DEBUG
+
+    # Relations
     evaluations = db.relationship('Evaluation', back_populates='flan', lazy=True)
-    # Relation avec les photos
-    photos = db.relationship('Photo', backref='flan_photo', lazy=True, foreign_keys='Photo.id_flan')
-    # Relation avec Etablissement
+    photos = db.relationship('Photo', back_populates='flan', foreign_keys='Photo.id_flan')
     etablissement = db.relationship('Etablissement', back_populates='flans')
-
-
-
+    utilisateur = db.relationship('Utilisateur', back_populates='flans')
 
 class Evaluation(db.Model):
     __tablename__ = 'evaluations'
@@ -91,15 +105,9 @@ class Evaluation(db.Model):
     date_creation = db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
     moyenne = db.Column(db.Numeric(2, 1), nullable=True)
 
-    # Relation avec Utilisateur
+    # Relations
     utilisateur = db.relationship('Utilisateur', back_populates='evaluations')
-    # Relation avec Flan
     flan = db.relationship('Flan', back_populates='evaluations')
-
-
-class TypeCible(Enum):
-    FLAN = 'Flan'
-    ETABLISSEMENT = 'Etablissement'
 
 class Photo(db.Model):
     __tablename__ = 'photos'
@@ -111,4 +119,6 @@ class Photo(db.Model):
     largeur = db.Column(db.Integer, nullable=False)
     hauteur = db.Column(db.Integer, nullable=False)
 
-
+    # Relations
+    etablissement = db.relationship('Etablissement', back_populates='photos')
+    flan = db.relationship('Flan', back_populates='photos')
