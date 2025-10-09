@@ -3,6 +3,17 @@ from enum import Enum
 from app import db # importe la base de données
 from flask_login import UserMixin
 
+class TypeEtab(Enum):
+    BOULANGERIE = 'Boulangerie'
+    PATISSERIE = "Pâtisserie"
+    RESTAURANT = 'Restaurant'
+    CAFE = "Coffee Shop"
+
+
+class StatutModeration(Enum): # Avantage de Enum : vérification des valeurs
+    EN_ATTENTE = 'EN_ATTENTE'
+    VALIDE = 'VALIDE'
+    SUPPRIME = 'SUPPRIME'
 
 class Utilisateur(db.Model, UserMixin):
     __tablename__ = 'utilisateurs'
@@ -24,13 +35,6 @@ class Utilisateur(db.Model, UserMixin):
     def check_password(self, password, bcrypt):
         return bcrypt.check_password_hash(self.password, password)
 
-
-class TypeEtab(Enum):
-    BOULANGERIE = 'Boulangerie'
-    PATISSERIE = "Pâtisserie"
-    RESTAURANT = 'Restaurant'
-    CAFE = "Coffee Shop"
-
 class Etablissement(db.Model):
     __tablename__ = 'etablissements'
     id_etab = db.Column(db.Integer, primary_key=True)
@@ -46,6 +50,7 @@ class Etablissement(db.Model):
     description = db.Column(db.Text, nullable=True)
     label = db.Column(db.Boolean, nullable=True, default=False)
     visite = db.Column(db.Boolean, nullable=True, default=False)
+    statut = db.Column(db.Enum(StatutModeration), nullable=False, server_default='EN_ATTENTE')
 
     # Relation avec les flans
     flans = db.relationship('Flan', back_populates='etablissement', lazy=True)
@@ -59,6 +64,8 @@ class Flan(db.Model):
     nom = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=True)
     prix = db.Column(db.Float, nullable=True)
+    statut = db.Column(db.Enum(StatutModeration), nullable=False, server_default='EN_ATTENTE')
+
     # Relation avec les évaluations
     evaluations = db.relationship('Evaluation', back_populates='flan', lazy=True)
     # Relation avec les photos
@@ -67,10 +74,7 @@ class Flan(db.Model):
     etablissement = db.relationship('Etablissement', back_populates='flans')
 
 
-class StatutEval(Enum): # Avantage de Enum : vérification des valeurs
-    EN_ATTENTE = 'EN_ATTENTE'
-    VALIDE = 'VALIDE'
-    SUPPRIME = 'SUPPRIME'
+
 
 class Evaluation(db.Model):
     __tablename__ = 'evaluations'
@@ -83,7 +87,7 @@ class Evaluation(db.Model):
     gout = db.Column(db.Numeric(2, 1), nullable=False)
     description = db.Column(db.Text, nullable=True)
     photo = db.Column(db.String(255), nullable=True)
-    statut = db.Column(db.Enum(StatutEval), nullable=False, server_default='EN_ATTENTE')
+    statut = db.Column(db.Enum(StatutModeration), nullable=False, server_default='EN_ATTENTE')
     date_creation = db.Column(db.DateTime, nullable=False, server_default=db.func.current_timestamp())
     moyenne = db.Column(db.Numeric(2, 1), nullable=True)
 
