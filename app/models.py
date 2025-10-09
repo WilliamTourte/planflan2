@@ -122,3 +122,4 @@ class Photo(db.Model):
     # Relations
     etablissement = db.relationship('Etablissement', back_populates='photos')
     flan = db.relationship('Flan', back_populates='photos')
+
