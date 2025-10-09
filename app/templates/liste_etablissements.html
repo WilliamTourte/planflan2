@@ -34,11 +34,11 @@
     // L'icône change selon que le lieu a été visité et/ou labellisé
     let icon;
     if (etablissement.visite && etablissement.label) {
-        icon = "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
+        icon = "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
     } else if (etablissement.visite) {
-        icon = "http://maps.google.com/mapfiles/ms/icons/red-dot.png";
+        icon = "https://maps.google.com/mapfiles/ms/icons/red-dot.png";
     } else {
-        icon = "http://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+        icon = "https://maps.google.com/mapfiles/ms/icons/blue-dot.png";
     }
     const marker = new google.maps.Marker({
         position: { lat: etablissement.latitude, lng: etablissement.longitude },
@@ -74,9 +74,9 @@
     // Ajouter le contenu de la légende
     legend.innerHTML = `
         <h3>Légende</h3>
-        <p><img src="http://maps.google.com/mapfiles/ms/icons/blue-dot.png" alt="Non visité">Non visité</p>
-        <p><img src="http://maps.google.com/mapfiles/ms/icons/red-dot.png" alt="Visité"> Visité</p>
-        <p><img src="http://maps.google.com/mapfiles/ms/icons/yellow-dot.png" alt="Labellisé">Labellisé</p>
+        <p><img src="https://maps.google.com/mapfiles/ms/icons/blue-dot.png" alt="Non visité">Non visité</p>
+        <p><img src="https://maps.google.com/mapfiles/ms/icons/red-dot.png" alt="Visité"> Visité</p>
+        <p><img src="https://maps.google.com/mapfiles/ms/icons/yellow-dot.png" alt="Labellisé">Labellisé</p>
     `;
     // Ajouter la légende à la carte
     map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(legend);
