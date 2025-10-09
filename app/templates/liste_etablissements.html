@@ -52,7 +52,7 @@
             <h3>${etablissement.nom}</h3>
             <p class="type">${etablissement.type_etab}</p>
             <p class="adresse">${etablissement.adresse}, ${etablissement.ville}</p>
-            ${etablissement.flans_count ? `<p class="flans-count">${etablissement.flans_count} flan${etablissement.flan_count > 1 ? 's' : ''}</p>` : ''}
+            ${etablissement.flans_count ? `<p class="flans-count">${etablissement.flans_count} flan${etablissement.flans_count > 1 ? 's' : ''}</p>` : ''}
             <a href="${detailsUrl}">Voir la page</a>
         </div>
     `;
@@ -60,7 +60,6 @@
         setTimeout(() => {
             infowindow.setContent(content);
             infowindow.open(map, marker);
-            const card = document.querySelector(`.carte[data-id="${etablissement.id_etab}"]`);
         }, 50);
     });
     markers.push(marker);
@@ -102,7 +101,6 @@
 </script>
 <style>
     #map { height: 80vh; width: 100%; background-color: #f5f5f5; }
-    .infowindow { font-family: Arial, sans-serif; }
     .infowindow h3 { margin: 0 0 5px 0; color: #333; }
     .infowindow a { color: #1a73e8; text-decoration: none; }
     .map-container { margin-bottom: 2rem; width: 100%; padding: 0; }
@@ -114,6 +112,7 @@
     <div id="map-container" class="map-container">
         <div id="map"></div>
     </div>
+</div>
     <!-- Grille des établissements -->
 {% from "macros.html" import afficher_grille_etablissements %}
 {{ afficher_grille_etablissements(etablissements) }}
