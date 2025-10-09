@@ -64,7 +64,7 @@ class Etablissement(db.Model):
     statut = db.Column(db.Enum(StatutModeration), nullable=False, server_default='EN_ATTENTE')
 
     # Clé étrangère pour l'utilisateur
-    id_user = db.Column(db.Integer, db.ForeignKey('utilisateurs.id_user'), nullable=True, index=True)  # /!\ Null temporaire !! DEBUG
+    id_user = db.Column(db.Integer, db.ForeignKey('utilisateurs.id_user'), nullable=False, index=True)
 
     # Relations
     flans = db.relationship('Flan', back_populates='etablissement', lazy=True)
@@ -82,7 +82,7 @@ class Flan(db.Model):
     statut = db.Column(db.Enum(StatutModeration), nullable=False, server_default='EN_ATTENTE')
 
     # Clé étrangère pour l'utilisateur
-    id_user = db.Column(db.Integer, db.ForeignKey('utilisateurs.id_user'), nullable=True, index=True) # /!\ Null temporaire !! DEBUG
+    id_user = db.Column(db.Integer, db.ForeignKey('utilisateurs.id_user'), nullable=False, index=True)
 
     # Relations
     evaluations = db.relationship('Evaluation', back_populates='flan', lazy=True)

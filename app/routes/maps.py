@@ -56,7 +56,8 @@ def ajouter_etablissement():
         ville=ville,
         latitude=latitude,
         longitude=longitude,
-        type_etab=TypeEtab.BOULANGERIE  # Par défaut, vous pouvez changer cela si nécessaire
+        type_etab=TypeEtab.BOULANGERIE,  # Par défaut, vous pouvez changer cela si nécessaire,
+        id_user=current_user.id_user
     )
     db.session.add(new_etablissement)
     db.session.commit()

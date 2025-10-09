@@ -200,6 +200,7 @@ def proposer_flan(id_etab):
             description=form.description.data,
             prix=form.prix.data,
             id_etab=id_etab,
+            id_user=current_user.id_user
         )
         db.session.add(flan)
         db.session.commit()
