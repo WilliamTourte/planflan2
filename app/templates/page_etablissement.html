@@ -9,9 +9,7 @@
     </div>
 
     <!-- Grille des flans -->
-
-    {{ afficher_grille('flan', flans, current_user, form, etablissement) }}
-
+    {{ afficher_grille('flan', etablissement.flans, current_user, form, etablissement) }}
     <!-- Bouton retour -->
     <a href="#" onclick="window.history.back(); return false;" class="btn-back">← Retour à la liste</a>
 </div>
