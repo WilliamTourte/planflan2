@@ -200,6 +200,8 @@ def proposer_flan(id_etab):
             description=form.description.data,
             prix=form.prix.data,
             type_pate=form.type_pate.data,
+            type_saveur=form.type_saveur.data,
+            type_texture=form.type_texture.data,
             id_etab=id_etab,
             id_user=current_user.id_user
         )

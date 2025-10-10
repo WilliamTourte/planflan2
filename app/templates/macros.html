@@ -118,7 +118,11 @@
                             <h3>{{ flan.nom | enlever_accents }}</h3>
                             {{ afficher_badge_flan(flan) }}
                         </div>
-                        <p class="type">{{ flan.description or "Un flan flantastique" }}</p>
+<p class="type">Saveur : {{ flan.type_saveur.value | default("inconnue") }}</p>
+<p class="type">Pâte : {{ flan.type_pate.value | default("inconnue") }}</p>
+<p class="type">Texture : {{ flan.type_texture.value | default("inconnue") }}</p>
+<p class="type">Description : {{ flan.description | default("Flantastique") }}</p>
+
                     </div>
                 </a>
             {% endfor %}
@@ -139,14 +143,14 @@
                         <div class="error-message">{{ form.nom.errors[0] }}</div>
                     {% endif %}
                 </div>
-                            <div class="form-group">
+                <div class="form-group">
                     {{ form.type_saveur.label(class="form-label") }}
                     {{ form.type_saveur(class="form-control") }}
                     {% if form.type_saveur.errors %}
                         <div class="error-message">{{ form.type_saveur.errors[0] }}</div>
                     {% endif %}
                 </div>
-                            <div class="form-group">
+                <div class="form-group">
                     {{ form.type_texture.label(class="form-label") }}
                     {{ form.type_texture(class="form-control") }}
                     {% if form.type_texture.errors %}

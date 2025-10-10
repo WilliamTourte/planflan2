@@ -24,13 +24,14 @@ class TypePate(Enum):
     BRISEE = 'Brisée'
     SUCREE = 'Sucrée'
     SABLEE = 'Sablée'
-    SABLEE_DIAMANT = 'Sablée Diamant'
+    MIXTE = 'Mixte'
 
 class TypeSaveur(Enum):
     VANILLE = "Vanille"
     NOIX = "Noix"
     FRUITS = "Fruits"
     INSOLITE = 'Insolite'
+    NATURE = 'Nature'
 
 class TypeTexture(Enum):
     GELATINEUSE = 'Gélatineuse'
@@ -38,7 +39,6 @@ class TypeTexture(Enum):
     COSTAUD = 'Costaud'
     OEUF = 'Oeuf'
     MIX_PARFAIT = 'Mix parfait'
-
 
 # Classes base de données avec SQLAlchemy
 class Utilisateur(db.Model, UserMixin):
