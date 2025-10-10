@@ -7,9 +7,9 @@
     <div class="etablissement-header">
         {{ afficher_objet('flan', flan) }}
     </div>
-    <!-- Grille des flans -->
+    <!-- Grille des évaluations -->
 
-    {{ afficher_grille('evaluation', evaluations, current_user, form, etablissement) }}
+    {{ afficher_grille('evaluation', flan.evaluations, current_user, form, etablissement) }}
 
         <!-- Boutons d'action -->
         <div class="flan-actions">

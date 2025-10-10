@@ -114,7 +114,7 @@
     </div>
 </div>
     <!-- Grille des établissements -->
-{% from "macros.html" import afficher_grille_etablissements %}
-{{ afficher_grille_etablissements(etablissements) }}
+{% from "macros.html" import afficher_grille %}
+{{ afficher_grille('etablissement', etablissements, current_user, form, etablissement) }}
 
 {% endblock %}
