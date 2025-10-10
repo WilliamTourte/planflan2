@@ -1,13 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
+    {% from "macros.html" import afficher_grille_evaluations %}
+        {% from "macros.html" import afficher_flan %}
 <div class="container">
     <div class="flan-detail-container">
-        <!-- En-tête du flan -->
-        <div class="flan-header">
-            <h1 class="flan-title">{{ flan.nom }}</h1>
-            <p class="flan-description">{{ flan.description or "Un délicieux flan maison" }}</p>
-            <p class="flan-price">Prix : {{ "%.2f"|format(flan.prix) }} €</p>
-        </div>
+            {{ afficher_flan(flan) }}
 
         <!-- Boutons d'action -->
         <div class="flan-actions">
@@ -18,7 +15,6 @@
                     Retour à {{ flan.etablissement.nom }}
                 </a>
             </div>
-
             <!-- Bouton évaluation -->
             <div>
                 {% if current_user.is_authenticated %}
@@ -38,9 +34,7 @@
             </div>
         </div>
 
-{% from "macros.html" import afficher_grille_evaluations %}
 <h2 class="section-title">Les evaluations</h2>
 {{ afficher_grille_evaluations(flan.evaluations, current_user) }}
-
 
 {% endblock %}

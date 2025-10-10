@@ -69,6 +69,76 @@
     {% endif %}
 {% endmacro %}
 
+{% macro proposer_flan(form, action_url) %}
+    <!-- Formulaire d'ajout de flan -->
+    <form method="POST" action="{{ action_url }}" class="form-container">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.nom.label(class="form-label") }}
+            {{ form.nom(class="form-control") }}
+            {% if form.nom.errors %}
+                <div class="error-message">{{ form.nom.errors[0] }}</div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.type_saveur.label(class="form-label") }}
+            {{ form.type_saveur(class="form-control") }}
+            {% if form.type_saveur.errors %}
+                <div class="error-message">{{ form.type_saveur.errors[0] }}</div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.type_texture.label(class="form-label") }}
+            {{ form.type_texture(class="form-control") }}
+            {% if form.type_texture.errors %}
+                <div class="error-message">{{ form.type_texture.errors[0] }}</div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.type_pate.label(class="form-label") }}
+            {{ form.type_pate(class="form-control") }}
+            {% if form.type_pate.errors %}
+                <div class="error-message">{{ form.type_pate.errors[0] }}</div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.description.label(class="form-label") }}
+            {{ form.description(class="form-control") }}
+            {% if form.description.errors %}
+                <div class="error-message">{{ form.description.errors[0] }}</div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.prix.label(class="form-label") }}
+            {{ form.prix(class="form-control") }}
+            {% if form.prix.errors %}
+                <div class="error-message">{{ form.prix.errors[0] }}</div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.submit(class="btn btn-proposer") }}
+        </div>
+    </form>
+{% endmacro %}
+
+{% macro afficher_etablissement(etablissement) %}
+    <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}" class="carte" data-id="{{ etablissement.id_etab }}" data-lat="{{ etablissement.latitude }}" data-lng="{{ etablissement.longitude }}">
+        <div class="card-image-container">
+            {{ afficher_image_ou_placeholder(etablissement) }}
+            {{ afficher_badge_etablissement(etablissement) }}
+        </div>
+        <div class="card-content">
+            <div class="card-header">
+                <h2>{{ etablissement.nom | enlever_accents }}</h2>
+            </div>
+            <p class="type">{{ etablissement.type_etab.value }}</p>
+            <p class="adresse">{{ etablissement.adresse }}, {{ etablissement.ville }}</p>
+            {% if etablissement.flans %}
+                <p class="flans-count">{{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}</p>
+            {% endif %}
+        </div>
+    </a>
+{% endmacro %}
 
 {% macro afficher_grille_etablissements(etablissements) %}
     {% if not etablissements %}
@@ -81,27 +151,26 @@
     {% else %}
         <div class="grille">
             {% for etablissement in etablissements %}
-                <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}" class="carte" data-id="{{ etablissement.id_etab }}" data-lat="{{ etablissement.latitude }}" data-lng="{{ etablissement.longitude }}">
-                    <div class="card-image-container">
-                        {{ afficher_image_ou_placeholder(etablissement) }}
-                        {{ afficher_badge_etablissement(etablissement) }}
-                    </div>
-                    <div class="card-content">
-                        <div class="card-header">
-                            <h2>{{ etablissement.nom | enlever_accents }}</h2>
-                        </div>
-                        <p class="type">{{ etablissement.type_etab.value }}</p>
-                        <p class="adresse">{{ etablissement.adresse }}, {{ etablissement.ville }}</p>
-                        {% if etablissement.flans %}
-                            <p class="flans-count">{{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}</p>
-                        {% endif %}
-                    </div>
-                </a>
+                {{ afficher_etablissement(etablissement) }}
             {% endfor %}
         </div>
     {% endif %}
 {% endmacro %}
 
+
+{% macro afficher_flan(flan) %}
+    <div class="card-content">
+        <div class="card-header">
+            <h3>{{ flan.nom | enlever_accents }}</h3>
+            {{ afficher_badge_flan(flan) }}
+        </div>
+        <p class="type">Saveur : {{ flan.type_saveur.value | default("inconnue") }}</p>
+        <p class="type">Pâte : {{ flan.type_pate.value | default("inconnue") }}</p>
+        <p class="type">Texture : {{ flan.type_texture.value | default("inconnue") }}</p>
+        <p class="type">Description : {{ flan.description | default("Flantastique") }}</p>
+        <p class="flan-price">Prix : {{ "%.2f"|format(flan.prix) }} €</p>
+    </div>
+{% endmacro %}
 
 {% macro afficher_grille_flans(flans, current_user, etablissement, form=None) %}
     {% if not flans %}
@@ -113,17 +182,7 @@
             {% for flan in flans %}
                 <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}" class="carte">
                     {{ afficher_image_ou_placeholder(flan) }}
-                    <div class="card-content">
-                        <div class="card-header">
-                            <h3>{{ flan.nom | enlever_accents }}</h3>
-                            {{ afficher_badge_flan(flan) }}
-                        </div>
-<p class="type">Saveur : {{ flan.type_saveur.value | default("inconnue") }}</p>
-<p class="type">Pâte : {{ flan.type_pate.value | default("inconnue") }}</p>
-<p class="type">Texture : {{ flan.type_texture.value | default("inconnue") }}</p>
-<p class="type">Description : {{ flan.description | default("Flantastique") }}</p>
-
-                    </div>
+                    {{ afficher_flan(flan) }}
                 </a>
             {% endfor %}
         </div>
@@ -133,55 +192,9 @@
     <div class="card-content">
         <h3>Ajouter un flan</h3>
         {% if current_user.is_authenticated %}
+
             <!-- Formulaire d'ajout de flan -->
-            <form method="POST" action="{{ url_for('main.proposer_flan', id_etab=etablissement.id_etab) }}" class="form-container">
-                {{ form.hidden_tag() }}
-                <div class="form-group">
-                    {{ form.nom.label(class="form-label") }}
-                    {{ form.nom(class="form-control") }}
-                    {% if form.nom.errors %}
-                        <div class="error-message">{{ form.nom.errors[0] }}</div>
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    {{ form.type_saveur.label(class="form-label") }}
-                    {{ form.type_saveur(class="form-control") }}
-                    {% if form.type_saveur.errors %}
-                        <div class="error-message">{{ form.type_saveur.errors[0] }}</div>
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    {{ form.type_texture.label(class="form-label") }}
-                    {{ form.type_texture(class="form-control") }}
-                    {% if form.type_texture.errors %}
-                        <div class="error-message">{{ form.type_texture.errors[0] }}</div>
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    {{ form.type_pate.label(class="form-label") }}
-                    {{ form.type_pate(class="form-control") }}
-                    {% if form.type_pate.errors %}
-                        <div class="error-message">{{ form.type_pate.errors[0] }}</div>
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    {{ form.description.label(class="form-label") }}
-                    {{ form.description(class="form-control") }}
-                    {% if form.description.errors %}
-                        <div class="error-message">{{ form.description.errors[0] }}</div>
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    {{ form.prix.label(class="form-label") }}
-                    {{ form.prix(class="form-control") }}
-                    {% if form.prix.errors %}
-                        <div class="error-message">{{ form.prix.errors[0] }}</div>
-                    {% endif %}
-                </div>
-                <div class="form-group">
-                    {{ form.submit(class="btn btn-proposer") }}
-                </div>
-            </form>
+            {{ proposer_flan(form, url_for('main.proposer_flan', id_etab=etablissement.id_etab)) }}
         {% else %}
             <!-- Bouton de connexion -->
             <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
@@ -191,7 +204,58 @@
     </div>
 {% endmacro %}
 
-<!-- Grille des évaluations -->
+
+{% macro afficher_evaluation(evaluation, current_user) %}
+    <a href="{{ url_for('main.afficher_flan_unique', id_flan=evaluation.flan.id_flan) }}" class="carte">
+        <div class="card-content">
+            <div class="card-header">
+                <h2>{{ evaluation.flan.etablissement.nom | enlever_accents }}</h2>
+                <h3>{{ evaluation.flan.nom | enlever_accents }}</h3>
+                {% if evaluation.statut.value == 'VALIDE' %}
+                    <span class="badge statut-valide">Valide</span>
+                {% else %}
+                    <span class="badge statut-en-attente">En attente</span>
+                {% endif %}
+            </div>
+            <div class="evaluation-date-container">
+                <small class="evaluation-date">
+                    {{ evaluation.date_creation.strftime('%d/%m/%Y') }}
+                </small>
+            </div>
+            <div class="criteria">
+                <div class="criterion">
+                    <span class="criterion-name">Goût :</span>
+                    <span class="criterion-value">{{ evaluation.gout }}/5</span>
+                </div>
+                <div class="criterion">
+                    <span class="criterion-name">Texture :</span>
+                    <span class="criterion-value">{{ evaluation.texture }}/5</span>
+                </div>
+                <div class="criterion">
+                    <span class="criterion-name">Visuel :</span>
+                    <span class="criterion-value">{{ evaluation.visuel }}/5</span>
+                </div>
+                <div class="criterion">
+                    <span class="criterion-name">Pâte :</span>
+                    <span class="criterion-value">{{ evaluation.pate }}/5</span>
+                </div>
+            </div>
+            {% if evaluation.gout is not none and evaluation.texture is not none and evaluation.visuel is not none and evaluation.pate is not none %}
+                {% set moyenne = (evaluation.gout + evaluation.texture + evaluation.visuel + evaluation.pate) / 4 %}
+                <div class="moyenne">
+                    <span class="moyenne-value">{{ moyenne }}/5</span>
+                </div>
+            {% else %}
+                <div class="moyenne">
+                    <span class="moyenne-value">N/A</span>
+                </div>
+            {% endif %}
+            <p class="type">{{ evaluation.description }}</p>
+            {{ afficher_boutons_actions(evaluation, current_user) }}
+        </div>
+    </a>
+{% endmacro %}
+
 {% macro afficher_grille_evaluations(evaluations, current_user) %}
     {% if not evaluations %}
         <div class="no-results">
@@ -200,56 +264,10 @@
     {% else %}
         <div class="grille">
             {% for evaluation in evaluations %}
-                <a href="{{ url_for('main.afficher_flan_unique', id_flan=evaluation.flan.id_flan) }}" class="carte">
-                    <div class="card-content">
-                        <div class="card-header">
-                            <h2>{{ evaluation.flan.etablissement.nom | enlever_accents }}</h2>
-                            <h3>{{ evaluation.flan.nom | enlever_accents }}</h3>
-                            {% if evaluation.statut.value == 'VALIDE' %}
-                                <span class="badge statut-valide">Valide</span>
-                            {% else %}
-                                <span class="badge statut-en-attente">En attente</span>
-                            {% endif %}
-                        </div>
-                        <div class="evaluation-date-container">
-                            <small class="evaluation-date">
-                                {{ evaluation.date_creation.strftime('%d/%m/%Y') }}
-                            </small>
-                        </div>
-                        <div class="criteria">
-                            <div class="criterion">
-                                <span class="criterion-name">Goût :</span>
-                                <span class="criterion-value">{{ evaluation.gout }}/5</span>
-                            </div>
-                            <div class="criterion">
-                                <span class="criterion-name">Texture :</span>
-                                <span class="criterion-value">{{ evaluation.texture }}/5</span>
-                            </div>
-                            <div class="criterion">
-                                <span class="criterion-name">Visuel :</span>
-                                <span class="criterion-value">{{ evaluation.visuel }}/5</span>
-                            </div>
-                            <div class="criterion">
-                                <span class="criterion-name">Pâte :</span>
-                                <span class="criterion-value">{{ evaluation.pate }}/5</span>
-                            </div>
-                        </div>
-                        {% if evaluation.gout is not none and evaluation.texture is not none and evaluation.visuel is not none and evaluation.pate is not none %}
-                            {% set moyenne = (evaluation.gout + evaluation.texture + evaluation.visuel + evaluation.pate) / 4 %}
-                            <div class="moyenne">
-                                <span class="moyenne-value">{{ moyenne }}/5</span>
-                            </div>
-                        {% else %}
-                            <div class="moyenne">
-                                <span class="moyenne-value">N/A</span>
-                            </div>
-                        {% endif %}
-                        <p class="type">{{ evaluation.description }}</p>
-                        {{ afficher_boutons_actions(evaluation, current_user) }}
-                    </div>
-                </a>
+                {{ afficher_evaluation(evaluation, current_user) }}
             {% endfor %}
         </div>
     {% endif %}
 {% endmacro %}
+
 
