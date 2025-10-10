@@ -199,6 +199,7 @@ def proposer_flan(id_etab):
             nom=form.nom.data,
             description=form.description.data,
             prix=form.prix.data,
+            type_pate=form.type_pate.data,
             id_etab=id_etab,
             id_user=current_user.id_user
         )
@@ -207,8 +208,6 @@ def proposer_flan(id_etab):
         flash('Votre flan a été proposé avec succès !', 'success')
         return redirect(url_for('main.afficher_etablissement_unique', id_etab=id_etab))
     return render_template('page_etablissement.html', form=form, etablissement=etablissement)
-
-
 
 
 @main_bp.route('/flan/<int:id_flan>/evaluer', methods=['GET', 'POST'])

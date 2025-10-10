@@ -124,6 +124,7 @@
             {% endfor %}
         </div>
     {% endif %}
+
     <!-- Section pour ajouter un flan -->
     <div class="card-content">
         <h3>Ajouter un flan</h3>
@@ -136,6 +137,27 @@
                     {{ form.nom(class="form-control") }}
                     {% if form.nom.errors %}
                         <div class="error-message">{{ form.nom.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                            <div class="form-group">
+                    {{ form.type_saveur.label(class="form-label") }}
+                    {{ form.type_saveur(class="form-control") }}
+                    {% if form.type_saveur.errors %}
+                        <div class="error-message">{{ form.type_saveur.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                            <div class="form-group">
+                    {{ form.type_texture.label(class="form-label") }}
+                    {{ form.type_texture(class="form-control") }}
+                    {% if form.type_texture.errors %}
+                        <div class="error-message">{{ form.type_texture.errors[0] }}</div>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.type_pate.label(class="form-label") }}
+                    {{ form.type_pate(class="form-control") }}
+                    {% if form.type_pate.errors %}
+                        <div class="error-message">{{ form.type_pate.errors[0] }}</div>
                     {% endif %}
                 </div>
                 <div class="form-group">

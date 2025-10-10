@@ -7,7 +7,7 @@ from wtforms import StringField, PasswordField, SubmitField, BooleanField, Selec
 from wtforms.validators import DataRequired, Length, Email, ValidationError, EqualTo, NumberRange, Optional
 
 from app import bcrypt
-from app.models import TypeEtab
+from app.models import TypeEtab, TypePate, TypeSaveur, TypeTexture
 
 from app.models import Utilisateur
 
@@ -56,6 +56,9 @@ class EtabForm(FlaskForm):
 class NewFlanForm(FlaskForm):
     id_etab = HiddenField('ID Établissement')  # Champ caché pour l'id_etab
     nom = StringField('Nom', validators=[DataRequired(), Length(min=3, max=50)])
+    type_saveur = SelectField('Saveur', choices=[(choice.name, choice.value) for choice in TypeSaveur])
+    type_pate = SelectField('Pâte',  choices=[(choice.name, choice.value) for choice in TypePate])
+    type_texture = SelectField('Texture',  choices=[(choice.name, choice.value) for choice in TypeTexture])
     description = StringField('Description', validators=[Length(min=3, max=255)])
     prix = DecimalField('Prix', validators=[DataRequired(), NumberRange(0,20, "Le prix doit être compris entre 0 et 20€") ])
 

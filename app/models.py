@@ -2,6 +2,8 @@ from enum import Enum
 from app import db
 from flask_login import UserMixin
 
+
+# Enumérations
 class TypeEtab(Enum):
     BOULANGERIE = 'Boulangerie'
     PATISSERIE = "Pâtisserie"
@@ -24,6 +26,21 @@ class TypePate(Enum):
     SABLEE = 'Sablée'
     SABLEE_DIAMANT = 'Sablée Diamant'
 
+class TypeSaveur(Enum):
+    VANILLE = "Vanille"
+    NOIX = "Noix"
+    FRUITS = "Fruits"
+    INSOLITE = 'Insolite'
+
+class TypeTexture(Enum):
+    GELATINEUSE = 'Gélatineuse'
+    CREMEUSE = 'Crémeuse'
+    COSTAUD = 'Costaud'
+    OEUF = 'Oeuf'
+    MIX_PARFAIT = 'Mix parfait'
+
+
+# Classes base de données avec SQLAlchemy
 class Utilisateur(db.Model, UserMixin):
     __tablename__ = 'utilisateurs'
     id_user = db.Column(db.Integer, primary_key=True)
@@ -78,7 +95,9 @@ class Flan(db.Model):
     nom = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=True)
     prix = db.Column(db.Float, nullable=True)
+    type_saveur = db.Column(db.Enum(TypeSaveur), nullable=True)
     type_pate = db.Column(db.Enum(TypePate), nullable=True)
+    type_texture = db.Column(db.Enum(TypeTexture), nullable=True)
     statut = db.Column(db.Enum(StatutModeration), nullable=False, server_default='EN_ATTENTE')
 
     # Clé étrangère pour l'utilisateur
