@@ -2,6 +2,7 @@
 {% block content %}
     {% from "macros.html" import afficher_grille %}
     {% from "macros.html" import afficher_objet %}
+
 <div class="container">
     <!-- Détails de l'établissement -->
     <div class="etablissement-header">
@@ -10,6 +11,7 @@
 
     <!-- Grille des flans -->
     {{ afficher_grille('flan', etablissement.flans, current_user, form, etablissement) }}
+
     <!-- Bouton retour -->
     <a href="#" onclick="window.history.back(); return false;" class="btn-back">← Retour à la liste</a>
 </div>
