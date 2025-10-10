@@ -20,16 +20,6 @@
     {% endif %}
 {% endmacro %}
 
-<!-- DEBUG Obsolete -->
-{% macro afficher_badge_evaluation(evaluation) %}
-    {% if evaluation.gout is not none and evaluation.texture is not none and evaluation.visuel is not none and evaluation.pate is not none %}
-        {% set moyenne = (evaluation.gout + evaluation.texture + evaluation.visuel + evaluation.pate) / 4 %}
-        <span class="badge">{{ moyenne }}/5</span>
-    {% else %}
-        <span class="badge">N/A</span>
-    {% endif %}
-{% endmacro %}
-
 {% macro afficher_badge_statut(evaluation) %}
     {% if evaluation.statut == 'valide' %}
         <span class="badge statut-valide">Valide</span>
@@ -37,7 +27,6 @@
         <span class="badge statut-en-attente">En attente</span>
     {% endif %}
 {% endmacro %}
-
 
 {% macro afficher_boutons_actions(evaluation, current_user) %}
     {% if current_user.id_user == evaluation.id_user %}
@@ -68,7 +57,6 @@
         </div>
     {% endif %}
 {% endmacro %}
-
 
 {% macro proposer_flan(form, action_url) %}
     <!-- Formulaire d'ajout de flan -->
@@ -141,24 +129,6 @@
     </a>
 {% endmacro %}
 
-{% macro afficher_grille_etablissements(etablissements) %}
-    {% if not etablissements %}
-        <div class="no-results">
-            <p>Aucun établissement trouvé.</p>
-            {% if current_user.is_authenticated and current_user.type_user == 'admin' %}
-                <a href="{{ url_for('main.ajouter_etablissement') }}" class="btn">Ajouter un établissement</a>
-            {% endif %}
-        </div>
-    {% else %}
-        <div class="grille">
-            {% for etablissement in etablissements %}
-                {{ afficher_etablissement(etablissement) }}
-            {% endfor %}
-        </div>
-    {% endif %}
-{% endmacro %}
-
-
 {% macro afficher_flan(flan) %}
     <div class="card-content">
         <div class="card-header">
@@ -172,39 +142,6 @@
         <p class="flan-price">Prix : {{ "%.2f"|format(flan.prix) }} €</p>
     </div>
 {% endmacro %}
-
-{% macro afficher_grille_flans(flans, current_user, etablissement, form=None) %}
-    {% if not flans %}
-        <div class="no-results">
-            <p>Aucun flan trouvé.</p>
-        </div>
-    {% else %}
-        <div class="grille">
-            {% for flan in flans %}
-                <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}" class="carte">
-                    {{ afficher_image_ou_placeholder(flan) }}
-                    {{ afficher_flan(flan) }}
-                </a>
-            {% endfor %}
-        </div>
-    {% endif %}
-
-    <!-- Section pour ajouter un flan -->
-    <div class="card-content">
-        <h3>Ajouter un flan</h3>
-        {% if current_user.is_authenticated %}
-
-            <!-- Formulaire d'ajout de flan -->
-            {{ proposer_flan(form, url_for('main.proposer_flan', id_etab=etablissement.id_etab)) }}
-        {% else %}
-            <!-- Bouton de connexion -->
-            <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
-                Ajouter un flan (connectez-vous)
-            </a>
-        {% endif %}
-    </div>
-{% endmacro %}
-
 
 {% macro afficher_evaluation(evaluation, current_user) %}
     <a href="{{ url_for('main.afficher_flan_unique', id_flan=evaluation.flan.id_flan) }}" class="carte">
@@ -257,18 +194,65 @@
     </a>
 {% endmacro %}
 
-{% macro afficher_grille_evaluations(evaluations, current_user) %}
-    {% if not evaluations %}
+{% macro afficher_grille(objet_type, objets, current_user=None, form=None, etablissement=None, flan=None) %}
+    {% if not objets %}
         <div class="no-results">
-            <p>Aucune évaluation trouvée.</p>
+            <p>Aucun {{ objet_type }} trouvé.</p>
+            {{ afficher_bouton_ajout(objet_type, current_user, etablissement, form, flan) }}
         </div>
     {% else %}
         <div class="grille">
-            {% for evaluation in evaluations %}
-                {{ afficher_evaluation(evaluation, current_user) }}
+            {% for objet in objets %}
+                {{ afficher_objet(objet_type, objet, current_user) }}
             {% endfor %}
         </div>
+        {% if objet_type == 'flan' and etablissement %}
+            {{ afficher_bouton_ajout(objet_type, current_user, etablissement, form, flan) }}
+        {% elif objet_type == 'evaluation' and flan %}
+            {{ afficher_bouton_ajout(objet_type, current_user, etablissement, form, flan) }}
+        {% endif %}
     {% endif %}
 {% endmacro %}
 
+{% macro afficher_objet(objet_type, objet, current_user=None) %}
+    {% if objet_type == 'etablissement' %}
+        {{ afficher_etablissement(objet) }}
+    {% elif objet_type == 'flan' %}
+        <a href="{{ url_for('main.afficher_flan_unique', id_flan=objet.id_flan) }}" class="carte">
+            {{ afficher_image_ou_placeholder(objet) }}
+            {{ afficher_flan(objet) }}
+        </a>
+    {% elif objet_type == 'evaluation' %}
+        {{ afficher_evaluation(objet, current_user) }}
+    {% endif %}
+{% endmacro %}
 
+{% macro afficher_bouton_ajout(objet_type, current_user, etablissement=None, form=None, flan=None) %}
+    {% if objet_type == 'établissement' and current_user.is_authenticated and current_user.type_user == 'admin' %}
+        <a href="{{ url_for('main.ajouter_etablissement') }}" class="btn">Ajouter un établissement</a>
+    {% elif objet_type == 'flan' and etablissement %}
+        <div class="card-content">
+            <h3>Ajouter un flan</h3>
+            {% if current_user.is_authenticated %}
+                {{ proposer_flan(form, url_for('main.proposer_flan', id_etab=etablissement.id_etab)) }}
+            {% else %}
+                <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
+                    Ajouter un flan (connectez-vous)
+                </a>
+            {% endif %}
+        </div>
+    {% elif objet_type == 'evaluation' and flan %}
+        <div class="card-content">
+            <h3>Ajouter une évaluation</h3>
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('main.ajouter_evaluation', id_flan=flan.id_flan) }}" class="btn-proposer">
+                    Ajouter une évaluation
+                </a>
+            {% else %}
+                <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
+                    Ajouter une évaluation (connectez-vous)
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+{% endmacro %}

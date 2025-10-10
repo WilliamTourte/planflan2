@@ -1,36 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
-
-
+    {% from "macros.html" import afficher_grille %}
+    {% from "macros.html" import afficher_objet %}
 <div class="container">
     <!-- Détails de l'établissement -->
     <div class="etablissement-header">
-        <h1>{{ etablissement.nom | enlever_accents }}</h1>
-        <p class="type-badge">{{ etablissement.type_etab.value }}</p>
-        <div class="etablissement-info">
-            <p><strong>Adresse :</strong> {{ etablissement.adresse }}, {{ etablissement.code_postal }} {{ etablissement.ville }}</p>
-            {% if etablissement.telephone %}
-                <p><strong>Téléphone :</strong> {{ etablissement.telephone }}</p>
-            {% endif %}
-            {% if etablissement.description %}
-                <p class="description">{{ etablissement.description }}</p>
-            {% endif %}
-        </div>
+        {{ afficher_objet('etablissement', etablissement) }}
     </div>
 
-{% from "macros.html" import afficher_grille_flans %}
-{{ afficher_grille_flans(etablissement.flans, current_user, etablissement, form) }}
+    <!-- Grille des flans -->
 
-
-
-
-
-
+    {{ afficher_grille('flan', flans, current_user, form, etablissement) }}
 
     <!-- Bouton retour -->
     <a href="#" onclick="window.history.back(); return false;" class="btn-back">← Retour à la liste</a>
-
-
-
 </div>
 {% endblock %}
