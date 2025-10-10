@@ -1,3 +1,5 @@
+<!-- MACROS D'AFFICHAGE -->
+
 {% macro afficher_image_ou_placeholder(item, classe='card-image') %}
     {% if item.photos %}
         <img src="{{ url_for('static', filename='uploads/' + item.photos[0].path) }}" alt="{{ item.nom }}" class="{{ classe }}">
@@ -6,6 +8,7 @@
     {% endif %}
 {% endmacro %}
 
+    <!-- BADGES - à refactoriser ? -->
 {% macro afficher_badge_etablissement(etablissement) %}
     {% if etablissement.label %}
         <span class="badge">⭐ Labellisé</span>
@@ -28,87 +31,6 @@
     {% endif %}
 {% endmacro %}
 
-{% macro afficher_boutons_actions(evaluation, current_user) %}
-    {% if current_user.id_user == evaluation.id_user %}
-        <div class="action-buttons d-flex gap-1">
-            <form method="POST" action="{{ url_for('main.modifier_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
-                <button type="submit" class="btn btn-primary btn-sm square-btn" title="Modifier">
-                    <i class="bi bi-pencil"></i>
-                </button>
-            </form>
-            <form method="POST" action="{{ url_for('main.supprimer_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
-                <button type="submit" class="btn btn-danger btn-sm square-btn" title="Supprimer">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </form>
-        </div>
-    {% elif current_user.is_admin %}
-        <div class="action-buttons">
-            <form method="POST" action="{{ url_for('main.valider_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
-                <button type="submit" class="btn btn-success square-btn" title="Valider">
-                    <i class="bi bi-check"></i>
-                </button>
-            </form>
-            <form method="POST" action="{{ url_for('main.supprimer_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
-                <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </form>
-        </div>
-    {% endif %}
-{% endmacro %}
-
-{% macro proposer_flan(form, action_url) %}
-    <!-- Formulaire d'ajout de flan -->
-    <form method="POST" action="{{ action_url }}" class="form-container">
-        {{ form.hidden_tag() }}
-        <div class="form-group">
-            {{ form.nom.label(class="form-label") }}
-            {{ form.nom(class="form-control") }}
-            {% if form.nom.errors %}
-                <div class="error-message">{{ form.nom.errors[0] }}</div>
-            {% endif %}
-        </div>
-        <div class="form-group">
-            {{ form.type_saveur.label(class="form-label") }}
-            {{ form.type_saveur(class="form-control") }}
-            {% if form.type_saveur.errors %}
-                <div class="error-message">{{ form.type_saveur.errors[0] }}</div>
-            {% endif %}
-        </div>
-        <div class="form-group">
-            {{ form.type_texture.label(class="form-label") }}
-            {{ form.type_texture(class="form-control") }}
-            {% if form.type_texture.errors %}
-                <div class="error-message">{{ form.type_texture.errors[0] }}</div>
-            {% endif %}
-        </div>
-        <div class="form-group">
-            {{ form.type_pate.label(class="form-label") }}
-            {{ form.type_pate(class="form-control") }}
-            {% if form.type_pate.errors %}
-                <div class="error-message">{{ form.type_pate.errors[0] }}</div>
-            {% endif %}
-        </div>
-        <div class="form-group">
-            {{ form.description.label(class="form-label") }}
-            {{ form.description(class="form-control") }}
-            {% if form.description.errors %}
-                <div class="error-message">{{ form.description.errors[0] }}</div>
-            {% endif %}
-        </div>
-        <div class="form-group">
-            {{ form.prix.label(class="form-label") }}
-            {{ form.prix(class="form-control") }}
-            {% if form.prix.errors %}
-                <div class="error-message">{{ form.prix.errors[0] }}</div>
-            {% endif %}
-        </div>
-        <div class="form-group">
-            {{ form.submit(class="btn btn-proposer") }}
-        </div>
-    </form>
-{% endmacro %}
 
 {% macro afficher_etablissement(etablissement) %}
     <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}" class="carte" data-id="{{ etablissement.id_etab }}" data-lat="{{ etablissement.latitude }}" data-lng="{{ etablissement.longitude }}">
@@ -253,6 +175,92 @@
                     Ajouter une évaluation (connectez-vous)
                 </a>
             {% endif %}
+        </div>
+    {% endif %}
+{% endmacro %}
+
+<!--MACROS POUR PROPOSER DES CHOSES - rajouter évaluation et établissement-->
+
+{% macro proposer_flan(form, action_url) %}
+    <!-- Formulaire d'ajout de flan -->
+    <form method="POST" action="{{ action_url }}" class="form-container">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.nom.label(class="form-label") }}
+            {{ form.nom(class="form-control") }}
+            {% if form.nom.errors %}
+                <div class="error-message">{{ form.nom.errors[0] }}</div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.type_saveur.label(class="form-label") }}
+            {{ form.type_saveur(class="form-control") }}
+            {% if form.type_saveur.errors %}
+                <div class="error-message">{{ form.type_saveur.errors[0] }}</div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.type_texture.label(class="form-label") }}
+            {{ form.type_texture(class="form-control") }}
+            {% if form.type_texture.errors %}
+                <div class="error-message">{{ form.type_texture.errors[0] }}</div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.type_pate.label(class="form-label") }}
+            {{ form.type_pate(class="form-control") }}
+            {% if form.type_pate.errors %}
+                <div class="error-message">{{ form.type_pate.errors[0] }}</div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.description.label(class="form-label") }}
+            {{ form.description(class="form-control") }}
+            {% if form.description.errors %}
+                <div class="error-message">{{ form.description.errors[0] }}</div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.prix.label(class="form-label") }}
+            {{ form.prix(class="form-control") }}
+            {% if form.prix.errors %}
+                <div class="error-message">{{ form.prix.errors[0] }}</div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.submit(class="btn btn-proposer") }}
+        </div>
+    </form>
+{% endmacro %}
+
+
+<!-- BOUTONS POUR MODIFIER EVALUATION - à étendre à flan et établissement ? -->
+{% macro afficher_boutons_actions(evaluation, current_user) %}
+    {% if current_user.id_user == evaluation.id_user %}
+        <div class="action-buttons d-flex gap-1">
+            <form method="POST" action="{{ url_for('main.modifier_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
+                <button type="submit" class="btn btn-primary btn-sm square-btn" title="Modifier">
+                    <i class="bi bi-pencil"></i>
+                </button>
+            </form>
+            <form method="POST" action="{{ url_for('main.supprimer_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
+                <button type="submit" class="btn btn-danger btn-sm square-btn" title="Supprimer">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </form>
+        </div>
+    {% elif current_user.is_admin %}
+        <div class="action-buttons">
+            <form method="POST" action="{{ url_for('main.valider_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
+                <button type="submit" class="btn btn-success square-btn" title="Valider">
+                    <i class="bi bi-check"></i>
+                </button>
+            </form>
+            <form method="POST" action="{{ url_for('main.supprimer_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
+                <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </form>
         </div>
     {% endif %}
 {% endmacro %}
