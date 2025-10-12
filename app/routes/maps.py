@@ -39,6 +39,26 @@ def extraire_infos_adresse():
         'ville': ville,
         'adresse_nettoyee': adresse_nettoyee
     })
+from flask import jsonify, request, url_for
+from app.models import Etablissement
+
+@maps_bp.route('/verifier_etablissement', methods=['POST'])
+def verifier_etablissement():
+    data = request.get_json()
+    nom = data.get('nom')
+    adresse = data.get('adresse')
+
+    # Vérifier si l'établissement existe déjà dans la base de données
+    etablissement = Etablissement.query.filter_by(nom=nom, adresse=adresse).first()
+    if etablissement:
+        return jsonify({
+            'exists': True,
+            'url': url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab)
+        })
+    else:
+        return jsonify({'exists': False})
+
+
 
 # Route pour afficher le formulaire d'ajout d'établissement
 @maps_bp.route('/ajouter_etablissement', methods=['GET', 'POST'])

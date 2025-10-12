@@ -24,6 +24,8 @@ window.initAutocomplete = function() {
         // Remplir les champs avec les données extraites
         document.getElementById('nom').value = place.name || '';
         document.getElementById('adresse').value = place.formatted_address || '';
+        document.getElementById('latitude').value = place.geometry.location.lat();
+        document.getElementById('longitude').value = place.geometry.location.lng();
 
         // Envoyer l'adresse à une route AJAX pour extraire le code postal et la ville
         fetch('/extraire_infos_adresse', {
@@ -38,6 +40,24 @@ window.initAutocomplete = function() {
             document.getElementById('code_postal').value = data.code_postal || '';
             document.getElementById('ville').value = data.ville || '';
             document.getElementById('adresse').value = data.adresse_nettoyee || '';
+
+            // Vérifier si le lieu est déjà dans la liste
+            return fetch('/verifier_etablissement', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ nom: place.name, adresse: place.formatted_address }),
+            });
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.exists) {
+                const message = document.createElement('div');
+                message.className = 'alert alert-warning';
+                message.innerHTML = `Cet établissement est déjà dans la liste. <a href="${data.url}">Voir la page de l'établissement</a>`;
+                document.querySelector('.form-container').prepend(message);
+            }
         })
         .catch((error) => {
             console.error('Erreur:', error);
