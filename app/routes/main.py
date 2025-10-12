@@ -1,7 +1,7 @@
 from flask import Blueprint, session, render_template, redirect, url_for, request, current_app, flash
 from flask_login import login_required, current_user
 from sqlalchemy.exc import IntegrityError
-from app.forms import EvalForm, NewFlanForm, ChercheEtabForm, UpdateProfileForm
+from app.forms import EvalForm, NewFlanForm, ChercheEtabForm, UpdateProfileForm, EtabForm
 from app.models import Etablissement, Flan, Evaluation, Utilisateur
 from app import db, bcrypt
 
@@ -11,12 +11,14 @@ main_bp = Blueprint('main', __name__)
 def index():
     from app.outils import afficher_etablissements
     # Redirection automatique vers la liste des établissements
+    form2 = EtabForm()
     resultats = Etablissement.query.all()
     etablissements, etablissements_json = afficher_etablissements(resultats)
     return render_template('liste_etablissements.html',
                            etablissements=etablissements,  # Pour la grille
                            etablissements_json=etablissements_json,  # Pour la carte
-                           google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
+                           google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
+                           form2=form2)
 
 @main_bp.route('/dashboard', methods=['GET', 'POST'])
 @login_required
@@ -124,6 +126,7 @@ def valider_evaluation(id_eval):
 def rechercher():
     from app.outils import afficher_etablissements
     form = ChercheEtabForm()
+    form2 = EtabForm()
     query = Etablissement.query
 
     def apply_filters(query, params):
@@ -148,7 +151,7 @@ def rechercher():
         if has_search_params:
             query = apply_filters(query, request.args)
         else:
-            return render_template('rechercher.html', form=form)
+            return render_template('rechercher.html', form=form, form2=form2)
     elif form.validate_on_submit():
         query = apply_filters(query, {
             'nom': form.nom.data,
@@ -157,7 +160,7 @@ def rechercher():
             'labellise': form.labellise.data
         })
     else:
-        return render_template('rechercher.html', form=form)
+        return render_template('rechercher.html', form=form, form2=form2)
 
     resultats = query.all()
     etablissements, etablissements_json = afficher_etablissements(resultats)
@@ -165,7 +168,8 @@ def rechercher():
     return render_template('liste_etablissements.html',
                            etablissements=etablissements,
                            etablissements_json=etablissements_json,
-                           google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
+                           google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
+                           form2=form2)
 
 
 
