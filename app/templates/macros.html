@@ -256,29 +256,33 @@
             {% endif %}
         </div>
         <div class="form-group">
+            <label for="search" class="form-label">Recherche d'établissement</label>
+            <input type="text" id="search" class="form-control" placeholder="Rechercher un établissement">
+        </div>
+        <div class="form-group">
             {{ form.nom.label(class="form-label") }}
-            {{ form.nom(class="form-control", id="nom") }}
+            {{ form.nom(class="form-control", id="nom", readonly=true) }}
             {% if form.nom.errors %}
                 <div class="error-message">{{ form.nom.errors[0] }}</div>
             {% endif %}
         </div>
         <div class="form-group">
             {{ form.adresse.label(class="form-label") }}
-            {{ form.adresse(class="form-control", id="adresse") }}
+            {{ form.adresse(class="form-control", id="adresse", readonly=true) }}
             {% if form.adresse.errors %}
                 <div class="error-message">{{ form.adresse.errors[0] }}</div>
             {% endif %}
         </div>
         <div class="form-group">
             {{ form.code_postal.label(class="form-label") }}
-            {{ form.code_postal(class="form-control", id="code_postal") }}
+            {{ form.code_postal(class="form-control", id="code_postal", readonly=true) }}
             {% if form.code_postal.errors %}
                 <div class="error-message">{{ form.code_postal.errors[0] }}</div>
             {% endif %}
         </div>
         <div class="form-group">
             {{ form.ville.label(class="form-label") }}
-            {{ form.ville(class="form-control", id="ville") }}
+            {{ form.ville(class="form-control", id="ville", readonly=true) }}
             {% if form.ville.errors %}
                 <div class="error-message">{{ form.ville.errors[0] }}</div>
             {% endif %}
@@ -311,7 +315,6 @@
         </div>
     </form>
 {% endmacro %}
-
 
 
 {% macro proposer_evaluation(form, action_url) %}

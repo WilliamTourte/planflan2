@@ -27,6 +27,18 @@ def extraire_ville(adresse):
 def nettoyer_adresse(adresse):
     return adresse.split(',')[0].strip()
 
+@maps_bp.route('/extraire_infos_adresse', methods=['POST'])
+def extraire_infos_adresse():
+    data = request.get_json()
+    adresse = data.get('adresse', '')
+    code_postal = extraire_code_postal(adresse)
+    ville = extraire_ville(adresse)
+    adresse_nettoyee = nettoyer_adresse(adresse)
+    return jsonify({
+        'code_postal': code_postal,
+        'ville': ville,
+        'adresse_nettoyee': adresse_nettoyee
+    })
 
 # Route pour afficher le formulaire d'ajout d'établissement
 @maps_bp.route('/ajouter_etablissement', methods=['GET', 'POST'])
@@ -55,7 +67,7 @@ def ajouter_etablissement():
             latitude=latitude,
             longitude=longitude,
             type_etab=TypeEtab[type_etab],  # Assurez-vous que type_etab est une valeur valide pour TypeEtab
-            id_user=current_user.id,
+            id_user=current_user.id_user,
             label=label,
             visite=visite,
             description=description

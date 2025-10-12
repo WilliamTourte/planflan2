@@ -1,57 +1,59 @@
 {% extends "base.html" %}
 {% from "macros.html" import ajouter_etablissement %}
 {% block scripts_head %}
-
 <script>
-    let autocomplete;
+let autocomplete;
 
-    // Définissez la fonction initAutocomplete au niveau global
-    window.initAutocomplete = function() {
-        console.log("Initialisation de l'autocomplétion...");
-        const input = document.getElementById('adresse');
-        if (!input) {
-            console.error("Élément #adresse introuvable !");
-            return;
-        }
-        autocomplete = new google.maps.places.Autocomplete(input, { types: ['geocode'] });
-
-        // Écouter les changements dans l'Autocomplete
-        autocomplete.addListener('place_changed', function() {
-            const place = autocomplete.getPlace();
-            if (!place.geometry) return;
-
-            // Remplir les champs du formulaire avec les informations du lieu
-            document.getElementById('nom').value = place.name || '';
-            document.getElementById('adresse').value = place.formatted_address || '';
-            document.getElementById('latitude').value = place.geometry.location.lat();
-            document.getElementById('longitude').value = place.geometry.location.lng();
-
-            // Extraire le code postal et la ville de l'adresse
-            let code_postal = '';
-            let ville = '';
-            const address_components = place.address_components || [];
-            for (const component of address_components) {
-                if (component.types.includes('postal_code')) {
-                    code_postal = component.long_name;
-                }
-                if (component.types.includes('locality')) {
-                    ville = component.long_name;
-                }
-            }
-            document.getElementById('code_postal').value = code_postal;
-            document.getElementById('ville').value = ville;
-        });
-    };
-
-    // Ajouter un écouteur d'événement pour DOMContentLoaded
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log("DOM complètement chargé et analysé");
-        const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyA8lo7V-ciL8oVwYXUiW00gb6O1_1K-JQ8&libraries=places&callback=initAutocomplete&v=weekly`;
-        script.async = true;
-        script.defer = true;
-        document.head.appendChild(script);
+window.initAutocomplete = function() {
+    console.log("Initialisation de l'autocomplétion...");
+    const input = document.getElementById('search');
+    if (!input) {
+        console.error("Élément #search introuvable !");
+        return;
+    }
+    autocomplete = new google.maps.places.Autocomplete(input, {
+        types: ['establishment'],  // Limite les résultats aux établissements commerciaux
+        componentRestrictions: {country: 'fr'}  // Limite les résultats à la France
     });
+
+    // Écouter les changements dans l'Autocomplete
+    autocomplete.addListener('place_changed', function() {
+        const place = autocomplete.getPlace();
+        if (!place.geometry) return;
+
+        // Remplir les champs avec les données extraites
+        document.getElementById('nom').value = place.name || '';
+        document.getElementById('adresse').value = place.formatted_address || '';
+
+        // Envoyer l'adresse à une route AJAX pour extraire le code postal et la ville
+        fetch('/extraire_infos_adresse', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ adresse: place.formatted_address }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('code_postal').value = data.code_postal || '';
+            document.getElementById('ville').value = data.ville || '';
+            document.getElementById('adresse').value = data.adresse_nettoyee || '';
+        })
+        .catch((error) => {
+            console.error('Erreur:', error);
+        });
+    });
+};
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM complètement chargé et analysé");
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyA8lo7V-ciL8oVwYXUiW00gb6O1_1K-JQ8&libraries=places&callback=initAutocomplete&v=weekly`;
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
+});
+
 </script>
 <style>
     .form-container { padding: 10px; }
