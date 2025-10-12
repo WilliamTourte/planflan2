@@ -1,5 +1,3 @@
-from argparse import OPTIONAL
-
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, RadioField, HiddenField, \
@@ -37,10 +35,6 @@ class LoginForm(FlaskForm):
     password = PasswordField('Mot de passe', validators=[DataRequired(), Length(min=6)])
     next = HiddenField()  # Champ caché pour stocker l'URL de redirection
     submit = SubmitField('Se connecter')
-
-from flask_wtf import FlaskForm
-from wtforms import StringField, SelectField, RadioField, SubmitField, HiddenField
-from wtforms.validators import DataRequired, Length
 
 class EtabForm(FlaskForm):
     type_etab = SelectField("Type d'établissement", validators=[DataRequired()])
