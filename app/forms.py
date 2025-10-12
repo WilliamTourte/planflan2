@@ -40,13 +40,12 @@ class LoginForm(FlaskForm):
 
 # Formulaire pour proposer un nouvel établissement
 class EtabForm(FlaskForm):
-    type_etab = SelectField("Type d'établissement", choices=TypeEtab, validators=[DataRequired()]  )
+    type_etab = SelectField("Type d'établissement", validators=[DataRequired()])
     nom = StringField('Nom', validators=[DataRequired(), Length(min=3, max=50)])
     adresse = StringField('Adresse', validators=[DataRequired(), Length(min=3, max=50)])
     code_postal = StringField('Code Postal', validators=[DataRequired(), Length(min=5, max=5)])
     ville = StringField('Ville', validators=[DataRequired(), Length(min=3, max=50)])
-
-    description = StringField('Description', validators=[ Length(min=3, max=255)]) #Vérifier si obligatoire dans base de données
+    description = StringField('Description', validators=[Length(min=3, max=255)])
     label = RadioField('Labellisé', choices=[('Oui','Labellisé par la Flanterie'),('Non','Non labellisé')])
     visite = RadioField('Visité', choices=[('Oui','Visité par la Flanterie'),('Non','Non visité')])
     submit = SubmitField('Proposer un établissement')

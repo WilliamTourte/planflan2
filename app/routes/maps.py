@@ -9,8 +9,8 @@ import re
 from flask import Blueprint, session, render_template, redirect, url_for, request, current_app, flash
 from flask_login import login_required, current_user
 from sqlalchemy.exc import IntegrityError
-from app.forms import EvalForm, NewFlanForm, ChercheEtabForm, UpdateProfileForm
-from app.models import Etablissement, Flan, Evaluation, Utilisateur
+from app.forms import EvalForm, NewFlanForm, ChercheEtabForm, UpdateProfileForm, EtabForm
+from app.models import Etablissement, Flan, Evaluation, Utilisateur, TypeEtab
 from app import db, bcrypt
 
 maps_bp = Blueprint('maps', __name__)
@@ -28,39 +28,40 @@ def nettoyer_adresse(adresse):
     return adresse.split(',')[0].strip()
 
 # Route pour afficher le formulaire d'ajout d'établissement
-@maps_bp.route('/ajouter_etablissement', methods=['GET'])
-def afficher_ajouter_etablissement():
-    return render_template('ajouter_etablissement.html', google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
-
-
-# Ajouter la route pour ajouter un établissement
-@maps_bp.route('/ajouter_etablissement', methods=['POST'])
+@maps_bp.route('/ajouter_etablissement', methods=['GET', 'POST'])
 def ajouter_etablissement():
-    data = request.get_json()
-    nom = data.get('nom')
-    adresse = data.get('adresse')
-    latitude = data.get('latitude')
-    longitude = data.get('longitude')
+    form = EtabForm()
+    form.type_etab.choices = [(type_etab.name, type_etab.value) for type_etab in TypeEtab]
 
-    # Extraire le code postal et la ville de l'adresse
-    code_postal = extraire_code_postal(adresse)
-    ville = extraire_ville(adresse)
-    adresse_nettoyee = nettoyer_adresse(adresse)
+    if form.validate_on_submit():
+        nom = form.nom.data
+        adresse = form.adresse.data
+        code_postal = form.code_postal.data
+        ville = form.ville.data
+        latitude = request.form.get('latitude')
+        longitude = request.form.get('longitude')
+        type_etab = form.type_etab.data
+        label = form.label.data == 'Oui'  # Convertir 'Oui'/'Non' en booléen
+        visite = form.visite.data == 'Oui'  # Convertir 'Oui'/'Non' en booléen
+        description = form.description.data
 
-    # Enregistrez les détails dans la base de données
-    from app.models import Etablissement, TypeEtab
-    new_etablissement = Etablissement(
-        nom=nom,
-        adresse=adresse_nettoyee,
-        code_postal=code_postal,
-        ville=ville,
-        latitude=latitude,
-        longitude=longitude,
-        type_etab=TypeEtab.BOULANGERIE,  # Par défaut, vous pouvez changer cela si nécessaire,
-        id_user=current_user.id_user
-    )
-    db.session.add(new_etablissement)
-    db.session.commit()
+        # Enregistrez les détails dans la base de données
+        new_etablissement = Etablissement(
+            nom=nom,
+            adresse=adresse,
+            code_postal=code_postal,
+            ville=ville,
+            latitude=latitude,
+            longitude=longitude,
+            type_etab=TypeEtab[type_etab],  # Assurez-vous que type_etab est une valeur valide pour TypeEtab
+            id_user=current_user.id,
+            label=label,
+            visite=visite,
+            description=description
+        )
+        db.session.add(new_etablissement)
+        db.session.commit()
+        flash('Établissement ajouté avec succès !', 'success')
+        return redirect(url_for('main.index'))  # Rediriger vers une page appropriée
 
-
-    return jsonify({"status": "success", "message": "Établissement ajouté avec succès"})
+    return render_template('ajouter_etablissement.html', form=form, google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
