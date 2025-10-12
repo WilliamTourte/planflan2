@@ -61,6 +61,7 @@ def verifier_etablissement():
         return jsonify({'exists': False})
 
 
+
 # Route pour afficher le formulaire d'ajout d'établissement
 @login_required
 @maps_bp.route('/ajouter_etablissement', methods=['GET', 'POST'])
