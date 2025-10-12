@@ -1,5 +1,4 @@
 <!-- MACROS D'AFFICHAGE -->
-
 {% macro afficher_image_ou_placeholder(item, classe='card-image') %}
     {% if item.photos %}
         <img src="{{ url_for('static', filename='uploads/' + item.photos[0].path) }}" alt="{{ item.nom }}" class="{{ classe }}">
@@ -8,7 +7,7 @@
     {% endif %}
 {% endmacro %}
 
-    <!-- BADGES - à refactoriser ? -->
+<!-- BADGES - à refactoriser ? -->
 {% macro afficher_badge_etablissement(etablissement) %}
     {% if etablissement.label %}
         <span class="badge">⭐ Labellisé</span>
@@ -30,7 +29,6 @@
         <span class="badge statut-en-attente">En attente</span>
     {% endif %}
 {% endmacro %}
-
 
 {% macro afficher_etablissement(etablissement) %}
     <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}" class="carte" data-id="{{ etablissement.id_etab }}" data-lat="{{ etablissement.latitude }}" data-lng="{{ etablissement.longitude }}">
@@ -120,7 +118,6 @@
     {% if not objets %}
         <div class="no-results">
             <p>Aucun {{ objet_type }} trouvé.</p>
-            {{ afficher_bouton_ajout(objet_type, current_user, etablissement, form, flan) }}
         </div>
     {% else %}
         <div class="grille">
@@ -128,13 +125,20 @@
                 {{ afficher_objet(objet_type, objet, current_user) }}
             {% endfor %}
         </div>
-        {% if objet_type == 'flan' and etablissement %}
+    {% endif %}
+    <!-- BOUTON AJOUT en fin de grille-->
+    {% if current_user.is_authenticated %}
+        <div class="card-content">
             {{ afficher_bouton_ajout(objet_type, current_user, etablissement, form, flan) }}
-        {% elif objet_type == 'evaluation' and flan %}
-            {{ afficher_bouton_ajout(objet_type, current_user, etablissement, form, flan) }}
-        {% endif %}
+        </div>
+        {%  else %}
+            <div class="card-content">
+        <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
+            Ajouter un {{ objet_type }} (connectez-vous)
+        </a>
     {% endif %}
 {% endmacro %}
+
 
 {% macro afficher_objet(objet_type, objet, current_user=None) %}
     {% if objet_type == 'etablissement' %}
@@ -151,7 +155,16 @@
 
 {% macro afficher_bouton_ajout(objet_type, current_user, etablissement=None, form=None, flan=None) %}
     {% if objet_type == 'établissement' and current_user.is_authenticated and current_user.type_user == 'admin' %}
-        <a href="{{ url_for('main.ajouter_etablissement') }}" class="btn">Ajouter un établissement</a>
+        <div class="card-content">
+            <h3>Ajouter un établissement</h3>
+            {% if current_user.is_authenticated %}
+                {{ proposer_etablissement(form, url_for('main.ajouter_etablissement')) }}
+            {% else %}
+                <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
+                    Ajouter un établissement (connectez-vous)
+                </a>
+            {% endif %}
+        </div>
     {% elif objet_type == 'flan' and etablissement %}
         <div class="card-content">
             <h3>Ajouter un flan</h3>
@@ -167,9 +180,7 @@
         <div class="card-content">
             <h3>Ajouter une évaluation</h3>
             {% if current_user.is_authenticated %}
-                <a href="{{ url_for('main.ajouter_evaluation', id_flan=flan.id_flan) }}" class="btn-proposer">
-                    Ajouter une évaluation
-                </a>
+                {{ proposer_evaluation(form, url_for('main.evaluer_flan', id_flan=flan.id_flan)) }}
             {% else %}
                 <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
                     Ajouter une évaluation (connectez-vous)
@@ -179,8 +190,8 @@
     {% endif %}
 {% endmacro %}
 
-<!--MACROS POUR PROPOSER DES CHOSES - rajouter évaluation et établissement-->
 
+<!-- MACROS POUR PROPOSER DES CHOSES -->
 {% macro proposer_flan(form, action_url) %}
     <!-- Formulaire d'ajout de flan -->
     <form method="POST" action="{{ action_url }}" class="form-container">
@@ -233,8 +244,96 @@
     </form>
 {% endmacro %}
 
+{% macro proposer_etablissement(form, action_url) %}
+    <!-- Formulaire d'ajout d'établissement -->
+    <form method="POST" action="{{ action_url }}" class="form-container">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.nom.label(class="form-label") }}
+            {{ form.nom(class="form-control") }}
+            {% if form.nom.errors %}
+                <div class="error-message">{{ form.nom.errors[0] }}</div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.type_etab.label(class="form-label") }}
+            {{ form.type_etab(class="form-control") }}
+            {% if form.type_etab.errors %}
+                <div class="error-message">{{ form.type_etab.errors[0] }}</div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.adresse.label(class="form-label") }}
+            {{ form.adresse(class="form-control") }}
+            {% if form.adresse.errors %}
+                <div class="error-message">{{ form.adresse.errors[0] }}</div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.ville.label(class="form-label") }}
+            {{ form.ville(class="form-control") }}
+            {% if form.ville.errors %}
+                <div class="error-message">{{ form.ville.errors[0] }}</div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.description.label(class="form-label") }}
+            {{ form.description(class="form-control") }}
+            {% if form.description.errors %}
+                <div class="error-message">{{ form.description.errors[0] }}</div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.submit(class="btn btn-proposer") }}
+        </div>
+    </form>
+{% endmacro %}
 
-<!-- BOUTONS POUR MODIFIER EVALUATION - à étendre à flan et établissement ? -->
+{% macro proposer_evaluation(form, action_url) %}
+    <!-- Formulaire d'ajout d'évaluation -->
+    <form method="POST" action="{{ action_url }}" class="form-container">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.visuel.label(class="form-label") }}
+            {{ form.visuel(class="form-control") }}
+            {% if form.visuel.errors %}
+                <div class="error-message">{{ form.visuel.errors[0] }}</div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.texture.label(class="form-label") }}
+            {{ form.texture(class="form-control") }}
+            {% if form.texture.errors %}
+                <div class="error-message">{{ form.texture.errors[0] }}</div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.pate.label(class="form-label") }}
+            {{ form.pate(class="form-control") }}
+            {% if form.pate.errors %}
+                <div class="error-message">{{ form.pate.errors[0] }}</div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.gout.label(class="form-label") }}
+            {{ form.gout(class="form-control") }}
+            {% if form.gout.errors %}
+                <div class="error-message">{{ form.gout.errors[0] }}</div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            {{ form.description.label(class="form-label") }}
+            {{ form.description(class="form-control") }}
+            {% if form.description.errors %}
+                <div class="error-message">{{ form.description.errors[0] }}</div>
+            {% endif %}
+        </div>
+        {{ form.submit(class="btn btn-proposer") }}
+    </form>
+{% endmacro %}
+
+
+<!-- BOUTONS POUR MODIFIER EVALUATION -->
 {% macro afficher_boutons_actions(evaluation, current_user) %}
     {% if current_user.id_user == evaluation.id_user %}
         <div class="action-buttons d-flex gap-1">

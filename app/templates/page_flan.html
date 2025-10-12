@@ -1,44 +1,39 @@
 {% extends "base.html" %}
 {% block content %}
     {% from "macros.html" import afficher_grille %}
-        {% from "macros.html" import afficher_objet %}
+    {% from "macros.html" import afficher_objet %}
 <div class="container">
-        <!-- Détails du flan -->
+    <!-- Détails du flan -->
     <div class="etablissement-header">
         {{ afficher_objet('flan', flan) }}
     </div>
     <!-- Grille des évaluations -->
-
-    {{ afficher_grille('evaluation', flan.evaluations, current_user, form, etablissement) }}
-
-        <!-- Boutons d'action -->
-        <div class="flan-actions">
-            <!-- Bouton retour -->
-            <div>
-                <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=flan.etablissement.id_etab) }}" class="btn btn-back btn-with-icon">
-                    <i class="fas fa-arrow-left"></i>
-                    Retour à {{ flan.etablissement.nom }}
-                </a>
-            </div>
-            <!-- Bouton évaluation -->
-            <div>
-                {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('main.evaluer_flan', id_flan=flan.id_flan) }}" class="btn btn-success btn-with-icon">
-                        <i class="fas fa-star"></i>
-                        <span>Évaluer ce flan</span>
-                    </a>
-                {% else %}
-                    <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn btn-success btn-with-icon">
-                        <i class="fas fa-star"></i>
-                        <span>
-                            Évaluer ce flan
-                            <small>(connectez-vous)</small>
-                        </span>
-                    </a>
-                {% endif %}
-            </div>
+    {{ afficher_grille('evaluation', flan.evaluations, current_user, form, etablissement, flan) }}
+    <!-- Boutons d'action -->
+    <div class="flan-actions">
+        <!-- Bouton retour -->
+        <div>
+            <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=flan.etablissement.id_etab) }}" class="btn btn-back btn-with-icon">
+                <i class="fas fa-arrow-left"></i>
+                Retour à {{ flan.etablissement.nom }}
+            </a>
         </div>
-
-
-
+        <!-- Bouton évaluation -->
+        <div>
+            {% if current_user.is_authenticated %}
+                <a href="{{ url_for('main.evaluer_flan', id_flan=flan.id_flan) }}" class="btn btn-success btn-with-icon">
+                    <i class="fas fa-star"></i>
+                    <span>Évaluer ce flan</span>
+                </a>
+            {% else %}
+                <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn btn-success btn-with-icon">
+                    <i class="fas fa-star"></i>
+                    <span>
+                        Évaluer ce flan
+                        <small>(connectez-vous)</small>
+                    </span>
+                </a>
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}

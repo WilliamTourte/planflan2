@@ -184,8 +184,9 @@ def afficher_etablissement_unique(id_etab):
 def afficher_flan_unique(id_flan):
     flan_unique = Flan.query.get_or_404(id_flan) # Récupère le flan par son ID ou 404 si l'id n'existe pas
     evaluations = flan_unique.evaluations # Pour que les évaluations soient transmises
+    form=EvalForm()
 
-    return render_template('page_flan.html', flan=flan_unique, request=request) # request pour se souvenir du endpoint  # Passe le flan au template
+    return render_template('page_flan.html', flan=flan_unique, form=form, request=request) # request pour se souvenir du endpoint  # Passe le flan au template
 
 @main_bp.route('/etablissement/<int:id_etab>/proposer_flan', methods=['GET', 'POST'])
 @login_required
