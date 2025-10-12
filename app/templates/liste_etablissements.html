@@ -8,7 +8,6 @@
 <script>
     let map;
     let markers = [];
-
     // Définissez la fonction initMap au niveau global
    window.initMap = function() {
     console.log("Initialisation de la carte...");
@@ -64,7 +63,6 @@
     });
     markers.push(marker);
 });
-
     // Créer un élément div pour la légende
     const legend = document.createElement('div');
     legend.style.backgroundColor = 'white';
@@ -81,8 +79,6 @@
     // Ajouter la légende à la carte
     map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(legend);
 };
-
-
     // Ajouter un écouteur d'événement pour DOMContentLoaded
     document.addEventListener('DOMContentLoaded', function() {
         console.log("DOM complètement chargé et analysé");
@@ -90,7 +86,7 @@
         if (mapElement) {
             console.log("Élément #map trouvé, chargement du script Google Maps...");
             const script = document.createElement('script');
-            script.src = `https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap&v=weekly`;
+            script.src = `https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap&v=weekly&loading=async`;
             script.async = true;
             script.defer = true;
             document.head.appendChild(script);
@@ -116,5 +112,4 @@
     <!-- Grille des établissements -->
 {% from "macros.html" import afficher_grille %}
 {{ afficher_grille('etablissement', etablissements, current_user, form, etablissement) }}
-
 {% endblock %}
