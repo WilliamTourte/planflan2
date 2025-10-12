@@ -9,6 +9,8 @@
     </div>
     <!-- Grille des évaluations -->
     {{ afficher_grille('evaluation', flan.evaluations, current_user, form, etablissement, flan) }}
+
+
     <!-- Boutons d'action -->
     <div class="flan-actions">
         <!-- Bouton retour -->
@@ -18,22 +20,6 @@
                 Retour à {{ flan.etablissement.nom }}
             </a>
         </div>
-        <!-- Bouton évaluation -->
-        <div>
-            {% if current_user.is_authenticated %}
-                <a href="{{ url_for('main.evaluer_flan', id_flan=flan.id_flan) }}" class="btn btn-success btn-with-icon">
-                    <i class="fas fa-star"></i>
-                    <span>Évaluer ce flan</span>
-                </a>
-            {% else %}
-                <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn btn-success btn-with-icon">
-                    <i class="fas fa-star"></i>
-                    <span>
-                        Évaluer ce flan
-                        <small>(connectez-vous)</small>
-                    </span>
-                </a>
-            {% endif %}
-        </div>
+
     </div>
 {% endblock %}
