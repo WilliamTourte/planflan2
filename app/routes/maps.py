@@ -27,6 +27,7 @@ def extraire_ville(adresse):
 def nettoyer_adresse(adresse):
     return adresse.split(',')[0].strip()
 
+
 # Route pour afficher le formulaire d'ajout d'établissement
 @maps_bp.route('/ajouter_etablissement', methods=['GET', 'POST'])
 def ajouter_etablissement():
