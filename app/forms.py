@@ -52,7 +52,7 @@ class EtabForm(FlaskForm):
     submit = SubmitField('Proposer un établissement')
 
 
-# Formulaire pour proposer un flan dans un établissement déjà ajouté
+# Formulaire pour proposer un flan
 class NewFlanForm(FlaskForm):
     id_etab = HiddenField('ID Établissement')  # Champ caché pour l'id_etab
     nom = StringField('Nom', validators=[DataRequired(), Length(min=3, max=50)])
@@ -61,11 +61,10 @@ class NewFlanForm(FlaskForm):
     type_texture = SelectField('Texture',  choices=[(choice.name, choice.value) for choice in TypeTexture])
     description = StringField('Description', validators=[Length(min=3, max=255)])
     prix = DecimalField('Prix', validators=[DataRequired(), NumberRange(0,20, "Le prix doit être compris entre 0 et 20€") ])
-
     submit = SubmitField('Proposer un flan')
 
 
-# Formulaire pour évaluer un flan
+# Formulaire pour proposer une évaluation
 class EvalForm(FlaskForm):
     visuel = SelectField("Visuel", choices=[(0,0), (0.5,0.5), (1,1),(1.5,1.5),(2,2),(2.5,2.5),(3,3),(3.5,3.5),(4,4),(4.5,4.5),(5,5)], validators=[DataRequired()] )
     texture =SelectField("Texture", choices=[(0,0), (0.5,0.5), (1,1),(1.5,1.5),(2,2),(2.5,2.5),(3,3),(3.5,3.5),(4,4),(4.5,4.5),(5,5)], validators=[DataRequired()] )
