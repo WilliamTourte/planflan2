@@ -1,6 +1,7 @@
 {% extends "base.html" %}
-{% from "macros.html" import afficher_grille_evaluations %}
+{% from "macros.html" import afficher_grille %}
 {% block content %}
+
   <div class="container">
       <h1>Tableau de bord</h1>
       <div id="user-info" class="etablissement-header">
@@ -60,13 +61,13 @@
       <!-- Section des évaluations de l'utilisateur -->
       <div class="evaluations-section">
           <h2 class="evaluations-title">Mes evaluations</h2>
-          {{ afficher_grille_evaluations(current_user.evaluations, current_user) }}
+          {{ afficher_grille('evaluation', current_user.evaluations, current_user, form, etablissement, flan) }}
       </div>
       <!-- Section des évaluations en attente pour les administrateurs -->
       {% if current_user.is_admin %}
       <div class="evaluations-section">
           <h2 class="evaluations-title">Evaluations en attente de validation</h2>
-          {{ afficher_grille_evaluations(pending_evaluations, current_user) }}
+          {{ afficher_grille('evaluation', pending_evaluations, current_user, form, etablissement, flan) }}
       </div>
       {% endif %}
   </div>

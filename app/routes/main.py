@@ -23,9 +23,9 @@ def index():
 def dashboard():
     form = UpdateProfileForm()
     pending_evaluations = []  # Initialisez avec une liste vide par défaut
-    # L'administrateur peut voir les évaluations en attente
+    # L'administrateur peut voir les évaluations en attente des autres utilisateurs non administrateurs
     if current_user.is_admin:
-        pending_evaluations = Evaluation.query.filter_by(statut='EN_ATTENTE').all()
+        pending_evaluations = Evaluation.query.filter_by(statut='EN_ATTENTE').join(Utilisateur).filter(Utilisateur.is_admin == False).all()
 
     # Si demande de modification du profil
     if request.method == 'POST' and form.validate_on_submit():
