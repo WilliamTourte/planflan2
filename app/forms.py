@@ -38,7 +38,10 @@ class LoginForm(FlaskForm):
     next = HiddenField()  # Champ caché pour stocker l'URL de redirection
     submit = SubmitField('Se connecter')
 
-# Formulaire pour proposer un nouvel établissement
+from flask_wtf import FlaskForm
+from wtforms import StringField, SelectField, RadioField, SubmitField, HiddenField
+from wtforms.validators import DataRequired, Length
+
 class EtabForm(FlaskForm):
     type_etab = SelectField("Type d'établissement", validators=[DataRequired()])
     nom = StringField('Nom', validators=[DataRequired(), Length(min=3, max=50)])
@@ -48,7 +51,10 @@ class EtabForm(FlaskForm):
     description = StringField('Description', validators=[Length(min=3, max=255)])
     label = RadioField('Labellisé', choices=[('Oui','Labellisé par la Flanterie'),('Non','Non labellisé')])
     visite = RadioField('Visité', choices=[('Oui','Visité par la Flanterie'),('Non','Non visité')])
+    latitude = HiddenField('Latitude')
+    longitude = HiddenField('Longitude')
     submit = SubmitField('Proposer un établissement')
+
 
 
 # Formulaire pour proposer un flan

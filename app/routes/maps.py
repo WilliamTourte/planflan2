@@ -42,6 +42,9 @@ def extraire_infos_adresse():
 from flask import jsonify, request, url_for
 from app.models import Etablissement
 
+from flask import jsonify, request, url_for
+from app.models import Etablissement
+
 @maps_bp.route('/verifier_etablissement', methods=['POST'])
 def verifier_etablissement():
     data = request.get_json()
@@ -57,6 +60,7 @@ def verifier_etablissement():
         })
     else:
         return jsonify({'exists': False})
+
 
 
 
