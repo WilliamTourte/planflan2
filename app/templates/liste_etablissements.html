@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% from "macros.html" import ajouter_etablissement %}
+{% from "macros.html" import afficher_grille %}
 {% block scripts_head %}
     <script>
 let autocomplete;
@@ -203,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
     <!-- Grille des établissements -->
-{% from "macros.html" import afficher_grille %}
+
 
 {{ afficher_grille('etablissement', etablissements, current_user, form2, etablissement) }}
 

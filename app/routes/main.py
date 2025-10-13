@@ -260,4 +260,4 @@ def evaluer_flan(id_flan):
         db.session.commit()
         return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
     # Si c'est une requête GET ou si le formulaire n'est pas valide, affichez le formulaire
-    return render_template('evaluer_flan.html', form=form, flan=flan_unique)
+    return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan, form=form))
