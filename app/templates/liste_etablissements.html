@@ -201,15 +201,10 @@ document.addEventListener('DOMContentLoaded', function() {
         <div id="map"></div>
     </div>
 </div>
+
     <!-- Grille des établissements -->
 {% from "macros.html" import afficher_grille %}
+
 {{ afficher_grille('etablissement', etablissements, current_user, form2, etablissement) }}
-    <div class="container">
 
-
-    <div class="form-container">
-        {{ ajouter_etablissement(form2, url_for('maps.ajouter_etablissement')) }}
-    </div>
-
-</div>
 {% endblock %}

@@ -154,11 +154,11 @@
 {% endmacro %}
 
 {% macro afficher_bouton_ajout(objet_type, current_user, etablissement=None, form=None, flan=None) %}
-    {% if objet_type == 'établissement' and current_user.is_authenticated and current_user.type_user == 'admin' %}
+    {% if objet_type == 'etablissement' and current_user.is_authenticated %}
         <div class="card-content">
             <h3>Ajouter un établissement</h3>
             {% if current_user.is_authenticated %}
-                {{ proposer_etablissement(form, url_for('main.ajouter_etablissement')) }}
+                {{ ajouter_etablissement(form, url_for('maps.ajouter_etablissement')) }}
             {% else %}
                 <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
                     Ajouter un établissement (connectez-vous)
