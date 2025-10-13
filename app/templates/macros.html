@@ -23,7 +23,7 @@
 {% endmacro %}
 
 {% macro afficher_badge_statut(evaluation) %}
-    {% if evaluation.statut == 'valide' %}
+    {% if evaluation.statut.value == 'VALIDE' %}
         <span class="badge statut-valide">Valide</span>
     {% else %}
         <span class="badge statut-en-attente">En attente</span>
@@ -32,7 +32,7 @@
 
 {% macro afficher_boutons_actions(objet, current_user, id_field, modify_route, delete_route, validate_route) %}
     {% if current_user.is_authenticated %}
-        {% if current_user.id_user == objet.id_user and not objet.statut == 'valide' %}
+        {% if current_user.id_user == objet.id_user and not objet.statut.value == 'VALIDE' %}
             <div class="action-buttons d-flex gap-1">
                 <form method="POST" action="{{ url_for(modify_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
                     <button type="submit" class="btn btn-primary btn-sm square-btn" title="Modifier">
@@ -46,7 +46,7 @@
                 </form>
             </div>
         {% elif current_user.is_admin %}
-            {% if objet.statut == 'en_attente' %}
+            {% if objet.statut.value == 'EN_ATTENTE' %}
                 <div class="action-buttons d-flex gap-1">
                     <form method="POST" action="{{ url_for(validate_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
                         <button type="submit" class="btn btn-success square-btn" title="Valider">
@@ -123,7 +123,6 @@
         </div>
     </a>
 {% endmacro %}
-
 {% macro afficher_evaluation(evaluation, current_user, form) %}
     <div class="carte">
         <div class="card-content">
@@ -139,96 +138,12 @@
             </div>
             {% if current_user.is_authenticated and (current_user.id_user == evaluation.id_user or current_user.is_admin) %}
                 <div id="evaluation-{{ evaluation.id_eval }}-display">
-                    <div class="criteria">
-                        <div class="criterion">
-                            <span class="criterion-name">Goût :</span>
-                            <span class="criterion-value">{{ evaluation.gout }}/5</span>
-                        </div>
-                        <div class="criterion">
-                            <span class="criterion-name">Texture :</span>
-                            <span class="criterion-value">{{ evaluation.texture }}/5</span>
-                        </div>
-                        <div class="criterion">
-                            <span class="criterion-name">Visuel :</span>
-                            <span class="criterion-value">{{ evaluation.visuel }}/5</span>
-                        </div>
-                        <div class="criterion">
-                            <span class="criterion-name">Pâte :</span>
-                            <span class="criterion-value">{{ evaluation.pate }}/5</span>
-                        </div>
-                    </div>
-                    {% if evaluation.gout is not none and evaluation.texture is not none and evaluation.visuel is not none and evaluation.pate is not none %}
-                        {% set moyenne = (evaluation.gout + evaluation.texture + evaluation.visuel + evaluation.pate) / 4 %}
-                        <div class="moyenne">
-                            <span class="moyenne-value">{{ moyenne }}/5</span>
-                        </div>
-                    {% else %}
-                        <div class="moyenne">
-                            <span class="moyenne-value">N/A</span>
-                        </div>
-                    {% endif %}
-                    <p class="type">{{ evaluation.description }}</p>
+                    {{ afficher_criteres_evaluation(evaluation) }}
                     {{ afficher_boutons_actions(evaluation, current_user, 'id_eval', 'main.modifier_evaluation', 'main.supprimer_evaluation', 'main.valider_evaluation') }}
                 </div>
-                <div id="evaluation-{{ evaluation.id_eval }}-edit" style="display: none;">
-                    <form method="POST" action="{{ url_for('main.modifier_evaluation', id_eval=evaluation.id_eval) }}" class="form-container">
-                        {{ form.hidden_tag() }}
-                        <div class="form-group">
-                            <label for="visuel-{{ evaluation.id_eval }}" class="form-label">Visuel</label>
-                            <input type="number" id="visuel-{{ evaluation.id_eval }}" name="visuel" class="form-control" value="{{ evaluation.visuel }}" min="0" max="5">
-                        </div>
-                        <div class="form-group">
-                            <label for="texture-{{ evaluation.id_eval }}" class="form-label">Texture</label>
-                            <input type="number" id="texture-{{ evaluation.id_eval }}" name="texture" class="form-control" value="{{ evaluation.texture }}" min="0" max="5">
-                        </div>
-                        <div class="form-group">
-                            <label for="pate-{{ evaluation.id_eval }}" class="form-label">Pâte</label>
-                            <input type="number" id="pate-{{ evaluation.id_eval }}" name="pate" class="form-control" value="{{ evaluation.pate }}" min="0" max="5">
-                        </div>
-                        <div class="form-group">
-                            <label for="gout-{{ evaluation.id_eval }}" class="form-label">Goût</label>
-                            <input type="number" id="gout-{{ evaluation.id_eval }}" name="gout" class="form-control" value="{{ evaluation.gout }}" min="0" max="5">
-                        </div>
-                        <div class="form-group">
-                            <label for="description-{{ evaluation.id_eval }}" class="form-label">Description</label>
-                            <textarea id="description-{{ evaluation.id_eval }}" name="description" class="form-control">{{ evaluation.description }}</textarea>
-                        </div>
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-primary">Enregistrer</button>
-                            <button type="button" class="btn btn-secondary" onclick="cancelEdit({{ evaluation.id_eval }})">Annuler</button>
-                        </div>
-                    </form>
-                </div>
+                {{ afficher_formulaire_edition_evaluation(evaluation, form) }}
             {% else %}
-                <div class="criteria">
-                    <div class="criterion">
-                        <span class="criterion-name">Goût :</span>
-                        <span class="criterion-value">{{ evaluation.gout }}/5</span>
-                    </div>
-                    <div class="criterion">
-                        <span class="criterion-name">Texture :</span>
-                        <span class="criterion-value">{{ evaluation.texture }}/5</span>
-                    </div>
-                    <div class="criterion">
-                        <span class="criterion-name">Visuel :</span>
-                        <span class="criterion-value">{{ evaluation.visuel }}/5</span>
-                    </div>
-                    <div class="criterion">
-                        <span class="criterion-name">Pâte :</span>
-                        <span class="criterion-value">{{ evaluation.pate }}/5</span>
-                    </div>
-                </div>
-                {% if evaluation.gout is not none and evaluation.texture is not none and evaluation.visuel is not none and evaluation.pate is not none %}
-                    {% set moyenne = (evaluation.gout + evaluation.texture + evaluation.visuel + evaluation.pate) / 4 %}
-                    <div class="moyenne">
-                        <span class="moyenne-value">{{ moyenne }}/5</span>
-                    </div>
-                {% else %}
-                    <div class="moyenne">
-                        <span class="moyenne-value">N/A</span>
-                    </div>
-                {% endif %}
-                <p class="type">{{ evaluation.description }}</p>
+                {{ afficher_criteres_evaluation(evaluation) }}
             {% endif %}
         </div>
     </div>
@@ -243,6 +158,71 @@
         }
     </script>
 {% endmacro %}
+
+{% macro afficher_criteres_evaluation(evaluation) %}
+    <div class="criteria">
+        <div class="criterion">
+            <span class="criterion-name">Goût :</span>
+            <span class="criterion-value">{{ evaluation.gout }}/5</span>
+        </div>
+        <div class="criterion">
+            <span class="criterion-name">Texture :</span>
+            <span class="criterion-value">{{ evaluation.texture }}/5</span>
+        </div>
+        <div class="criterion">
+            <span class="criterion-name">Visuel :</span>
+            <span class="criterion-value">{{ evaluation.visuel }}/5</span>
+        </div>
+        <div class="criterion">
+            <span class="criterion-name">Pâte :</span>
+            <span class="criterion-value">{{ evaluation.pate }}/5</span>
+        </div>
+    </div>
+    {% if evaluation.gout is not none and evaluation.texture is not none and evaluation.visuel is not none and evaluation.pate is not none %}
+        {% set moyenne = (evaluation.gout + evaluation.texture + evaluation.visuel + evaluation.pate) / 4 %}
+        <div class="moyenne">
+            <span class="moyenne-value">{{ moyenne }}/5</span>
+        </div>
+    {% else %}
+        <div class="moyenne">
+            <span class="moyenne-value">N/A</span>
+        </div>
+    {% endif %}
+    <p class="type">{{ evaluation.description }}</p>
+{% endmacro %}
+
+{% macro afficher_formulaire_edition_evaluation(evaluation, form) %}
+    <div id="evaluation-{{ evaluation.id_eval }}-edit" style="display: none;">
+        <form method="POST" action="{{ url_for('main.modifier_evaluation', id_eval=evaluation.id_eval) }}" class="form-container">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                <label for="visuel-{{ evaluation.id_eval }}" class="form-label">Visuel</label>
+                <input type="number" id="visuel-{{ evaluation.id_eval }}" name="visuel" class="form-control" value="{{ evaluation.visuel }}" min="0" max="5">
+            </div>
+            <div class="form-group">
+                <label for="texture-{{ evaluation.id_eval }}" class="form-label">Texture</label>
+                <input type="number" id="texture-{{ evaluation.id_eval }}" name="texture" class="form-control" value="{{ evaluation.texture }}" min="0" max="5">
+            </div>
+            <div class="form-group">
+                <label for="pate-{{ evaluation.id_eval }}" class="form-label">Pâte</label>
+                <input type="number" id="pate-{{ evaluation.id_eval }}" name="pate" class="form-control" value="{{ evaluation.pate }}" min="0" max="5">
+            </div>
+            <div class="form-group">
+                <label for="gout-{{ evaluation.id_eval }}" class="form-label">Goût</label>
+                <input type="number" id="gout-{{ evaluation.id_eval }}" name="gout" class="form-control" value="{{ evaluation.gout }}" min="0" max="5">
+            </div>
+            <div class="form-group">
+                <label for="description-{{ evaluation.id_eval }}" class="form-label">Description</label>
+                <textarea id="description-{{ evaluation.id_eval }}" name="description" class="form-control">{{ evaluation.description }}</textarea>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                <button type="button" class="btn btn-secondary" onclick="cancelEdit({{ evaluation.id_eval }})">Annuler</button>
+            </div>
+        </form>
+    </div>
+{% endmacro %}
+
 
 
 {% macro afficher_grille(objet_type, objets, current_user=None, form=None, etablissement=None, flan=None) %}
