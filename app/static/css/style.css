@@ -49,29 +49,50 @@ header h1 {
     color: #fee10d;
     transform: scale(1.1);
 }
+/* Barre de recherche ultra-compacte */
 .search-bar {
     background-color: #fee10d;
-    padding: 1rem 0;
+    padding: 0.1rem 0; /* Padding vertical minimal */
+    margin-bottom: 0; /* Supprime l'espace en dessous */
+}
+.search-bar .container {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+.search-bar form.d-flex {
+    align-items: center;
+    margin: 0;
+    padding: 0;
 }
 .search-bar .form-control {
     border-radius: 25px;
     border: none;
-    padding: 0.75rem 1.5rem;
-    font-size: 1.1rem;
+    padding: 0.3rem 1rem;
+    font-size: 1rem;
     box-shadow: none;
-    width: 100%;
+    height: 34px; /* Hauteur réduite */
+    width: calc(100% - 45px);
+    margin: 0;
+    margin-right: 0.3rem;
+    line-height: 1.2;
 }
-.search-bar .btn-primary {
+.btn-search-icon {
+    width: 38px;
+    height: 34px;
+    padding: 0;
+    margin: 0;
     border-radius: 25px;
-    padding: 0.75rem 2rem;
     background-color: #799dcb;
     border: none;
-    font-weight: bold;
-    box-shadow: none;
-    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
 }
-.search-bar .btn-primary:hover {
-    background-color: #6a8bc0;
+.btn-search-icon i {
+    margin: 0;
+    position: relative;
+    top: 1px;
 }
 .container {
     width: 90%;
@@ -437,14 +458,34 @@ h1, h2, h3, h4, h5, h6 {
     header h1 {
         font-size: 1.5rem;
     }
-    .search-bar .form-control,
-    .search-bar .btn-primary {
-        padding: 0.5rem 1rem;
+    .search-bar {
+        padding: 0.05rem 0;
+    }
+    .search-bar .form-control {
+        height: 30px;
+        padding: 0.2rem 0.8rem;
+        font-size: 0.9rem;
+        width: calc(100% - 40px);
+    }
+    .btn-search-icon {
+        width: 34px;
+        height: 30px;
         font-size: 1rem;
     }
 }
 @media (max-width: 480px) {
     .container {
         padding: 10px;
+    }
+    .search-bar .form-control {
+        height: 28px;
+        padding: 0.15rem 0.6rem;
+        font-size: 0.8rem;
+        width: calc(100% - 36px);
+    }
+    .btn-search-icon {
+        width: 30px;
+        height: 28px;
+        font-size: 0.9rem;
     }
 }

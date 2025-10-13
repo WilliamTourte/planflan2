@@ -39,15 +39,18 @@
         </div>
     </header>
 
-    <!-- Barre de recherche centrale -->
-    <nav class="search-bar">
-        <div class="container">
-            <form action="{{ url_for('main.rechercher') }}" method="GET" class="d-flex">
-                <input type="text" name="nom" placeholder="Rechercher un établissement, une ville..." class="form-control me-2">
-                <button type="submit" class="btn btn-primary">Rechercher</button>
-            </form>
-        </div>
-    </nav>
+<!-- Barre de recherche centrale -->
+<nav class="search-bar">
+    <div class="container">
+        <form action="{{ url_for('main.rechercher') }}" method="GET" class="d-flex align-items-center">
+            <input type="text" name="nom" placeholder="Rechercher un établissement, une ville..." class="form-control me-2">
+            <button type="submit" class="btn btn-primary btn-search-icon">
+                <i class="bi bi-search"></i>
+            </button>
+        </form>
+    </div>
+</nav>
+
 
     <main class="container">
         {% with messages = get_flashed_messages(with_categories=true) %}
