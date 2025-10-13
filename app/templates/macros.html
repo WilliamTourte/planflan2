@@ -47,7 +47,7 @@
                 </form>
             </div>
         {% elif current_user.is_admin %}
-            {% if etablissement.statut != 'valide' %}
+            {% if etablissement.statut == 'en_attente' %}
                 <div class="action-buttons d-flex gap-1">
                     <form method="POST" action="{{ url_for('maps.valider_etablissement', id_etab=etablissement.id_etab) }}" style="display: inline-block;">
                         <button type="submit" class="btn btn-success square-btn" title="Valider">
@@ -99,7 +99,7 @@
                 </form>
             </div>
         {% elif current_user.is_admin %}
-            {% if flan.statut != 'valide' %}
+            {% if flan.statut == 'en_attente' %}
                 <div class="action-buttons d-flex gap-1">
                     <form method="POST" action="{{ url_for('main.valider_flan', id_flan=flan.id_flan) }}" style="display: inline-block;">
                         <button type="submit" class="btn btn-success square-btn" title="Valider">
@@ -151,7 +151,7 @@
                 </form>
             </div>
         {% elif current_user.is_admin %}
-            {% if evaluation.statut != 'valide' %}
+            {% if evaluation.statut == 'en_attente' %}
                 <div class="action-buttons d-flex gap-1">
                     <form method="POST" action="{{ url_for('main.valider_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
                         <button type="submit" class="btn btn-success square-btn" title="Valider">
