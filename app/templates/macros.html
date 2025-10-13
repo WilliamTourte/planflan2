@@ -1,4 +1,4 @@
-<!-- MACROS D'AFFICHAGE -->
+<!-- MACROS D'AFFICHAGE (inchangées) -->
 {% macro afficher_image_ou_placeholder(item, classe='card-image') %}
     {% if item.photos %}
         <img src="{{ url_for('static', filename='uploads/' + item.photos[0].path) }}" alt="{{ item.nom }}" class="{{ classe }}">
@@ -7,7 +7,7 @@
     {% endif %}
 {% endmacro %}
 
-<!-- BADGES - à refactoriser ? -->
+<!-- BADGES (inchangés) -->
 {% macro afficher_badge_etablissement(etablissement) %}
     {% if etablissement.label %}
         <span class="badge">⭐ Labellisé</span>
@@ -30,6 +30,7 @@
     {% endif %}
 {% endmacro %}
 
+<!-- MACROS D'AFFICHAGE D'OBJETS (inchangées) -->
 {% macro afficher_etablissement(etablissement) %}
     <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}" class="carte" data-id="{{ etablissement.id_etab }}" data-lat="{{ etablissement.latitude }}" data-lng="{{ etablissement.longitude }}">
         <div class="card-image-container">
@@ -50,18 +51,24 @@
 {% endmacro %}
 
 {% macro afficher_flan(flan) %}
-    <div class="card-content">
-        <div class="card-header">
-            <h3>{{ flan.nom | enlever_accents }}</h3>
+    <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}" class="carte">
+        <div class="card-image-container">
+            {{ afficher_image_ou_placeholder(flan) }}
             {{ afficher_badge_flan(flan) }}
         </div>
-        <p class="type">Saveur : {{ flan.type_saveur.value | default("inconnue") }}</p>
-        <p class="type">Pâte : {{ flan.type_pate.value | default("inconnue") }}</p>
-        <p class="type">Texture : {{ flan.type_texture.value | default("inconnue") }}</p>
-        <p class="type">Description : {{ flan.description | default("Flantastique") }}</p>
-        <p class="flan-price">Prix : {{ "%.2f"|format(flan.prix) }} €</p>
-    </div>
+        <div class="card-content">
+            <div class="card-header">
+                <h2>{{ flan.nom | enlever_accents }}</h2>
+            </div>
+            <p class="type">Saveur : {{ flan.type_saveur.value | default("inconnue") }}</p>
+            <p class="type">Pâte : {{ flan.type_pate.value | default("inconnue") }}</p>
+            <p class="type">Texture : {{ flan.type_texture.value | default("inconnue") }}</p>
+            <p class="type">Description : {{ flan.description | default("Flantastique") }}</p>
+            <p class="flan-price">Prix : {{ "%.2f"|format(flan.prix) }} €</p>
+        </div>
+    </a>
 {% endmacro %}
+
 
 {% macro afficher_evaluation(evaluation, current_user) %}
     <a href="{{ url_for('main.afficher_flan_unique', id_flan=evaluation.flan.id_flan) }}" class="carte">
@@ -69,11 +76,7 @@
             <div class="card-header">
                 <h2>{{ evaluation.flan.etablissement.nom | enlever_accents }}</h2>
                 <h3>{{ evaluation.flan.nom | enlever_accents }}</h3>
-                {% if evaluation.statut.value == 'VALIDE' %}
-                    <span class="badge statut-valide">Valide</span>
-                {% else %}
-                    <span class="badge statut-en-attente">En attente</span>
-                {% endif %}
+                {{ afficher_badge_statut(evaluation) }}
             </div>
             <div class="evaluation-date-container">
                 <small class="evaluation-date">
@@ -131,7 +134,7 @@
         <div class="card-content">
             {{ afficher_bouton_ajout(objet_type, current_user, etablissement, form, flan) }}
         </div>
-        {%  else %}
+        {% else %}
             <div class="card-content">
         <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
             Ajouter un {{ objet_type }} (connectez-vous)
@@ -139,19 +142,16 @@
     {% endif %}
 {% endmacro %}
 
-
 {% macro afficher_objet(objet_type, objet, current_user=None) %}
     {% if objet_type == 'etablissement' %}
         {{ afficher_etablissement(objet) }}
     {% elif objet_type == 'flan' %}
-        <a href="{{ url_for('main.afficher_flan_unique', id_flan=objet.id_flan) }}" class="carte">
-            {{ afficher_image_ou_placeholder(objet) }}
-            {{ afficher_flan(objet) }}
-        </a>
+        {{ afficher_flan(objet) }}
     {% elif objet_type == 'evaluation' %}
         {{ afficher_evaluation(objet, current_user) }}
     {% endif %}
 {% endmacro %}
+
 
 {% macro afficher_bouton_ajout(objet_type, current_user, etablissement=None, form=None, flan=None) %}
     {% if objet_type == 'etablissement' %}
@@ -190,54 +190,26 @@
     {% endif %}
 {% endmacro %}
 
+<!-- MACROS POUR PROPOSER DES CHOSES (version refactorisée) -->
+{% macro afficher_champ_formulaire(field) %}
+    <div class="form-group">
+        {{ field.label(class="form-label") }}
+        {{ field(class="form-control") }}
+        {% if field.errors %}
+            <div class="error-message">{{ field.errors[0] }}</div>
+        {% endif %}
+    </div>
+{% endmacro %}
 
-<!-- MACROS POUR PROPOSER DES CHOSES -->
 {% macro proposer_flan(form, action_url) %}
-    <!-- Formulaire d'ajout de flan -->
     <form method="POST" action="{{ action_url }}" class="form-container">
         {{ form.hidden_tag() }}
-        <div class="form-group">
-            {{ form.nom.label(class="form-label") }}
-            {{ form.nom(class="form-control") }}
-            {% if form.nom.errors %}
-                <div class="error-message">{{ form.nom.errors[0] }}</div>
-            {% endif %}
-        </div>
-        <div class="form-group">
-            {{ form.type_saveur.label(class="form-label") }}
-            {{ form.type_saveur(class="form-control") }}
-            {% if form.type_saveur.errors %}
-                <div class="error-message">{{ form.type_saveur.errors[0] }}</div>
-            {% endif %}
-        </div>
-        <div class="form-group">
-            {{ form.type_texture.label(class="form-label") }}
-            {{ form.type_texture(class="form-control") }}
-            {% if form.type_texture.errors %}
-                <div class="error-message">{{ form.type_texture.errors[0] }}</div>
-            {% endif %}
-        </div>
-        <div class="form-group">
-            {{ form.type_pate.label(class="form-label") }}
-            {{ form.type_pate(class="form-control") }}
-            {% if form.type_pate.errors %}
-                <div class="error-message">{{ form.type_pate.errors[0] }}</div>
-            {% endif %}
-        </div>
-        <div class="form-group">
-            {{ form.description.label(class="form-label") }}
-            {{ form.description(class="form-control") }}
-            {% if form.description.errors %}
-                <div class="error-message">{{ form.description.errors[0] }}</div>
-            {% endif %}
-        </div>
-        <div class="form-group">
-            {{ form.prix.label(class="form-label") }}
-            {{ form.prix(class="form-control") }}
-            {% if form.prix.errors %}
-                <div class="error-message">{{ form.prix.errors[0] }}</div>
-            {% endif %}
-        </div>
+        {{ afficher_champ_formulaire(form.nom) }}
+        {{ afficher_champ_formulaire(form.type_saveur) }}
+        {{ afficher_champ_formulaire(form.type_texture) }}
+        {{ afficher_champ_formulaire(form.type_pate) }}
+        {{ afficher_champ_formulaire(form.description) }}
+        {{ afficher_champ_formulaire(form.prix) }}
         <div class="form-group">
             {{ form.submit(class="btn btn-proposer") }}
         </div>
@@ -245,69 +217,20 @@
 {% endmacro %}
 
 {% macro proposer_etablissement(form, action_url) %}
-    <!-- Formulaire d'ajout d'établissement -->
     <form method="POST" action="{{ action_url }}" class="form-container">
         {{ form.hidden_tag() }}
-        <div class="form-group">
-            {{ form.type_etab.label(class="form-label") }}
-            {{ form.type_etab(class="form-control") }}
-            {% if form.type_etab.errors %}
-                <div class="error-message">{{ form.type_etab.errors[0] }}</div>
-            {% endif %}
-        </div>
+        {{ afficher_champ_formulaire(form.type_etab) }}
         <div class="form-group">
             <label for="search" class="form-label">Recherche d'établissement</label>
             <input type="text" id="search" class="form-control" placeholder="Rechercher un établissement">
         </div>
-        <div class="form-group">
-            {{ form.nom.label(class="form-label") }}
-            {{ form.nom(class="form-control", id="nom", readonly=true) }}
-            {% if form.nom.errors %}
-                <div class="error-message">{{ form.nom.errors[0] }}</div>
-            {% endif %}
-        </div>
-        <div class="form-group">
-            {{ form.adresse.label(class="form-label") }}
-            {{ form.adresse(class="form-control", id="adresse", readonly=true) }}
-            {% if form.adresse.errors %}
-                <div class="error-message">{{ form.adresse.errors[0] }}</div>
-            {% endif %}
-        </div>
-        <div class="form-group">
-            {{ form.code_postal.label(class="form-label") }}
-            {{ form.code_postal(class="form-control", id="code_postal", readonly=true) }}
-            {% if form.code_postal.errors %}
-                <div class="error-message">{{ form.code_postal.errors[0] }}</div>
-            {% endif %}
-        </div>
-        <div class="form-group">
-            {{ form.ville.label(class="form-label") }}
-            {{ form.ville(class="form-control", id="ville", readonly=true) }}
-            {% if form.ville.errors %}
-                <div class="error-message">{{ form.ville.errors[0] }}</div>
-            {% endif %}
-        </div>
-        <div class="form-group">
-            {{ form.description.label(class="form-label") }}
-            {{ form.description(class="form-control", id="description") }}
-            {% if form.description.errors %}
-                <div class="error-message">{{ form.description.errors[0] }}</div>
-            {% endif %}
-        </div>
-        <div class="form-group">
-            {{ form.label.label(class="form-label") }}
-            {{ form.label(class="form-control", id="label") }}
-            {% if form.label.errors %}
-                <div class="error-message">{{ form.label.errors[0] }}</div>
-            {% endif %}
-        </div>
-        <div class="form-group">
-            {{ form.visite.label(class="form-label") }}
-            {{ form.visite(class="form-control", id="visite") }}
-            {% if form.visite.errors %}
-                <div class="error-message">{{ form.visite.errors[0] }}</div>
-            {% endif %}
-        </div>
+        {{ afficher_champ_formulaire(form.nom) }}
+        {{ afficher_champ_formulaire(form.adresse) }}
+        {{ afficher_champ_formulaire(form.code_postal) }}
+        {{ afficher_champ_formulaire(form.ville) }}
+        {{ afficher_champ_formulaire(form.description) }}
+        {{ afficher_champ_formulaire(form.label) }}
+        {{ afficher_champ_formulaire(form.visite) }}
         <input type="hidden" id="latitude" name="latitude">
         <input type="hidden" id="longitude" name="longitude">
         <div class="form-group">
@@ -316,52 +239,21 @@
     </form>
 {% endmacro %}
 
-
 {% macro proposer_evaluation(form, action_url) %}
-    <!-- Formulaire d'ajout d'évaluation -->
     <form method="POST" action="{{ action_url }}" class="form-container">
         {{ form.hidden_tag() }}
+        {{ afficher_champ_formulaire(form.visuel) }}
+        {{ afficher_champ_formulaire(form.texture) }}
+        {{ afficher_champ_formulaire(form.pate) }}
+        {{ afficher_champ_formulaire(form.gout) }}
+        {{ afficher_champ_formulaire(form.description) }}
         <div class="form-group">
-            {{ form.visuel.label(class="form-label") }}
-            {{ form.visuel(class="form-control") }}
-            {% if form.visuel.errors %}
-                <div class="error-message">{{ form.visuel.errors[0] }}</div>
-            {% endif %}
+            {{ form.submit(class="btn btn-proposer") }}
         </div>
-        <div class="form-group">
-            {{ form.texture.label(class="form-label") }}
-            {{ form.texture(class="form-control") }}
-            {% if form.texture.errors %}
-                <div class="error-message">{{ form.texture.errors[0] }}</div>
-            {% endif %}
-        </div>
-        <div class="form-group">
-            {{ form.pate.label(class="form-label") }}
-            {{ form.pate(class="form-control") }}
-            {% if form.pate.errors %}
-                <div class="error-message">{{ form.pate.errors[0] }}</div>
-            {% endif %}
-        </div>
-        <div class="form-group">
-            {{ form.gout.label(class="form-label") }}
-            {{ form.gout(class="form-control") }}
-            {% if form.gout.errors %}
-                <div class="error-message">{{ form.gout.errors[0] }}</div>
-            {% endif %}
-        </div>
-        <div class="form-group">
-            {{ form.description.label(class="form-label") }}
-            {{ form.description(class="form-control") }}
-            {% if form.description.errors %}
-                <div class="error-message">{{ form.description.errors[0] }}</div>
-            {% endif %}
-        </div>
-        {{ form.submit(class="btn btn-proposer") }}
     </form>
 {% endmacro %}
 
-
-<!-- BOUTONS POUR MODIFIER EVALUATION -->
+<!-- BOUTONS POUR MODIFIER EVALUATION (inchangés) -->
 {% macro afficher_boutons_actions(evaluation, current_user) %}
     {% if current_user.id_user == evaluation.id_user %}
         <div class="action-buttons d-flex gap-1">
