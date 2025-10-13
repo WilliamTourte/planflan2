@@ -22,11 +22,13 @@
     {% endif %}
 {% endmacro %}
 
-{% macro afficher_badge_statut(evaluation) %}
-    {% if evaluation.statut.value == 'VALIDE' %}
-        <span class="badge statut-valide">Valide</span>
-    {% else %}
-        <span class="badge statut-en-attente">En attente</span>
+{% macro afficher_badge_statut(evaluation, current_user) %}
+    {% if current_user and current_user.is_authenticated and (current_user.is_admin or evaluation.user_id == current_user.user_id) %}
+        {% if evaluation.statut.value == 'VALIDE' %}
+            <span class="badge statut-valide">Valide</span>
+        {% elif evaluation.statut.value == 'EN_ATTENTE' %}
+            <span class="badge statut-en-attente">En attente</span>
+        {% endif %}
     {% endif %}
 {% endmacro %}
 
@@ -129,7 +131,7 @@
             <div class="card-header">
                 <h2>{{ evaluation.flan.etablissement.nom | enlever_accents }}</h2>
                 <h3>{{ evaluation.flan.nom | enlever_accents }}</h3>
-                {{ afficher_badge_statut(evaluation) }}
+                {{ afficher_badge_statut(evaluation, current_user) }}
             </div>
             <div class="evaluation-date-container">
                 <small class="evaluation-date">
