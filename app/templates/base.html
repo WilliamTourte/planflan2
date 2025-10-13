@@ -24,6 +24,9 @@
             <!-- Bouton connexion/déconnexion à droite -->
             <div>
                 {% if current_user.is_authenticated %}
+                     <a class="btn btn-icon" href="{{ url_for('main.dashboard') }}">
+                        <i class="bi bi-person-square"></i>
+                    </a>
                     <a class="btn btn-icon" href="{{ url_for('auth.logout') }}">
                         <i class="bi bi-person-slash"></i>
                     </a>
