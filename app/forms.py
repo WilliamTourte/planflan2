@@ -39,7 +39,7 @@ class LoginForm(FlaskForm):
 class EtabForm(FlaskForm):
     type_etab = SelectField("Type d'établissement", choices=[(choice.name, choice.value) for choice in TypeEtab],
                             validators=[DataRequired()])
-    nom = StringField('Nom', validators=[DataRequired(), Length(min=3, max=50)])
+    nom = StringField('Nom', validators=[DataRequired(), Length(min=3, max=100)])
     adresse = StringField('Adresse', validators=[DataRequired(), Length(min=3, max=50)])
     code_postal = StringField('Code Postal', validators=[DataRequired(), Length(min=5, max=5)])
     ville = StringField('Ville', validators=[DataRequired(), Length(min=3, max=50)])

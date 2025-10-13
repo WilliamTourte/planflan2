@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from app.config import Config
-from app.outils import enlever_accents
+from app.outils import enlever_accents, afficher_etablissements
 import re
 
 from flask import Blueprint, session, render_template, redirect, url_for, request, current_app, flash
@@ -62,19 +62,20 @@ def verifier_etablissement():
 
 
 
-# Route pour afficher le formulaire d'ajout d'établissement
 @login_required
 @maps_bp.route('/ajouter_etablissement', methods=['GET', 'POST'])
 def ajouter_etablissement():
     form = EtabForm()
     form.type_etab.choices = [(type_etab.name, type_etab.value) for type_etab in TypeEtab]
+    etablissements = Etablissement.query.all()  # Récupérer tous les établissements
+    etablissements, etablissements_json = afficher_etablissements(etablissements)  # Déballer le tuple
     if request.method == 'POST':
         nom = form.nom.data
         # Vérifier si l'établissement existe déjà dans la base de données
         etablissement_existe = Etablissement.query.filter_by(nom=nom).first()
         if etablissement_existe:
             flash('Un établissement avec ce nom existe déjà.', 'error')
-            return render_template('ajouter_etablissement.html', form=form, google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
+            return render_template('liste_etablissements.html', form=form, etablissements_json=etablissements_json, google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
         if form.validate_on_submit():
             adresse = form.adresse.data
             code_postal = form.code_postal.data
@@ -103,5 +104,5 @@ def ajouter_etablissement():
             db.session.commit()
             flash('Établissement ajouté avec succès !', 'success')
             return redirect(url_for('main.index'))  # Rediriger vers une page appropriée
-    return render_template('ajouter_etablissement.html', form=form, google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
+    return render_template('liste_etablissements.html', form2=form, etablissements_json=etablissements_json, google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
 
