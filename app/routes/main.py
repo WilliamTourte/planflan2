@@ -171,7 +171,7 @@ def valider_flan(id_flan):
 @login_required
 def modifier_flan(id_flan):
     flan = Flan.query.get_or_404(id_flan)
-    form = FlanForm()
+    form = NewFlanForm()
 
     # Vérifier si l'utilisateur est l'auteur du flan ou un admin
     if current_user.id_user != flan.id_user and not current_user.is_admin:
@@ -278,11 +278,12 @@ def valider_evaluation(id_eval):
         db.session.rollback()
         flash('Une erreur est survenue lors de la validation de l\'évaluation.', 'danger')
     return redirect(url_for('main.dashboard'))
-
 @main_bp.route('/modifier_evaluation/<int:id_eval>', methods=['POST'])
 @login_required
 def modifier_evaluation(id_eval):
     evaluation = Evaluation.query.get_or_404(id_eval)
+
+    # Vérifier si l'utilisateur est l'auteur de l'évaluation ou un admin
     if current_user.id_user != evaluation.id_user and not current_user.is_admin:
         flash('Vous n\'avez pas le droit de modifier cette évaluation.', 'danger')
         return redirect(url_for('main.dashboard'))
@@ -310,8 +311,8 @@ def modifier_evaluation(id_eval):
         db.session.rollback()
         flash('Une erreur est survenue lors de la modification de l\'évaluation.', 'danger')
 
-    # Redirige vers la route evaluer_flan avec l'ID du flan associé à cette évaluation
-    return redirect(url_for('main.evaluer_flan', id_flan=evaluation.id_flan))
+    # Redirige vers la route afficher_flan_unique avec l'ID du flan associé à cette évaluation
+    return redirect(url_for('main.afficher_flan_unique', id_flan=evaluation.id_flan))
 
 
 @main_bp.route('/supprimer_evaluation/<int:id_eval>', methods=['POST'])
