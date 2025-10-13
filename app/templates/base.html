@@ -4,46 +4,65 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}PlanFlan{% endblock %}</title>
-    {% block scripts_head %}{% endblock %}
-    <!-- Lien vers le fichier CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Lien vers les icones -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
+    <!-- Lien vers le fichier CSS personnalisé -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block scripts_head %}{% endblock %}
 </head>
 <body>
     <header>
-        <h1>PLANFLAN</h1>
+        <div class="container d-flex justify-content-between align-items-center py-2">
+            <!-- Bouton maison à gauche -->
+            <a class="btn btn-icon" href="{{ url_for('main.index') }}">
+                <i class="bi bi-house-door"></i>
+            </a>
+            <!-- Titre centré -->
+            <h1 class="mb-0">PLANFLAN</h1>
+            <!-- Bouton connexion/déconnexion à droite -->
+            <div>
+                {% if current_user.is_authenticated %}
+                    <a class="btn btn-icon" href="{{ url_for('auth.logout') }}">
+                        <i class="bi bi-person-slash"></i>
+                    </a>
+                {% else %}
+                    <a class="btn btn-icon" href="{{ url_for('auth.login') }}">
+                        <i class="bi bi-person-fill"></i>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
     </header>
-    <nav>
-        <a href="{{ url_for('main.index') }}" class="nav-link">Accueil</a>
-        <a href="{{ url_for('main.rechercher') }}" class="nav-link">Recherche</a>
-        {% if current_user.is_authenticated %}
-            <a href="{{ url_for('main.dashboard') }}" class="nav-link">Tableau de bord</a>
-            <a href="{{ url_for('auth.logout') }}" class="nav-link">Deconnexion</a>
-        {% else %}
-            <a href="{{ url_for('auth.login') }}" class="nav-link">Connexion</a>
-            <a href="{{ url_for('auth.register') }}" class="nav-link">Inscription</a>
-        {% endif %}
-        <!-- Formulaire de recherche -->
-        <form action="{{ url_for('main.rechercher') }}" method="GET" class="navbar-search">
-            <input type="text" name="nom" placeholder="Rechercher..." class="search-input">
-            <button type="submit" class="search-button">Rechercher</button>
-        </form>
+
+    <!-- Barre de recherche centrale -->
+    <nav class="search-bar">
+        <div class="container">
+            <form action="{{ url_for('main.rechercher') }}" method="GET" class="d-flex">
+                <input type="text" name="nom" placeholder="Rechercher un établissement ou un flan..." class="form-control me-2">
+                <button type="submit" class="btn btn-primary">Rechercher</button>
+            </form>
+        </div>
     </nav>
+
     <main class="container">
-        <!-- Affichage des messages flash (succès/erreur) -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="flash-message {{ category }}">{{ message }}</div>
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
         {% block content %}{% endblock %}
     </main>
+
     <footer>
         <p>&copy; 2025 PlanFlan. Tous droits réservés.</p>
     </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    {% block scripts %}{% endblock %}
 </body>
 </html>
