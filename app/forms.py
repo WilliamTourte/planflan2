@@ -37,7 +37,7 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Se connecter')
 
 class EtabForm(FlaskForm):
-    type_etab = SelectField("Type d'établissement", choices=[(choice.value, choice.name) for choice in TypeEtab],
+    type_etab = SelectField("Type d'établissement", choices=[(choice.name, choice.value) for choice in TypeEtab],
                             validators=[DataRequired()])
     nom = StringField('Nom', validators=[DataRequired(), Length(min=3, max=50)])
     adresse = StringField('Adresse', validators=[DataRequired(), Length(min=3, max=50)])
