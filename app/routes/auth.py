@@ -52,7 +52,8 @@ def login():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('main.index'))
+    # Redirige vers la page précédente ou vers l'index si la page précédente n'est pas disponible
+    return redirect(request.referrer or url_for('main.index'))
 
 @auth_bp.route('/supprimer_compte', methods=['POST'])
 @login_required
