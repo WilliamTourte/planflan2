@@ -1,4 +1,4 @@
-<!-- MACROS D'AFFICHAGE (inchangées) -->
+<!-- MACROS D'AFFICHAGE -->
 {% macro afficher_image_ou_placeholder(item, classe='card-image') %}
     {% if item.photos %}
         <img src="{{ url_for('static', filename='uploads/' + item.photos[0].path) }}" alt="{{ item.nom }}" class="{{ classe }}">
@@ -7,7 +7,7 @@
     {% endif %}
 {% endmacro %}
 
-<!-- BADGES (inchangés) -->
+<!-- BADGES -->
 {% macro afficher_badge_etablissement(etablissement) %}
     {% if etablissement.label %}
         <span class="badge">⭐ Labellisé</span>
@@ -36,7 +36,7 @@
     {% if current_user.is_authenticated %}
         {% if current_user.id_user == objet.id_user and not objet.statut.value == 'VALIDE' %}
             <div class="action-buttons d-flex gap-1">
-                <form method="POST" action="{{ url_for(modify_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
+                <form method="POST" action="{{ url_for(modify_route, id_flan=objet.flan.id_flan if modify_route == 'main.evaluer_flan' else objet[id_field]) }}" style="display: inline-block;">
                     <button type="submit" class="btn btn-primary btn-sm square-btn" title="Modifier">
                         <i class="bi bi-pencil"></i>
                     </button>
@@ -55,7 +55,7 @@
                             <i class="bi bi-check"></i>
                         </button>
                     </form>
-                    <form method="POST" action="{{ url_for(modify_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
+                    <form method="POST" action="{{ url_for(modify_route, id_flan=objet.flan.id_flan if modify_route == 'main.evaluer_flan' else objet[id_field]) }}" style="display: inline-block;">
                         <button type="submit" class="btn btn-primary btn-sm square-btn" title="Modifier">
                             <i class="bi bi-pencil"></i>
                         </button>
@@ -68,7 +68,7 @@
                 </div>
             {% else %}
                 <div class="action-buttons d-flex gap-1">
-                    <form method="POST" action="{{ url_for(modify_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
+                    <form method="POST" action="{{ url_for(modify_route, id_flan=objet.flan.id_flan if modify_route == 'main.evaluer_flan' else objet[id_field]) }}" style="display: inline-block;">
                         <button type="submit" class="btn btn-primary btn-sm square-btn" title="Modifier">
                             <i class="bi bi-pencil"></i>
                         </button>
@@ -83,6 +83,8 @@
         {% endif %}
     {% endif %}
 {% endmacro %}
+
+
 
 <!-- MACROS D'AFFICHAGE D'OBJETS -->
 {% macro afficher_etablissement(etablissement, current_user) %}
@@ -121,10 +123,10 @@
             <p class="type">Description : {{ flan.description | default("Flantastique") }}</p>
             <p class="flan-price">Prix : {{ "%.2f"|format(flan.prix) }} €</p>
             {{ afficher_boutons_actions(flan, current_user, 'id_flan', 'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan') }}
-
         </div>
     </a>
 {% endmacro %}
+
 {% macro afficher_evaluation(evaluation, current_user, form) %}
     <div class="carte">
         <div class="card-content">
@@ -141,7 +143,7 @@
             {% if current_user.is_authenticated and (current_user.id_user == evaluation.id_user or current_user.is_admin) %}
                 <div id="evaluation-{{ evaluation.id_eval }}-display">
                     {{ afficher_criteres_evaluation(evaluation) }}
-                    {{ afficher_boutons_actions(evaluation, current_user, 'id_eval', 'main.modifier_evaluation', 'main.supprimer_evaluation', 'main.valider_evaluation') }}
+                    {{ afficher_boutons_actions(evaluation, current_user, 'id_eval', 'main.evaluer_flan', 'main.supprimer_evaluation', 'main.valider_evaluation') }}
                 </div>
                 {{ afficher_formulaire_edition_evaluation(evaluation, form) }}
             {% else %}
@@ -195,7 +197,7 @@
 
 {% macro afficher_formulaire_edition_evaluation(evaluation, form) %}
     <div id="evaluation-{{ evaluation.id_eval }}-edit" style="display: none;">
-        <form method="POST" action="{{ url_for('main.modifier_evaluation', id_eval=evaluation.id_eval) }}" class="form-container">
+        <form method="POST" action="{{ url_for('main.evaluer_flan', id_flan=evaluation.flan.id_flan) }}" class="form-container">
             {{ form.hidden_tag() }}
             <div class="form-group">
                 <label for="visuel-{{ evaluation.id_eval }}" class="form-label">Visuel</label>
@@ -225,8 +227,6 @@
     </div>
 {% endmacro %}
 
-
-
 {% macro afficher_grille(objet_type, objets, current_user=None, form=None, etablissement=None, flan=None) %}
     {% if not objets %}
         <div class="no-results">
@@ -235,7 +235,7 @@
     {% else %}
         <div class="grille">
             {% for objet in objets %}
-                {{ afficher_objet(objet_type, objet, current_user,form) }}
+                {{ afficher_objet(objet_type, objet, current_user, form) }}
             {% endfor %}
         </div>
     {% endif %}
@@ -252,13 +252,13 @@
     {% endif %}
 {% endmacro %}
 
-{% macro afficher_objet(objet_type, objet, current_user=None,form=None) %}
+{% macro afficher_objet(objet_type, objet, current_user=None, form=None) %}
     {% if objet_type == 'etablissement' %}
         {{ afficher_etablissement(objet, current_user) }}
     {% elif objet_type == 'flan' %}
         {{ afficher_flan(objet, current_user) }}
     {% elif objet_type == 'evaluation' %}
-        {{ afficher_evaluation(objet, current_user,form) }}
+        {{ afficher_evaluation(objet, current_user, form) }}
     {% endif %}
 {% endmacro %}
 
