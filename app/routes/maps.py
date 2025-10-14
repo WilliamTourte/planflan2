@@ -61,21 +61,26 @@ def verifier_etablissement():
         return jsonify({'exists': False})
 
 
-
 @login_required
 @maps_bp.route('/ajouter_etablissement', methods=['GET', 'POST'])
 def ajouter_etablissement():
     form = EtabForm()
     form.type_etab.choices = [(type_etab.name, type_etab.value) for type_etab in TypeEtab]
-    etablissements = Etablissement.query.all()  # Récupérer tous les établissements
-    etablissements, etablissements_json = afficher_etablissements(etablissements)  # Déballer le tuple
+    etablissements = Etablissement.query.all()
+    etablissements, etablissements_json = afficher_etablissements(etablissements)
+
     if request.method == 'POST':
-        nom = form.nom.data
-        # Vérifier si l'établissement existe déjà dans la base de données
-        etablissement_existe = Etablissement.query.filter_by(nom=nom).first()
+        print("Requête POST reçue")
+        print(f"Nom de l'établissement: {form.nom.data}")
+
+        etablissement_existe = Etablissement.query.filter_by(nom=form.nom.data).first()
         if etablissement_existe:
             flash('Un établissement avec ce nom existe déjà.', 'error')
             return render_template('liste_etablissements.html', form=form, etablissements_json=etablissements_json, google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
+
+        if not form.validate_on_submit():
+            print("Erreurs de validation :", form.errors)  # Imprime les erreurs de validation
+
         if form.validate_on_submit():
             adresse = form.adresse.data
             code_postal = form.code_postal.data
@@ -83,29 +88,34 @@ def ajouter_etablissement():
             latitude = request.form.get('latitude')
             longitude = request.form.get('longitude')
             type_etab = form.type_etab.data
-            label = form.label.data == 'Oui'  # Convertir 'Oui'/'Non' en booléen
-            visite = form.visite.data == 'Oui'  # Convertir 'Oui'/'Non' en booléen
+            label = form.label.data == 'Oui'
+            visite = form.visite.data == 'Oui'
             description = form.description.data
-            # Enregistrez les détails dans la base de données
+
+            print("Données du formulaire validées")
+
             new_etablissement = Etablissement(
-                nom=nom,
+                nom=form.nom.data,
                 adresse=adresse,
                 code_postal=code_postal,
                 ville=ville,
                 latitude=latitude,
                 longitude=longitude,
-                type_etab=TypeEtab[type_etab],  # Assurez-vous que type_etab est une valeur valide pour TypeEtab
+                type_etab=TypeEtab[type_etab],
                 id_user=current_user.id_user,
                 description=description,
                 label=label,
                 visite=visite
-
             )
             db.session.add(new_etablissement)
             db.session.commit()
+            print("Établissement ajouté avec succès")
             flash('Établissement ajouté avec succès !', 'success')
-            return redirect(url_for('main.index'))  # Rediriger vers une page appropriée
+            return redirect(url_for('main.index'))
+
+    print("Rendu du template")
     return render_template('liste_etablissements.html', form2=form, etablissements_json=etablissements_json, google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
+
 
 @maps_bp.route('/modifier_etablissement/<int:id_etab>', methods=['GET', 'POST'])
 @login_required
