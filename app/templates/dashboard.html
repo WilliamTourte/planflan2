@@ -1,7 +1,84 @@
 {% extends "base.html" %}
-
 {% block content %}
-<h1>Tableau de bord</h1>
-<p>Bienvenue, {{ current_user.pseudo }} !</p>
-<a href="{{ url_for('auth.logout') }}">Se déconnecter</a>
+
+  <div class="container">
+      <h1>Tableau de bord</h1>
+      <div id="user-info" class="etablissement-header">
+          <p><strong>Pseudo:</strong> {{ current_user.pseudo }}</p>
+          <p><strong>Email:</strong> {{ current_user.email }}</p>
+          <div style="text-align: right;">
+              <button id="edit-profile-btn" class="btn btn-primary">Modifier le profil</button>
+              <form method="POST" action="{{ url_for('auth.supprimer_compte') }}" style="display: inline-block;">
+                  <button type="submit" class="btn btn-danger">Supprimer le compte</button>
+              </form>
+          </div>
+      </div>
+      <div id="edit-profile-form" style="display: none;">
+          <form method="POST" action="" class="form">
+              {{ form.hidden_tag() }}
+              <div class="form-group">
+                  {{ form.pseudo.label }}<br>
+                  {{ form.pseudo(size=20, class="form-control") }}<br>
+                  {% for error in form.pseudo.errors %}
+                  <span class="error-message">[{{ error }}]</span>
+                  {% endfor %}
+              </div>
+              <div class="form-group">
+                  {{ form.email.label }}<br>
+                  {{ form.email(size=20, class="form-control") }}<br>
+                  {% for error in form.email.errors %}
+                  <span class="error-message">[{{ error }}]</span>
+                  {% endfor %}
+              </div>
+              <div class="form-group">
+                  {{ form.current_password.label }}<br>
+                  {{ form.current_password(size=20, class="form-control") }}<br>
+                  {% for error in form.current_password.errors %}
+                  <span class="error-message">[{{ error }}]</span>
+                  {% endfor %}
+              </div>
+              <div class="form-group">
+                  {{ form.new_password.label }}<br>
+                  {{ form.new_password(size=20, class="form-control") }}<br>
+                  {% for error in form.new_password.errors %}
+                  <span class="error-message">[{{ error }}]</span>
+                  {% endfor %}
+              </div>
+              <div class="form-group">
+                  {{ form.confirm_password.label }}<br>
+                  {{ form.confirm_password(size=20, class="form-control") }}<br>
+                  {% for error in form.confirm_password.errors %}
+                  <span class="error-message">[{{ error }}]</span>
+                  {% endfor %}
+              </div>
+              <div class="form-group">
+                  {{ form.submit(class="btn btn-submit") }}
+                  <button id="cancel-edit-btn" class="btn btn-secondary">Annuler</button>
+              </div>
+          </form>
+      </div>
+      <!-- Section des évaluations de l'utilisateur -->
+      <div class="evaluations-section">
+          <h2 class="evaluations-title">Mes evaluations</h2>
+          {{ afficher_grille('evaluation', current_user.evaluations, current_user, form, etablissement, flan) }}
+      </div>
+      <!-- Section des évaluations en attente pour les administrateurs -->
+      {% if current_user.is_admin %}
+      <div class="evaluations-section">
+          <h2 class="evaluations-title">Evaluations en attente de validation</h2>
+          {{ afficher_grille('evaluation', pending_evaluations, current_user, form, etablissement, flan) }}
+      </div>
+      {% endif %}
+  </div>
+  <script>
+      document.getElementById('edit-profile-btn').addEventListener('click', function() {
+          document.getElementById('user-info').style.display = 'none';
+          document.getElementById('edit-profile-form').style.display = 'block';
+      });
+
+      document.getElementById('cancel-edit-btn').addEventListener('click', function() {
+          document.getElementById('user-info').style.display = 'block';
+          document.getElementById('edit-profile-form').style.display = 'none';
+      });
+  </script>
 {% endblock %}

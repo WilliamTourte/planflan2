@@ -1,43 +1,112 @@
+{% from "macros.html" import afficher_grille %}
+{% from "macros.html" import afficher_objet %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}PlanFlan{% endblock %}</title>
-    {% block scripts_head %}{% endblock %}
-
-    <!-- Lien vers le fichier CSS -->
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Lien vers les icones -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Lien vers le fichier CSS personnalisé -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    {% block scripts_head %}
+    {% endblock %}
 </head>
 <body>
     <header>
-        <h1>PLANFLAN</h1>
+        <div class="container d-flex justify-content-between align-items-center py-2">
+            <!-- Bouton maison à gauche -->
+            <a class="btn btn-icon" href="{{ url_for('main.index') }}">
+                <i class="bi bi-house-door"></i>
+            </a>
+            <!-- Titre centré -->
+            <h1 class="mb-0">PLANFLAN</h1>
+            <!-- Bouton connexion/déconnexion à droite -->
+            <div>
+                {% if current_user.is_authenticated %}
+                     <a class="btn btn-icon" href="{{ url_for('main.dashboard') }}">
+                        <i class="bi bi-person-square"></i>
+                    </a>
+                    <a class="btn btn-icon" href="{{ url_for('auth.logout') }}">
+                        <i class="bi bi-person-slash"></i>
+                    </a>
+                {% else %}
+                    <a class="btn btn-icon" href="{{ url_for('auth.login') }}">
+                        <i class="bi bi-person-fill"></i>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    <!-- Barre de recherche centrale -->
+<nav class="search-bar">
+    <div class="container">
+        <form action="{{ url_for('main.rechercher') }}" method="GET" class="d-flex align-items-center">
+            <input type="text" name="nom" placeholder="Rechercher un établissement, une ville..." class="form-control me-2">
+            <button type="submit" class="btn btn-primary btn-search-icon">
+                <i class="bi bi-search"></i>
+            </button>
+        </form>
+    </div>
+</nav>
     </header>
-    <nav>
-        <a href="{{ url_for('main.index') }}">Accueil</a>
-        <a href="{{ url_for('main.rechercher') }}">Recherche</a>
 
-        {% if current_user.is_authenticated %}
-            <a href="{{ url_for('main.dashboard') }}">Tableau de bord</a>
-            <a href="{{ url_for('auth.logout') }}">Déconnexion</a>
-        {% else %}
-            <a href="{{ url_for('auth.login') }}">Connexion</a>
-            <a href="{{ url_for('auth.register') }}">Inscription</a>
-        {% endif %}
-    </nav>
+
+
+
     <main class="container">
-        <!-- Affichage des messages flash (succès/erreur) -->
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
-                    <div class="flash-message {{ category }}">{{ message }}</div>
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
         {% block content %}{% endblock %}
     </main>
+
     <footer>
         <p>&copy; 2025 PlanFlan. Tous droits réservés.</p>
     </footer>
+
+
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{% block scripts %}{% endblock %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let lastScroll = 0;
+    const header = document.querySelector('header');
+    const searchBar = document.querySelector('.search-bar');
+
+    window.addEventListener('scroll', function() {
+        const currentScroll = window.scrollY;
+
+        if (currentScroll <= 0) {
+            // Si on est en haut de la page, tout est visible
+            header.classList.remove('hide');
+            searchBar.classList.remove('hide');
+            return;
+        }
+
+        if (currentScroll > lastScroll && currentScroll > 100) {
+            // Défilement vers le bas
+            header.classList.add('hide');
+            searchBar.classList.add('hide');
+        } else {
+            // Défilement vers le haut
+            header.classList.remove('hide');
+            searchBar.classList.remove('hide');
+        }
+
+        lastScroll = currentScroll;
+    });
+});
+</script>
 </body>
 </html>

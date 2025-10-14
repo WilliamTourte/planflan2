@@ -1,12 +1,10 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
-from flask_login import login_user, logout_user, login_required
+from flask_login import login_user, logout_user, login_required, current_user
 from flask_bcrypt import check_password_hash, generate_password_hash
-
 
 from app import db, bcrypt
 from app.models import Utilisateur
 from app.forms import LoginForm, RegistrationForm
-
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -45,19 +43,23 @@ def login():
             # Redirige vers la page stockée dans 'next', ou vers une page par défaut
             next_page = form.next.data or request.args.get('next', url_for('main.index'))
 
-
-
-
             return redirect(next_page)
 
         flash('Pseudo ou mot de passe incorrect.', 'danger')
     return render_template('login.html', form=form)
 
-
-
-
 @auth_bp.route('/logout')
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('auth.login'))
+    # Redirige vers la page précédente ou vers l'index si la page précédente n'est pas disponible
+    return redirect(request.referrer or url_for('main.index'))
+
+@auth_bp.route('/supprimer_compte', methods=['POST'])
+@login_required
+def supprimer_compte():
+    user = Utilisateur.query.get(current_user.id_user)
+    db.session.delete(user)
+    db.session.commit()
+    flash('Votre compte a bien été supprimé', 'success')
+    return redirect(url_for('main.index'))

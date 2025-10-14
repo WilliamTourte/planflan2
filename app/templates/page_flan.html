@@ -1,102 +1,25 @@
 {% extends "base.html" %}
 {% block content %}
+
 <div class="container">
-    <div class="flan-detail-container">
-        <!-- En-tête du flan -->
-        <div class="flan-header">
-            <h1 class="flan-title">{{ flan.nom }}</h1>
-            <p class="flan-description">{{ flan.description or "Un délicieux flan maison" }}</p>
-            <p class="flan-price">Prix : {{ "%.2f"|format(flan.prix) }} €</p>
+    <!-- Détails du flan -->
+    <div class="etablissement-header">
+        {{ afficher_objet('flan', flan) }}
+    </div>
+    <!-- Grille des évaluations -->
+    {{ afficher_grille('evaluation', flan.evaluations, current_user, form, etablissement, flan) }}
+
+
+    <!-- Boutons d'action -->
+    <div class="flan-actions">
+        <!-- Bouton retour -->
+        <div>
+            <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=flan.etablissement.id_etab) }}" class="btn btn-back btn-with-icon">
+                <i class="fas fa-arrow-left"></i>
+                Retour à {{ flan.etablissement.nom }}
+            </a>
         </div>
 
-        <!-- Boutons d'action -->
-        <div class="flan-actions">
-            <!-- Bouton retour -->
-            <div>
-                <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=flan.etablissement.id_etab) }}" class="btn btn-back btn-with-icon">
-                    <i class="fas fa-arrow-left"></i>
-                    Retour à {{ flan.etablissement.nom }}
-                </a>
-            </div>
-
-            <!-- Bouton évaluation -->
-            <div>
-                {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('main.evaluer_flan', id_flan=flan.id_flan) }}" class="btn btn-success btn-with-icon">
-                        <i class="fas fa-star"></i>
-                        <span>Évaluer ce flan</span>
-                    </a>
-                {% else %}
-                    <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn btn-success btn-with-icon">
-                        <i class="fas fa-star"></i>
-                        <span>
-                            Évaluer ce flan
-                            <small>(connectez-vous)</small>
-                        </span>
-                    </a>
-                {% endif %}
-            </div>
-        </div>
-
-        <!-- Section des évaluations -->
-        <div class="evaluations-section">
-            <h2 class="evaluations-title">Evaluations</h2>
-
-            {% if flan.evaluations|selectattr('statut.value', 'equalto', 'VALIDE')|list %}
-                {% for evaluation in flan.evaluations if evaluation.statut.value == "VALIDE" %}
-                <div class="evaluation-card">
-                    <div class="evaluation-content">
-                        <div class="evaluation-left">
-                            <h3 style="color: #333; margin-bottom: 10px; font-family: 'Bubblegum', cursive !important;">
-                                Evaluation par {{ evaluation.user.pseudo }}
-                                <small style="color: #7f8c8d; font-size: 0.9em; font-weight: normal;">
-                                    {{ evaluation.date_creation.strftime('%d/%m/%Y') }}
-                                </small>
-                            </h3>
-
-                            <div class="evaluation-notes">
-                                <div class="note-item">
-                                    <p><strong>Visuel:</strong> {{ evaluation.visuel }}/5</p>
-                                </div>
-                                <div class="note-item">
-                                    <p><strong>Texture:</strong> {{ evaluation.texture }}/5</p>
-                                </div>
-                                <div class="note-item">
-                                    <p><strong>Pâte:</strong> {{ evaluation.pate }}/5</p>
-                                </div>
-                                <div class="note-item">
-                                    <p><strong>Goût:</strong> {{ evaluation.gout }}/5</p>
-                                </div>
-                            </div>
-
-                            <div class="evaluation-moyenne">
-                                <strong>Moyenne : {{ "%.1f"|format(evaluation.moyenne) }}/5</strong>
-                            </div>
-
-                            <div class="evaluation-comment">
-                                <p>{{ evaluation.description or "Aucun commentaire" }}</p>
-                            </div>
-                        </div>
-
-                        <div class="evaluation-right">
-                            {% if evaluation.photo %}
-                                <img src="{{ url_for('static', filename='uploads/' + evaluation.photo.path) }}"
-                                     alt="Photo de l'évaluation"
-                                     class="evaluation-photo">
-                            {% else %}
-                                <p style="color: #7f8c8d; font-style: italic;">Aucune photo disponible</p>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-                {% endfor %}
-            {% else %}
-                <div class="no-evaluations">
-                    <i class="fas fa-comment-slash"></i>
-                    <p>Aucune evaluation validée pour ce flan.</p>
-                </div>
-            {% endif %}
-        </div>
     </div>
 </div>
 {% endblock %}

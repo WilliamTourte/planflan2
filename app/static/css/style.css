@@ -25,19 +25,101 @@ body {
 header {
     background-color: #799dcb;
     color: white;
-    padding: 0.25rem 0;
+    padding: 0.5rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    transition: transform 0.3s ease;
+}
+
+header.hide {
+    transform: translateY(-100%);
+}
+
+header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    font-family: 'Bubblegum', cursive !important;
     text-align: center;
-}
-
-nav {
-    background-color: lightsalmon;
-    padding: 0.25rem 0;
-}
-
-nav a {
+    margin: 0;
     color: white;
-    text-decoration: none;
-    margin: 0 10px;
+    font-size: 2rem;
+}
+
+.btn-icon {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    padding: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-icon:hover {
+    color: #fee10d;
+    transform: scale(1.1);
+}
+
+/* Barre de recherche ultra-compacte */
+.search-bar {
+    background-color: #fee10d;
+    padding: 0.1rem 0;
+    margin-bottom: 0;
+    transition: transform 0.3s ease;
+}
+
+/* Suppression du position: sticky pour .search-bar car il est maintenant dans le header */
+.search-bar.hide {
+    display: none; /* Changé de transform à display pour une meilleure intégration */
+}
+
+.search-bar .container {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.search-bar form.d-flex {
+    align-items: center;
+    margin: 0;
+    padding: 0;
+}
+
+.search-bar .form-control {
+    border-radius: 25px;
+    border: none;
+    padding: 0.3rem 1rem;
+    font-size: 1rem;
+    box-shadow: none;
+    height: 34px;
+    width: calc(100% - 45px);
+    margin: 0;
+    margin-right: 0.3rem;
+    line-height: 1.2;
+}
+
+.btn-search-icon {
+    width: 38px;
+    height: 34px;
+    padding: 0;
+    margin: 0;
+    border-radius: 25px;
+    background-color: #799dcb;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
+.btn-search-icon i {
+    margin: 0;
+    position: relative;
+    top: 1px;
 }
 
 .container {
@@ -49,14 +131,14 @@ nav a {
 
 main {
     padding: 20px 0;
+    margin-top: 20px; /* Ajouté pour éviter que le contenu ne soit collé sous le header */
 }
 
 footer {
     background-color: #799dcb;
     color: white;
     text-align: center;
-    padding: 0.5rem;
-    position: fixed;
+    padding: 1rem 0;
     bottom: 0;
     width: 100%;
 }
@@ -65,13 +147,7 @@ h1, h2, h3, h4, h5, h6 {
     font-family: 'Bubblegum', cursive !important;
 }
 
-h1 {
-    text-align: center;
-    margin-bottom: 30px;
-    color: white; /* Pour les titres sur fond bleu */
-}
-
-/* Boutons - Version standard */
+/* Boutons */
 .btn, .btn-primary, .btn-success, .btn-info, .btn-back,
 .btn-details, .btn-proposer, .btn-evaluate, .btn-submit {
     display: inline-flex;
@@ -163,141 +239,85 @@ h1 {
     margin: 20px auto 0;
 }
 
-.filter-btn {
-    padding: 8px 18px;
-    background-color: #ecf0f1;
-    color: #2c3e50;
-    border-radius: 25px;
-    min-width: auto;
-    height: auto;
-    box-shadow: none;
-}
-
-.filter-btn:hover {
-    background-color: #d6eaf8;
-    transform: none;
-}
-
-.filter-btn.active {
-    background-color: #3498db;
+.btn-danger {
+    background-color: #e74c3c;
     color: white;
 }
 
-
-/* Formulaires */
-form {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+.btn-danger:hover {
+    background-color: #c0392b;
 }
 
-.form-group {
-    margin-bottom: 0.5rem;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 5px;
-    color: #333;
-    font-weight: bold;
-}
-
-.form-group input,
-.form-group textarea {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
+.square-btn {
+    width: 45px;
+    height: 45px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
     border-radius: 4px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 16px;
+    margin: 0;
 }
 
-.error-message {
-    color: #e74c36;
-    font-size: 0.9rem;
-    margin-top: 5px;
+.square-btn i {
+    margin: 0;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: flex-end;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
 }
 
 /* Flash messages */
-.flash-message {
+.alert {
     padding: 10px;
     margin: 10px 0;
     border-radius: 4px;
 }
 
-.flash-message.success {
+.alert-success {
     background-color: #4caf50;
     color: white;
 }
 
-.flash-message.danger {
+.alert-danger {
     background-color: #f44336;
     color: white;
 }
 
-/* En-tête de l'établissement */
-.etablissement-header {
-    background: white;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    margin-bottom: 30px;
-    text-align: center;
-}
-
-.etablissement-header h1 {
-    color: #333 !important;
-    margin: 0 0 10px 0;
-}
-
-.type-badge {
-    display: inline-block;
-    background: #e74c3c;
-    color: white;
-    padding: 5px 15px;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    margin-bottom: 15px;
-}
-
-.etablissement-info {
-    text-align: left;
-    max-width: 600px;
-    margin: 0 auto;
-}
-
-.etablissement-info p {
-    margin: 8px 0;
+/* Badges */
+.badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #fee10d;
     color: #333;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    z-index: 10;
 }
 
-/* Section title */
-.section-title {
-    color: #2c3e50;
-    margin: 30px 0 20px 0;
-    text-align: center;
-    position: relative;
+.statut-valide {
+    background-color: green;
+    color: white;
 }
 
-.section-title:after {
-    content: "";
-    display: block;
-    width: 80px;
-    height: 3px;
-    background: #3498db;
-    margin: 10px auto;
+.statut-en-attente {
+    background-color: orange;
+    color: white;
 }
 
-/* Grille des établissements */
-.etablissements-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 25px;
-    margin-top: 20px;
-}
-
-/* Cartes cliquables */
-.etablissement-card {
+/* Cartes */
+.carte {
     text-decoration: none;
     color: inherit;
     border-radius: 10px;
@@ -309,15 +329,22 @@ form {
     height: 100%;
 }
 
-.etablissement-card:hover {
+.carte:hover {
     transform: translateY(-7px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
     color: inherit;
 }
 
+.card-image-container {
+    position: relative;
+    display: block;
+    height: 180px;
+    overflow: hidden;
+}
+
 .card-image {
     width: 100%;
-    height: 180px;
+    height: 100%;
     object-fit: cover;
 }
 
@@ -328,6 +355,7 @@ form {
     justify-content: center;
     color: #7f8c8d;
     font-style: italic;
+    height: 100%;
 }
 
 .card-content {
@@ -338,12 +366,13 @@ form {
 
 .card-header {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    justify-content: flex-start;
     align-items: flex-start;
     margin-bottom: 10px;
 }
 
-.etablissement-card h2 {
+.carte h2, .carte h3 {
     margin: 0 0 8px 0;
     font-size: 1.3rem;
     color: #333 !important;
@@ -377,6 +406,12 @@ form {
     margin: 10px 0;
 }
 
+.flan-price {
+    color: #e74c3c;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
 .arrow {
     position: absolute;
     bottom: 20px;
@@ -386,272 +421,103 @@ form {
     transition: all 0.2s;
 }
 
-.etablissement-card:hover .arrow {
+.carte:hover .arrow {
     transform: translateX(5px);
 }
 
-/* Badge "Label La Flanterie" */
-.badge {
-    background: #f39c12;
-    color: white;
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    font-weight: bold;
-    margin-left: 10px;
-}
-
-/* Filtres */
-.filters {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin: 25px 0;
-    flex-wrap: wrap;
-}
-
-.filter-btn {
-    padding: 8px 18px;
-    background: #ecf0f1;
-    border-radius: 25px;
-    text-decoration: none;
-    color: #2c3e50;
-    transition: all 0.2s;
-    font-weight: 500;
-}
-
-.filter-btn:hover {
-    background: #d6eaf8;
-}
-
-.filter-btn.active {
-    background: #3498db;
-    color: white;
-}
-
-/* Grille des flans */
-.flans-grid {
+/* Grille */
+.grille {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 25px;
-    margin-bottom: 30px;
+    margin-top: 20px;
 }
 
-.flan-card {
+/* Formulaires */
+.form-container {
     background: white;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-}
-
-.flan-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
-}
-
-.flan-card .card-content {
     padding: 20px;
-    min-height: 150px;
-    display: flex;
-    flex-direction: column;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
 }
 
-.flan-card h3 {
-    margin: 0 0 10px 0;
-    font-size: 1.2rem;
-    color: #333 !important;
+.form-group {
+    margin-bottom: 1rem;
 }
 
-.flan-header {
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+    font-weight: bold;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.error-message {
+    color: #e74c36;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+/* Évaluations */
+.criteria {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.criterion {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #eee;
 }
 
-.flan-price {
-    color: #e74c3c;
+.criterion-name {
     font-weight: bold;
+    color: #333;
 }
 
-.flan-description {
-    color: #555;
-    flex-grow: 1;
-    margin: 10px 0;
-    line-height: 1.5;
-}
-
-.flan-actions {
-    margin-top: auto;
-    text-align: right;
-}
-
-.btn-details {
-    display: inline-block;
-    padding: 8px 15px;
-    background: #3498db;
-    color: white;
-    border-radius: 5px;
-    text-decoration: none;
-    font-weight: bold;
-    transition: background 0.2s;
-}
-
-.btn-details:hover {
-    background: #2980b9;
-}
-
-/* ===== Page Flan ===== */
-/* Conteneur principal du flan */
-.flan-detail-container {
-    background: white;
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-    margin-bottom: 30px;
-}
-
-/* En-tête du flan */
-.flan-header {
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.flan-title {
-    color: #2c3e50;
-    margin-bottom: 15px;
-}
-
-.flan-description {
-    color: #555;
-    font-size: 1.1em;
-    margin-bottom: 10px;
-}
-
-.flan-price {
-    color: #e74c3c;
-    font-weight: bold;
-    font-size: 1.2em;
-}
-
-/* Section des boutons */
-.flan-actions {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-    gap: 15px;
-}
-
-/* Section des évaluations */
-.evaluations-section {
-    margin-top: 30px;
-}
-
-.evaluations-title {
-    color: #2c3e50;
-    margin-bottom: 20px;
-    font-family: 'Bubblegum', cursive !important;
-    text-align: center;
-}
-
-.evaluation-card {
-    border: 1px solid #eee;
-    border-radius: 8px;
-    padding: 20px;
-    margin-bottom: 20px;
-    background: #f9f9f9;
-}
-
-.evaluation-content {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-.evaluation-left {
-    flex: 1;
-}
-
-.evaluation-right {
-    text-align: center;
-    margin-top: 15px;
-}
-
-.evaluation-notes {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    margin-bottom: 15px;
-}
-
-.note-item {
-    background: #f0f8ff;
-    padding: 8px;
-    border-radius: 5px;
-}
-
-.note-item p {
-    margin: 0;
+.criterion-value {
     color: #3498db;
+    font-weight: bold;
 }
 
-.evaluation-moyenne {
+.moyenne {
+    text-align: center;
+    margin: 15px 0;
+}
+
+.moyenne-value {
     background: #e8f5e9;
-    padding: 10px;
-    border-radius: 5px;
-    text-align: center;
-    margin-bottom: 15px;
-}
-
-.evaluation-moyenne strong {
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-weight: bold;
     color: #4CAF50;
-    font-size: 1.2em;
 }
 
-.evaluation-comment {
-    background: #fff;
-    padding: 15px;
-    border-radius: 5px;
-    border: 1px solid #eee;
-}
-
-.evaluation-photo {
-    max-width: 100%;
-    max-height: 200px;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.no-evaluations {
-    text-align: center;
-    padding: 30px;
-    background: #f9f9f9;
-    border-radius: 8px;
+.evaluation-date {
     color: #7f8c8d;
-}
-
-.no-evaluations i {
-    font-size: 2em;
-    color: #ccc;
+    font-size: 0.9em;
+    font-weight: normal;
+    text-align: left;
+    display: block;
     margin-bottom: 10px;
 }
 
-/* Boutons avec icônes */
-.btn-with-icon i {
-    margin-right: 8px;
-}
-
-.btn-with-icon small {
-    display: block;
-    font-size: 0.7em;
-    font-weight: normal;
-    margin-top: 2px;
-    opacity: 0.9;
-}
-
-/* Message "Aucun résultat" */
+/* No results */
 .no-results {
     grid-column: 1 / -1;
     text-align: center;
@@ -666,60 +532,49 @@ form {
     color: #7f8c8d;
 }
 
-/* Animation */
-@keyframes pulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.02); }
-    100% { transform: scale(1); }
-}
-
-.etablissement-card:hover {
-    animation: pulse 0.3s ease;
-}
-
-/* Section "Ajouter un flan" */
-.ajouter-flan-section {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
-}
-
-.ajouter-flan-section h3 {
-    color: #2c3e50;
-    text-align: center;
-    margin-bottom: 20px;
-    font-family: 'Bubblegum', cursive !important;
-}
-
 /* Responsive */
 @media (max-width: 768px) {
-    .etablissements-grid,
-    .flans-grid {
+    .grille {
         grid-template-columns: 1fr;
     }
-
-    .etablissement-card,
-    .flan-card .card-content {
-        min-height: auto;
-    }
-
-    .container {
-        padding: 10px;
-    }
-
-    .etablissement-card {
+    .carte {
         border-radius: 8px;
     }
-
     .card-content {
         padding: 15px;
+    }
+    header h1 {
+        font-size: 1.5rem;
+    }
+    .search-bar {
+        padding: 0.05rem 0;
+    }
+    .search-bar .form-control {
+        height: 30px;
+        padding: 0.2rem 0.8rem;
+        font-size: 0.9rem;
+        width: calc(100% - 40px);
+    }
+    .btn-search-icon {
+        width: 34px;
+        height: 30px;
+        font-size: 1rem;
     }
 }
 
 @media (max-width: 480px) {
     .container {
         padding: 10px;
+    }
+    .search-bar .form-control {
+        height: 28px;
+        padding: 0.15rem 0.6rem;
+        font-size: 0.8rem;
+        width: calc(100% - 36px);
+    }
+    .btn-search-icon {
+        width: 30px;
+        height: 28px;
+        font-size: 0.9rem;
     }
 }

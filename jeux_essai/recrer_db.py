@@ -5,8 +5,7 @@ app = create_app()
 
 # Crée le contexte d'application
 with app.app_context():
-    # Supprime toutes les tables existantes (si nécessaire)
-    db.drop_all()
+
 
     # Crée toutes les tables
     db.create_all()
