@@ -33,46 +33,58 @@
 {% endmacro %}
 
 {% macro afficher_boutons_actions(objet, current_user, id_field, modify_route, delete_route, validate_route) %}
+    {# Vérifie si l'utilisateur est authentifié #}
     {% if current_user.is_authenticated %}
+        {# Vérifie si l'utilisateur est le propriétaire de l'objet et que l'objet n'est pas validé #}
         {% if current_user.id_user == objet.id_user and not objet.statut.value == 'VALIDE' %}
             <div class="action-buttons d-flex gap-1">
+                {# Bouton de modification : utilise id_flan si la route est main.evaluer_flan, sinon utilise id_field #}
                 <form method="POST" action="{{ url_for(modify_route, id_flan=objet.flan.id_flan if modify_route == 'main.evaluer_flan' else objet[id_field]) }}" style="display: inline-block;">
                     <button type="submit" class="btn btn-primary btn-sm square-btn" title="Modifier">
                         <i class="bi bi-pencil"></i>
                     </button>
                 </form>
+                {# Bouton de suppression : utilise id_field pour identifier l'objet à supprimer #}
                 <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
                     <button type="submit" class="btn btn-danger btn-sm square-btn" title="Supprimer">
                         <i class="bi bi-trash"></i>
                     </button>
                 </form>
             </div>
+        {# Vérifie si l'utilisateur est un administrateur #}
         {% elif current_user.is_admin %}
+            {# Vérifie si l'objet est en attente de validation #}
             {% if objet.statut.value == 'EN_ATTENTE' %}
                 <div class="action-buttons d-flex gap-1">
+                    {# Bouton de validation : utilise id_field pour identifier l'objet à valider #}
                     <form method="POST" action="{{ url_for(validate_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
                         <button type="submit" class="btn btn-success square-btn" title="Valider">
                             <i class="bi bi-check"></i>
                         </button>
                     </form>
+                    {# Bouton de modification : utilise id_flan si la route est main.evaluer_flan, sinon utilise id_field #}
                     <form method="POST" action="{{ url_for(modify_route, id_flan=objet.flan.id_flan if modify_route == 'main.evaluer_flan' else objet[id_field]) }}" style="display: inline-block;">
                         <button type="submit" class="btn btn-primary btn-sm square-btn" title="Modifier">
                             <i class="bi bi-pencil"></i>
                         </button>
                     </form>
+                    {# Bouton de suppression : utilise id_field pour identifier l'objet à supprimer #}
                     <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
                         <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
                             <i class="bi bi-trash"></i>
                         </button>
                     </form>
                 </div>
+            {# Si l'objet est déjà validé, affiche seulement les boutons de modification et de suppression #}
             {% else %}
                 <div class="action-buttons d-flex gap-1">
+                    {# Bouton de modification : utilise id_flan si la route est main.evaluer_flan, sinon utilise id_field #}
                     <form method="POST" action="{{ url_for(modify_route, id_flan=objet.flan.id_flan if modify_route == 'main.evaluer_flan' else objet[id_field]) }}" style="display: inline-block;">
                         <button type="submit" class="btn btn-primary btn-sm square-btn" title="Modifier">
                             <i class="bi bi-pencil"></i>
                         </button>
                     </form>
+                    {# Bouton de suppression : utilise id_field pour identifier l'objet à supprimer #}
                     <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
                         <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
                             <i class="bi bi-trash"></i>
@@ -83,6 +95,7 @@
         {% endif %}
     {% endif %}
 {% endmacro %}
+
 
 
 
