@@ -4,13 +4,11 @@
 let autocomplete;
 let map;
 let markers = [];
-
 // Fonction pour initialiser l'autocomplétion et la carte
 window.initAll = function() {
     initAutocomplete();
     initMap();
 };
-
 window.initAutocomplete = function() {
     console.log("Initialisation de l'autocomplétion...");
     const input = document.getElementById('search');
@@ -82,7 +80,6 @@ window.initAutocomplete = function() {
         });
     });
 };
-
 window.initMap = function() {
     console.log("Initialisation de la carte...");
     const mapElement = document.getElementById("map");
@@ -103,16 +100,26 @@ window.initMap = function() {
     console.log("Carte initialisée avec succès !");
     const etablissements = {{ etablissements_json|tojson|safe }};
     const infowindow = new google.maps.InfoWindow(); // Déplacez cette ligne ici
-
+    const isAdmin = {{ current_user.is_admin if current_user.is_authenticated else False|tojson|safe }}; // Variable pour vérifier si l'utilisateur est admin
     etablissements.forEach(etablissement => {
         // L'icône change selon que le lieu a été visité et/ou labellisé
         let icon;
-        if (etablissement.visite && etablissement.label) {
-            icon = "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
-        } else if (etablissement.visite) {
-            icon = "https://maps.google.com/mapfiles/ms/icons/red-dot.png";
+        if (isAdmin) {
+            // Logique pour les admins : afficher visité et labellisé
+            if (etablissement.visite) {
+                icon = "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
+            } else if (etablissement.label) {
+                icon = "https://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+            } else {
+                icon = "https://maps.google.com/mapfiles/ms/icons/red-dot.png";
+            }
         } else {
-            icon = "https://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+            // Logique pour les non-admins : afficher labellisé
+            if (etablissement.label) {
+                icon = "https://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+            } else {
+                icon = "https://maps.google.com/mapfiles/ms/icons/red-dot.png";
+            }
         }
         const marker = new google.maps.Marker({
             position: { lat: etablissement.latitude, lng: etablissement.longitude },
@@ -138,7 +145,6 @@ window.initMap = function() {
         });
         markers.push(marker);
     });
-
     // Créer un élément div pour la légende
     const legend = document.createElement('div');
     legend.style.backgroundColor = 'white';
@@ -146,16 +152,21 @@ window.initMap = function() {
     legend.style.margin = '10px';
     legend.style.border = '1px solid #ccc';
     // Ajouter le contenu de la légende
-    legend.innerHTML = `
-        <h3>Légende</h3>
-        <p><img src="https://maps.google.com/mapfiles/ms/icons/blue-dot.png" alt="Non visité">Non visité</p>
-        <p><img src="https://maps.google.com/mapfiles/ms/icons/red-dot.png" alt="Visité"> Visité</p>
-        <p><img src="https://maps.google.com/mapfiles/ms/icons/yellow-dot.png" alt="Labellisé">Labellisé</p>
-    `;
+    if (isAdmin) {
+        legend.innerHTML = `
+            <h3>Legende</h3>
+            <p><img src="https://maps.google.com/mapfiles/ms/icons/blue-dot.png" alt="Labellisé"> Labellisé</p>
+            <p><img src="https://maps.google.com/mapfiles/ms/icons/yellow-dot.png" alt="Visité"> Visité</p>
+            <p><img src="https://maps.google.com/mapfiles/ms/icons/red-dot.png" alt="Non visité"> Non visité</p>
+        `;
+    } else {
+        legend.innerHTML = `
+            <h3><img src="https://maps.google.com/mapfiles/ms/icons/blue-dot.png" alt="Labellisé">Labellise </h3>
+        `;
+    }
     // Ajouter la légende à la carte
     map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(legend);
 };
-
 // Ajouter un écouteur d'événement pour DOMContentLoaded
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM complètement chargé et analysé");
@@ -171,7 +182,6 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error("Élément #map introuvable même après le chargement du DOM !");
     }
 });
-
 const nom = "{{ request.args.get('nom') }}";
 const visite = "{{ request.args.get('visite') }}";
 const labellise = "{{ request.args.get('labellise') }}";
