@@ -38,12 +38,10 @@
         {# Vérifie si l'utilisateur est le propriétaire de l'objet et que l'objet n'est pas validé #}
         {% if current_user.id_user == objet.id_user and not objet.statut.value == 'VALIDE' %}
             <div class="action-buttons d-flex gap-1">
-                {# Bouton de modification : utilise id_flan si la route est main.evaluer_flan, sinon utilise id_field #}
-                <form method="POST" action="{{ url_for(modify_route, id_flan=objet.flan.id_flan if modify_route == 'main.evaluer_flan' else objet[id_field]) }}" style="display: inline-block;">
-                    <button type="submit" class="btn btn-primary btn-sm square-btn" title="Modifier">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                </form>
+                {# Bouton de modification : appelle la fonction editEvaluation pour afficher le formulaire #}
+                <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editEvaluation({{ objet.id_eval }})">
+                    <i class="bi bi-pencil"></i>
+                </button>
                 {# Bouton de suppression : utilise id_field pour identifier l'objet à supprimer #}
                 <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
                     <button type="submit" class="btn btn-danger btn-sm square-btn" title="Supprimer">
@@ -62,12 +60,10 @@
                             <i class="bi bi-check"></i>
                         </button>
                     </form>
-                    {# Bouton de modification : utilise id_flan si la route est main.evaluer_flan, sinon utilise id_field #}
-                    <form method="POST" action="{{ url_for(modify_route, id_flan=objet.flan.id_flan if modify_route == 'main.evaluer_flan' else objet[id_field]) }}" style="display: inline-block;">
-                        <button type="submit" class="btn btn-primary btn-sm square-btn" title="Modifier">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                    </form>
+                    {# Bouton de modification : appelle la fonction editEvaluation pour afficher le formulaire #}
+                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editEvaluation({{ objet.id_eval }})">
+                        <i class="bi bi-pencil"></i>
+                    </button>
                     {# Bouton de suppression : utilise id_field pour identifier l'objet à supprimer #}
                     <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
                         <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
@@ -78,12 +74,10 @@
             {# Si l'objet est déjà validé, affiche seulement les boutons de modification et de suppression #}
             {% else %}
                 <div class="action-buttons d-flex gap-1">
-                    {# Bouton de modification : utilise id_flan si la route est main.evaluer_flan, sinon utilise id_field #}
-                    <form method="POST" action="{{ url_for(modify_route, id_flan=objet.flan.id_flan if modify_route == 'main.evaluer_flan' else objet[id_field]) }}" style="display: inline-block;">
-                        <button type="submit" class="btn btn-primary btn-sm square-btn" title="Modifier">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                    </form>
+                    {# Bouton de modification : appelle la fonction editEvaluation pour afficher le formulaire directement dans la carte #}
+                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editEvaluation({{ objet.id_eval }})">
+                        <i class="bi bi-pencil"></i>
+                    </button>
                     {# Bouton de suppression : utilise id_field pour identifier l'objet à supprimer #}
                     <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
                         <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
@@ -178,22 +172,23 @@
 
 {% macro afficher_criteres_evaluation(evaluation) %}
     <div class="criteria">
-        <div class="criterion">
-            <span class="criterion-name">Goût :</span>
-            <span class="criterion-value">{{ evaluation.gout }}/5</span>
+            <div class="criterion">
+            <span class="criterion-name">Visuel :</span>
+            <span class="criterion-value">{{ evaluation.visuel }}/5</span>
         </div>
-        <div class="criterion">
+                <div class="criterion">
+            <span class="criterion-name">Pâte :</span>
+            <span class="criterion-value">{{ evaluation.pate }}/5</span>
+        </div>
+                <div class="criterion">
             <span class="criterion-name">Texture :</span>
             <span class="criterion-value">{{ evaluation.texture }}/5</span>
         </div>
         <div class="criterion">
-            <span class="criterion-name">Visuel :</span>
-            <span class="criterion-value">{{ evaluation.visuel }}/5</span>
+            <span class="criterion-name">Goût :</span>
+            <span class="criterion-value">{{ evaluation.gout }}/5</span>
         </div>
-        <div class="criterion">
-            <span class="criterion-name">Pâte :</span>
-            <span class="criterion-value">{{ evaluation.pate }}/5</span>
-        </div>
+
     </div>
     {% if evaluation.gout is not none and evaluation.texture is not none and evaluation.visuel is not none and evaluation.pate is not none %}
         {% set moyenne = (evaluation.gout + evaluation.texture + evaluation.visuel + evaluation.pate) / 4 %}
@@ -217,12 +212,12 @@
                 <input type="number" id="visuel-{{ evaluation.id_eval }}" name="visuel" class="form-control" value="{{ evaluation.visuel }}" min="0" max="5">
             </div>
             <div class="form-group">
-                <label for="texture-{{ evaluation.id_eval }}" class="form-label">Texture</label>
-                <input type="number" id="texture-{{ evaluation.id_eval }}" name="texture" class="form-control" value="{{ evaluation.texture }}" min="0" max="5">
-            </div>
-            <div class="form-group">
                 <label for="pate-{{ evaluation.id_eval }}" class="form-label">Pâte</label>
                 <input type="number" id="pate-{{ evaluation.id_eval }}" name="pate" class="form-control" value="{{ evaluation.pate }}" min="0" max="5">
+            </div>
+            <div class="form-group">
+                <label for="texture-{{ evaluation.id_eval }}" class="form-label">Texture</label>
+                <input type="number" id="texture-{{ evaluation.id_eval }}" name="texture" class="form-control" value="{{ evaluation.texture }}" min="0" max="5">
             </div>
             <div class="form-group">
                 <label for="gout-{{ evaluation.id_eval }}" class="form-label">Goût</label>
@@ -366,8 +361,8 @@
     <form method="POST" action="{{ action_url }}" class="form-container">
         {{ form.hidden_tag() }}
         {{ afficher_champ_formulaire(form.visuel) }}
-        {{ afficher_champ_formulaire(form.texture) }}
         {{ afficher_champ_formulaire(form.pate) }}
+        {{ afficher_champ_formulaire(form.texture) }}
         {{ afficher_champ_formulaire(form.gout) }}
         {{ afficher_champ_formulaire(form.description) }}
         <div class="form-group">
