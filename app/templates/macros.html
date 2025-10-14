@@ -247,19 +247,11 @@
             {% endfor %}
         </div>
     {% endif %}
-    <!-- BOUTON AJOUT en fin de grille-->
-    {% if current_user.is_authenticated %}
-        <div class="card-content">
-            {{ afficher_bouton_ajout(objet_type, current_user, etablissement, form, flan) }}
-        </div>
-        {% else %}
-            <div class="card-content">
-        <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
-            Ajouter un {{ objet_type }} (connectez-vous)
-        </a>
-    {% endif %}
+    <!-- Possibilité d'ajout toujours en fin de grille-->
+    {{ afficher_bouton_ajout(objet_type, current_user, etablissement, form, flan) }}
 {% endmacro %}
 
+<!-- Afficher un objet, que ce soit sur sa page ou dans une grille -->
 {% macro afficher_objet(objet_type, objet, current_user=None, form=None) %}
     {% if objet_type == 'etablissement' %}
         {{ afficher_etablissement(objet, current_user) }}
@@ -270,6 +262,7 @@
     {% endif %}
 {% endmacro %}
 
+<!-- Déterminer si le bouton "Ajout" s'affiche ou si on propose de se connecter -->
 {% macro afficher_bouton_ajout(objet_type, current_user, etablissement=None, form=None, flan=None) %}
     {% if objet_type == 'etablissement' %}
         <div class="card-content">
@@ -307,6 +300,7 @@
     {% endif %}
 {% endmacro %}
 
+
 <!-- MACROS POUR PROPOSER DES CHOSES -->
 <!-- Affiche un champ de formulaire -->
 {% macro afficher_champ_formulaire(field) %}
@@ -319,6 +313,7 @@
     </div>
 {% endmacro %}
 
+<!-- Proposer un flan -->
 {% macro proposer_flan(form, action_url) %}
     <form method="POST" action="{{ action_url }}" class="form-container">
         {{ form.hidden_tag() }}
@@ -334,6 +329,7 @@
     </form>
 {% endmacro %}
 
+<!-- Proposer un établissement -->
 {% macro proposer_etablissement(form, action_url) %}
     <form method="POST" action="{{ action_url }}" class="form-container">
         {{ form.hidden_tag() }}
@@ -357,6 +353,7 @@
     </form>
 {% endmacro %}
 
+<!-- Proposer une évaluation -->
 {% macro proposer_evaluation(form, action_url) %}
     <form method="POST" action="{{ action_url }}" class="form-container">
         {{ form.hidden_tag() }}
