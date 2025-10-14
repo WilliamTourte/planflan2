@@ -338,17 +338,26 @@
             <label for="search" class="form-label">Recherche d'établissement</label>
             <input type="text" id="search" class="form-control" placeholder="Rechercher un établissement">
         </div>
-        {{ afficher_champ_formulaire(form.nom) }}
-        {{ afficher_champ_formulaire(form.adresse) }}
-        {{ afficher_champ_formulaire(form.code_postal) }}
-        {{ afficher_champ_formulaire(form.ville) }}
         {{ afficher_champ_formulaire(form.description) }}
-            {% if current_user.is_admin %}
-                {{ afficher_champ_formulaire(form.label) }}
-                {{ afficher_champ_formulaire(form.visite) }}
-            {%  endif %}
-        <input type="hidden" id="latitude" name="latitude">
-        <input type="hidden" id="longitude" name="longitude">
+        {% if current_user.is_admin %}
+            <div class="form-group">
+                <label>Labellisé</label><br>
+                <input type="radio" name="label" value="Oui" {% if form.label.data == 'Oui' %}checked{% endif %}> Labellisé par la Flanterie<br>
+                <input type="radio" name="label" value="Non" {% if form.label.data == 'Non' %}checked{% endif %}> Non labellisé
+            </div>
+            <div class="form-group">
+                <label>Visité</label><br>
+                <input type="radio" name="visite" value="Oui" {% if form.visite.data == 'Oui' %}checked{% endif %}> Visité par la Flanterie<br>
+                <input type="radio" name="visite" value="Non" {% if form.visite.data == 'Non' %}checked{% endif %}> Non visité
+            </div>
+        {% endif %}
+        <!-- Champs cachés pour les données qui ne doivent pas être modifiées -->
+        <input type="hidden" id="nom" name="nom" value="{{ form.nom.data }}">
+        <input type="hidden" id="adresse" name="adresse" value="{{ form.adresse.data }}">
+        <input type="hidden" id="code_postal" name="code_postal" value="{{ form.code_postal.data }}">
+        <input type="hidden" id="ville" name="ville" value="{{ form.ville.data }}">
+        <input type="hidden" id="latitude" name="latitude" value="{{ form.latitude.data }}">
+        <input type="hidden" id="longitude" name="longitude" value="{{ form.longitude.data }}">
         <div class="form-group">
             {{ form.submit(class="btn btn-proposer") }}
         </div>
