@@ -10,7 +10,6 @@ window.initAll = function() {
     initMap();
 };
 window.initAutocomplete = function() {
-    console.log("Initialisation de l'autocomplétion...");
     const input = document.getElementById('search');
     if (!input) {
         console.error("Élément #search introuvable !");
@@ -23,7 +22,6 @@ window.initAutocomplete = function() {
     // Écouter les changements dans l'Autocomplete
     autocomplete.addListener('place_changed', function() {
         const place = autocomplete.getPlace();
-        console.log("Lieu sélectionné :", place);  // Log pour déboguer
         if (!place.geometry) return;
         // Remplir les champs avec les données extraites
         document.getElementById('nom').value = place.name || '';
@@ -45,7 +43,6 @@ window.initAutocomplete = function() {
             return response.json();
         })
         .then(data => {
-            console.log("Réponse de la vérification :", data);  // Log pour déboguer
             if (data.exists) {
                 // Supprimer les messages précédents
                 const previousMessages = document.querySelectorAll('.alert-warning');
@@ -70,7 +67,6 @@ window.initAutocomplete = function() {
         })
         .then(response => response.json())
         .then(data => {
-            console.log("Réponse de l'extraction d'adresse :", data);  // Log pour déboguer
             document.getElementById('code_postal').value = data.code_postal || '';
             document.getElementById('ville').value = data.ville || '';
             document.getElementById('adresse').value = data.adresse_nettoyee || '';
@@ -81,7 +77,6 @@ window.initAutocomplete = function() {
     });
 };
 window.initMap = function() {
-    console.log("Initialisation de la carte...");
     const mapElement = document.getElementById("map");
     if (!mapElement) {
         console.error("Élément #map introuvable !");
@@ -97,10 +92,9 @@ window.initMap = function() {
         center: { lat: 46.2276, lng: 2.2137 }, // Coordonnées approximatives du centre de la France
         zoom: 6, // Niveau de zoom pour afficher toute la France
     });
-    console.log("Carte initialisée avec succès !");
     const etablissements = {{ etablissements_json|tojson|safe }};
-    const infowindow = new google.maps.InfoWindow(); // Déplacez cette ligne ici
-    const isAdmin = {{ current_user.is_admin if current_user.is_authenticated else False|tojson|safe }}; // Variable pour vérifier si l'utilisateur est admin
+    const infowindow = new google.maps.InfoWindow();
+    const isAdmin = {{ current_user.is_admin|tojson|safe if current_user.is_authenticated else 'false' }}; // Variable pour vérifier si l'utilisateur est admin
     etablissements.forEach(etablissement => {
         // L'icône change selon que le lieu a été visité et/ou labellisé
         let icon;
@@ -169,12 +163,10 @@ window.initMap = function() {
 };
 // Ajouter un écouteur d'événement pour DOMContentLoaded
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("DOM complètement chargé et analysé");
     const mapElement = document.getElementById("map");
     if (mapElement) {
-        console.log("Élément #map trouvé, chargement du script Google Maps...");
         const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places&callback=initAll&v=weekly`;
+        script.src = `https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places&callback=initAll&v=weekly&loading=async`;
         script.async = true;
         script.defer = true;
         document.head.appendChild(script);
