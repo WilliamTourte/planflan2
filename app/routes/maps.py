@@ -96,9 +96,10 @@ def ajouter_etablissement():
                 longitude=longitude,
                 type_etab=TypeEtab[type_etab],  # Assurez-vous que type_etab est une valeur valide pour TypeEtab
                 id_user=current_user.id_user,
+                description=description,
                 label=label,
-                visite=visite,
-                description=description
+                visite=visite
+
             )
             db.session.add(new_etablissement)
             db.session.commit()

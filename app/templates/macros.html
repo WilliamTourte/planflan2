@@ -268,7 +268,7 @@
         <div class="card-content">
             <h3>Ajouter un établissement</h3>
             {% if current_user.is_authenticated %}
-                {{ proposer_etablissement(form, url_for('maps.ajouter_etablissement')) }}
+                {{ proposer_etablissement(form, url_for('maps.ajouter_etablissement'), current_user) }}
             {% else %}
                 <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
                     Ajouter un établissement (connectez-vous)
@@ -330,7 +330,7 @@
 {% endmacro %}
 
 <!-- Proposer un établissement -->
-{% macro proposer_etablissement(form, action_url) %}
+{% macro proposer_etablissement(form, action_url, current_user) %}
     <form method="POST" action="{{ action_url }}" class="form-container">
         {{ form.hidden_tag() }}
         {{ afficher_champ_formulaire(form.type_etab) }}
@@ -343,8 +343,10 @@
         {{ afficher_champ_formulaire(form.code_postal) }}
         {{ afficher_champ_formulaire(form.ville) }}
         {{ afficher_champ_formulaire(form.description) }}
-        {{ afficher_champ_formulaire(form.label) }}
-        {{ afficher_champ_formulaire(form.visite) }}
+            {% if current_user.is_admin %}
+                {{ afficher_champ_formulaire(form.label) }}
+                {{ afficher_champ_formulaire(form.visite) }}
+            {%  endif %}
         <input type="hidden" id="latitude" name="latitude">
         <input type="hidden" id="longitude" name="longitude">
         <div class="form-group">
