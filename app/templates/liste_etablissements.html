@@ -1,7 +1,16 @@
 {% extends "base.html" %}
 {% block scripts_head %}
-    <script>
+<script>
 let autocomplete;
+let map;
+let markers = [];
+
+// Fonction pour initialiser l'autocomplétion et la carte
+window.initAll = function() {
+    initAutocomplete();
+    initMap();
+};
+
 window.initAutocomplete = function() {
     console.log("Initialisation de l'autocomplétion...");
     const input = document.getElementById('search');
@@ -73,34 +82,8 @@ window.initAutocomplete = function() {
         });
     });
 };
-document.addEventListener('DOMContentLoaded', function() {
-    console.log("DOM complètement chargé et analysé");
-    const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyA8lo7V-ciL8oVwYXUiW00gb6O1_1K-JQ8&libraries=places&callback=initAutocomplete&v=weekly`;
-    script.async = true;
-    script.defer = true;
-    document.head.appendChild(script);
-});
-</script>
-<style>
-    .form-container { padding: 10px; }
-    .form-group { margin-bottom: 10px; }
-    .form-label { display: block; margin-bottom: 5px; }
-    .form-control { width: 100%; padding: 5px; }
-    .error-message { color: red; }
-    .btn-proposer { background-color: #4CAF50; color: white; padding: 10px 15px; border: none; cursor: pointer; }
-    .btn-proposer:hover { background-color: #45a049; }
-</style>
-    <script>
-    const nom = "{{ request.args.get('nom') }}";
-    const visite = "{{ request.args.get('visite') }}";
-    const labellise = "{{ request.args.get('labellise') }}";
-</script>
-<script>
-    let map;
-    let markers = [];
-    // Définissez la fonction initMap au niveau global
-   window.initMap = function() {
+
+window.initMap = function() {
     console.log("Initialisation de la carte...");
     const mapElement = document.getElementById("map");
     if (!mapElement) {
@@ -120,40 +103,42 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log("Carte initialisée avec succès !");
     const etablissements = {{ etablissements_json|tojson|safe }};
     const infowindow = new google.maps.InfoWindow(); // Déplacez cette ligne ici
-   etablissements.forEach(etablissement => {
-    // L'icône change selon que le lieu a été visité et/ou labellisé
-    let icon;
-    if (etablissement.visite && etablissement.label) {
-        icon = "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
-    } else if (etablissement.visite) {
-        icon = "https://maps.google.com/mapfiles/ms/icons/red-dot.png";
-    } else {
-        icon = "https://maps.google.com/mapfiles/ms/icons/blue-dot.png";
-    }
-    const marker = new google.maps.Marker({
-        position: { lat: etablissement.latitude, lng: etablissement.longitude },
-        map: map,
-        title: etablissement.nom,
-        icon: icon
+
+    etablissements.forEach(etablissement => {
+        // L'icône change selon que le lieu a été visité et/ou labellisé
+        let icon;
+        if (etablissement.visite && etablissement.label) {
+            icon = "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
+        } else if (etablissement.visite) {
+            icon = "https://maps.google.com/mapfiles/ms/icons/red-dot.png";
+        } else {
+            icon = "https://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+        }
+        const marker = new google.maps.Marker({
+            position: { lat: etablissement.latitude, lng: etablissement.longitude },
+            map: map,
+            title: etablissement.nom,
+            icon: icon
+        });
+        const detailsUrl = `/etablissement/${etablissement.id_etab}?nom=${nom}&visite=${visite}&labellise=${labellise}`;
+        const content = `
+            <div class="infowindow">
+                <h3>${etablissement.nom}</h3>
+                <p class="type">${etablissement.type_etab}</p>
+                <p class="adresse">${etablissement.adresse}, ${etablissement.ville}</p>
+                ${etablissement.flans_count ? `<p class="flans-count">${etablissement.flans_count} flan${etablissement.flans_count > 1 ? 's' : ''}</p>` : ''}
+                <a href="${detailsUrl}">Voir la page</a>
+            </div>
+        `;
+        marker.addListener("click", () => {
+            setTimeout(() => {
+                infowindow.setContent(content);
+                infowindow.open(map, marker);
+            }, 50);
+        });
+        markers.push(marker);
     });
-    const detailsUrl = `/etablissement/${etablissement.id_etab}?nom=${nom}&visite=${visite}&labellise=${labellise}`;
-    const content = `
-        <div class="infowindow">
-            <h3>${etablissement.nom}</h3>
-            <p class="type">${etablissement.type_etab}</p>
-            <p class="adresse">${etablissement.adresse}, ${etablissement.ville}</p>
-            ${etablissement.flans_count ? `<p class="flans-count">${etablissement.flans_count} flan${etablissement.flans_count > 1 ? 's' : ''}</p>` : ''}
-            <a href="${detailsUrl}">Voir la page</a>
-        </div>
-    `;
-    marker.addListener("click", () => {
-        setTimeout(() => {
-            infowindow.setContent(content);
-            infowindow.open(map, marker);
-        }, 50);
-    });
-    markers.push(marker);
-});
+
     // Créer un élément div pour la légende
     const legend = document.createElement('div');
     legend.style.backgroundColor = 'white';
@@ -170,23 +155,35 @@ document.addEventListener('DOMContentLoaded', function() {
     // Ajouter la légende à la carte
     map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(legend);
 };
-    // Ajouter un écouteur d'événement pour DOMContentLoaded
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log("DOM complètement chargé et analysé");
-        const mapElement = document.getElementById("map");
-        if (mapElement) {
-            console.log("Élément #map trouvé, chargement du script Google Maps...");
-            const script = document.createElement('script');
-            script.src = `https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&callback=initMap&v=weekly&loading=async`;
-            script.async = true;
-            script.defer = true;
-            document.head.appendChild(script);
-        } else {
-            console.error("Élément #map introuvable même après le chargement du DOM !");
-        }
-    });
+
+// Ajouter un écouteur d'événement pour DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM complètement chargé et analysé");
+    const mapElement = document.getElementById("map");
+    if (mapElement) {
+        console.log("Élément #map trouvé, chargement du script Google Maps...");
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places&callback=initAll&v=weekly`;
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+    } else {
+        console.error("Élément #map introuvable même après le chargement du DOM !");
+    }
+});
+
+const nom = "{{ request.args.get('nom') }}";
+const visite = "{{ request.args.get('visite') }}";
+const labellise = "{{ request.args.get('labellise') }}";
 </script>
 <style>
+    .form-container { padding: 10px; }
+    .form-group { margin-bottom: 10px; }
+    .form-label { display: block; margin-bottom: 5px; }
+    .form-control { width: 100%; padding: 5px; }
+    .error-message { color: red; }
+    .btn-proposer { background-color: #4CAF50; color: white; padding: 10px 15px; border: none; cursor: pointer; }
+    .btn-proposer:hover { background-color: #45a049; }
     #map { height: 80vh; width: 100%; background-color: #f5f5f5; }
     .infowindow h3 { margin: 0 0 5px 0; color: #333; }
     .infowindow a { color: #1a73e8; text-decoration: none; }
@@ -200,10 +197,6 @@ document.addEventListener('DOMContentLoaded', function() {
         <div id="map"></div>
     </div>
 </div>
-
-    <!-- Grille des établissements -->
-
-
+<!-- Grille des établissements -->
 {{ afficher_grille('etablissement', etablissements, current_user, form2, etablissement) }}
-
 {% endblock %}
