@@ -266,7 +266,7 @@
 {% macro afficher_bouton_ajout(objet_type, current_user, etablissement=None, form=None, flan=None) %}
     {% if objet_type == 'etablissement' %}
         <div class="card-content">
-            <h3>Ajouter un établissement</h3>
+            <h3>Ajouter un etablissement</h3>
             {% if current_user.is_authenticated %}
                 {{ proposer_etablissement(form, url_for('maps.ajouter_etablissement'), current_user) }}
             {% else %}
@@ -288,7 +288,7 @@
         </div>
     {% elif objet_type == 'evaluation' and flan %}
         <div class="card-content">
-            <h3>Ajouter une évaluation</h3>
+            <h3>Ajouter une evaluation</h3>
             {% if current_user.is_authenticated %}
                 {{ proposer_evaluation(form, url_for('main.evaluer_flan', id_flan=flan.id_flan)) }}
             {% else %}

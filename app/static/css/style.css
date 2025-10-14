@@ -5,12 +5,14 @@
     font-weight: bold;
     font-style: normal;
 }
+
 /* Reset basique et styles globaux */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
+
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
@@ -19,16 +21,27 @@ body {
     background-color: #799dcb;
     color: #333;
 }
+
 header {
     background-color: #799dcb;
     color: white;
     padding: 0.5rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    transition: transform 0.3s ease;
 }
+
+header.hide {
+    transform: translateY(-100%);
+}
+
 header .container {
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
+
 header h1 {
     font-family: 'Bubblegum', cursive !important;
     text-align: center;
@@ -36,6 +49,7 @@ header h1 {
     color: white;
     font-size: 2rem;
 }
+
 .btn-icon {
     background: transparent;
     border: none;
@@ -45,37 +59,49 @@ header h1 {
     cursor: pointer;
     transition: all 0.2s;
 }
+
 .btn-icon:hover {
     color: #fee10d;
     transform: scale(1.1);
 }
+
 /* Barre de recherche ultra-compacte */
 .search-bar {
     background-color: #fee10d;
-    padding: 0.1rem 0; /* Padding vertical minimal */
-    margin-bottom: 0; /* Supprime l'espace en dessous */
+    padding: 0.1rem 0;
+    margin-bottom: 0;
+    transition: transform 0.3s ease;
 }
+
+/* Suppression du position: sticky pour .search-bar car il est maintenant dans le header */
+.search-bar.hide {
+    display: none; /* Changé de transform à display pour une meilleure intégration */
+}
+
 .search-bar .container {
     padding-top: 0;
     padding-bottom: 0;
 }
+
 .search-bar form.d-flex {
     align-items: center;
     margin: 0;
     padding: 0;
 }
+
 .search-bar .form-control {
     border-radius: 25px;
     border: none;
     padding: 0.3rem 1rem;
     font-size: 1rem;
     box-shadow: none;
-    height: 34px; /* Hauteur réduite */
+    height: 34px;
     width: calc(100% - 45px);
     margin: 0;
     margin-right: 0.3rem;
     line-height: 1.2;
 }
+
 .btn-search-icon {
     width: 38px;
     height: 34px;
@@ -89,20 +115,25 @@ header h1 {
     justify-content: center;
     font-size: 1.1rem;
 }
+
 .btn-search-icon i {
     margin: 0;
     position: relative;
     top: 1px;
 }
+
 .container {
     width: 90%;
     max-width: 1200px;
     margin: 0 auto;
     padding: 10px;
 }
+
 main {
     padding: 20px 0;
+    margin-top: 20px; /* Ajouté pour éviter que le contenu ne soit collé sous le header */
 }
+
 footer {
     background-color: #799dcb;
     color: white;
@@ -111,9 +142,11 @@ footer {
     bottom: 0;
     width: 100%;
 }
+
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Bubblegum', cursive !important;
 }
+
 /* Boutons */
 .btn, .btn-primary, .btn-success, .btn-info, .btn-back,
 .btn-details, .btn-proposer, .btn-evaluate, .btn-submit {
@@ -134,57 +167,70 @@ h1, h2, h3, h4, h5, h6 {
     height: 44px;
     margin: 8px 0;
 }
+
 .btn:hover, .btn-primary:hover, .btn-success:hover,
 .btn-info:hover, .btn-back:hover, .btn-details:hover,
 .btn-proposer:hover, .btn-evaluate:hover, .btn-submit:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
 }
+
 .btn:active, .btn-primary:active, .btn-success:active,
 .btn-info:active, .btn-back:active, .btn-details:active,
 .btn-proposer:active, .btn-evaluate:active, .btn-submit:active {
     transform: translateY(0);
     box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
 }
+
 .btn-primary {
     background-color: #799dcb;
     color: white;
 }
+
 .btn-primary:hover {
     background-color: #6a8bc0;
 }
+
 .btn-success {
     background-color: #4CAF50;
     color: white;
 }
+
 .btn-success:hover {
     background-color: #45a049;
 }
+
 .btn-info {
     background-color: #3498db;
     color: white;
 }
+
 .btn-info:hover {
     background-color: #2980b9;
 }
+
 .btn-back {
     background-color: #7f8c8d;
     color: white;
 }
+
 .btn-back:hover {
     background-color: #6c7a7d;
 }
+
 .btn-details {
     background-color: #3498db;
     color: white;
     padding: 8px 18px;
     min-width: 100px;
 }
+
 .btn-proposer, .btn-evaluate {
     background-color: #4CAF50;
     color: white;
     min-width: 200px;
 }
+
 .btn-submit {
     background-color: #4CAF50;
     color: white;
@@ -192,13 +238,16 @@ h1, h2, h3, h4, h5, h6 {
     max-width: 200px;
     margin: 20px auto 0;
 }
+
 .btn-danger {
     background-color: #e74c3c;
     color: white;
 }
+
 .btn-danger:hover {
     background-color: #c0392b;
 }
+
 .square-btn {
     width: 45px;
     height: 45px;
@@ -210,9 +259,11 @@ h1, h2, h3, h4, h5, h6 {
     font-size: 16px;
     margin: 0;
 }
+
 .square-btn i {
     margin: 0;
 }
+
 .action-buttons {
     display: flex;
     gap: 10px;
@@ -223,20 +274,24 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0;
     padding: 0;
 }
+
 /* Flash messages */
 .alert {
     padding: 10px;
     margin: 10px 0;
     border-radius: 4px;
 }
+
 .alert-success {
     background-color: #4caf50;
     color: white;
 }
+
 .alert-danger {
     background-color: #f44336;
     color: white;
 }
+
 /* Badges */
 .badge {
     position: absolute;
@@ -250,14 +305,17 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: bold;
     z-index: 10;
 }
+
 .statut-valide {
     background-color: green;
     color: white;
 }
+
 .statut-en-attente {
     background-color: orange;
     color: white;
 }
+
 /* Cartes */
 .carte {
     text-decoration: none;
@@ -270,22 +328,26 @@ h1, h2, h3, h4, h5, h6 {
     display: block;
     height: 100%;
 }
+
 .carte:hover {
     transform: translateY(-7px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
     color: inherit;
 }
+
 .card-image-container {
     position: relative;
     display: block;
     height: 180px;
     overflow: hidden;
 }
+
 .card-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
+
 .card-image.placeholder {
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     display: flex;
@@ -295,11 +357,13 @@ h1, h2, h3, h4, h5, h6 {
     font-style: italic;
     height: 100%;
 }
+
 .card-content {
     padding: 20px;
     position: relative;
     min-height: 160px;
 }
+
 .card-header {
     display: flex;
     flex-direction: column;
@@ -307,40 +371,47 @@ h1, h2, h3, h4, h5, h6 {
     align-items: flex-start;
     margin-bottom: 10px;
 }
+
 .carte h2, .carte h3 {
     margin: 0 0 8px 0;
     font-size: 1.3rem;
     color: #333 !important;
 }
+
 .type {
     color: #7f8c8d;
     font-style: italic;
     font-size: 0.9rem;
     margin: 5px 0;
 }
+
 .adresse {
     color: #34495e;
     font-size: 0.9rem;
     margin: 10px 0;
     line-height: 1.4;
 }
+
 .description {
     color: #555;
     font-size: 0.9rem;
     line-height: 1.4;
     margin: 10px 0;
 }
+
 .flans-count {
     color: #e74c3c;
     font-weight: bold;
     font-size: 0.9rem;
     margin: 10px 0;
 }
+
 .flan-price {
     color: #e74c3c;
     font-weight: bold;
     margin: 10px 0;
 }
+
 .arrow {
     position: absolute;
     bottom: 20px;
@@ -349,9 +420,11 @@ h1, h2, h3, h4, h5, h6 {
     color: #3498db;
     transition: all 0.2s;
 }
+
 .carte:hover .arrow {
     transform: translateX(5px);
 }
+
 /* Grille */
 .grille {
     display: grid;
@@ -359,6 +432,7 @@ h1, h2, h3, h4, h5, h6 {
     gap: 25px;
     margin-top: 20px;
 }
+
 /* Formulaires */
 .form-container {
     background: white;
@@ -367,15 +441,18 @@ h1, h2, h3, h4, h5, h6 {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     margin-top: 20px;
 }
+
 .form-group {
     margin-bottom: 1rem;
 }
+
 .form-group label {
     display: block;
     margin-bottom: 5px;
     color: #333;
     font-weight: bold;
 }
+
 .form-group input,
 .form-group textarea,
 .form-group select {
@@ -385,11 +462,13 @@ h1, h2, h3, h4, h5, h6 {
     border-radius: 4px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
+
 .error-message {
     color: #e74c36;
     font-size: 0.9rem;
     margin-top: 5px;
 }
+
 /* Évaluations */
 .criteria {
     display: grid;
@@ -397,6 +476,7 @@ h1, h2, h3, h4, h5, h6 {
     gap: 10px;
     margin: 15px 0;
 }
+
 .criterion {
     display: flex;
     justify-content: space-between;
@@ -404,18 +484,22 @@ h1, h2, h3, h4, h5, h6 {
     padding: 8px 0;
     border-bottom: 1px solid #eee;
 }
+
 .criterion-name {
     font-weight: bold;
     color: #333;
 }
+
 .criterion-value {
     color: #3498db;
     font-weight: bold;
 }
+
 .moyenne {
     text-align: center;
     margin: 15px 0;
 }
+
 .moyenne-value {
     background: #e8f5e9;
     padding: 5px 15px;
@@ -423,6 +507,7 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: bold;
     color: #4CAF50;
 }
+
 .evaluation-date {
     color: #7f8c8d;
     font-size: 0.9em;
@@ -431,6 +516,7 @@ h1, h2, h3, h4, h5, h6 {
     display: block;
     margin-bottom: 10px;
 }
+
 /* No results */
 .no-results {
     grid-column: 1 / -1;
@@ -440,10 +526,12 @@ h1, h2, h3, h4, h5, h6 {
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
+
 .no-results p {
     margin-bottom: 15px;
     color: #7f8c8d;
 }
+
 /* Responsive */
 @media (max-width: 768px) {
     .grille {
@@ -473,6 +561,7 @@ h1, h2, h3, h4, h5, h6 {
         font-size: 1rem;
     }
 }
+
 @media (max-width: 480px) {
     .container {
         padding: 10px;

@@ -41,9 +41,7 @@
                 {% endif %}
             </div>
         </div>
-    </header>
-
-<!-- Barre de recherche centrale -->
+    <!-- Barre de recherche centrale -->
 <nav class="search-bar">
     <div class="container">
         <form action="{{ url_for('main.rechercher') }}" method="GET" class="d-flex align-items-center">
@@ -54,6 +52,9 @@
         </form>
     </div>
 </nav>
+    </header>
+
+
 
 
     <main class="container">
@@ -71,8 +72,41 @@
         <p>&copy; 2025 PlanFlan. Tous droits réservés.</p>
     </footer>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    {% block scripts %}{% endblock %}
+
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{% block scripts %}{% endblock %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let lastScroll = 0;
+    const header = document.querySelector('header');
+    const searchBar = document.querySelector('.search-bar');
+
+    window.addEventListener('scroll', function() {
+        const currentScroll = window.scrollY;
+
+        if (currentScroll <= 0) {
+            // Si on est en haut de la page, tout est visible
+            header.classList.remove('hide');
+            searchBar.classList.remove('hide');
+            return;
+        }
+
+        if (currentScroll > lastScroll && currentScroll > 100) {
+            // Défilement vers le bas
+            header.classList.add('hide');
+            searchBar.classList.add('hide');
+        } else {
+            // Défilement vers le haut
+            header.classList.remove('hide');
+            searchBar.classList.remove('hide');
+        }
+
+        lastScroll = currentScroll;
+    });
+});
+</script>
 </body>
 </html>
