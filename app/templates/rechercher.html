@@ -13,7 +13,7 @@
                         <span class="error-message">{{ error }}</span>
                     {% endfor %}
                 </div>
-                            <div class="form-group">
+                <div class="form-group">
                     {{ form.ville.label(class="form-label") }}
                     {{ form.ville(placeholder="Ville", class="form-control") }}
                     {% for error in form.ville.errors %}
@@ -21,27 +21,57 @@
                     {% endfor %}
                 </div>
                 <div class="form-group">
-                    {{ form.visite.label(class="form-label") }}
-                    <div style="display: flex; align-items: center; gap: 20px;">
-                        {% for subfield in form.visite %}
-                            <div style="display: flex; align-items: center;">
-                                {{ subfield(style="margin-right: 5px;") }}
-                                <label style="font-weight: normal;">{{ subfield.label.text }}</label>
-                            </div>
-                        {% endfor %}
-                    </div>
+                    {{ form.type_saveur.label(class="form-label") }}
+                    {{ form.type_saveur(class="form-control") }}
+                    {% for error in form.type_saveur.errors %}
+                        <span class="error-message">{{ error }}</span>
+                    {% endfor %}
                 </div>
                 <div class="form-group">
-                    {{ form.labellise.label(class="form-label") }}
-                    <div style="display: flex; align-items: center; gap: 20px;">
-                        {% for subfield in form.labellise %}
-                            <div style="display: flex; align-items: center;">
-                                {{ subfield(style="margin-right: 5px;") }}
-                                <label style="font-weight: normal;">{{ subfield.label.text }}</label>
-                            </div>
-                        {% endfor %}
-                    </div>
+                    {{ form.type_pate.label(class="form-label") }}
+                    {{ form.type_pate(class="form-control") }}
+                    {% for error in form.type_pate.errors %}
+                        <span class="error-message">{{ error }}</span>
+                    {% endfor %}
                 </div>
+                <div class="form-group">
+                    {{ form.type_texture.label(class="form-label") }}
+                    {{ form.type_texture(class="form-control") }}
+                    {% for error in form.type_texture.errors %}
+                        <span class="error-message">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                <div class="form-group">
+                    {{ form.prix.label(class="form-label") }}
+                    {{ form.prix(class="form-control") }}
+                    {% for error in form.prix.errors %}
+                        <span class="error-message">{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% if current_user.is_admin %}
+                    <div class="form-group">
+                        {{ form.visite.label(class="form-label") }}
+                        <div style="display: flex; align-items: center; gap: 20px;">
+                            {% for subfield in form.visite %}
+                                <div style="display: flex; align-items: center;">
+                                    {{ subfield(style="margin-right: 5px;") }}
+                                    <label style="font-weight: normal;">{{ subfield.label.text }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        {{ form.labellise.label(class="form-label") }}
+                        <div style="display: flex; align-items: center; gap: 20px;">
+                            {% for subfield in form.labellise %}
+                                <div style="display: flex; align-items: center;">
+                                    {{ subfield(style="margin-right: 5px;") }}
+                                    <label style="font-weight: normal;">{{ subfield.label.text }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
                 <div class="d-grid gap-2">
                     {{ form.submit(class="btn btn-primary") }}
                 </div>
