@@ -6,14 +6,12 @@
         <div class="{{ classe }} placeholder"><span>Pas de photo</span></div>
     {% endif %}
 {% endmacro %}
-
 <!-- BADGES -->
 {% macro afficher_badge_etablissement(etablissement) %}
     {% if etablissement.label %}
         <span class="badge">⭐ Labellisé</span>
     {% endif %}
 {% endmacro %}
-
 {% macro afficher_badge_flan(flan) %}
     {% if flan.prix is not none %}
         <span class="badge">{{ "%.2f"|format(flan.prix) }} €</span>
@@ -21,7 +19,6 @@
         <span class="badge">Prix non renseigné</span>
     {% endif %}
 {% endmacro %}
-
 {% macro afficher_badge_statut(evaluation, current_user) %}
     {% if current_user and current_user.is_authenticated and (current_user.is_admin or evaluation.user_id == current_user.user_id) %}
         {% if evaluation.statut.value == 'VALIDE' %}
@@ -31,7 +28,6 @@
         {% endif %}
     {% endif %}
 {% endmacro %}
-
 {% macro afficher_boutons_actions(objet, current_user, id_field, modify_route, delete_route, validate_route) %}
     {# Vérifie si l'utilisateur est authentifié #}
     {% if current_user.is_authenticated %}
@@ -89,10 +85,6 @@
         {% endif %}
     {% endif %}
 {% endmacro %}
-
-
-
-
 <!-- MACROS D'AFFICHAGE D'OBJETS -->
 {% macro afficher_etablissement(etablissement, current_user) %}
     <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}" class="carte" data-id="{{ etablissement.id_etab }}" data-lat="{{ etablissement.latitude }}" data-lng="{{ etablissement.longitude }}">
@@ -113,7 +105,6 @@
         </div>
     </a>
 {% endmacro %}
-
 {% macro afficher_flan(flan, current_user) %}
     <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}" class="carte">
         <div class="card-image-container">
@@ -133,7 +124,6 @@
         </div>
     </a>
 {% endmacro %}
-
 {% macro afficher_evaluation(evaluation, current_user, form) %}
     <div class="card">
         <div class="card-content">
@@ -150,7 +140,7 @@
             {% if current_user.is_authenticated and (current_user.id_user == evaluation.id_user or current_user.is_admin) %}
                 <div id="evaluation-{{ evaluation.id_eval }}-display">
                     {{ afficher_criteres_evaluation(evaluation) }}
-                    {{ afficher_boutons_actions(evaluation, current_user, 'id_eval', 'main.evaluer_flan', 'main.supprimer_evaluation', 'main.valider_evaluation') }}
+                    {{ afficher_boutons_actions(evaluation, current_user, 'id_eval', 'main.afficher_evaluation_unique', 'main.supprimer_evaluation', 'main.valider_evaluation') }}
                 </div>
                 {{ afficher_formulaire_edition_evaluation(evaluation, form) }}
             {% else %}
@@ -170,9 +160,6 @@
         }
     </script>
 {% endmacro %}
-
-
-
 {% macro afficher_criteres_evaluation(evaluation) %}
     <div class="criteria">
             <div class="criterion">
@@ -191,7 +178,6 @@
             <span class="criterion-name">Goût :</span>
             <span class="criterion-value">{{ evaluation.gout }}/5</span>
         </div>
-
     </div>
     {% if evaluation.gout is not none and evaluation.texture is not none and evaluation.visuel is not none and evaluation.pate is not none %}
         {% set moyenne = (evaluation.gout + evaluation.texture + evaluation.visuel + evaluation.pate) / 4 %}
@@ -208,7 +194,7 @@
 
 {% macro afficher_formulaire_edition_evaluation(evaluation, form) %}
     <div id="evaluation-{{ evaluation.id_eval }}-edit" style="display: none;">
-        <form method="POST" action="{{ url_for('main.evaluer_flan', id_flan=evaluation.flan.id_flan) }}" class="form-container">
+        <form method="POST" action="{{ url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval) }}" class="form-container">
             {{ form.hidden_tag() }}
             <div class="form-group">
                 <label for="visuel-{{ evaluation.id_eval }}" class="form-label">Visuel</label>
@@ -253,7 +239,6 @@
     <!-- Possibilité d'ajout toujours en fin de grille-->
     {{ afficher_bouton_ajout(objet_type, current_user, etablissement, form, flan) }}
 {% endmacro %}
-
 <!-- Afficher un objet, que ce soit sur sa page ou dans une grille -->
 {% macro afficher_objet(objet_type, objet, current_user=None, form=None) %}
     {% if objet_type == 'etablissement' %}
@@ -264,7 +249,6 @@
         {{ afficher_evaluation(objet, current_user, form) }}
     {% endif %}
 {% endmacro %}
-
 <!-- Déterminer si le bouton "Ajout" s'affiche ou si on propose de se connecter -->
 {% macro afficher_bouton_ajout(objet_type, current_user, etablissement=None, form=None, flan=None) %}
     {% if objet_type == 'etablissement' %}
@@ -302,8 +286,6 @@
         </div>
     {% endif %}
 {% endmacro %}
-
-
 <!-- MACROS POUR PROPOSER DES CHOSES -->
 <!-- Affiche un champ de formulaire -->
 {% macro afficher_champ_formulaire(field) %}
@@ -315,7 +297,6 @@
         {% endif %}
     </div>
 {% endmacro %}
-
 <!-- Proposer un flan -->
 {% macro proposer_flan(form, action_url) %}
     <form method="POST" action="{{ action_url }}" class="form-container">
@@ -331,7 +312,6 @@
         </div>
     </form>
 {% endmacro %}
-
 <!-- Proposer un établissement -->
 {% macro proposer_etablissement(form, action_url, current_user) %}
     <form method="POST" action="{{ action_url }}" class="form-container">
@@ -366,7 +346,6 @@
         </div>
     </form>
 {% endmacro %}
-
 <!-- Proposer une évaluation -->
 {% macro proposer_evaluation(form, action_url) %}
     <form method="POST" action="{{ action_url }}" class="form-container">

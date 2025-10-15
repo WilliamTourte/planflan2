@@ -7,6 +7,43 @@ from app import db, bcrypt
 
 main_bp = Blueprint('main', __name__)
 
+def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
+    evaluation = Evaluation.query.filter_by(id_flan=id_flan, id_user=id_user).first()
+    moyenne = (
+        float(form.visuel.data) +
+        float(form.texture.data) +
+        float(form.pate.data) +
+        float(form.gout.data)
+    ) / 4
+
+    if evaluation:
+        # Mettre à jour l'évaluation existante
+        evaluation.visuel = form.visuel.data
+        evaluation.texture = form.texture.data
+        evaluation.pate = form.pate.data
+        evaluation.gout = form.gout.data
+        evaluation.description = form.description.data
+        evaluation.moyenne = moyenne
+    else:
+        # Créer une nouvelle évaluation
+        evaluation = Evaluation(
+            visuel=form.visuel.data,
+            texture=form.texture.data,
+            pate=form.pate.data,
+            gout=form.gout.data,
+            description=form.description.data,
+            id_flan=id_flan,
+            id_user=id_user,
+            moyenne=moyenne
+        )
+
+    if is_admin:
+        evaluation.statut = 'VALIDE'
+
+    db.session.add(evaluation)
+    db.session.commit()
+    return evaluation
+
 @main_bp.route('/')
 def index():
     from app.outils import afficher_etablissements
@@ -28,7 +65,6 @@ def dashboard():
     # L'administrateur peut voir les évaluations en attente des autres utilisateurs non administrateurs
     if current_user.is_admin:
         pending_evaluations = Evaluation.query.filter_by(statut='EN_ATTENTE').join(Utilisateur).filter(Utilisateur.is_admin == False).all()
-
     # Si demande de modification du profil
     if request.method == 'POST' and form.validate_on_submit():
         #  Email modifié ?
@@ -54,14 +90,12 @@ def dashboard():
         form.email.data = current_user.email
     return render_template('dashboard.html', title='Tableau de bord', form=form, pending_evaluations=pending_evaluations)
 
-
 @main_bp.route('/rechercher', methods=['GET', 'POST'])
 def rechercher():
     from app.outils import afficher_etablissements
     form = ChercheEtabForm()
     form2 = EtabForm()
     query = Etablissement.query
-
     def apply_filters(query, params):
         search_term = params.get('nom')  # Supposons que le terme de recherche est passé sous le paramètre 'nom'
         if search_term:
@@ -78,7 +112,6 @@ def rechercher():
         elif params.get('labellise') == 'non':
             query = query.filter(Etablissement.label == 0)
         return query
-
     if request.method == 'GET':
         has_search_params = any(request.args.get(k) for k in ['nom', 'visite', 'labellise'])
         if has_search_params:
@@ -94,7 +127,6 @@ def rechercher():
         })
     else:
         return render_template('rechercher.html', form=form, form2=form2)
-
     resultats = query.all()
     etablissements, etablissements_json = afficher_etablissements(resultats)
     session['resultats_recherche'] = etablissements_json
@@ -105,14 +137,12 @@ def rechercher():
                            form2=form2)
 
 ### ROUTES D'AFFICHAGE POUR PAGES (ETABLISSEMENT, FLAN)###
-
 @main_bp.route('/etablissement/<int:id_etab>', methods=['GET', 'POST'])
 def afficher_etablissement_unique(id_etab):
     etablissement = Etablissement.query.get_or_404(id_etab)
     form = NewFlanForm()  # Instancie un formulaire si on veut proposer un nouveau flan
     form.id_etab.data = id_etab  # Remplit le champ caché
     if form.validate_on_submit():  # Si le formulaire est soumis et valide
-
         pass
     # Passe toujours le formulaire au template, même en GET
     return render_template('page_etablissement.html', etablissement=etablissement, form=form, current_user=current_user)
@@ -122,9 +152,7 @@ def afficher_flan_unique(id_flan):
     flan_unique = Flan.query.get_or_404(id_flan) # Récupère le flan par son ID ou 404 si l'id n'existe pas
     evaluations = flan_unique.evaluations # Pour que les évaluations soient transmises
     form=EvalForm()
-
     return render_template('page_flan.html', flan=flan_unique, form=form, request=request) # request pour se souvenir du endpoint  # Passe le flan au template
-
 
 ### AUTOUR DU FLAN ###
 @main_bp.route('/etablissement/<int:id_etab>/proposer_flan', methods=['GET', 'POST'])
@@ -172,12 +200,10 @@ def valider_flan(id_flan):
 def modifier_flan(id_flan):
     flan = Flan.query.get_or_404(id_flan)
     form = NewFlanForm()
-
     # Vérifier si l'utilisateur est l'auteur du flan ou un admin
     if current_user.id_user != flan.id_user and not current_user.is_admin:
         flash('Vous n\'avez pas le droit de modifier ce flan.', 'danger')
         return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
-
     if form.validate_on_submit():
         # Mettre à jour les données du flan
         flan.nom = form.nom.data
@@ -190,22 +216,16 @@ def modifier_flan(id_flan):
         flash('Le flan a été mis à jour avec succès!', 'success')
     else:
         flash('Le formulaire n\'a pas été validé. Veuillez vérifier les erreurs.', 'danger')
-
     return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
-
-
-
 
 @main_bp.route('/supprimer_flan/<int:id_flan>', methods=['POST'])
 @login_required
 def supprimer_flan(id_flan):
     flan = Flan.query.get_or_404(id_flan)
-
     # Vérifier si l'utilisateur est l'auteur du flan ou un admin
     if current_user.id_user != flan.id_user and not current_user.is_admin:
         flash('Vous n\'avez pas le droit de supprimer ce flan.', 'danger')
         return redirect(url_for('main.dashboard'))
-
     db.session.delete(flan)
     try:
         db.session.commit()
@@ -216,8 +236,6 @@ def supprimer_flan(id_flan):
     return redirect(url_for('main.dashboard'))
 
 ### EVALUATION ###
-
-
 @main_bp.route('/flan/<int:id_flan>/evaluer', methods=['GET', 'POST'])
 @login_required
 def evaluer_flan(id_flan):
@@ -225,8 +243,29 @@ def evaluer_flan(id_flan):
     form = EvalForm()
     # Vérifier si une évaluation existe déjà pour cet utilisateur et ce flan
     evaluation = Evaluation.query.filter_by(id_flan=id_flan, id_user=current_user.id_user).first()
-
     if request.method == 'GET' and evaluation:
+        # Pré-remplir le formulaire avec les valeurs de l'évaluation existante
+        form.visuel.data = evaluation.visuel
+        form.texture.data = evaluation.texture
+        form.pate.data = evaluation.pate
+        form.gout.data = evaluation.gout
+        form.description.data = evaluation.description
+    if form.validate_on_submit():
+        evaluation = mise_a_jour_evaluation(form, id_flan, current_user.id_user, current_user.is_admin)
+        return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
+    # Si c'est une requête GET ou si le formulaire n'est pas valide, affichez le formulaire
+    return render_template('page_flan.html', id_flan=id_flan, form=form, flan=flan_unique)
+
+@main_bp.route('/evaluation/<int:id_eval>', methods=['GET', 'POST'])
+@login_required
+def afficher_evaluation_unique(id_eval):
+    # Récupérer l'évaluation de la base de données
+    evaluation = Evaluation.query.get_or_404(id_eval)
+    flan_unique = Flan.query.get_or_404(evaluation.id_flan)
+    form = EvalForm()
+
+    # Vérifier si une évaluation existe déjà pour cet utilisateur et ce flan
+    if request.method == 'GET':
         # Pré-remplir le formulaire avec les valeurs de l'évaluation existante
         form.visuel.data = evaluation.visuel
         form.texture.data = evaluation.texture
@@ -235,41 +274,13 @@ def evaluer_flan(id_flan):
         form.description.data = evaluation.description
 
     if form.validate_on_submit():
-        moyenne = (
-            float(form.visuel.data) +
-            float(form.texture.data) +
-            float(form.pate.data) +
-            float(form.gout.data)
-        ) / 4
-        if evaluation:
-            # Mettre à jour l'évaluation existante
-            evaluation.visuel = form.visuel.data
-            evaluation.texture = form.texture.data
-            evaluation.pate = form.pate.data
-            evaluation.gout = form.gout.data
-            evaluation.description = form.description.data
-            evaluation.moyenne = moyenne
-        else:
-            # Créer une nouvelle évaluation
-            evaluation = Evaluation(
-                visuel=form.visuel.data,
-                texture=form.texture.data,
-                pate=form.pate.data,
-                gout=form.gout.data,
-                description=form.description.data,
-                id_flan=id_flan,
-                id_user=current_user.id_user,
-                moyenne=moyenne
-            )
-            # Les évaluations de l'admin sont validées automatiquement
-            if current_user.is_admin:
-                evaluation.statut = 'VALIDE'
-        db.session.add(evaluation)
-        db.session.commit()
-        return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
+        print("Form data:", form.data)  # Ajoutez cette ligne pour déboguer
+        evaluation = mise_a_jour_evaluation(form, flan_unique.id_flan, current_user.id_user, current_user.is_admin)
+        flash('L\'évaluation a été mise à jour avec succès!', 'success')
+        return redirect(url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval))
 
-    # Si c'est une requête GET ou si le formulaire n'est pas valide, affichez le formulaire
-    return render_template('page_flan.html', id_flan=id_flan, form=form, flan=flan_unique)
+    # Rendre le template en passant l'évaluation, le formulaire et l'utilisateur actuel
+    return render_template('page_evaluation.html', evaluation=evaluation, form=form, current_user=current_user)
 
 
 @main_bp.route('/valider_evaluation/<int:id_eval>', methods=['POST'])
@@ -288,9 +299,6 @@ def valider_evaluation(id_eval):
         flash('Une erreur est survenue lors de la validation de l\'évaluation.', 'danger')
     return redirect(url_for('main.dashboard'))
 
-
-
-
 @main_bp.route('/supprimer_evaluation/<int:id_eval>', methods=['POST'])
 @login_required
 def supprimer_evaluation(id_eval):
@@ -306,12 +314,3 @@ def supprimer_evaluation(id_eval):
         db.session.rollback()
         flash('Une erreur est survenue lors de la suppression de l\'évaluation.', 'danger')
     return redirect(url_for('main.dashboard'))
-
-@main_bp.route('/evaluation/<int:id_eval>', methods=['GET'])
-def afficher_evaluation_unique(id_eval):
-    form=EvalForm()
-    # Récupérer l'évaluation de la base de données
-    evaluation = Evaluation.query.get_or_404(id_eval)
-
-    # Rendre le template en passant l'évaluation et l'utilisateur actuel
-    return render_template('page_evaluation.html', evaluation=evaluation, current_user=current_user, form=form)
