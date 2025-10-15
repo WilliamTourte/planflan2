@@ -82,7 +82,8 @@ class RechercheForm(FlaskForm):
     type_saveur = SelectField('Saveur', choices=[('tous', 'Tous')] + [(choice.name, choice.value) for choice in TypeSaveur], default='tous')
     type_pate = SelectField('Pâte', choices=[('tous', 'Tous')] + [(choice.name, choice.value) for choice in TypePate], default='tous')
     type_texture = SelectField('Texture', choices=[('tous', 'Tous')] + [(choice.name, choice.value) for choice in TypeTexture], default='tous')
-    prix = SelectField('Gamme de prix', choices=[('tous', 'Tous'), ("Moins de 2€50", 0), ("Plus de 2€50 mais moins de 5€", 2.5), ("Plus de 5€", 5)], default='tous')
+    prix = prix = SelectField('Gamme de prix', choices=[('tous', 'Tous'), (0, "Moins de 2€50"), (2.5, "Plus de 2€50 mais moins de 5€"), (5, "Plus de 5€")], default='tous')
+
     submit = SubmitField('Rechercher')
     # SEULEMENT POUR ADMIN #
     visite = RadioField('Visité', choices=[('tous', 'Tous'), ('oui', 'Oui'), ('non', 'Non')], default='tous')

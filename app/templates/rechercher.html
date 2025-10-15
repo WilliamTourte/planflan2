@@ -48,6 +48,7 @@
                         <span class="error-message">{{ error }}</span>
                     {% endfor %}
                 </div>
+            <! -- Seul l'admin peut filtrer par visite et labellise -->
                 {% if current_user.is_admin %}
                     <div class="form-group">
                         {{ form.visite.label(class="form-label") }}
