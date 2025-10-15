@@ -58,14 +58,18 @@
       </div>
       <!-- Section des évaluations de l'utilisateur -->
       <div class="evaluations-section">
-          <h2 class="evaluations-title">Mes evaluations</h2>
-          {{ afficher_grille('evaluation', current_user.evaluations, current_user, eval_form) }}
+          <h2 class="evaluations-title" onclick="toggleSection('mes-evaluations')">Mes evaluations</h2>
+          <div id="mes-evaluations" style="display: none;">
+              {{ afficher_grille('evaluation', current_user.evaluations, current_user, eval_form) }}
+          </div>
       </div>
       <!-- Section des évaluations en attente pour les administrateurs -->
       {% if current_user.is_admin %}
       <div class="evaluations-section">
-          <h2 class="evaluations-title">Evaluations en attente de validation</h2>
-          {{ afficher_grille('evaluation', pending_evaluations, current_user, eval_form) }}
+          <h2 class="evaluations-title" onclick="toggleSection('evaluations-attente')">Evaluations en attente de validation</h2>
+          <div id="evaluations-attente" style="display: none;">
+              {{ afficher_grille('evaluation', pending_evaluations, current_user, eval_form) }}
+          </div>
       </div>
       {% endif %}
   </div>
@@ -78,5 +82,14 @@
           document.getElementById('user-info').style.display = 'block';
           document.getElementById('edit-profile-form').style.display = 'none';
       });
+
+      function toggleSection(sectionId) {
+          const section = document.getElementById(sectionId);
+          if (section.style.display === 'none') {
+              section.style.display = 'block';
+          } else {
+              section.style.display = 'none';
+          }
+      }
   </script>
 {% endblock %}

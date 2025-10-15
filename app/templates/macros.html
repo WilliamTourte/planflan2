@@ -7,78 +7,65 @@
     {% endif %}
 {% endmacro %}
 
-<!-- BADGES -->
-{% macro afficher_badge_etablissement(etablissement) %}
-    {% if etablissement.label %}
-        <span class="badge">⭐ Labellisé</span>
-    {% endif %}
-{% endmacro %}
-
-{% macro afficher_badge_flan(flan) %}
-    {% if flan.prix is not none %}
-        <span class="badge">{{ "%.2f"|format(flan.prix) }} €</span>
-    {% else %}
-        <span class="badge">Prix non renseigné</span>
-    {% endif %}
-{% endmacro %}
-
-{% macro afficher_badge_statut(evaluation, current_user) %}
-    {% if current_user and current_user.is_authenticated and (current_user.is_admin or evaluation.user_id == current_user.user_id) %}
-        {% if evaluation.statut.value == 'VALIDE' %}
-            <span class="badge statut-valide">Valide</span>
-        {% elif evaluation.statut.value == 'EN_ATTENTE' %}
-            <span class="badge statut-en-attente">En attente</span>
+<!-- MACROS DE BADGES -->
+{% macro afficher_badge(type, objet, current_user=None) %}
+    {% if type == 'etablissement' %}
+        {% if objet.label %}
+            <span class="badge">⭐ Labellisé</span>
+        {% endif %}
+    {% elif type == 'flan' %}
+        {% if objet.prix is not none %}
+            <span class="badge">{{ "%.2f"|format(objet.prix) }} €</span>
+        {% else %}
+            <span class="badge">Prix non renseigné</span>
+        {% endif %}
+    {% elif type == 'statut' %}
+        {% if current_user and current_user.is_authenticated and (current_user.is_admin or objet.user_id == current_user.user_id) %}
+            {% if objet.statut.value == 'VALIDE' %}
+                <span class="badge statut-valide">Valide</span>
+            {% elif objet.statut.value == 'EN_ATTENTE' %}
+                <span class="badge statut-en-attente">En attente</span>
+            {% endif %}
         {% endif %}
     {% endif %}
 {% endmacro %}
 
+<!-- MACROS DE BOUTONS D'ACTIONS -->
 {% macro afficher_boutons_actions(objet, current_user, id_field, modify_route, delete_route, validate_route) %}
-    {# Vérifie si l'utilisateur est authentifié #}
     {% if current_user.is_authenticated %}
-        {# Vérifie si l'utilisateur est le propriétaire de l'objet et que l'objet n'est pas validé #}
         {% if current_user.id_user == objet.id_user and not objet.statut.value == 'VALIDE' %}
             <div class="action-buttons d-flex gap-1">
-                {# Bouton de modification : appelle la fonction editEvaluation pour afficher le formulaire #}
                 <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editEvaluation({{ objet.id_eval }})">
                     <i class="bi bi-pencil"></i>
                 </button>
-                {# Bouton de suppression : utilise id_field pour identifier l'objet à supprimer #}
                 <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
                     <button type="submit" class="btn btn-danger btn-sm square-btn" title="Supprimer">
                         <i class="bi bi-trash"></i>
                     </button>
                 </form>
             </div>
-        {# Vérifie si l'utilisateur est un administrateur #}
         {% elif current_user.is_admin %}
-            {# Vérifie si l'objet est en attente de validation #}
             {% if objet.statut.value == 'EN_ATTENTE' %}
                 <div class="action-buttons d-flex gap-1">
-                    {# Bouton de validation : utilise id_field pour identifier l'objet à valider #}
                     <form method="POST" action="{{ url_for(validate_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
                         <button type="submit" class="btn btn-success square-btn" title="Valider">
                             <i class="bi bi-check"></i>
                         </button>
                     </form>
-                    {# Bouton de modification : appelle la fonction editEvaluation pour afficher le formulaire #}
                     <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editEvaluation({{ objet.id_eval }})">
                         <i class="bi bi-pencil"></i>
                     </button>
-                    {# Bouton de suppression : utilise id_field pour identifier l'objet à supprimer #}
                     <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
                         <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
                             <i class="bi bi-trash"></i>
                         </button>
                     </form>
                 </div>
-            {# Si l'objet est déjà validé, affiche seulement les boutons de modification et de suppression #}
             {% else %}
                 <div class="action-buttons d-flex gap-1">
-                    {# Bouton de modification : appelle la fonction editEvaluation pour afficher le formulaire directement dans la carte #}
                     <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editEvaluation({{ objet.id_eval }})">
                         <i class="bi bi-pencil"></i>
                     </button>
-                    {# Bouton de suppression : utilise id_field pour identifier l'objet à supprimer #}
                     <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
                         <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
                             <i class="bi bi-trash"></i>
@@ -91,94 +78,93 @@
 {% endmacro %}
 
 <!-- MACROS D'AFFICHAGE D'OBJETS -->
-{% macro afficher_etablissement(etablissement, current_user) %}
-    <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}" class="carte" data-id="{{ etablissement.id_etab }}" data-lat="{{ etablissement.latitude }}" data-lng="{{ etablissement.longitude }}">
-        <div class="card-image-container">
-            {{ afficher_image_ou_placeholder(etablissement) }}
-            {{ afficher_badge_etablissement(etablissement) }}
-        </div>
-        <div class="card-content">
-            <div class="card-header">
-                <h2>{{ etablissement.nom | enlever_accents }}</h2>
+{% macro afficher_objet(type, objet, current_user=None, form=None) %}
+    {% if type == 'etablissement' %}
+        <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=objet.id_etab) }}" class="carte" data-id="{{ objet.id_etab }}" data-lat="{{ objet.latitude }}" data-lng="{{ objet.longitude }}">
+            <div class="card-image-container">
+                {{ afficher_image_ou_placeholder(objet) }}
+                {{ afficher_badge('etablissement', objet) }}
             </div>
-            <p class="type">{{ etablissement.type_etab.value }}</p>
-            <p class="adresse">{{ etablissement.adresse }}, {{ etablissement.ville }}</p>
-            {% if etablissement.flans %}
-                <p class="flans-count">{{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}</p>
-            {% endif %}
-            {{ afficher_boutons_actions(etablissement, current_user, 'id_etab', 'maps.modifier_etablissement', 'maps.supprimer_etablissement', 'maps.valider_etablissement') }}
-        </div>
-    </a>
-{% endmacro %}
-
-{% macro afficher_flan(flan, current_user) %}
-    <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}" class="carte">
-        <div class="card-image-container">
-            {{ afficher_image_ou_placeholder(flan) }}
-            {{ afficher_badge_flan(flan) }}
-        </div>
-        <div class="card-content">
-            <div class="card-header">
-                <h2>{{ flan.nom | enlever_accents }}</h2>
-            </div>
-            <p class="type">Saveur : {{ flan.type_saveur.value | default("inconnue") }}</p>
-            <p class="type">Pâte : {{ flan.type_pate.value | default("inconnue") }}</p>
-            <p class="type">Texture : {{ flan.type_texture.value | default("inconnue") }}</p>
-            <p class="type">Description : {{ flan.description | default("Flantastique") }}</p>
-            <p class="flan-price">Prix : {{ "%.2f"|format(flan.prix) }} €</p>
-            {{ afficher_boutons_actions(flan, current_user, 'id_flan', 'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan') }}
-        </div>
-    </a>
-{% endmacro %}
-
-{% macro afficher_evaluation(evaluation, current_user, form) %}
-    <div class="card">
-        <div class="card-content">
-            <div class="card-header">
-                <h2>{{ evaluation.flan.etablissement.nom | enlever_accents }}</h2>
-                <h3>{{ evaluation.flan.nom | enlever_accents }}</h3>
-                {{ afficher_badge_statut(evaluation, current_user) }}
-            </div>
-            <div class="evaluation-date-container">
-                <small class="evaluation-date">
-                    {{ evaluation.date_creation.strftime('%d/%m/%Y') }}
-                </small>
-            </div>
-            {% if current_user.is_authenticated and (current_user.id_user == evaluation.id_user or current_user.is_admin) %}
-                <div id="evaluation-{{ evaluation.id_eval }}-display">
-                    {{ afficher_criteres_evaluation(evaluation) }}
-                    {{ afficher_boutons_actions(evaluation, current_user, 'id_eval', 'main.afficher_evaluation_unique', 'main.supprimer_evaluation', 'main.valider_evaluation') }}
+            <div class="card-content">
+                <div class="card-header">
+                    <h2>{{ objet.nom | enlever_accents }}</h2>
                 </div>
-                {{ afficher_formulaire_edition_evaluation(evaluation, form) }}
-            {% else %}
-                {{ afficher_criteres_evaluation(evaluation) }}
-            {% endif %}
-            <a href="{{ url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval) }}" class="btn btn-primary">Voir plus</a>
+                <p class="type">{{ objet.type_etab.value }}</p>
+                <p class="adresse">{{ objet.adresse }}, {{ objet.ville }}</p>
+                {% if objet.flans %}
+                    <p class="flans-count">{{ objet.flans|length }} flan{{ 's' if objet.flans|length > 1 else '' }}</p>
+                {% endif %}
+                {{ afficher_boutons_actions(objet, current_user, 'id_etab', 'maps.modifier_etablissement', 'maps.supprimer_etablissement', 'maps.valider_etablissement') }}
+            </div>
+        </a>
+    {% elif type == 'flan' %}
+        <a href="{{ url_for('main.afficher_flan_unique', id_flan=objet.id_flan) }}" class="carte">
+            <div class="card-image-container">
+                {{ afficher_image_ou_placeholder(objet) }}
+                {{ afficher_badge('flan', objet) }}
+            </div>
+            <div class="card-content">
+                <div class="card-header">
+                    <h2>{{ objet.nom | enlever_accents }}</h2>
+                </div>
+                <p class="type">Saveur : {{ objet.type_saveur.value | default("inconnue") }}</p>
+                <p class="type">Pâte : {{ objet.type_pate.value | default("inconnue") }}</p>
+                <p class="type">Texture : {{ objet.type_texture.value | default("inconnue") }}</p>
+                <p class="type">Description : {{ objet.description | default("Flantastique") }}</p>
+                <p class="flan-price">Prix : {{ "%.2f"|format(objet.prix) }} €</p>
+                {{ afficher_boutons_actions(objet, current_user, 'id_flan', 'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan') }}
+            </div>
+        </a>
+    {% elif type == 'evaluation' %}
+        <div class="card">
+            <div class="card-content">
+                <div class="card-header">
+                    <h2>{{ objet.flan.etablissement.nom | enlever_accents }}</h2>
+                    <h3>{{ objet.flan.nom | enlever_accents }}</h3>
+                    {{ afficher_badge('statut', objet, current_user) }}
+                </div>
+                <div class="evaluation-date-container">
+                    <small class="evaluation-date">
+                        {{ objet.date_creation.strftime('%d/%m/%Y') }}
+                    </small>
+                </div>
+                {% if current_user.is_authenticated and (current_user.id_user == objet.id_user or current_user.is_admin) %}
+                    <div id="evaluation-{{ objet.id_eval }}-display">
+                        {{ afficher_criteres_evaluation(objet) }}
+                        {{ afficher_boutons_actions(objet, current_user, 'id_eval', 'main.afficher_evaluation_unique', 'main.supprimer_evaluation', 'main.valider_evaluation') }}
+                    </div>
+                    {{ afficher_formulaire_edition_evaluation(objet, form) }}
+                {% else %}
+                    {{ afficher_criteres_evaluation(objet) }}
+                {% endif %}
+                <a href="{{ url_for('main.afficher_evaluation_unique', id_eval=objet.id_eval) }}" class="btn btn-primary">Voir plus</a>
+            </div>
         </div>
-    </div>
-    <script>
-        function editEvaluation(idEval) {
-            document.getElementById('evaluation-' + idEval + '-display').style.display = 'none';
-            document.getElementById('evaluation-' + idEval + '-edit').style.display = 'block';
-        }
-        function cancelEdit(idEval) {
-            document.getElementById('evaluation-' + idEval + '-display').style.display = 'block';
-            document.getElementById('evaluation-' + idEval + '-edit').style.display = 'none';
-        }
-    </script>
+        <script>
+            function editEvaluation(idEval) {
+                document.getElementById('evaluation-' + idEval + '-display').style.display = 'none';
+                document.getElementById('evaluation-' + idEval + '-edit').style.display = 'block';
+            }
+            function cancelEdit(idEval) {
+                document.getElementById('evaluation-' + idEval + '-display').style.display = 'block';
+                document.getElementById('evaluation-' + idEval + '-edit').style.display = 'none';
+            }
+        </script>
+    {% endif %}
 {% endmacro %}
 
+<!-- MACROS D'AFFICHAGE DE CRITÈRES D'ÉVALUATION -->
 {% macro afficher_criteres_evaluation(evaluation) %}
     <div class="criteria">
-            <div class="criterion">
+        <div class="criterion">
             <span class="criterion-name">Visuel :</span>
             <span class="criterion-value">{{ evaluation.visuel }}/5</span>
         </div>
-                <div class="criterion">
+        <div class="criterion">
             <span class="criterion-name">Pâte :</span>
             <span class="criterion-value">{{ evaluation.pate }}/5</span>
         </div>
-                <div class="criterion">
+        <div class="criterion">
             <span class="criterion-name">Texture :</span>
             <span class="criterion-value">{{ evaluation.texture }}/5</span>
         </div>
@@ -200,6 +186,7 @@
     <p class="type">{{ evaluation.description }}</p>
 {% endmacro %}
 
+<!-- MACROS DE FORMULAIRES -->
 {% macro afficher_formulaire_edition_evaluation(evaluation, form) %}
     <div id="evaluation-{{ evaluation.id_eval }}-edit" style="display: none;">
         <form method="POST" action="{{ url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval) }}" class="form-container">
@@ -248,7 +235,7 @@
     </div>
 {% endmacro %}
 
-
+<!-- MACROS D'AFFICHAGE DE GRILLE -->
 {% macro afficher_grille(objet_type, objets, current_user=None, form=None, etablissement=None, flan=None) %}
     {% if not objets %}
         <div class="no-results">
@@ -265,24 +252,13 @@
     {{ afficher_bouton_ajout(objet_type, current_user, etablissement, form, flan) }}
 {% endmacro %}
 
-<!-- Afficher un objet, que ce soit sur sa page ou dans une grille -->
-{% macro afficher_objet(objet_type, objet, current_user=None, form=None) %}
-    {% if objet_type == 'etablissement' %}
-        {{ afficher_etablissement(objet, current_user) }}
-    {% elif objet_type == 'flan' %}
-        {{ afficher_flan(objet, current_user) }}
-    {% elif objet_type == 'evaluation' %}
-        {{ afficher_evaluation(objet, current_user, form) }}
-    {% endif %}
-{% endmacro %}
-
-<!-- Déterminer si le bouton "Ajout" s'affiche ou si on propose de se connecter -->
+<!-- MACROS DE BOUTONS D'AJOUT -->
 {% macro afficher_bouton_ajout(objet_type, current_user, etablissement=None, form=None, flan=None) %}
     {% if objet_type == 'etablissement' %}
         <div class="card-content">
             <h3>Ajouter un etablissement</h3>
             {% if current_user.is_authenticated %}
-                {{ proposer_etablissement(form, url_for('maps.ajouter_etablissement'), current_user) }}
+                {{ afficher_formulaire('etablissement', form, url_for('maps.ajouter_etablissement'), current_user) }}
             {% else %}
                 <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
                     Ajouter un établissement (connectez-vous)
@@ -293,7 +269,7 @@
         <div class="card-content">
             <h3>Ajouter un flan</h3>
             {% if current_user.is_authenticated %}
-                {{ proposer_flan(form, url_for('main.proposer_flan', id_etab=etablissement.id_etab)) }}
+                {{ afficher_formulaire('flan', form, url_for('main.proposer_flan', id_etab=etablissement.id_etab)) }}
             {% else %}
                 <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
                     Ajouter un flan (connectez-vous)
@@ -304,7 +280,7 @@
         <div class="card-content">
             <h3>Ajouter une evaluation</h3>
             {% if current_user.is_authenticated %}
-                {{ proposer_evaluation(form, url_for('main.evaluer_flan', id_flan=flan.id_flan)) }}
+                {{ afficher_formulaire('evaluation', form, url_for('main.evaluer_flan', id_flan=flan.id_flan)) }}
             {% else %}
                 <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
                     Ajouter une évaluation (connectez-vous)
@@ -315,7 +291,6 @@
 {% endmacro %}
 
 <!-- MACROS POUR PROPOSER DES CHOSES -->
-<!-- Affiche un champ de formulaire -->
 {% macro afficher_champ_formulaire(field) %}
     <div class="form-group">
         {{ field.label(class="form-label") }}
@@ -326,112 +301,48 @@
     </div>
 {% endmacro %}
 
-<!-- Proposer un flan -->
-{% macro proposer_flan(form, action_url) %}
+{% macro afficher_formulaire(type, form, action_url, current_user=None, objet=None) %}
     <form method="POST" action="{{ action_url }}" class="form-container">
         {{ form.hidden_tag() }}
-        {{ afficher_champ_formulaire(form.nom) }}
-        {{ afficher_champ_formulaire(form.type_saveur) }}
-        {{ afficher_champ_formulaire(form.type_texture) }}
-        {{ afficher_champ_formulaire(form.type_pate) }}
-        {{ afficher_champ_formulaire(form.description) }}
-        {{ afficher_champ_formulaire(form.prix) }}
-        <div class="form-group">
-            {{ form.submit(class="btn btn-proposer") }}
-        </div>
-    </form>
-{% endmacro %}
-
-<!-- Proposer un établissement -->
-{% macro proposer_etablissement(form, action_url, current_user) %}
-    <form method="POST" action="{{ action_url }}" class="form-container">
-        {{ form.hidden_tag() }}
-        {{ afficher_champ_formulaire(form.type_etab) }}
-        <div class="form-group">
-            <label for="search" class="form-label">Recherche d'établissement</label>
-            <input type="text" id="search" class="form-control" placeholder="Rechercher un établissement">
-        </div>
-        {{ afficher_champ_formulaire(form.description) }}
-        {% if current_user.is_admin %}
+        {% if type == 'flan' %}
+            {{ afficher_champ_formulaire(form.nom) }}
+            {{ afficher_champ_formulaire(form.type_saveur) }}
+            {{ afficher_champ_formulaire(form.type_texture) }}
+            {{ afficher_champ_formulaire(form.type_pate) }}
+            {{ afficher_champ_formulaire(form.description) }}
+            {{ afficher_champ_formulaire(form.prix) }}
+        {% elif type == 'etablissement' %}
+            {{ afficher_champ_formulaire(form.type_etab) }}
             <div class="form-group">
-                <label>Labellisé</label><br>
-                <input type="radio" name="label" value="Oui" {% if form.label.data == 'Oui' %}checked{% endif %}> Labellisé par la Flanterie<br>
-                <input type="radio" name="label" value="Non" {% if form.label.data == 'Non' %}checked{% endif %}> Non labellisé
+                <label for="search" class="form-label">Recherche d'établissement</label>
+                <input type="text" id="search" class="form-control" placeholder="Rechercher un établissement">
             </div>
-            <div class="form-group">
-                <label>Visité</label><br>
-                <input type="radio" name="visite" value="Oui" {% if form.visite.data == 'Oui' %}checked{% endif %}> Visité par la Flanterie<br>
-                <input type="radio" name="visite" value="Non" {% if form.visite.data == 'Non' %}checked{% endif %}> Non visité
-            </div>
+            {{ afficher_champ_formulaire(form.description) }}
+            {% if current_user.is_admin %}
+                <div class="form-group">
+                    <label>Labellisé</label><br>
+                    <input type="radio" name="label" value="Oui" {% if form.label.data == 'Oui' %}checked{% endif %}> Labellisé par la Flanterie<br>
+                    <input type="radio" name="label" value="Non" {% if form.label.data == 'Non' %}checked{% endif %}> Non labellisé
+                </div>
+                <div class="form-group">
+                    <label>Visité</label><br>
+                    <input type="radio" name="visite" value="Oui" {% if form.visite.data == 'Oui' %}checked{% endif %}> Visité par la Flanterie<br>
+                    <input type="radio" name="visite" value="Non" {% if form.visite.data == 'Non' %}checked{% endif %}> Non visité
+                </div>
+            {% endif %}
+            <input type="hidden" id="nom" name="nom" value="{{ form.nom.data }}">
+            <input type="hidden" id="adresse" name="adresse" value="{{ form.adresse.data }}">
+            <input type="hidden" id="code_postal" name="code_postal" value="{{ form.code_postal.data }}">
+            <input type="hidden" id="ville" name="ville" value="{{ form.ville.data }}">
+            <input type="hidden" id="latitude" name="latitude" value="{{ form.latitude.data }}">
+            <input type="hidden" id="longitude" name="longitude" value="{{ form.longitude.data }}">
+        {% elif type == 'evaluation' %}
+            {{ afficher_champ_formulaire(form.visuel) }}
+            {{ afficher_champ_formulaire(form.pate) }}
+            {{ afficher_champ_formulaire(form.texture) }}
+            {{ afficher_champ_formulaire(form.gout) }}
+            {{ afficher_champ_formulaire(form.description) }}
         {% endif %}
-        <!-- Champs cachés pour les données qui ne doivent pas être modifiées -->
-        <input type="hidden" id="nom" name="nom" value="{{ form.nom.data }}">
-        <input type="hidden" id="adresse" name="adresse" value="{{ form.adresse.data }}">
-        <input type="hidden" id="code_postal" name="code_postal" value="{{ form.code_postal.data }}">
-        <input type="hidden" id="ville" name="ville" value="{{ form.ville.data }}">
-        <input type="hidden" id="latitude" name="latitude" value="{{ form.latitude.data }}">
-        <input type="hidden" id="longitude" name="longitude" value="{{ form.longitude.data }}">
-        <div class="form-group">
-            {{ form.submit(class="btn btn-proposer") }}
-        </div>
-    </form>
-{% endmacro %}
-
-<!-- Proposer une évaluation -->
-{% macro proposer_evaluation(form, action_url) %}
-    <form method="POST" action="{{ action_url }}" class="form-container">
-        {{ form.hidden_tag() }}
-        {{ afficher_champ_formulaire(form.visuel) }}
-        {{ afficher_champ_formulaire(form.pate) }}
-        {{ afficher_champ_formulaire(form.texture) }}
-        {{ afficher_champ_formulaire(form.gout) }}
-        {{ afficher_champ_formulaire(form.description) }}
-        <div class="form-group">
-            {{ form.submit(class="btn btn-proposer") }}
-        </div>
-    </form>
-{% endmacro %}
-
-<!-- Modifier un établissement -->
-{% macro modifier_etablissement(form, action_url) %}
-    <form method="POST" action="{{ action_url }}" class="form-container">
-        {{ form.hidden_tag() }}
-        {{ afficher_champ_formulaire(form.nom) }}
-        {{ afficher_champ_formulaire(form.description) }}
-        {{ afficher_champ_formulaire(form.adresse) }}
-        {{ afficher_champ_formulaire(form.ville) }}
-        {{ afficher_champ_formulaire(form.code_postal) }}
-        {{ afficher_champ_formulaire(form.latitude) }}
-        {{ afficher_champ_formulaire(form.longitude) }}
-        {{ afficher_champ_formulaire(form.type_etab) }}
-        {% if current_user.is_admin %}
-            <div class="form-group">
-                <label>Labellisé</label><br>
-                <input type="radio" name="label" value="Oui" {% if form.label.data == 'Oui' %}checked{% endif %}> Labellisé par la Flanterie<br>
-                <input type="radio" name="label" value="Non" {% if form.label.data == 'Non' %}checked{% endif %}> Non labellisé
-            </div>
-            <div class="form-group">
-                <label>Visité</label><br>
-                <input type="radio" name="visite" value="Oui" {% if form.visite.data == 'Oui' %}checked{% endif %}> Visité par la Flanterie<br>
-                <input type="radio" name="visite" value="Non" {% if form.visite.data == 'Non' %}checked{% endif %}> Non visité
-            </div>
-        {% endif %}
-        <div class="form-group">
-            {{ form.submit(class="btn btn-proposer") }}
-        </div>
-    </form>
-{% endmacro %}
-
-<!-- Modifier un flan -->
-{% macro modifier_flan(form, action_url) %}
-    <form method="POST" action="{{ action_url }}" class="form-container">
-        {{ form.hidden_tag() }}
-        {{ afficher_champ_formulaire(form.nom) }}
-        {{ afficher_champ_formulaire(form.description) }}
-        {{ afficher_champ_formulaire(form.prix) }}
-        {{ afficher_champ_formulaire(form.type_pate) }}
-        {{ afficher_champ_formulaire(form.type_saveur) }}
-        {{ afficher_champ_formulaire(form.type_texture) }}
         <div class="form-group">
             {{ form.submit(class="btn btn-proposer") }}
         </div>
