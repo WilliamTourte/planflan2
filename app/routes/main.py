@@ -84,24 +84,28 @@ def index():
 @main_bp.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    form = UpdateProfileForm()
+    profile_form = UpdateProfileForm()
+    eval_form = EvalForm()  # Créez une instance du formulaire d'évaluation
     pending_evaluations = []  # Initialisez avec une liste vide par défaut
+
     # L'administrateur peut voir les évaluations en attente des autres utilisateurs non administrateurs
     if current_user.is_admin:
         pending_evaluations = Evaluation.query.filter_by(statut='EN_ATTENTE').join(Utilisateur).filter(Utilisateur.is_admin == False).all()
+
     # Si demande de modification du profil
-    if request.method == 'POST' and form.validate_on_submit():
+    if request.method == 'POST' and profile_form.validate_on_submit():
         #  Email modifié ?
-        if form.email.data and form.email.data != current_user.email:
-            existing_user = Utilisateur.query.filter(Utilisateur.email == form.email.data).first()
+        if profile_form.email.data and profile_form.email.data != current_user.email:
+            existing_user = Utilisateur.query.filter(Utilisateur.email == profile_form.email.data).first()
             if existing_user and existing_user.id_user != current_user.id_user:
                 flash('Cet email est déjà utilisé par un autre utilisateur.', 'danger')
                 return redirect(url_for('main.dashboard'))
-        current_user.pseudo = form.pseudo.data
-        if form.email.data:  # Mettre à jour l'email uniquement s'il a été soumis
-            current_user.email = form.email.data
-        if form.new_password.data:
-            current_user.password = bcrypt.generate_password_hash(form.new_password.data).decode('utf-8')
+
+        current_user.pseudo = profile_form.pseudo.data
+        if profile_form.email.data:  # Mettre à jour l'email uniquement s'il a été soumis
+            current_user.email = profile_form.email.data
+        if profile_form.new_password.data:
+            current_user.password = bcrypt.generate_password_hash(profile_form.new_password.data).decode('utf-8')
         try:
             db.session.commit()
             flash('Votre profil a été mis à jour!', 'success')
@@ -110,9 +114,11 @@ def dashboard():
             flash('Une erreur est survenue lors de la mise à jour de votre profil.', 'danger')
         return redirect(url_for('main.dashboard'))
     elif request.method == 'GET':
-        form.pseudo.data = current_user.pseudo
-        form.email.data = current_user.email
-    return render_template('dashboard.html', title='Tableau de bord', form=form, pending_evaluations=pending_evaluations)
+        profile_form.pseudo.data = current_user.pseudo
+        profile_form.email.data = current_user.email
+
+    return render_template('dashboard.html', title='Tableau de bord', profile_form=profile_form, eval_form=eval_form, pending_evaluations=pending_evaluations)
+
 
 @main_bp.route('/rechercher', methods=['GET', 'POST'])
 def rechercher():
