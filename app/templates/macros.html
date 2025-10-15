@@ -156,6 +156,7 @@
             {% else %}
                 {{ afficher_criteres_evaluation(evaluation) }}
             {% endif %}
+            <a href="{{ url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval) }}" class="btn btn-primary">Voir plus</a>
         </div>
     </div>
     <script>
@@ -169,6 +170,7 @@
         }
     </script>
 {% endmacro %}
+
 
 
 {% macro afficher_criteres_evaluation(evaluation) %}

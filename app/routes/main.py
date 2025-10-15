@@ -307,7 +307,11 @@ def supprimer_evaluation(id_eval):
         flash('Une erreur est survenue lors de la suppression de l\'évaluation.', 'danger')
     return redirect(url_for('main.dashboard'))
 
-@main_bp.route('/evaluation/<int:id_eval>')
+@main_bp.route('/evaluation/<int:id_eval>', methods=['GET'])
 def afficher_evaluation_unique(id_eval):
+    form=EvalForm()
+    # Récupérer l'évaluation de la base de données
     evaluation = Evaluation.query.get_or_404(id_eval)
-    return render_template('page_evaluation.html', evaluation=evaluation, current_user=current_user)
+
+    # Rendre le template en passant l'évaluation et l'utilisateur actuel
+    return render_template('page_evaluation.html', evaluation=evaluation, current_user=current_user, form=form)
