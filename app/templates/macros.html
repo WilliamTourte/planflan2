@@ -135,7 +135,7 @@
 {% endmacro %}
 
 {% macro afficher_evaluation(evaluation, current_user, form) %}
-    <div class="carte">
+    <div class="card">
         <div class="card-content">
             <div class="card-header">
                 <h2>{{ evaluation.flan.etablissement.nom | enlever_accents }}</h2>
@@ -169,6 +169,7 @@
         }
     </script>
 {% endmacro %}
+
 
 {% macro afficher_criteres_evaluation(evaluation) %}
     <div class="criteria">

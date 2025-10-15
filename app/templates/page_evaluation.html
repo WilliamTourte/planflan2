@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% from "macros.html" import afficher_badge_statut, afficher_criteres_evaluation %}
+{% block content %}
+  <div class="container">
+      <h1>Évaluation</h1>
+      <div class="carte">
+          <div class="card-content">
+              <div class="card-header">
+                  <h2>{{ evaluation.flan.etablissement.nom | enlever_accents }}</h2>
+                  <h3>{{ evaluation.flan.nom | enlever_accents }}</h3>
+                  {{ afficher_badge_statut(evaluation, current_user) }}
+              </div>
+              <div class="evaluation-date-container">
+                  <small class="evaluation-date">
+                      {{ evaluation.date_creation.strftime('%d/%m/%Y') }}
+                  </small>
+              </div>
+              {{ afficher_criteres_evaluation(evaluation) }}
+              <p>{{ evaluation.description }}</p>
+          </div>
+      </div>
+      {% if current_user.is_authenticated and (current_user.id_user == evaluation.id_user or current_user.is_admin) %}
+          <div class="action-buttons">
+              <a href="{{ url_for('main.evaluer_flan', id_flan=evaluation.flan.id_flan) }}" class="btn btn-primary">Modifier</a>
+              <form method="POST" action="{{ url_for('main.supprimer_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
+                  <button type="submit" class="btn btn-danger">Supprimer</button>
+              </form>
+              {% if current_user.is_admin %}
+                  <form method="POST" action="{{ url_for('main.valider_evaluation', id_eval=evaluation.id_eval) }}" style="display: inline-block;">
+                      <button type="submit" class="btn btn-success">Valider</button>
+                  </form>
+              {% endif %}
+          </div>
+      {% endif %}
+  </div>
+{% endblock %}

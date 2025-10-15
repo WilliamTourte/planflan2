@@ -306,3 +306,8 @@ def supprimer_evaluation(id_eval):
         db.session.rollback()
         flash('Une erreur est survenue lors de la suppression de l\'évaluation.', 'danger')
     return redirect(url_for('main.dashboard'))
+
+@main_bp.route('/evaluation/<int:id_eval>')
+def afficher_evaluation_unique(id_eval):
+    evaluation = Evaluation.query.get_or_404(id_eval)
+    return render_template('page_evaluation.html', evaluation=evaluation, current_user=current_user)
