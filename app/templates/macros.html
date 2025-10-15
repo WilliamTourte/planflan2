@@ -206,19 +206,35 @@
             {{ form.hidden_tag() }}
             <div class="form-group">
                 <label for="visuel-{{ evaluation.id_eval }}" class="form-label">Visuel</label>
-                <input type="number" id="visuel-{{ evaluation.id_eval }}" name="visuel" class="form-control" value="{{ evaluation.visuel }}" min="0" max="5">
+                <select id="visuel-{{ evaluation.id_eval }}" name="visuel" class="form-control">
+                    {% for choice in form.visuel.choices %}
+                        <option value="{{ choice[0] }}" {% if choice[0] == evaluation.visuel|float %}selected{% endif %}>{{ choice[1] }}</option>
+                    {% endfor %}
+                </select>
             </div>
             <div class="form-group">
                 <label for="pate-{{ evaluation.id_eval }}" class="form-label">Pâte</label>
-                <input type="number" id="pate-{{ evaluation.id_eval }}" name="pate" class="form-control" value="{{ evaluation.pate }}" min="0" max="5">
+                <select id="pate-{{ evaluation.id_eval }}" name="pate" class="form-control">
+                    {% for choice in form.pate.choices %}
+                        <option value="{{ choice[0] }}" {% if choice[0] == evaluation.pate|float %}selected{% endif %}>{{ choice[1] }}</option>
+                    {% endfor %}
+                </select>
             </div>
             <div class="form-group">
                 <label for="texture-{{ evaluation.id_eval }}" class="form-label">Texture</label>
-                <input type="number" id="texture-{{ evaluation.id_eval }}" name="texture" class="form-control" value="{{ evaluation.texture }}" min="0" max="5">
+                <select id="texture-{{ evaluation.id_eval }}" name="texture" class="form-control">
+                    {% for choice in form.texture.choices %}
+                        <option value="{{ choice[0] }}" {% if choice[0] == evaluation.texture|float %}selected{% endif %}>{{ choice[1] }}</option>
+                    {% endfor %}
+                </select>
             </div>
             <div class="form-group">
                 <label for="gout-{{ evaluation.id_eval }}" class="form-label">Goût</label>
-                <input type="number" id="gout-{{ evaluation.id_eval }}" name="gout" class="form-control" value="{{ evaluation.gout }}" min="0" max="5">
+                <select id="gout-{{ evaluation.id_eval }}" name="gout" class="form-control">
+                    {% for choice in form.gout.choices %}
+                        <option value="{{ choice[0] }}" {% if choice[0] == evaluation.gout|float %}selected{% endif %}>{{ choice[1] }}</option>
+                    {% endfor %}
+                </select>
             </div>
             <div class="form-group">
                 <label for="description-{{ evaluation.id_eval }}" class="form-label">Description</label>
@@ -231,6 +247,7 @@
         </form>
     </div>
 {% endmacro %}
+
 
 {% macro afficher_grille(objet_type, objets, current_user=None, form=None, etablissement=None, flan=None) %}
     {% if not objets %}

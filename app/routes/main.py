@@ -8,44 +8,65 @@ from app import db, bcrypt
 main_bp = Blueprint('main', __name__)
 
 def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
-    print("Form data:", form.data)  # Ajoutez cette ligne pour voir les données du formulaire
+    print("Form data received:", form.data)
+    # Convertir les valeurs des champs en float avec des points
+    visuel = float(str(form.visuel.data).replace(',', '.')) if form.visuel.data else None
+    texture = float(str(form.texture.data).replace(',', '.')) if form.texture.data else None
+    pate = float(str(form.pate.data).replace(',', '.')) if form.pate.data else None
+    gout = float(str(form.gout.data).replace(',', '.')) if form.gout.data else None
+
+    print(f"Converted values - visuel: {visuel}, texture: {texture}, pate: {pate}, gout: {gout}")
+
     evaluation = Evaluation.query.filter_by(id_flan=id_flan, id_user=id_user).first()
-    moyenne = (
-        float(form.visuel.data) +
-        float(form.texture.data) +
-        float(form.pate.data) +
-        float(form.gout.data)
-    ) / 4
-    print("Moyenne calculée:", moyenne)  # Ajoutez cette ligne pour voir la moyenne calculée
+
     if evaluation:
-        # Mettre à jour l'évaluation existante
-        evaluation.visuel = form.visuel.data
-        evaluation.texture = form.texture.data
-        evaluation.pate = form.pate.data
-        evaluation.gout = form.gout.data
-        evaluation.description = form.description.data
-        evaluation.moyenne = moyenne
-        print("Évaluation existante mise à jour:", evaluation)  # Ajoutez cette ligne pour voir l'évaluation mise à jour
+        # Mettre à jour uniquement les champs qui ont été modifiés
+        if visuel is not None:
+            evaluation.visuel = visuel
+        if texture is not None:
+            evaluation.texture = texture
+        if pate is not None:
+            evaluation.pate = pate
+        if gout is not None:
+            evaluation.gout = gout
+        if form.description.data is not None and form.description.data != '':
+            evaluation.description = form.description.data
+
+        # Recalculer la moyenne uniquement si les champs nécessaires ont été modifiés
+        if visuel is not None or texture is not None or pate is not None or gout is not None:
+            moyenne = (
+                float(evaluation.visuel or 0) +
+                float(evaluation.texture or 0) +
+                float(evaluation.pate or 0) +
+                float(evaluation.gout or 0)
+            ) / 4
+            evaluation.moyenne = moyenne
+
     else:
         # Créer une nouvelle évaluation
+        moyenne = (
+            float(visuel or 0) +
+            float(texture or 0) +
+            float(pate or 0) +
+            float(gout or 0)
+        ) / 4
         evaluation = Evaluation(
-            visuel=form.visuel.data,
-            texture=form.texture.data,
-            pate=form.pate.data,
-            gout=form.gout.data,
-            description=form.description.data,
+            visuel=visuel,
+            texture=texture,
+            pate=pate,
+            gout=gout,
+            description=form.description.data or '',
             id_flan=id_flan,
             id_user=id_user,
             moyenne=moyenne
         )
-        print("Nouvelle évaluation créée:", evaluation)  # Ajoutez cette ligne pour voir la nouvelle évaluation
+
     if is_admin:
         evaluation.statut = 'VALIDE'
+
     db.session.add(evaluation)
     db.session.commit()
-    print("Évaluation sauvegardée dans la base de données")  # Ajoutez cette ligne pour confirmer la sauvegarde
     return evaluation
-
 
 @main_bp.route('/')
 def index():
@@ -288,16 +309,28 @@ def evaluer_flan(id_flan):
     flan_unique = Flan.query.get_or_404(id_flan)
     form = EvalForm()
     evaluation = Evaluation.query.filter_by(id_flan=id_flan, id_user=current_user.id_user).first()
+
     if request.method == 'GET' and evaluation:
-        form.visuel.data = evaluation.visuel
-        form.texture.data = evaluation.texture
-        form.pate.data = evaluation.pate
-        form.gout.data = evaluation.gout
+        form.visuel.data = str(evaluation.visuel)
+        form.texture.data = str(evaluation.texture)
+        form.pate.data = str(evaluation.pate)
+        form.gout.data = str(evaluation.gout)
         form.description.data = evaluation.description
+
     if form.validate_on_submit():
-        evaluation = mise_a_jour_evaluation(form, id_flan, current_user.id_user, current_user.is_admin)
-        flash('Votre évaluation a été mise à jour avec succès!', 'success')
-        return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
+        print("Form submitted with data:", form.data)
+        try:
+            evaluation = mise_a_jour_evaluation(form, id_flan, current_user.id_user, current_user.is_admin)
+            flash('Votre évaluation a été mise à jour avec succès!', 'success')
+            return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
+        except Exception as e:
+            print("Error during form submission:", e)
+            flash('Une erreur est survenue lors de la mise à jour de l\'évaluation: ' + str(e), 'danger')
+    else:
+        if request.method == 'POST':
+            print("Form validation errors:", form.errors)
+            flash('Le formulaire n\'a pas été validé correctement. Veuillez vérifier les erreurs.', 'danger')
+
     return render_template('page_flan.html', id_flan=id_flan, form=form, flan=flan_unique, evaluation=evaluation)
 
 
