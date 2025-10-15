@@ -15,7 +15,6 @@ def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
         float(form.pate.data) +
         float(form.gout.data)
     ) / 4
-
     if evaluation:
         # Mettre à jour l'évaluation existante
         evaluation.visuel = form.visuel.data
@@ -36,10 +35,8 @@ def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
             id_user=id_user,
             moyenne=moyenne
         )
-
     if is_admin:
         evaluation.statut = 'VALIDE'
-
     db.session.add(evaluation)
     db.session.commit()
     return evaluation
@@ -52,8 +49,8 @@ def index():
     resultats = Etablissement.query.all()
     etablissements, etablissements_json = afficher_etablissements(resultats)
     return render_template('liste_etablissements.html',
-                           etablissements=etablissements,  # Pour la grille
-                           etablissements_json=etablissements_json,  # Pour la carte
+                           etablissements=etablissements,
+                           etablissements_json=etablissements_json,
                            google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
                            form2=form2)
 
@@ -97,7 +94,7 @@ def rechercher():
     form2 = EtabForm()
     query = Etablissement.query
     def apply_filters(query, params):
-        search_term = params.get('nom')  # Supposons que le terme de recherche est passé sous le paramètre 'nom'
+        search_term = params.get('nom')
         if search_term:
             query = query.filter(
                 (Etablissement.nom.ilike(f'%{search_term}%')) |
@@ -140,19 +137,66 @@ def rechercher():
 @main_bp.route('/etablissement/<int:id_etab>', methods=['GET', 'POST'])
 def afficher_etablissement_unique(id_etab):
     etablissement = Etablissement.query.get_or_404(id_etab)
-    form = NewFlanForm()  # Instancie un formulaire si on veut proposer un nouveau flan
-    form.id_etab.data = id_etab  # Remplit le champ caché
-    if form.validate_on_submit():  # Si le formulaire est soumis et valide
-        pass
-    # Passe toujours le formulaire au template, même en GET
-    return render_template('page_etablissement.html', etablissement=etablissement, form=form, current_user=current_user)
+    form_flan = NewFlanForm()  # Formulaire pour proposer un nouveau flan
+    form_flan.id_etab.data = id_etab
+    form_etab = EtabForm(obj=etablissement)  # Formulaire pour modifier l'établissement
 
-@main_bp.route('/flan/<int:id_flan>')
+    if form_flan.validate_on_submit():  # Si le formulaire pour proposer un flan est soumis
+        flan = Flan(
+            nom=form_flan.nom.data,
+            description=form_flan.description.data,
+            prix=form_flan.prix.data,
+            type_pate=form_flan.type_pate.data,
+            type_saveur=form_flan.type_saveur.data,
+            type_texture=form_flan.type_texture.data,
+            id_etab=id_etab,
+            id_user=current_user.id_user
+        )
+        db.session.add(flan)
+        db.session.commit()
+        flash('Votre flan a été proposé avec succès !', 'success')
+        return redirect(url_for('main.afficher_etablissement_unique', id_etab=id_etab))
+
+    if form_etab.validate_on_submit():  # Si le formulaire pour modifier l'établissement est soumis
+        etablissement.nom = form_etab.nom.data
+        etablissement.description = form_etab.description.data
+        etablissement.adresse = form_etab.adresse.data
+        etablissement.ville = form_etab.ville.data
+        etablissement.code_postal = form_etab.code_postal.data
+        etablissement.latitude = form_etab.latitude.data
+        etablissement.longitude = form_etab.longitude.data
+        etablissement.type_etab = form_etab.type_etab.data
+        if current_user.is_admin:
+            etablissement.label = form_etab.label.data
+            etablissement.visite = form_etab.visite.data
+        db.session.commit()
+        flash('L\'établissement a été mis à jour avec succès!', 'success')
+        return redirect(url_for('main.afficher_etablissement_unique', id_etab=id_etab))
+
+    return render_template('page_etablissement.html', etablissement=etablissement, form_flan=form_flan, form_etab=form_etab, current_user=current_user)
+
+@main_bp.route('/flan/<int:id_flan>', methods=['GET', 'POST'])
 def afficher_flan_unique(id_flan):
-    flan_unique = Flan.query.get_or_404(id_flan) # Récupère le flan par son ID ou 404 si l'id n'existe pas
-    evaluations = flan_unique.evaluations # Pour que les évaluations soient transmises
-    form=EvalForm()
-    return render_template('page_flan.html', flan=flan_unique, form=form, request=request) # request pour se souvenir du endpoint  # Passe le flan au template
+    flan_unique = Flan.query.get_or_404(id_flan)
+    form_eval = EvalForm()  # Formulaire pour évaluer le flan
+    form_flan = NewFlanForm(obj=flan_unique)  # Formulaire pour modifier le flan
+
+    if form_eval.validate_on_submit():  # Si le formulaire pour évaluer le flan est soumis
+        evaluation = mise_a_jour_evaluation(form_eval, id_flan, current_user.id_user, current_user.is_admin)
+        return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
+
+    if form_flan.validate_on_submit():  # Si le formulaire pour modifier le flan est soumis
+        flan_unique.nom = form_flan.nom.data
+        flan_unique.description = form_flan.description.data
+        flan_unique.prix = form_flan.prix.data
+        flan_unique.type_pate = form_flan.type_pate.data
+        flan_unique.type_saveur = form_flan.type_saveur.data
+        flan_unique.type_texture = form_flan.type_texture.data
+        db.session.commit()
+        flash('Le flan a été mis à jour avec succès!', 'success')
+        return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
+
+    return render_template('page_flan.html', flan=flan_unique, form_eval=form_eval, form_flan=form_flan, request=request)
 
 ### AUTOUR DU FLAN ###
 @main_bp.route('/etablissement/<int:id_etab>/proposer_flan', methods=['GET', 'POST'])
@@ -160,7 +204,6 @@ def afficher_flan_unique(id_flan):
 def proposer_flan(id_etab):
     etablissement = Etablissement.query.get_or_404(id_etab)
     form = NewFlanForm()
-    # Pré-remplir le champ caché id_etab
     form.id_etab.data = id_etab
     if form.validate_on_submit():
         flan = Flan(
@@ -200,12 +243,10 @@ def valider_flan(id_flan):
 def modifier_flan(id_flan):
     flan = Flan.query.get_or_404(id_flan)
     form = NewFlanForm()
-    # Vérifier si l'utilisateur est l'auteur du flan ou un admin
     if current_user.id_user != flan.id_user and not current_user.is_admin:
         flash('Vous n\'avez pas le droit de modifier ce flan.', 'danger')
         return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
     if form.validate_on_submit():
-        # Mettre à jour les données du flan
         flan.nom = form.nom.data
         flan.type_saveur = form.type_saveur.data
         flan.type_texture = form.type_texture.data
@@ -222,7 +263,6 @@ def modifier_flan(id_flan):
 @login_required
 def supprimer_flan(id_flan):
     flan = Flan.query.get_or_404(id_flan)
-    # Vérifier si l'utilisateur est l'auteur du flan ou un admin
     if current_user.id_user != flan.id_user and not current_user.is_admin:
         flash('Vous n\'avez pas le droit de supprimer ce flan.', 'danger')
         return redirect(url_for('main.dashboard'))
@@ -241,10 +281,8 @@ def supprimer_flan(id_flan):
 def evaluer_flan(id_flan):
     flan_unique = Flan.query.get_or_404(id_flan)
     form = EvalForm()
-    # Vérifier si une évaluation existe déjà pour cet utilisateur et ce flan
     evaluation = Evaluation.query.filter_by(id_flan=id_flan, id_user=current_user.id_user).first()
     if request.method == 'GET' and evaluation:
-        # Pré-remplir le formulaire avec les valeurs de l'évaluation existante
         form.visuel.data = evaluation.visuel
         form.texture.data = evaluation.texture
         form.pate.data = evaluation.pate
@@ -253,35 +291,26 @@ def evaluer_flan(id_flan):
     if form.validate_on_submit():
         evaluation = mise_a_jour_evaluation(form, id_flan, current_user.id_user, current_user.is_admin)
         return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
-    # Si c'est une requête GET ou si le formulaire n'est pas valide, affichez le formulaire
     return render_template('page_flan.html', id_flan=id_flan, form=form, flan=flan_unique)
 
 @main_bp.route('/evaluation/<int:id_eval>', methods=['GET', 'POST'])
 @login_required
 def afficher_evaluation_unique(id_eval):
-    # Récupérer l'évaluation de la base de données
     evaluation = Evaluation.query.get_or_404(id_eval)
     flan_unique = Flan.query.get_or_404(evaluation.id_flan)
     form = EvalForm()
-
-    # Vérifier si une évaluation existe déjà pour cet utilisateur et ce flan
     if request.method == 'GET':
-        # Pré-remplir le formulaire avec les valeurs de l'évaluation existante
         form.visuel.data = evaluation.visuel
         form.texture.data = evaluation.texture
         form.pate.data = evaluation.pate
         form.gout.data = evaluation.gout
         form.description.data = evaluation.description
-
     if form.validate_on_submit():
-        print("Form data:", form.data)  # Ajoutez cette ligne pour déboguer
+        print("Form data:", form.data)
         evaluation = mise_a_jour_evaluation(form, flan_unique.id_flan, current_user.id_user, current_user.is_admin)
         flash('L\'évaluation a été mise à jour avec succès!', 'success')
         return redirect(url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval))
-
-    # Rendre le template en passant l'évaluation, le formulaire et l'utilisateur actuel
     return render_template('page_evaluation.html', evaluation=evaluation, form=form, current_user=current_user)
-
 
 @main_bp.route('/valider_evaluation/<int:id_eval>', methods=['POST'])
 @login_required
