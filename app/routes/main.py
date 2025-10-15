@@ -8,6 +8,7 @@ from app import db, bcrypt
 main_bp = Blueprint('main', __name__)
 
 def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
+    print("Form data:", form.data)  # Ajoutez cette ligne pour voir les données du formulaire
     evaluation = Evaluation.query.filter_by(id_flan=id_flan, id_user=id_user).first()
     moyenne = (
         float(form.visuel.data) +
@@ -15,6 +16,7 @@ def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
         float(form.pate.data) +
         float(form.gout.data)
     ) / 4
+    print("Moyenne calculée:", moyenne)  # Ajoutez cette ligne pour voir la moyenne calculée
     if evaluation:
         # Mettre à jour l'évaluation existante
         evaluation.visuel = form.visuel.data
@@ -23,6 +25,7 @@ def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
         evaluation.gout = form.gout.data
         evaluation.description = form.description.data
         evaluation.moyenne = moyenne
+        print("Évaluation existante mise à jour:", evaluation)  # Ajoutez cette ligne pour voir l'évaluation mise à jour
     else:
         # Créer une nouvelle évaluation
         evaluation = Evaluation(
@@ -35,11 +38,14 @@ def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
             id_user=id_user,
             moyenne=moyenne
         )
+        print("Nouvelle évaluation créée:", evaluation)  # Ajoutez cette ligne pour voir la nouvelle évaluation
     if is_admin:
         evaluation.statut = 'VALIDE'
     db.session.add(evaluation)
     db.session.commit()
+    print("Évaluation sauvegardée dans la base de données")  # Ajoutez cette ligne pour confirmer la sauvegarde
     return evaluation
+
 
 @main_bp.route('/')
 def index():
@@ -290,8 +296,10 @@ def evaluer_flan(id_flan):
         form.description.data = evaluation.description
     if form.validate_on_submit():
         evaluation = mise_a_jour_evaluation(form, id_flan, current_user.id_user, current_user.is_admin)
+        flash('Votre évaluation a été mise à jour avec succès!', 'success')
         return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
-    return render_template('page_flan.html', id_flan=id_flan, form=form, flan=flan_unique)
+    return render_template('page_flan.html', id_flan=id_flan, form=form, flan=flan_unique, evaluation=evaluation)
+
 
 @main_bp.route('/evaluation/<int:id_eval>', methods=['GET', 'POST'])
 @login_required
