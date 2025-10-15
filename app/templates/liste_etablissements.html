@@ -95,6 +95,7 @@ window.initMap = function() {
     const etablissements = {{ etablissements_json|tojson|safe }};
     const infowindow = new google.maps.InfoWindow();
     const isAdmin = {{ current_user.is_admin|tojson|safe if current_user.is_authenticated else 'false' }}; // Variable pour vérifier si l'utilisateur est admin
+    const bounds = new google.maps.LatLngBounds(); // Crée une nouvelle instance de LatLngBounds
     etablissements.forEach(etablissement => {
         // L'icône change selon que le lieu a été visité et/ou labellisé
         let icon;
@@ -121,6 +122,7 @@ window.initMap = function() {
             title: etablissement.nom,
             icon: icon
         });
+        bounds.extend(marker.position); // Ajoute la position du marqueur aux limites
         const detailsUrl = `/etablissement/${etablissement.id_etab}?nom=${nom}&visite=${visite}&labellise=${labellise}`;
         const content = `
             <div class="infowindow">
@@ -139,6 +141,14 @@ window.initMap = function() {
         });
         markers.push(marker);
     });
+    if (etablissements.length > 0) {
+        if (etablissements.length === 1) {
+            map.setCenter(markers[0].position);
+            map.setZoom(14); // Niveau de zoom pour un seul marqueur
+        } else {
+            map.fitBounds(bounds); // Ajuster la carte aux limites
+        }
+    }
     // Créer un élément div pour la légende
     const legend = document.createElement('div');
     legend.style.backgroundColor = 'white';
