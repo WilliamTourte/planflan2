@@ -30,7 +30,6 @@
     {% endif %}
 {% endmacro %}
 
-
 <!-- MACROS D'AFFICHAGE D'OBJETS -->
 {% macro afficher_objet(type, objet, current_user=None, form=None) %}
     {% if type == 'etablissement' %}
@@ -78,7 +77,15 @@
                             <label for="nom-{{ objet.id_flan }}" class="form-label">Nom</label>
                             <input type="text" id="nom-{{ objet.id_flan }}" name="nom" class="form-control" value="{{ objet.nom }}">
                         </div>
-                                            <div class="form-group">
+                        <div class="form-group">
+                            <label for="description-{{ objet.id_flan }}" class="form-label">Description</label>
+                            <textarea id="description-{{ objet.id_flan }}" name="description" class="form-control">{{ objet.description }}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="prix-{{ objet.id_flan }}" class="form-label">Prix</label>
+                            <input type="number" id="prix-{{ objet.id_flan }}" name="prix" class="form-control" value="{{ objet.prix }}">
+                        </div>
+                        <div class="form-group">
                             <label for="type_saveur-{{ objet.id_flan }}" class="form-label">Type de saveur</label>
                             <select id="type_saveur-{{ objet.id_flan }}" name="type_saveur" class="form-control">
                                 {% for choice in form.type_saveur.choices %}
@@ -86,7 +93,6 @@
                                 {% endfor %}
                             </select>
                         </div>
-
                         <div class="form-group">
                             <label for="type_pate-{{ objet.id_flan }}" class="form-label">Type de pâte</label>
                             <select id="type_pate-{{ objet.id_flan }}" name="type_pate" class="form-control">
@@ -95,7 +101,6 @@
                                 {% endfor %}
                             </select>
                         </div>
-
                         <div class="form-group">
                             <label for="type_texture-{{ objet.id_flan }}" class="form-label">Type de texture</label>
                             <select id="type_texture-{{ objet.id_flan }}" name="type_texture" class="form-control">
@@ -104,19 +109,6 @@
                                 {% endfor %}
                             </select>
                         </div>
-
-
-                        <div class="form-group">
-                            <label for="description-{{ objet.id_flan }}" class="form-label">Description</label>
-                            <textarea id="description-{{ objet.id_flan }}" name="description" class="form-control">{{ objet.description }}</textarea>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="prix-{{ objet.id_flan }}" class="form-label">Prix</label>
-                            <input type="number" id="prix-{{ objet.id_flan }}" name="prix" class="form-control" value="{{ objet.prix }}">
-                        </div>
-
-
                         <div class="form-group">
                             <button type="submit" class="btn btn-primary">Enregistrer</button>
                             <button type="button" class="btn btn-secondary" onclick="cancelEdit({{ objet.id_flan }})">Annuler</button>
@@ -150,8 +142,13 @@
         <div class="card">
             <div class="card-content">
                 <div class="card-header">
-                    <h2>{{ objet.flan.etablissement.nom | enlever_accents }}</h2>
-                    <h3>{{ objet.flan.nom | enlever_accents }}</h3>
+                    {% if objet.flan and objet.flan.etablissement %}
+                        <h2>{{ objet.flan.etablissement.nom | enlever_accents }}</h2>
+                        <h3>{{ objet.flan.nom | enlever_accents }}</h3>
+                    {% else %}
+                        <h2>Établissement inconnu</h2>
+                        <h3>{{ objet.flan.nom | enlever_accents if objet.flan else 'Flan inconnu' }}</h3>
+                    {% endif %}
                     {{ afficher_badge('statut', objet, current_user) }}
                 </div>
                 <div class="evaluation-date-container">
@@ -343,6 +340,7 @@
         </div>
     </form>
 {% endmacro %}
+
 <!-- MACROS DE BOUTONS D'ACTIONS -->
 {% macro afficher_boutons_actions(objet, current_user, id_field, modify_route, delete_route, validate_route) %}
     {% if current_user.is_authenticated %}
@@ -352,6 +350,7 @@
                     <i class="bi bi-pencil"></i>
                 </button>
                 <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <button type="submit" class="btn btn-danger btn-sm square-btn" title="Supprimer">
                         <i class="bi bi-trash"></i>
                     </button>
@@ -361,6 +360,7 @@
             {% if objet.statut.value == 'EN_ATTENTE' %}
                 <div class="action-buttons d-flex gap-1">
                     <form method="POST" action="{{ url_for(validate_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <button type="submit" class="btn btn-success square-btn" title="Valider">
                             <i class="bi bi-check"></i>
                         </button>
@@ -369,6 +369,7 @@
                         <i class="bi bi-pencil"></i>
                     </button>
                     <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
                             <i class="bi bi-trash"></i>
                         </button>
@@ -380,6 +381,7 @@
                         <i class="bi bi-pencil"></i>
                     </button>
                     <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
                             <i class="bi bi-trash"></i>
                         </button>
@@ -389,6 +391,7 @@
         {% endif %}
     {% endif %}
 {% endmacro %}
+
 
 <!-- MACROS DE BOUTONS D'AJOUT -->
 {% macro afficher_bouton_ajout(objet_type, current_user, etablissement=None, form=None, flan=None) %}
