@@ -131,13 +131,13 @@
                 {% if current_user.is_authenticated and (current_user.id_user == objet.id_user or current_user.is_admin) %}
                     <div id="evaluation-{{ objet.id_eval }}-display">
                         {{ afficher_criteres_evaluation(objet) }}
-                        {{ afficher_boutons_actions(objet, current_user, 'id_eval', 'main.afficher_evaluation_unique', 'main.supprimer_evaluation', 'main.valider_evaluation') }}
+                        {{ afficher_boutons_actions(objet, current_user, 'id_eval', 'main.gerer_evaluation', 'main.supprimer_evaluation', 'main.valider_evaluation') }}
                     </div>
                     {{ afficher_formulaire_edition_evaluation(objet, form) }}
                 {% else %}
                     {{ afficher_criteres_evaluation(objet) }}
                 {% endif %}
-                <a href="{{ url_for('main.afficher_evaluation_unique', id_eval=objet.id_eval) }}" class="btn btn-primary">Voir plus</a>
+                <a href="{{ url_for('main.gerer_evaluation', id_eval=objet.id_eval) }}" class="btn btn-primary">Voir plus</a>
             </div>
         </div>
         <script>
@@ -189,7 +189,7 @@
 <!-- MACROS DE FORMULAIRES -->
 {% macro afficher_formulaire_edition_evaluation(evaluation, form) %}
     <div id="evaluation-{{ evaluation.id_eval }}-edit" style="display: none;">
-        <form method="POST" action="{{ url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval) }}" class="form-container">
+        <form method="POST" action="{{ url_for('main.gerer_evaluation', id_eval=evaluation.id_eval) }}" class="form-container">
             {{ form.hidden_tag() }}
             <div class="form-group">
                 <label for="visuel-{{ evaluation.id_eval }}" class="form-label">Visuel</label>
@@ -251,45 +251,6 @@
     <!-- Possibilité d'ajout toujours en fin de grille-->
     {{ afficher_bouton_ajout(objet_type, current_user, etablissement, form, flan) }}
 {% endmacro %}
-
-<!-- MACROS DE BOUTONS D'AJOUT -->
-{% macro afficher_bouton_ajout(objet_type, current_user, etablissement=None, form=None, flan=None) %}
-    {% if objet_type == 'etablissement' %}
-        <div class="card-content">
-            <h3>Ajouter un etablissement</h3>
-            {% if current_user.is_authenticated %}
-                {{ afficher_formulaire('etablissement', form, url_for('maps.ajouter_etablissement'), current_user) }}
-            {% else %}
-                <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
-                    Ajouter un établissement (connectez-vous)
-                </a>
-            {% endif %}
-        </div>
-    {% elif objet_type == 'flan' and etablissement %}
-        <div class="card-content">
-            <h3>Ajouter un flan</h3>
-            {% if current_user.is_authenticated %}
-                {{ afficher_formulaire('flan', form, url_for('main.proposer_flan', id_etab=etablissement.id_etab)) }}
-            {% else %}
-                <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
-                    Ajouter un flan (connectez-vous)
-                </a>
-            {% endif %}
-        </div>
-    {% elif objet_type == 'evaluation' and flan %}
-        <div class="card-content">
-            <h3>Ajouter une evaluation</h3>
-            {% if current_user.is_authenticated %}
-                {{ afficher_formulaire('evaluation', form, url_for('main.evaluer_flan', id_flan=flan.id_flan)) }}
-            {% else %}
-                <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
-                    Ajouter une évaluation (connectez-vous)
-                </a>
-            {% endif %}
-        </div>
-    {% endif %}
-{% endmacro %}
-
 <!-- MACROS POUR PROPOSER DES CHOSES -->
 {% macro afficher_champ_formulaire(field) %}
     <div class="form-group">
@@ -347,4 +308,43 @@
             {{ form.submit(class="btn btn-proposer") }}
         </div>
     </form>
+{% endmacro %}
+
+<!-- MACROS DE BOUTONS D'AJOUT -->
+{% macro afficher_bouton_ajout(objet_type, current_user, etablissement=None, form=None, flan=None) %}
+    {% if objet_type == 'etablissement' %}
+        <div class="card-content">
+            <h3>Ajouter un etablissement</h3>
+            {% if current_user.is_authenticated %}
+                {{ afficher_formulaire('etablissement', form, url_for('maps.ajouter_etablissement'), current_user) }}
+            {% else %}
+                <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
+                    Ajouter un établissement (connectez-vous)
+                </a>
+            {% endif %}
+        </div>
+    {% elif objet_type == 'flan' and etablissement %}
+        <div class="card-content">
+            <h3>Ajouter un flan</h3>
+            {% if current_user.is_authenticated %}
+                {{ afficher_formulaire('flan', form, url_for('main.proposer_flan', id_etab=etablissement.id_etab)) }}
+            {% else %}
+                <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
+                    Ajouter un flan (connectez-vous)
+                </a>
+            {% endif %}
+        </div>
+    {% elif objet_type == 'evaluation' and flan %}
+        <div class="card-content">
+            <h3>Ajouter une evaluation</h3>
+            {% if current_user.is_authenticated %}
+                {% set action_url = url_for('main.gerer_evaluation', id_flan=flan.id_flan) %}
+                {{ afficher_formulaire('evaluation', form, action_url) }}
+            {% else %}
+                <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
+                    Ajouter une évaluation (connectez-vous)
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
 {% endmacro %}
