@@ -30,53 +30,6 @@
     {% endif %}
 {% endmacro %}
 
-<!-- MACROS DE BOUTONS D'ACTIONS -->
-{% macro afficher_boutons_actions(objet, current_user, id_field, modify_route, delete_route, validate_route) %}
-    {% if current_user.is_authenticated %}
-        {% if current_user.id_user == objet.id_user and not objet.statut.value == 'VALIDE' %}
-            <div class="action-buttons d-flex gap-1">
-                <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editEvaluation({{ objet.id_eval }})">
-                    <i class="bi bi-pencil"></i>
-                </button>
-                <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
-                    <button type="submit" class="btn btn-danger btn-sm square-btn" title="Supprimer">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </form>
-            </div>
-        {% elif current_user.is_admin %}
-            {% if objet.statut.value == 'EN_ATTENTE' %}
-                <div class="action-buttons d-flex gap-1">
-                    <form method="POST" action="{{ url_for(validate_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
-                        <button type="submit" class="btn btn-success square-btn" title="Valider">
-                            <i class="bi bi-check"></i>
-                        </button>
-                    </form>
-                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editEvaluation({{ objet.id_eval }})">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
-                        <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </form>
-                </div>
-            {% else %}
-                <div class="action-buttons d-flex gap-1">
-                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editEvaluation({{ objet.id_eval }})">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
-                        <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </form>
-                </div>
-            {% endif %}
-        {% endif %}
-    {% endif %}
-{% endmacro %}
-
 <!-- MACROS D'AFFICHAGE D'OBJETS -->
 {% macro afficher_objet(type, objet, current_user=None, form=None) %}
     {% if type == 'etablissement' %}
@@ -98,29 +51,104 @@
             </div>
         </a>
     {% elif type == 'flan' %}
-        <a href="{{ url_for('main.afficher_flan_unique', id_flan=objet.id_flan) }}" class="carte">
+        <div class="flan-card">
             <div class="card-image-container">
                 {{ afficher_image_ou_placeholder(objet) }}
                 {{ afficher_badge('flan', objet) }}
             </div>
-            <div class="card-content">
-                <div class="card-header">
-                    <h2>{{ objet.nom | enlever_accents }}</h2>
+            {% if current_user.is_authenticated and (current_user.id_user == objet.id_user or current_user.is_admin) %}
+                <div id="flan-{{ objet.id_flan }}-display">
+                    <div class="card-content">
+                        <div class="card-header">
+                            <h2>{{ objet.nom | enlever_accents }}</h2>
+                        </div>
+                        <p class="type">Saveur : {{ objet.type_saveur.value | default("inconnue") }}</p>
+                        <p class="type">Pâte : {{ objet.type_pate.value | default("inconnue") }}</p>
+                        <p class="type">Texture : {{ objet.type_texture.value | default("inconnue") }}</p>
+                        <p class="type">Description : {{ objet.description | default("Flantastique") }}</p>
+                        <p class="flan-price">Prix : {{ "%.2f"|format(objet.prix) }} €</p>
+                        {{ afficher_boutons_actions(objet, current_user, 'id_flan', 'main.gerer_flan', 'main.supprimer_flan', 'main.valider_flan') }}
+                    </div>
                 </div>
-                <p class="type">Saveur : {{ objet.type_saveur.value | default("inconnue") }}</p>
-                <p class="type">Pâte : {{ objet.type_pate.value | default("inconnue") }}</p>
-                <p class="type">Texture : {{ objet.type_texture.value | default("inconnue") }}</p>
-                <p class="type">Description : {{ objet.description | default("Flantastique") }}</p>
-                <p class="flan-price">Prix : {{ "%.2f"|format(objet.prix) }} €</p>
-                {{ afficher_boutons_actions(objet, current_user, 'id_flan', 'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan') }}
-            </div>
-        </a>
+                <div id="flan-{{ objet.id_flan }}-edit" style="display: none;">
+                    <form method="POST" action="{{ url_for('main.gerer_flan', id_flan=objet.id_flan) }}" class="form-container">
+                        {{ form.hidden_tag() }}
+                        <div class="form-group">
+                            <label for="nom-{{ objet.id_flan }}" class="form-label">Nom</label>
+                            <input type="text" id="nom-{{ objet.id_flan }}" name="nom" class="form-control" value="{{ objet.nom }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="description-{{ objet.id_flan }}" class="form-label">Description</label>
+                            <textarea id="description-{{ objet.id_flan }}" name="description" class="form-control">{{ objet.description }}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="prix-{{ objet.id_flan }}" class="form-label">Prix</label>
+                            <input type="number" id="prix-{{ objet.id_flan }}" name="prix" class="form-control" value="{{ objet.prix }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="type_saveur-{{ objet.id_flan }}" class="form-label">Type de saveur</label>
+                            <select id="type_saveur-{{ objet.id_flan }}" name="type_saveur" class="form-control">
+                                {% for choice in form.type_saveur.choices %}
+                                    <option value="{{ choice[0] }}" {% if choice[0] == objet.type_saveur.value %}selected{% endif %}>{{ choice[1] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="type_pate-{{ objet.id_flan }}" class="form-label">Type de pâte</label>
+                            <select id="type_pate-{{ objet.id_flan }}" name="type_pate" class="form-control">
+                                {% for choice in form.type_pate.choices %}
+                                    <option value="{{ choice[0] }}" {% if choice[0] == objet.type_pate.value %}selected{% endif %}>{{ choice[1] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="type_texture-{{ objet.id_flan }}" class="form-label">Type de texture</label>
+                            <select id="type_texture-{{ objet.id_flan }}" name="type_texture" class="form-control">
+                                {% for choice in form.type_texture.choices %}
+                                    <option value="{{ choice[0] }}" {% if choice[0] == objet.type_texture.value %}selected{% endif %}>{{ choice[1] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                            <button type="button" class="btn btn-secondary" onclick="cancelEdit({{ objet.id_flan }})">Annuler</button>
+                        </div>
+                    </form>
+                </div>
+            {% else %}
+                <div class="card-content">
+                    <div class="card-header">
+                        <h2>{{ objet.nom | enlever_accents }}</h2>
+                    </div>
+                    <p class="type">Saveur : {{ objet.type_saveur.value | default("inconnue") }}</p>
+                    <p class="type">Pâte : {{ objet.type_pate.value | default("inconnue") }}</p>
+                    <p class="type">Texture : {{ objet.type_texture.value | default("inconnue") }}</p>
+                    <p class="type">Description : {{ objet.description | default("Flantastique") }}</p>
+                    <p class="flan-price">Prix : {{ "%.2f"|format(objet.prix) }} €</p>
+                </div>
+            {% endif %}
+        </div>
+        <script>
+            function editFlan(idFlan) {
+                document.getElementById('flan-' + idFlan + '-display').style.display = 'none';
+                document.getElementById('flan-' + idFlan + '-edit').style.display = 'block';
+            }
+            function cancelEdit(idFlan) {
+                document.getElementById('flan-' + idFlan + '-display').style.display = 'block';
+                document.getElementById('flan-' + idFlan + '-edit').style.display = 'none';
+            }
+        </script>
     {% elif type == 'evaluation' %}
         <div class="card">
             <div class="card-content">
                 <div class="card-header">
-                    <h2>{{ objet.flan.etablissement.nom | enlever_accents }}</h2>
-                    <h3>{{ objet.flan.nom | enlever_accents }}</h3>
+                    {% if objet.flan and objet.flan.etablissement %}
+                        <h2>{{ objet.flan.etablissement.nom | enlever_accents }}</h2>
+                        <h3>{{ objet.flan.nom | enlever_accents }}</h3>
+                    {% else %}
+                        <h2>Établissement inconnu</h2>
+                        <h3>{{ objet.flan.nom | enlever_accents if objet.flan else 'Flan inconnu' }}</h3>
+                    {% endif %}
                     {{ afficher_badge('statut', objet, current_user) }}
                 </div>
                 <div class="evaluation-date-container">
@@ -131,13 +159,13 @@
                 {% if current_user.is_authenticated and (current_user.id_user == objet.id_user or current_user.is_admin) %}
                     <div id="evaluation-{{ objet.id_eval }}-display">
                         {{ afficher_criteres_evaluation(objet) }}
-                        {{ afficher_boutons_actions(objet, current_user, 'id_eval', 'main.afficher_evaluation_unique', 'main.supprimer_evaluation', 'main.valider_evaluation') }}
+                        {{ afficher_boutons_actions(objet, current_user, 'id_eval', 'main.gerer_evaluation', 'main.supprimer_evaluation', 'main.valider_evaluation') }}
                     </div>
                     {{ afficher_formulaire_edition_evaluation(objet, form) }}
                 {% else %}
                     {{ afficher_criteres_evaluation(objet) }}
                 {% endif %}
-                <a href="{{ url_for('main.afficher_evaluation_unique', id_eval=objet.id_eval) }}" class="btn btn-primary">Voir plus</a>
+                <a href="{{ url_for('main.gerer_evaluation', id_eval=objet.id_eval) }}" class="btn btn-primary">Voir plus</a>
             </div>
         </div>
         <script>
@@ -152,6 +180,8 @@
         </script>
     {% endif %}
 {% endmacro %}
+
+
 
 <!-- MACROS D'AFFICHAGE DE CRITÈRES D'ÉVALUATION -->
 {% macro afficher_criteres_evaluation(evaluation) %}
@@ -189,7 +219,7 @@
 <!-- MACROS DE FORMULAIRES -->
 {% macro afficher_formulaire_edition_evaluation(evaluation, form) %}
     <div id="evaluation-{{ evaluation.id_eval }}-edit" style="display: none;">
-        <form method="POST" action="{{ url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval) }}" class="form-container">
+        <form method="POST" action="{{ url_for('main.gerer_evaluation', id_eval=evaluation.id_eval) }}" class="form-container">
             {{ form.hidden_tag() }}
             <div class="form-group">
                 <label for="visuel-{{ evaluation.id_eval }}" class="form-label">Visuel</label>
@@ -252,44 +282,6 @@
     {{ afficher_bouton_ajout(objet_type, current_user, etablissement, form, flan) }}
 {% endmacro %}
 
-<!-- MACROS DE BOUTONS D'AJOUT -->
-{% macro afficher_bouton_ajout(objet_type, current_user, etablissement=None, form=None, flan=None) %}
-    {% if objet_type == 'etablissement' %}
-        <div class="card-content">
-            <h3>Ajouter un etablissement</h3>
-            {% if current_user.is_authenticated %}
-                {{ afficher_formulaire('etablissement', form, url_for('maps.ajouter_etablissement'), current_user) }}
-            {% else %}
-                <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
-                    Ajouter un établissement (connectez-vous)
-                </a>
-            {% endif %}
-        </div>
-    {% elif objet_type == 'flan' and etablissement %}
-        <div class="card-content">
-            <h3>Ajouter un flan</h3>
-            {% if current_user.is_authenticated %}
-                {{ afficher_formulaire('flan', form, url_for('main.proposer_flan', id_etab=etablissement.id_etab)) }}
-            {% else %}
-                <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
-                    Ajouter un flan (connectez-vous)
-                </a>
-            {% endif %}
-        </div>
-    {% elif objet_type == 'evaluation' and flan %}
-        <div class="card-content">
-            <h3>Ajouter une evaluation</h3>
-            {% if current_user.is_authenticated %}
-                {{ afficher_formulaire('evaluation', form, url_for('main.evaluer_flan', id_flan=flan.id_flan)) }}
-            {% else %}
-                <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
-                    Ajouter une évaluation (connectez-vous)
-                </a>
-            {% endif %}
-        </div>
-    {% endif %}
-{% endmacro %}
-
 <!-- MACROS POUR PROPOSER DES CHOSES -->
 {% macro afficher_champ_formulaire(field) %}
     <div class="form-group">
@@ -347,4 +339,96 @@
             {{ form.submit(class="btn btn-proposer") }}
         </div>
     </form>
+{% endmacro %}
+
+<!-- MACROS DE BOUTONS D'ACTIONS -->
+{% macro afficher_boutons_actions(objet, current_user, id_field, modify_route, delete_route, validate_route) %}
+    {% if current_user.is_authenticated %}
+        {% if current_user.id_user == objet.id_user and not objet.statut.value == 'VALIDE' %}
+            <div class="action-buttons d-flex gap-1">
+                <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editFlan({{ objet[id_field] }})">
+                    <i class="bi bi-pencil"></i>
+                </button>
+                <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <button type="submit" class="btn btn-danger btn-sm square-btn" title="Supprimer">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </form>
+            </div>
+        {% elif current_user.is_admin %}
+            {% if objet.statut.value == 'EN_ATTENTE' %}
+                <div class="action-buttons d-flex gap-1">
+                    <form method="POST" action="{{ url_for(validate_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="btn btn-success square-btn" title="Valider">
+                            <i class="bi bi-check"></i>
+                        </button>
+                    </form>
+                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editFlan({{ objet[id_field] }})">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            {% else %}
+                <div class="action-buttons d-flex gap-1">
+                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editFlan({{ objet[id_field] }})">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+{% endmacro %}
+
+
+<!-- MACROS DE BOUTONS D'AJOUT -->
+{% macro afficher_bouton_ajout(objet_type, current_user, etablissement=None, form=None, flan=None) %}
+    {% if objet_type == 'etablissement' %}
+        <div class="card-content">
+            <h3>Ajouter un etablissement</h3>
+            {% if current_user.is_authenticated %}
+                {{ afficher_formulaire('etablissement', form, url_for('maps.ajouter_etablissement'), current_user) }}
+            {% else %}
+                <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
+                    Ajouter un établissement (connectez-vous)
+                </a>
+            {% endif %}
+        </div>
+    {% elif objet_type == 'flan' and etablissement %}
+        <div class="card-content">
+            <h3>Ajouter un flan</h3>
+            {% if current_user.is_authenticated %}
+                {% set action_url = url_for('main.gerer_flan', id_etab=etablissement.id_etab) %}
+                {{ afficher_formulaire('flan', form, action_url) }}
+            {% else %}
+                <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
+                    Ajouter un flan (connectez-vous)
+                </a>
+            {% endif %}
+        </div>
+    {% elif objet_type == 'evaluation' and flan %}
+        <div class="card-content">
+            <h3>Ajouter une evaluation</h3>
+            {% if current_user.is_authenticated %}
+                {% set action_url = url_for('main.gerer_evaluation', id_flan=flan.id_flan) %}
+                {{ afficher_formulaire('evaluation', form, action_url) }}
+            {% else %}
+                <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
+                    Ajouter une évaluation (connectez-vous)
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
 {% endmacro %}
