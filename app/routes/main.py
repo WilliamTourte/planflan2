@@ -192,11 +192,14 @@ def afficher_etablissement_unique(id_etab):
 @main_bp.route('/etablissement/<int:id_etab>/proposer_flan', methods=['GET', 'POST'])
 @login_required
 def gerer_flan(id_flan=None, id_etab=None):
+    print(f"Route gerer_flan appelée avec id_flan={id_flan} et id_etab={id_etab}")  # Debug
     if id_flan:
         flan_unique = Flan.query.get_or_404(id_flan)
         form_flan = NewFlanForm(obj=flan_unique)  # Formulaire pour modifier le flan
         form_eval = EvalForm()  # Formulaire pour évaluer le flan
+        print(f"Formulaire flan : {form_flan}")  # Debug
         if form_flan.validate_on_submit():  # Si le formulaire pour modifier le flan est soumis
+            print(f"Formulaire flan validé : {form_flan.data}")  # Debug
             flan_unique.nom = form_flan.nom.data
             flan_unique.description = form_flan.description.data
             flan_unique.prix = form_flan.prix.data
@@ -206,6 +209,7 @@ def gerer_flan(id_flan=None, id_etab=None):
             db.session.commit()
             flash('Le flan a été mis à jour avec succès!', 'success')
             return redirect(url_for('main.gerer_flan', id_flan=id_flan))
+        print(f"Rendu du template page_flan.html avec flan={flan_unique}")  # Debug
         return render_template('page_flan.html', flan=flan_unique, form_flan=form_flan, form_eval=form_eval, request=request)
     else:
         etablissement = Etablissement.query.get_or_404(id_etab)

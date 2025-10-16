@@ -35,7 +35,7 @@
     {% if current_user.is_authenticated %}
         {% if current_user.id_user == objet.id_user and not objet.statut.value == 'VALIDE' %}
             <div class="action-buttons d-flex gap-1">
-                <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editEvaluation({{ objet.id_eval }})">
+                <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="document.getElementById('modify-form-{{ objet[id_field] }}').submit()">
                     <i class="bi bi-pencil"></i>
                 </button>
                 <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
@@ -52,7 +52,7 @@
                             <i class="bi bi-check"></i>
                         </button>
                     </form>
-                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editEvaluation({{ objet.id_eval }})">
+                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="document.getElementById('modify-form-{{ objet[id_field] }}').submit()">
                         <i class="bi bi-pencil"></i>
                     </button>
                     <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
@@ -63,7 +63,7 @@
                 </div>
             {% else %}
                 <div class="action-buttons d-flex gap-1">
-                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editEvaluation({{ objet.id_eval }})">
+                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="document.getElementById('modify-form-{{ objet[id_field] }}').submit()">
                         <i class="bi bi-pencil"></i>
                     </button>
                     <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
@@ -98,7 +98,7 @@
             </div>
         </a>
     {% elif type == 'flan' %}
-        <a href="{{ url_for('main.gerer_flan', id_flan=objet.id_flan) }}" class="carte">
+        <div class="flan-card">
             <div class="card-image-container">
                 {{ afficher_image_ou_placeholder(objet) }}
                 {{ afficher_badge('flan', objet) }}
@@ -114,7 +114,30 @@
                 <p class="flan-price">Prix : {{ "%.2f"|format(objet.prix) }} €</p>
                 {{ afficher_boutons_actions(objet, current_user, 'id_flan', 'main.gerer_flan', 'main.supprimer_flan', 'main.valider_flan') }}
             </div>
-        </a>
+            {% if current_user.is_authenticated and (current_user.id_user == objet.id_user or current_user.is_admin) %}
+                <div id="modify-form-{{ objet.id_flan }}" style="display: none;">
+                    <form method="POST" action="{{ url_for('main.gerer_flan', id_flan=objet.id_flan) }}">
+                        {{ form.hidden_tag() }}
+                        {{ form.nom.label }} {{ form.nom }}
+                        {{ form.description.label }} {{ form.description }}
+                        {{ form.prix.label }} {{ form.prix }}
+                        {{ form.type_pate.label }} {{ form.type_pate }}
+                        {{ form.type_saveur.label }} {{ form.type_saveur }}
+                        {{ form.type_texture.label }} {{ form.type_texture }}
+                        <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+                        <button type="button" class="btn btn-secondary" onclick="cancelEdit({{ objet.id_flan }})">Annuler</button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+        <script>
+            function editFlan(idFlan) {
+                document.getElementById('modify-form-' + idFlan).style.display = 'block';
+            }
+            function cancelEdit(idFlan) {
+                document.getElementById('modify-form-' + idFlan).style.display = 'none';
+            }
+        </script>
     {% elif type == 'evaluation' %}
         <div class="card">
             <div class="card-content">
@@ -152,6 +175,7 @@
         </script>
     {% endif %}
 {% endmacro %}
+
 
 <!-- MACROS D'AFFICHAGE DE CRITÈRES D'ÉVALUATION -->
 {% macro afficher_criteres_evaluation(evaluation) %}
@@ -309,6 +333,52 @@
             {{ form.submit(class="btn btn-proposer") }}
         </div>
     </form>
+{% endmacro %}
+<!-- MACROS DE BOUTONS D'ACTIONS -->
+{% macro afficher_boutons_actions(objet, current_user, id_field, modify_route, delete_route, validate_route) %}
+    {% if current_user.is_authenticated %}
+        {% if current_user.id_user == objet.id_user and not objet.statut.value == 'VALIDE' %}
+            <div class="action-buttons d-flex gap-1">
+                <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editFlan({{ objet[id_field] }})">
+                    <i class="bi bi-pencil"></i>
+                </button>
+                <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
+                    <button type="submit" class="btn btn-danger btn-sm square-btn" title="Supprimer">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </form>
+            </div>
+        {% elif current_user.is_admin %}
+            {% if objet.statut.value == 'EN_ATTENTE' %}
+                <div class="action-buttons d-flex gap-1">
+                    <form method="POST" action="{{ url_for(validate_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
+                        <button type="submit" class="btn btn-success square-btn" title="Valider">
+                            <i class="bi bi-check"></i>
+                        </button>
+                    </form>
+                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editFlan({{ objet[id_field] }})">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
+                        <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            {% else %}
+                <div class="action-buttons d-flex gap-1">
+                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editFlan({{ objet[id_field] }})">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
+                        <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
+        {% endif %}
+    {% endif %}
 {% endmacro %}
 
 <!-- MACROS DE BOUTONS D'AJOUT -->

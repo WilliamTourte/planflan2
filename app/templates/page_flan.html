@@ -1,12 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>{{ flan.nom }}</h1>
-{{ afficher_objet('flan', flan, current_user, form) }}
+    {{ afficher_objet('flan', flan, current_user, form_flan) }}
+
     <!-- Affichage des évaluations -->
     {{ afficher_grille('evaluation', flan.evaluations, current_user, form_eval, etablissement, flan) }}
-{% endblock %}
-
 
     <!-- Boutons d'action -->
     <div class="flan-actions">
@@ -17,6 +15,5 @@
                 Retour à {{ flan.etablissement.nom }}
             </a>
         </div>
-
     </div>
-
+{% endblock %}
