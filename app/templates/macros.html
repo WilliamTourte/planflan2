@@ -30,52 +30,6 @@
     {% endif %}
 {% endmacro %}
 
-<!-- MACROS DE BOUTONS D'ACTIONS -->
-{% macro afficher_boutons_actions(objet, current_user, id_field, modify_route, delete_route, validate_route) %}
-    {% if current_user.is_authenticated %}
-        {% if current_user.id_user == objet.id_user and not objet.statut.value == 'VALIDE' %}
-            <div class="action-buttons d-flex gap-1">
-                <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="document.getElementById('modify-form-{{ objet[id_field] }}').submit()">
-                    <i class="bi bi-pencil"></i>
-                </button>
-                <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
-                    <button type="submit" class="btn btn-danger btn-sm square-btn" title="Supprimer">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </form>
-            </div>
-        {% elif current_user.is_admin %}
-            {% if objet.statut.value == 'EN_ATTENTE' %}
-                <div class="action-buttons d-flex gap-1">
-                    <form method="POST" action="{{ url_for(validate_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
-                        <button type="submit" class="btn btn-success square-btn" title="Valider">
-                            <i class="bi bi-check"></i>
-                        </button>
-                    </form>
-                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="document.getElementById('modify-form-{{ objet[id_field] }}').submit()">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
-                        <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </form>
-                </div>
-            {% else %}
-                <div class="action-buttons d-flex gap-1">
-                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="document.getElementById('modify-form-{{ objet[id_field] }}').submit()">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
-                        <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </form>
-                </div>
-            {% endif %}
-        {% endif %}
-    {% endif %}
-{% endmacro %}
 
 <!-- MACROS D'AFFICHAGE D'OBJETS -->
 {% macro afficher_objet(type, objet, current_user=None, form=None) %}
@@ -103,39 +57,93 @@
                 {{ afficher_image_ou_placeholder(objet) }}
                 {{ afficher_badge('flan', objet) }}
             </div>
-            <div class="card-content">
-                <div class="card-header">
-                    <h2>{{ objet.nom | enlever_accents }}</h2>
-                </div>
-                <p class="type">Saveur : {{ objet.type_saveur.value | default("inconnue") }}</p>
-                <p class="type">Pâte : {{ objet.type_pate.value | default("inconnue") }}</p>
-                <p class="type">Texture : {{ objet.type_texture.value | default("inconnue") }}</p>
-                <p class="type">Description : {{ objet.description | default("Flantastique") }}</p>
-                <p class="flan-price">Prix : {{ "%.2f"|format(objet.prix) }} €</p>
-                {{ afficher_boutons_actions(objet, current_user, 'id_flan', 'main.gerer_flan', 'main.supprimer_flan', 'main.valider_flan') }}
-            </div>
             {% if current_user.is_authenticated and (current_user.id_user == objet.id_user or current_user.is_admin) %}
-                <div id="modify-form-{{ objet.id_flan }}" style="display: none;">
-                    <form method="POST" action="{{ url_for('main.gerer_flan', id_flan=objet.id_flan) }}">
+                <div id="flan-{{ objet.id_flan }}-display">
+                    <div class="card-content">
+                        <div class="card-header">
+                            <h2>{{ objet.nom | enlever_accents }}</h2>
+                        </div>
+                        <p class="type">Saveur : {{ objet.type_saveur.value | default("inconnue") }}</p>
+                        <p class="type">Pâte : {{ objet.type_pate.value | default("inconnue") }}</p>
+                        <p class="type">Texture : {{ objet.type_texture.value | default("inconnue") }}</p>
+                        <p class="type">Description : {{ objet.description | default("Flantastique") }}</p>
+                        <p class="flan-price">Prix : {{ "%.2f"|format(objet.prix) }} €</p>
+                        {{ afficher_boutons_actions(objet, current_user, 'id_flan', 'main.gerer_flan', 'main.supprimer_flan', 'main.valider_flan') }}
+                    </div>
+                </div>
+                <div id="flan-{{ objet.id_flan }}-edit" style="display: none;">
+                    <form method="POST" action="{{ url_for('main.gerer_flan', id_flan=objet.id_flan) }}" class="form-container">
                         {{ form.hidden_tag() }}
-                        {{ form.nom.label }} {{ form.nom }}
-                        {{ form.description.label }} {{ form.description }}
-                        {{ form.prix.label }} {{ form.prix }}
-                        {{ form.type_pate.label }} {{ form.type_pate }}
-                        {{ form.type_saveur.label }} {{ form.type_saveur }}
-                        {{ form.type_texture.label }} {{ form.type_texture }}
-                        <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
-                        <button type="button" class="btn btn-secondary" onclick="cancelEdit({{ objet.id_flan }})">Annuler</button>
+                        <div class="form-group">
+                            <label for="nom-{{ objet.id_flan }}" class="form-label">Nom</label>
+                            <input type="text" id="nom-{{ objet.id_flan }}" name="nom" class="form-control" value="{{ objet.nom }}">
+                        </div>
+                                            <div class="form-group">
+                            <label for="type_saveur-{{ objet.id_flan }}" class="form-label">Type de saveur</label>
+                            <select id="type_saveur-{{ objet.id_flan }}" name="type_saveur" class="form-control">
+                                {% for choice in form.type_saveur.choices %}
+                                    <option value="{{ choice[0] }}" {% if choice[0] == objet.type_saveur.value %}selected{% endif %}>{{ choice[1] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="type_pate-{{ objet.id_flan }}" class="form-label">Type de pâte</label>
+                            <select id="type_pate-{{ objet.id_flan }}" name="type_pate" class="form-control">
+                                {% for choice in form.type_pate.choices %}
+                                    <option value="{{ choice[0] }}" {% if choice[0] == objet.type_pate.value %}selected{% endif %}>{{ choice[1] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="type_texture-{{ objet.id_flan }}" class="form-label">Type de texture</label>
+                            <select id="type_texture-{{ objet.id_flan }}" name="type_texture" class="form-control">
+                                {% for choice in form.type_texture.choices %}
+                                    <option value="{{ choice[0] }}" {% if choice[0] == objet.type_texture.value %}selected{% endif %}>{{ choice[1] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="description-{{ objet.id_flan }}" class="form-label">Description</label>
+                            <textarea id="description-{{ objet.id_flan }}" name="description" class="form-control">{{ objet.description }}</textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="prix-{{ objet.id_flan }}" class="form-label">Prix</label>
+                            <input type="number" id="prix-{{ objet.id_flan }}" name="prix" class="form-control" value="{{ objet.prix }}">
+                        </div>
+
+
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                            <button type="button" class="btn btn-secondary" onclick="cancelEdit({{ objet.id_flan }})">Annuler</button>
+                        </div>
                     </form>
+                </div>
+            {% else %}
+                <div class="card-content">
+                    <div class="card-header">
+                        <h2>{{ objet.nom | enlever_accents }}</h2>
+                    </div>
+                    <p class="type">Saveur : {{ objet.type_saveur.value | default("inconnue") }}</p>
+                    <p class="type">Pâte : {{ objet.type_pate.value | default("inconnue") }}</p>
+                    <p class="type">Texture : {{ objet.type_texture.value | default("inconnue") }}</p>
+                    <p class="type">Description : {{ objet.description | default("Flantastique") }}</p>
+                    <p class="flan-price">Prix : {{ "%.2f"|format(objet.prix) }} €</p>
                 </div>
             {% endif %}
         </div>
         <script>
             function editFlan(idFlan) {
-                document.getElementById('modify-form-' + idFlan).style.display = 'block';
+                document.getElementById('flan-' + idFlan + '-display').style.display = 'none';
+                document.getElementById('flan-' + idFlan + '-edit').style.display = 'block';
             }
             function cancelEdit(idFlan) {
-                document.getElementById('modify-form-' + idFlan).style.display = 'none';
+                document.getElementById('flan-' + idFlan + '-display').style.display = 'block';
+                document.getElementById('flan-' + idFlan + '-edit').style.display = 'none';
             }
         </script>
     {% elif type == 'evaluation' %}
@@ -175,6 +183,7 @@
         </script>
     {% endif %}
 {% endmacro %}
+
 
 
 <!-- MACROS D'AFFICHAGE DE CRITÈRES D'ÉVALUATION -->
