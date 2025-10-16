@@ -189,51 +189,45 @@ def afficher_etablissement_unique(id_etab):
     return render_template('page_etablissement.html', etablissement=etablissement, form_flan=form_flan, form_etab=form_etab, current_user=current_user)
 
 @main_bp.route('/flan/<int:id_flan>', methods=['GET', 'POST'])
-def afficher_flan_unique(id_flan):
-    flan_unique = Flan.query.get_or_404(id_flan)
-    form_eval = EvalForm()  # Formulaire pour évaluer le flan
-    form_flan = NewFlanForm(obj=flan_unique)  # Formulaire pour modifier le flan
-
-    if form_eval.validate_on_submit():  # Si le formulaire pour évaluer le flan est soumis
-        evaluation = mise_a_jour_evaluation(form_eval, id_flan, current_user.id_user, current_user.is_admin)
-        return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
-
-    if form_flan.validate_on_submit():  # Si le formulaire pour modifier le flan est soumis
-        flan_unique.nom = form_flan.nom.data
-        flan_unique.description = form_flan.description.data
-        flan_unique.prix = form_flan.prix.data
-        flan_unique.type_pate = form_flan.type_pate.data
-        flan_unique.type_saveur = form_flan.type_saveur.data
-        flan_unique.type_texture = form_flan.type_texture.data
-        db.session.commit()
-        flash('Le flan a été mis à jour avec succès!', 'success')
-        return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
-
-    return render_template('page_flan.html', flan=flan_unique, form_eval=form_eval, form_flan=form_flan, request=request)
-
-### AUTOUR DU FLAN ###
 @main_bp.route('/etablissement/<int:id_etab>/proposer_flan', methods=['GET', 'POST'])
 @login_required
-def proposer_flan(id_etab):
-    etablissement = Etablissement.query.get_or_404(id_etab)
-    form = NewFlanForm()
-    form.id_etab.data = id_etab
-    if form.validate_on_submit():
-        flan = Flan(
-            nom=form.nom.data,
-            description=form.description.data,
-            prix=form.prix.data,
-            type_pate=form.type_pate.data,
-            type_saveur=form.type_saveur.data,
-            type_texture=form.type_texture.data,
-            id_etab=id_etab,
-            id_user=current_user.id_user
-        )
-        db.session.add(flan)
-        db.session.commit()
-        flash('Votre flan a été proposé avec succès !', 'success')
-        return redirect(url_for('main.afficher_etablissement_unique', id_etab=id_etab))
-    return render_template('page_etablissement.html', form=form, etablissement=etablissement)
+def gerer_flan(id_flan=None, id_etab=None):
+    if id_flan:
+        flan_unique = Flan.query.get_or_404(id_flan)
+        form_flan = NewFlanForm(obj=flan_unique)  # Formulaire pour modifier le flan
+        form_eval = EvalForm()  # Formulaire pour évaluer le flan
+        if form_flan.validate_on_submit():  # Si le formulaire pour modifier le flan est soumis
+            flan_unique.nom = form_flan.nom.data
+            flan_unique.description = form_flan.description.data
+            flan_unique.prix = form_flan.prix.data
+            flan_unique.type_pate = form_flan.type_pate.data
+            flan_unique.type_saveur = form_flan.type_saveur.data
+            flan_unique.type_texture = form_flan.type_texture.data
+            db.session.commit()
+            flash('Le flan a été mis à jour avec succès!', 'success')
+            return redirect(url_for('main.gerer_flan', id_flan=id_flan))
+        return render_template('page_flan.html', flan=flan_unique, form_flan=form_flan, form_eval=form_eval, request=request)
+    else:
+        etablissement = Etablissement.query.get_or_404(id_etab)
+        form = NewFlanForm()
+        form.id_etab.data = id_etab
+        if form.validate_on_submit():
+            flan = Flan(
+                nom=form.nom.data,
+                description=form.description.data,
+                prix=form.prix.data,
+                type_pate=form.type_pate.data,
+                type_saveur=form.type_saveur.data,
+                type_texture=form.type_texture.data,
+                id_etab=id_etab,
+                id_user=current_user.id_user
+            )
+            db.session.add(flan)
+            db.session.commit()
+            flash('Votre flan a été proposé avec succès !', 'success')
+            return redirect(url_for('main.afficher_etablissement_unique', id_etab=id_etab))
+        return render_template('page_etablissement.html', form=form, etablissement=etablissement)
+
 
 @main_bp.route('/valider_flan/<int:id_flan>', methods=['POST'])
 @login_required
@@ -249,28 +243,7 @@ def valider_flan(id_flan):
     except IntegrityError:
         db.session.rollback()
         flash('Une erreur est survenue lors de la validation du flan.', 'danger')
-    return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
-
-@main_bp.route('/modifier_flan/<int:id_flan>', methods=['POST'])
-@login_required
-def modifier_flan(id_flan):
-    flan = Flan.query.get_or_404(id_flan)
-    form = NewFlanForm()
-    if current_user.id_user != flan.id_user and not current_user.is_admin:
-        flash('Vous n\'avez pas le droit de modifier ce flan.', 'danger')
-        return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
-    if form.validate_on_submit():
-        flan.nom = form.nom.data
-        flan.type_saveur = form.type_saveur.data
-        flan.type_texture = form.type_texture.data
-        flan.type_pate = form.type_pate.data
-        flan.description = form.description.data
-        flan.prix = form.prix.data
-        db.session.commit()
-        flash('Le flan a été mis à jour avec succès!', 'success')
-    else:
-        flash('Le formulaire n\'a pas été validé. Veuillez vérifier les erreurs.', 'danger')
-    return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
+    return redirect(url_for('main.gerer_flan', id_flan=id_flan))
 
 @main_bp.route('/supprimer_flan/<int:id_flan>', methods=['POST'])
 @login_required
@@ -372,7 +345,7 @@ def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
             id_user=id_user,
             moyenne=moyenne
         )
-
+    # Si c'est un admin qui évalue, l'évaluation est automatiquement validée
     if is_admin:
         evaluation.statut = 'VALIDE'
 

@@ -98,7 +98,7 @@
             </div>
         </a>
     {% elif type == 'flan' %}
-        <a href="{{ url_for('main.afficher_flan_unique', id_flan=objet.id_flan) }}" class="carte">
+        <a href="{{ url_for('main.gerer_flan', id_flan=objet.id_flan) }}" class="carte">
             <div class="card-image-container">
                 {{ afficher_image_ou_placeholder(objet) }}
                 {{ afficher_badge('flan', objet) }}
@@ -112,7 +112,7 @@
                 <p class="type">Texture : {{ objet.type_texture.value | default("inconnue") }}</p>
                 <p class="type">Description : {{ objet.description | default("Flantastique") }}</p>
                 <p class="flan-price">Prix : {{ "%.2f"|format(objet.prix) }} €</p>
-                {{ afficher_boutons_actions(objet, current_user, 'id_flan', 'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan') }}
+                {{ afficher_boutons_actions(objet, current_user, 'id_flan', 'main.gerer_flan', 'main.supprimer_flan', 'main.valider_flan') }}
             </div>
         </a>
     {% elif type == 'evaluation' %}
@@ -251,6 +251,7 @@
     <!-- Possibilité d'ajout toujours en fin de grille-->
     {{ afficher_bouton_ajout(objet_type, current_user, etablissement, form, flan) }}
 {% endmacro %}
+
 <!-- MACROS POUR PROPOSER DES CHOSES -->
 {% macro afficher_champ_formulaire(field) %}
     <div class="form-group">
@@ -327,7 +328,8 @@
         <div class="card-content">
             <h3>Ajouter un flan</h3>
             {% if current_user.is_authenticated %}
-                {{ afficher_formulaire('flan', form, url_for('main.proposer_flan', id_etab=etablissement.id_etab)) }}
+                {% set action_url = url_for('main.gerer_flan', id_etab=etablissement.id_etab) %}
+                {{ afficher_formulaire('flan', form, action_url) }}
             {% else %}
                 <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
                     Ajouter un flan (connectez-vous)
