@@ -114,7 +114,7 @@
     </a>
 {% endmacro %}
 
-{% macro afficher_flan(flan, current_user) %}
+{% macro afficher_flan(flan, current_user, form) %}
     <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}" class="carte">
         <div class="card-image-container">
             {{ afficher_image_ou_placeholder(flan) }}
@@ -132,6 +132,16 @@
             {{ afficher_boutons_actions(flan, current_user, 'id_flan', 'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan') }}
         </div>
     </a>
+        <script>
+        function editFlan(idFlan)  {
+            document.getElementById('flan-' + idFlan + '-display').style.display = 'none';
+            document.getElementById('flan-' + idFlan + '-edit').style.display = 'block';
+        }
+        function cancelEdit(idFlan) {
+            document.getElementById('flan-' + idFlan + '-display').style.display = 'block';
+            document.getElementById('flan-' + idFlan + '-edit').style.display = 'none';
+        }
+    </script>
 {% endmacro %}
 
 
@@ -274,7 +284,7 @@
     {% if objet_type == 'etablissement' %}
         {{ afficher_etablissement(objet, current_user) }}
     {% elif objet_type == 'flan' %}
-        {{ afficher_flan(objet, current_user) }}
+        {{ afficher_flan(objet, current_user, form) }}
     {% elif objet_type == 'evaluation' %}
         {{ afficher_evaluation(objet, current_user, form) }}
     {% endif %}
