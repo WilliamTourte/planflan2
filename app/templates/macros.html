@@ -39,9 +39,10 @@
         {% if current_user.id_user == objet.id_user and not objet.statut.value == 'VALIDE' %}
             <div class="action-buttons d-flex gap-1">
                 {# Bouton de modification : appelle la fonction editEvaluation pour afficher le formulaire #}
-                <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editEvaluation({{ objet.id_eval }})">
-                    <i class="bi bi-pencil"></i>
-                </button>
+                <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editEvaluation({{ objet[id_field] }})">
+    <i class="bi bi-pencil"></i>
+</button>
+
                 {# Bouton de suppression : utilise id_field pour identifier l'objet à supprimer #}
                 <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
                     <button type="submit" class="btn btn-danger btn-sm square-btn" title="Supprimer">
@@ -61,9 +62,10 @@
                         </button>
                     </form>
                     {# Bouton de modification : appelle la fonction editEvaluation pour afficher le formulaire #}
-                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editEvaluation({{ objet.id_eval }})">
-                        <i class="bi bi-pencil"></i>
-                    </button>
+                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editEvaluation({{ objet[id_field] }})">
+    <i class="bi bi-pencil"></i>
+</button>
+
                     {# Bouton de suppression : utilise id_field pour identifier l'objet à supprimer #}
                     <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
                         <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
@@ -75,9 +77,10 @@
             {% else %}
                 <div class="action-buttons d-flex gap-1">
                     {# Bouton de modification : appelle la fonction editEvaluation pour afficher le formulaire directement dans la carte #}
-                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editEvaluation({{ objet.id_eval }})">
-                        <i class="bi bi-pencil"></i>
-                    </button>
+                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editEvaluation({{ objet[id_field] }})">
+    <i class="bi bi-pencil"></i>
+</button>
+
                     {# Bouton de suppression : utilise id_field pour identifier l'objet à supprimer #}
                     <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
                         <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
