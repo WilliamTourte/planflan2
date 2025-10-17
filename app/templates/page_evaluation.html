@@ -8,5 +8,12 @@
       <h1>Évaluation</h1>
       {{ afficher_objet('evaluation', evaluation, current_user, form) }}
 
+          <!-- Bouton retour -->
+        <div>
+            <a href="{{ url_for('main.afficher_flan_unique', id_flan=evaluation.flan.id_flan) }}" class="btn btn-back btn-with-icon">
+                <i class="fas fa-arrow-left"></i>
+                Retour à {{ evaluation.flan.nom }} de {{ evaluation.flan.etablissement.nom }}
+            </a>
+        </div>
   </div>
 {% endblock %}
