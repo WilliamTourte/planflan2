@@ -32,14 +32,14 @@
     {% endif %}
 {% endmacro %}
 
-{% macro afficher_boutons_actions(objet, current_user, id_field, modify_route, delete_route, validate_route) %}
+{% macro afficher_boutons_actions(objet, current_user, id_field, modify_route, delete_route, validate_route, type_objet) %}
     {# Vérifie si l'utilisateur est authentifié #}
     {% if current_user.is_authenticated %}
         {# Vérifie si l'utilisateur est le propriétaire de l'objet et que l'objet n'est pas validé #}
         {% if current_user.id_user == objet.id_user and not objet.statut.value == 'VALIDE' %}
             <div class="action-buttons d-flex gap-1">
-                {# Bouton de modification : appelle la fonction editEvaluation pour afficher le formulaire #}
-                <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editEvaluation({{ objet.id_eval }})">
+                {# Bouton de modification : appelle la fonction editObjet pour afficher le formulaire #}
+                <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
                     <i class="bi bi-pencil"></i>
                 </button>
                 {# Bouton de suppression : utilise id_field pour identifier l'objet à supprimer #}
@@ -60,8 +60,8 @@
                             <i class="bi bi-check"></i>
                         </button>
                     </form>
-                    {# Bouton de modification : appelle la fonction editEvaluation pour afficher le formulaire #}
-                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editEvaluation({{ objet.id_eval }})">
+                    {# Bouton de modification : appelle la fonction editObjet pour afficher le formulaire #}
+                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
                         <i class="bi bi-pencil"></i>
                     </button>
                     {# Bouton de suppression : utilise id_field pour identifier l'objet à supprimer #}
@@ -74,8 +74,8 @@
             {# Si l'objet est déjà validé, affiche seulement les boutons de modification et de suppression #}
             {% else %}
                 <div class="action-buttons d-flex gap-1">
-                    {# Bouton de modification : appelle la fonction editEvaluation pour afficher le formulaire directement dans la carte #}
-                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editEvaluation({{ objet.id_eval }})">
+                    {# Bouton de modification : appelle la fonction editObjet pour afficher le formulaire directement dans la carte #}
+                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
                         <i class="bi bi-pencil"></i>
                     </button>
                     {# Bouton de suppression : utilise id_field pour identifier l'objet à supprimer #}
@@ -90,8 +90,9 @@
     {% endif %}
 {% endmacro %}
 
+
 <!-- MACROS D'AFFICHAGE D'OBJETS -->
-{% macro afficher_etablissement(etablissement, current_user) %}
+{% macro afficher_etablissement(etablissement, current_user, form) %}
     <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}" class="carte" data-id="{{ etablissement.id_etab }}" data-lat="{{ etablissement.latitude }}" data-lng="{{ etablissement.longitude }}">
         <div class="card-image-container">
             {{ afficher_image_ou_placeholder(etablissement) }}
@@ -111,13 +112,13 @@
     </a>
 {% endmacro %}
 
-{% macro afficher_flan(flan, current_user) %}
-    <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}" class="carte">
-        <div class="card-image-container">
-            {{ afficher_image_ou_placeholder(flan) }}
-            {{ afficher_badge_flan(flan) }}
-        </div>
+{% macro afficher_flan(flan, current_user, form) %}
+    <div class="card">
         <div class="card-content">
+            <div class="card-image-container">
+                {{ afficher_image_ou_placeholder(flan) }}
+                {{ afficher_badge_flan(flan) }}
+            </div>
             <div class="card-header">
                 <h2>{{ flan.nom | enlever_accents }}</h2>
             </div>
@@ -126,10 +127,28 @@
             <p class="type">Texture : {{ flan.type_texture.value | default("inconnue") }}</p>
             <p class="type">Description : {{ flan.description | default("Flantastique") }}</p>
             <p class="flan-price">Prix : {{ "%.2f"|format(flan.prix) }} €</p>
-            {{ afficher_boutons_actions(flan, current_user, 'id_flan', 'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan') }}
+            {% if current_user.is_authenticated and (current_user.id_user == flan.id_user or current_user.is_admin) %}
+                <div id="flan-{{ flan.id_flan }}-display">
+                    {{ afficher_boutons_actions(flan, current_user, 'id_flan', 'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan', 'flan') }}
+                </div>
+                {{ afficher_formulaire_edition_flan(flan, form) }}
+            {% else %}
+                {{ afficher_boutons_actions(flan, current_user, 'id_flan', 'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan', 'flan') }}
+            {% endif %}
         </div>
-    </a>
+    </div>
+    <script>
+        function editFlan(idFlan) {
+            document.getElementById('flan-' + idFlan + '-display').style.display = 'none';
+            document.getElementById('flan-' + idFlan + '-edit').style.display = 'block';
+        }
+        function cancelEdit(idFlan) {
+            document.getElementById('flan-' + idFlan + '-display').style.display = 'block';
+            document.getElementById('flan-' + idFlan + '-edit').style.display = 'none';
+        }
+    </script>
 {% endmacro %}
+
 
 {% macro afficher_evaluation(evaluation, current_user, form) %}
     <div class="card">
@@ -147,7 +166,7 @@
             {% if current_user.is_authenticated and (current_user.id_user == evaluation.id_user or current_user.is_admin) %}
                 <div id="evaluation-{{ evaluation.id_eval }}-display">
                     {{ afficher_criteres_evaluation(evaluation) }}
-                    {{ afficher_boutons_actions(evaluation, current_user, 'id_eval', 'main.afficher_evaluation_unique', 'main.supprimer_evaluation', 'main.valider_evaluation') }}
+                    {{ afficher_boutons_actions(evaluation, current_user, 'id_eval', 'main.afficher_evaluation_unique', 'main.supprimer_evaluation', 'main.valider_evaluation', 'evaluation') }}
                 </div>
                 {{ afficher_formulaire_edition_evaluation(evaluation, form) }}
             {% else %}
@@ -268,9 +287,9 @@
 <!-- Afficher un objet, que ce soit sur sa page ou dans une grille -->
 {% macro afficher_objet(objet_type, objet, current_user=None, form=None) %}
     {% if objet_type == 'etablissement' %}
-        {{ afficher_etablissement(objet, current_user) }}
+        {{ afficher_etablissement(objet, current_user, form) }}
     {% elif objet_type == 'flan' %}
-        {{ afficher_flan(objet, current_user) }}
+        {{ afficher_flan(objet, current_user, form) }}
     {% elif objet_type == 'evaluation' %}
         {{ afficher_evaluation(objet, current_user, form) }}
     {% endif %}
@@ -436,4 +455,52 @@
             {{ form.submit(class="btn btn-proposer") }}
         </div>
     </form>
+{% endmacro %}
+
+{% macro afficher_formulaire_edition_flan(flan, form) %}
+    <div id="flan-{{ flan.id_flan }}-edit" style="display: none;">
+        <form method="POST" action="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}" class="form-container">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                <label for="nom-{{ flan.id_flan }}" class="form-label">Nom</label>
+                <input type="text" id="nom-{{ flan.id_flan }}" name="nom" class="form-control" value="{{ flan.nom }}">
+            </div>
+            <div class="form-group">
+                <label for="type_saveur-{{ flan.id_flan }}" class="form-label">Saveur</label>
+                <select id="type_saveur-{{ flan.id_flan }}" name="type_saveur" class="form-control">
+                    {% for choice in form.type_saveur.choices %}
+                        <option value="{{ choice[0] }}" {% if choice[0] == flan.type_saveur.value %}selected{% endif %}>{{ choice[1] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="type_pate-{{ flan.id_flan }}" class="form-label">Pâte</label>
+                <select id="type_pate-{{ flan.id_flan }}" name="type_pate" class="form-control">
+                    {% for choice in form.type_pate.choices %}
+                        <option value="{{ choice[0] }}" {% if choice[0] == flan.type_pate.value %}selected{% endif %}>{{ choice[1] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="type_texture-{{ flan.id_flan }}" class="form-label">Texture</label>
+                <select id="type_texture-{{ flan.id_flan }}" name="type_texture" class="form-control">
+                    {% for choice in form.type_texture.choices %}
+                        <option value="{{ choice[0] }}" {% if choice[0] == flan.type_texture.value %}selected{% endif %}>{{ choice[1] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="description-{{ flan.id_flan }}" class="form-label">Description</label>
+                <textarea id="description-{{ flan.id_flan }}" name="description" class="form-control">{{ flan.description }}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="prix-{{ flan.id_flan }}" class="form-label">Prix</label>
+                <input type="number" step="0.01" id="prix-{{ flan.id_flan }}" name="prix" class="form-control" value="{{ flan.prix }}">
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                <button type="button" class="btn btn-secondary" onclick="cancelEdit({{ flan.id_flan }})">Annuler</button>
+            </div>
+        </form>
+    </div>
 {% endmacro %}
