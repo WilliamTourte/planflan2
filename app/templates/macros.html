@@ -47,7 +47,7 @@
                 {% if objet.flans %}
                     <p class="flans-count">{{ objet.flans|length }} flan{{ 's' if objet.flans|length > 1 else '' }}</p>
                 {% endif %}
-                {{ afficher_boutons_actions(objet, current_user, 'id_etab', 'maps.modifier_etablissement', 'maps.supprimer_etablissement', 'maps.valider_etablissement') }}
+                {{ afficher_boutons_actions(objet, current_user, 'id_etab', 'maps.modifier_etablissement', 'maps.supprimer_etablissement', 'maps.valider_etablissement', etablissement) }}
             </div>
         </a>
     {% elif type == 'flan' %}
@@ -67,7 +67,7 @@
                         <p class="type">Texture : {{ objet.type_texture.value | default("inconnue") }}</p>
                         <p class="type">Description : {{ objet.description | default("Flantastique") }}</p>
                         <p class="flan-price">Prix : {{ "%.2f"|format(objet.prix) }} €</p>
-                        {{ afficher_boutons_actions(objet, current_user, 'id_flan', 'main.gerer_flan', 'main.supprimer_flan', 'main.valider_flan') }}
+                        {{ afficher_boutons_actions(objet, current_user, 'id_flan', 'main.gerer_flan', 'main.supprimer_flan', 'main.valider_flan', 'flan') }}
                     </div>
                 </div>
                 <div id="flan-{{ objet.id_flan }}-edit" style="display: none;">
@@ -159,7 +159,7 @@
                 {% if current_user.is_authenticated and (current_user.id_user == objet.id_user or current_user.is_admin) %}
                     <div id="evaluation-{{ objet.id_eval }}-display">
                         {{ afficher_criteres_evaluation(objet) }}
-                        {{ afficher_boutons_actions(objet, current_user, 'id_eval', 'main.gerer_evaluation', 'main.supprimer_evaluation', 'main.valider_evaluation') }}
+                        {{ afficher_boutons_actions(objet, current_user, 'id_eval', 'main.gerer_evaluation', 'main.supprimer_evaluation', 'main.valider_evaluation', 'evaluation') }}
                     </div>
                     {{ afficher_formulaire_edition_evaluation(objet, form) }}
                 {% else %}
@@ -340,15 +340,25 @@
         </div>
     </form>
 {% endmacro %}
-
 <!-- MACROS DE BOUTONS D'ACTIONS -->
-{% macro afficher_boutons_actions(objet, current_user, id_field, modify_route, delete_route, validate_route) %}
+
+{% macro afficher_boutons_actions(objet, current_user, id_field, modify_route, delete_route, validate_route, type_objet) %}
     {% if current_user.is_authenticated %}
         {% if current_user.id_user == objet.id_user and not objet.statut.value == 'VALIDE' %}
             <div class="action-buttons d-flex gap-1">
-                <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editFlan({{ objet[id_field] }})">
-                    <i class="bi bi-pencil"></i>
-                </button>
+                {% if type_objet == 'evaluation' %}
+                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editEvaluation({{ objet[id_field] }})">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                {% elif type_objet == 'flan' %}
+                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editFlan({{ objet[id_field] }})">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                {% elif type_objet == 'etablissement' %}
+                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editEtablissement({{ objet[id_field] }})">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                {% endif %}
                 <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <button type="submit" class="btn btn-danger btn-sm square-btn" title="Supprimer">
@@ -359,15 +369,27 @@
         {% elif current_user.is_admin %}
             {% if objet.statut.value == 'EN_ATTENTE' %}
                 <div class="action-buttons d-flex gap-1">
-                    <form method="POST" action="{{ url_for(validate_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <button type="submit" class="btn btn-success square-btn" title="Valider">
-                            <i class="bi bi-check"></i>
+                    {% if validate_route %}
+                        <form method="POST" action="{{ url_for(validate_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <button type="submit" class="btn btn-success square-btn" title="Valider">
+                                <i class="bi bi-check"></i>
+                            </button>
+                        </form>
+                    {% endif %}
+                    {% if type_objet == 'evaluation' %}
+                        <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editEvaluation({{ objet[id_field] }})">
+                            <i class="bi bi-pencil"></i>
                         </button>
-                    </form>
-                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editFlan({{ objet[id_field] }})">
-                        <i class="bi bi-pencil"></i>
-                    </button>
+                    {% elif type_objet == 'flan' %}
+                        <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editFlan({{ objet[id_field] }})">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                    {% elif type_objet == 'etablissement' %}
+                        <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editEtablissement({{ objet[id_field] }})">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                    {% endif %}
                     <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
@@ -377,9 +399,19 @@
                 </div>
             {% else %}
                 <div class="action-buttons d-flex gap-1">
-                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editFlan({{ objet[id_field] }})">
-                        <i class="bi bi-pencil"></i>
-                    </button>
+                    {% if type_objet == 'evaluation' %}
+                        <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editEvaluation({{ objet[id_field] }})">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                    {% elif type_objet == 'flan' %}
+                        <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editFlan({{ objet[id_field] }})">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                    {% elif type_objet == 'etablissement' %}
+                        <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editEtablissement({{ objet[id_field] }})">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                    {% endif %}
                     <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
@@ -391,6 +423,7 @@
         {% endif %}
     {% endif %}
 {% endmacro %}
+
 
 
 <!-- MACROS DE BOUTONS D'AJOUT -->
