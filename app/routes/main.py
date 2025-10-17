@@ -1,7 +1,7 @@
 from flask import Blueprint, session, render_template, redirect, url_for, request, current_app, flash
 from flask_login import login_required, current_user
 from sqlalchemy.exc import IntegrityError
-from app.forms import EvalForm, NewFlanForm, ChercheEtabForm, UpdateProfileForm, EtabForm
+from app.forms import EvalForm, NewFlanForm, RechercheForm, UpdateProfileForm, EtabForm
 from app.models import Etablissement, Flan, Evaluation, Utilisateur
 from app import db, bcrypt
 
@@ -123,9 +123,12 @@ def dashboard():
 @main_bp.route('/rechercher', methods=['GET', 'POST'])
 def rechercher():
     from app.outils import afficher_etablissements
-    form = ChercheEtabForm()
+    from app.models import Flan  # Assurez-vous d'importer le modèle Flan si ce n'est pas déjà fait
+
+    form = RechercheForm()
     form2 = EtabForm()
     query = Etablissement.query
+
     def apply_filters(query, params):
         search_term = params.get('nom')
         if search_term:
@@ -133,17 +136,46 @@ def rechercher():
                 (Etablissement.nom.ilike(f'%{search_term}%')) |
                 (Etablissement.ville.ilike(f'%{search_term}%'))
             )
+
+        ville = params.get('ville')
+        if ville:
+            query = query.filter(Etablissement.ville.ilike(f'%{ville}%'))
+
+        type_saveur = params.get('type_saveur')
+        if type_saveur and type_saveur != 'tous':
+            query = query.join(Flan).filter(Flan.type_saveur == type_saveur)
+
+        type_pate = params.get('type_pate')
+        if type_pate and type_pate != 'tous':
+            query = query.join(Flan).filter(Flan.type_pate == type_pate)
+
+        type_texture = params.get('type_texture')
+        if type_texture and type_texture != 'tous':
+            query = query.join(Flan).filter(Flan.type_texture == type_texture)
+
+        prix = params.get('prix')
+        if prix and prix != 'tous':
+            if prix == '0':
+                query = query.join(Flan).filter(Flan.prix < 2.5)
+            elif prix == '2.5':
+                query = query.join(Flan).filter(Flan.prix >= 2.5, Flan.prix < 5)
+            elif prix == '5':
+                query = query.join(Flan).filter(Flan.prix >= 5)
+
         if params.get('visite') == 'oui':
             query = query.filter(Etablissement.visite == 1)
         elif params.get('visite') == 'non':
             query = query.filter(Etablissement.visite == 0)
+
         if params.get('labellise') == 'oui':
             query = query.filter(Etablissement.label == 1)
         elif params.get('labellise') == 'non':
             query = query.filter(Etablissement.label == 0)
+
         return query
+
     if request.method == 'GET':
-        has_search_params = any(request.args.get(k) for k in ['nom', 'visite', 'labellise'])
+        has_search_params = any(request.args.get(k) for k in ['nom', 'ville', 'type_saveur', 'type_pate', 'type_texture', 'prix', 'visite', 'labellise'])
         if has_search_params:
             query = apply_filters(query, request.args)
         else:
@@ -152,11 +184,16 @@ def rechercher():
         query = apply_filters(query, {
             'nom': form.nom.data,
             'ville': form.ville.data,
+            'type_saveur': form.type_saveur.data,
+            'type_pate': form.type_pate.data,
+            'type_texture': form.type_texture.data,
+            'prix': form.prix.data,
             'visite': form.visite.data,
             'labellise': form.labellise.data
         })
     else:
         return render_template('rechercher.html', form=form, form2=form2)
+
     resultats = query.all()
     etablissements, etablissements_json = afficher_etablissements(resultats)
     session['resultats_recherche'] = etablissements_json
@@ -165,6 +202,8 @@ def rechercher():
                            etablissements_json=etablissements_json,
                            google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
                            form2=form2)
+
+
 
 ### ROUTES D'AFFICHAGE POUR PAGES (ETABLISSEMENT, FLAN)###
 @main_bp.route('/etablissement/<int:id_etab>', methods=['GET', 'POST'])

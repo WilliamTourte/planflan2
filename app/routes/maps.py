@@ -9,7 +9,7 @@ import re
 from flask import Blueprint, session, render_template, redirect, url_for, request, current_app, flash
 from flask_login import login_required, current_user
 from sqlalchemy.exc import IntegrityError
-from app.forms import EvalForm, NewFlanForm, ChercheEtabForm, UpdateProfileForm, EtabForm
+from app.forms import EvalForm, NewFlanForm, RechercheForm, UpdateProfileForm, EtabForm
 from app.models import Etablissement, Flan, Evaluation, Utilisateur, TypeEtab
 from app import db, bcrypt
 
