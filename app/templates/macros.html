@@ -29,27 +29,96 @@
         {% endif %}
     {% endif %}
 {% endmacro %}
-
 <!-- MACROS D'AFFICHAGE D'OBJETS -->
 {% macro afficher_objet(type, objet, current_user=None, form=None) %}
     {% if type == 'etablissement' %}
-        <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=objet.id_etab) }}" class="carte" data-id="{{ objet.id_etab }}" data-lat="{{ objet.latitude }}" data-lng="{{ objet.longitude }}">
-            <div class="card-image-container">
-                {{ afficher_image_ou_placeholder(objet) }}
-                {{ afficher_badge('etablissement', objet) }}
-            </div>
-            <div class="card-content">
-                <div class="card-header">
-                    <h2>{{ objet.nom | enlever_accents }}</h2>
+        <div class="etablissement-card">
+            {% if current_user.is_authenticated and (current_user.id_user == objet.id_user or current_user.is_admin) %}
+                <div id="etablissement-{{ objet.id_etab }}-display">
+                    <div class="card-image-container">
+                        {{ afficher_image_ou_placeholder(objet) }}
+                        {{ afficher_badge('etablissement', objet) }}
+                    </div>
+                    <div class="card-content">
+                        <div class="card-header">
+                            <h2>{{ objet.nom | enlever_accents }}</h2>
+                        </div>
+                        <p class="type">{{ objet.type_etab.value }}</p>
+                        <p class="adresse">{{ objet.adresse }}, {{ objet.ville }}</p>
+                        {% if objet.flans %}
+                            <p class="flans-count">{{ objet.flans|length }} flan{{ 's' if objet.flans|length > 1 else '' }}</p>
+                        {% endif %}
+                        {{ afficher_boutons_actions(objet, current_user, 'id_etab', 'maps.modifier_etablissement', 'maps.supprimer_etablissement', 'maps.valider_etablissement', 'etablissement') }}
+                    </div>
                 </div>
-                <p class="type">{{ objet.type_etab.value }}</p>
-                <p class="adresse">{{ objet.adresse }}, {{ objet.ville }}</p>
-                {% if objet.flans %}
-                    <p class="flans-count">{{ objet.flans|length }} flan{{ 's' if objet.flans|length > 1 else '' }}</p>
-                {% endif %}
-                {{ afficher_boutons_actions(objet, current_user, 'id_etab', 'maps.modifier_etablissement', 'maps.supprimer_etablissement', 'maps.valider_etablissement', etablissement) }}
-            </div>
-        </a>
+                <div id="etablissement-{{ objet.id_etab }}-edit" style="display: none;">
+                    <form method="POST" action="{{ url_for('maps.modifier_etablissement', id_etab=objet.id_etab) }}" class="form-container">
+                        {{ form.hidden_tag() }}
+                        <div class="form-group">
+                            <label for="nom-{{ objet.id_etab }}" class="form-label">Nom</label>
+                            <input type="text" id="nom-{{ objet.id_etab }}" name="nom" class="form-control" value="{{ objet.nom }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="description-{{ objet.id_etab }}" class="form-label">Description</label>
+                            <textarea id="description-{{ objet.id_etab }}" name="description" class="form-control">{{ objet.description }}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="adresse-{{ objet.id_etab }}" class="form-label">Adresse</label>
+                            <input type="text" id="adresse-{{ objet.id_etab }}" name="adresse" class="form-control" value="{{ objet.adresse }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="ville-{{ objet.id_etab }}" class="form-label">Ville</label>
+                            <input type="text" id="ville-{{ objet.id_etab }}" name="ville" class="form-control" value="{{ objet.ville }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="code_postal-{{ objet.id_etab }}" class="form-label">Code Postal</label>
+                            <input type="text" id="code_postal-{{ objet.id_etab }}" name="code_postal" class="form-control" value="{{ objet.code_postal }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="latitude-{{ objet.id_etab }}" class="form-label">Latitude</label>
+                            <input type="text" id="latitude-{{ objet.id_etab }}" name="latitude" class="form-control" value="{{ objet.latitude }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="longitude-{{ objet.id_etab }}" class="form-label">Longitude</label>
+                            <input type="text" id="longitude-{{ objet.id_etab }}" name="longitude" class="form-control" value="{{ objet.longitude }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="type_etab-{{ objet.id_etab }}" class="form-label">Type d'établissement</label>
+                            <select id="type_etab-{{ objet.id_etab }}" name="type_etab" class="form-control">
+                                {% for choice in form.type_etab.choices %}
+                                    <option value="{{ choice[0] }}" {% if choice[0] == objet.type_etab.value %}selected{% endif %}>{{ choice[1] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                            <button type="button" class="btn btn-secondary" onclick="cancelEdit({{ objet.id_etab }})">Annuler</button>
+                        </div>
+                    </form>
+                </div>
+            {% else %}
+                <div class="card-content">
+                    <div class="card-header">
+                        <h2>{{ objet.nom | enlever_accents }}</h2>
+                    </div>
+                    <p class="type">{{ objet.type_etab.value }}</p>
+                    <p class="adresse">{{ objet.adresse }}, {{ objet.ville }}</p>
+                    {% if objet.flans %}
+                        <p class="flans-count">{{ objet.flans|length }} flan{{ 's' if objet.flans|length > 1 else '' }}</p>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+        <script>
+            function editEtablissement(idEtablissement) {
+                document.getElementById('etablissement-' + idEtablissement + '-display').style.display = 'none';
+                document.getElementById('etablissement-' + idEtablissement + '-edit').style.display = 'block';
+            }
+            function cancelEdit(idEtablissement) {
+                document.getElementById('etablissement-' + idEtablissement + '-display').style.display = 'block';
+                document.getElementById('etablissement-' + idEtablissement + '-edit').style.display = 'none';
+            }
+        </script>
     {% elif type == 'flan' %}
         <div class="flan-card">
             <div class="card-image-container">
