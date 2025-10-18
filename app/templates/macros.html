@@ -115,7 +115,7 @@
 {% endmacro %}
 
 {% macro afficher_flan(flan, current_user, form) %}
-    <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}" class="carte">
+    <div class="carte">
         <div class="card-image-container">
             {{ afficher_image_ou_placeholder(flan) }}
             {{ afficher_badge_flan(flan) }}
@@ -131,7 +131,7 @@
             <p class="flan-price">Prix : {{ "%.2f"|format(flan.prix) }} €</p>
             {{ afficher_boutons_actions(flan, current_user, 'id_flan', 'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan') }}
         </div>
-    </a>
+    </div>
         <script>
         function editFlan(idFlan)  {
             document.getElementById('flan-' + idFlan + '-display').style.display = 'none';
