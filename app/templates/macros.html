@@ -212,6 +212,7 @@
     </script>
 {% endmacro %}
 
+
 {% macro afficher_formulaire_edition_flan(flan, form) %}
     <div id="flan-{{ flan.id_flan }}-edit" style="display: none;">
         <form method="POST" action="{{ url_for('main.modifier_flan', id_flan=flan.id_flan) }}" class="form-container">
