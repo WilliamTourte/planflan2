@@ -72,14 +72,14 @@ def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
 def index():
     from app.outils import afficher_etablissements
     # Redirection automatique vers la liste des établissements
-    form2 = EtabForm()
+    form_etab = EtabForm()
     resultats = Etablissement.query.all()
     etablissements, etablissements_json = afficher_etablissements(resultats)
     return render_template('liste_etablissements.html',
                            etablissements=etablissements,
                            etablissements_json=etablissements_json,
                            google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
-                           form2=form2)
+                           form_etab=form_etab)
 
 @main_bp.route('/dashboard', methods=['GET', 'POST'])
 @login_required
@@ -126,7 +126,7 @@ def rechercher():
     from app.models import Flan  # Assurez-vous d'importer le modèle Flan si ce n'est pas déjà fait
 
     form = RechercheForm()
-    form2 = EtabForm()
+    form_etab= EtabForm()
     query = Etablissement.query
 
     def apply_filters(query, params):
@@ -179,7 +179,7 @@ def rechercher():
         if has_search_params:
             query = apply_filters(query, request.args)
         else:
-            return render_template('rechercher.html', form=form, form2=form2)
+            return render_template('rechercher.html', form=form, form_etab=form_etab)
     elif form.validate_on_submit():
         query = apply_filters(query, {
             'nom': form.nom.data,
@@ -192,7 +192,7 @@ def rechercher():
             'labellise': form.labellise.data
         })
     else:
-        return render_template('rechercher.html', form=form, form2=form2)
+        return render_template('rechercher.html', form=form, form_etab=form_etab)
 
     resultats = query.all()
     etablissements, etablissements_json = afficher_etablissements(resultats)
@@ -201,7 +201,7 @@ def rechercher():
                            etablissements=etablissements,
                            etablissements_json=etablissements_json,
                            google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
-                           form2=form2)
+                           form_etab=form_etab)
 
 
 

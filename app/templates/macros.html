@@ -93,36 +93,58 @@
 
 
 <!-- MACROS D'AFFICHAGE D'OBJETS -->
-{% macro afficher_etablissement(etablissement, current_user) %}
-    <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}" class="carte" data-id="{{ etablissement.id_etab }}" data-lat="{{ etablissement.latitude }}" data-lng="{{ etablissement.longitude }}">
+{% macro afficher_etablissement(etablissement, current_user, form_etab=None) %}
+    <div class="carte">
         <div class="card-image-container">
             {{ afficher_image_ou_placeholder(etablissement) }}
             {{ afficher_badge_etablissement(etablissement) }}
         </div>
         <div class="card-content">
-            <div class="card-header">
-                <h2>{{ etablissement.nom | enlever_accents }}</h2>
+            <div id="etablissement-{{ etablissement.id_etab }}-display">
+                <div class="card-header">
+                    <h2>{{ etablissement.nom | enlever_accents }}</h2>
+                </div>
+                <p class="type">{{ etablissement.type_etab.value }}</p>
+                <p class="adresse">{{ etablissement.adresse }}, {{ etablissement.ville }}</p>
+                <p class="description">{{ etablissement.description }}</p>
+                {% if etablissement.flans %}
+                    <p class="flans-count">{{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}</p>
+                {% endif %}
+                {{ afficher_boutons_actions(etablissement, current_user, 'id_etab', 'maps.modifier_etablissement', 'maps.supprimer_etablissement', 'maps.valider_etablissement', 'etablissement') }}
             </div>
-            <p class="type">{{ etablissement.type_etab.value }}</p>
-            <p class="adresse">{{ etablissement.adresse }}, {{ etablissement.ville }}</p>
-            {% if etablissement.flans %}
-                <p class="flans-count">{{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}</p>
+            {% if form_etab is not none %}
+                {{ afficher_formulaire_edition_etablissement(etablissement, form_etab, current_user) }}
             {% endif %}
-            {{ afficher_boutons_actions(etablissement, current_user, 'id_etab', 'maps.modifier_etablissement', 'maps.supprimer_etablissement', 'maps.valider_etablissement', 'etablissement') }}
-
         </div>
-    </a>
+    <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}" class="btn btn-primary">Voir plus</a>
+    </div>
     <script>
-    function cancelEdit(idFlan) {
-        document.getElementById('flan-' + idFlan + '-display').style.display = 'block';
-        document.getElementById('flan-' + idFlan + '-edit').style.display = 'none';
-    }
-    function editEtablissement(idEtablissement) {
-        document.getElementById('etablissement-' + idEtablissement + '-display').style.display = 'none';
-        document.getElementById('etablissement-' + idEtablissement + '-edit').style.display = 'block';
-    }
+        function editEtablissement(idEtablissement) {
+            console.log('Editing etablissement with ID:', idEtablissement);
+            var displayElement = document.getElementById('etablissement-' + idEtablissement + '-display');
+            var editElement = document.getElementById('etablissement-' + idEtablissement + '-edit');
+            console.log('Display element:', displayElement);
+            console.log('Edit element:', editElement);
+            if (displayElement && editElement) {
+                displayElement.style.display = 'none';
+                editElement.style.display = 'block';
+            } else {
+                console.error('Elements not found');
+            }
+        }
+        function cancelEdit(idEtablissement) {
+            var displayElement = document.getElementById('etablissement-' + idEtablissement + '-display');
+            var editElement = document.getElementById('etablissement-' + idEtablissement + '-edit');
+            if (displayElement && editElement) {
+                displayElement.style.display = 'block';
+                editElement.style.display = 'none';
+            } else {
+                console.error('Elements not found');
+            }
+        }
     </script>
 {% endmacro %}
+
 
 {% macro afficher_flan(flan, current_user, form) %}
     <div class="carte">
@@ -202,12 +224,27 @@
     </div>
     <script>
         function editEvaluation(idEval) {
-            document.getElementById('evaluation-' + idEval + '-display').style.display = 'none';
-            document.getElementById('evaluation-' + idEval + '-edit').style.display = 'block';
+            console.log('Editing evaluation with ID:', idEval);
+            var displayElement = document.getElementById('evaluation-' + idEval + '-display');
+            var editElement = document.getElementById('evaluation-' + idEval + '-edit');
+            console.log('Display element:', displayElement);
+            console.log('Edit element:', editElement);
+            if (displayElement && editElement) {
+                displayElement.style.display = 'none';
+                editElement.style.display = 'block';
+            } else {
+                console.error('Elements not found');
+            }
         }
         function cancelEdit(idEval) {
-            document.getElementById('evaluation-' + idEval + '-display').style.display = 'block';
-            document.getElementById('evaluation-' + idEval + '-edit').style.display = 'none';
+            var displayElement = document.getElementById('evaluation-' + idEval + '-display');
+            var editElement = document.getElementById('evaluation-' + idEval + '-edit');
+            if (displayElement && editElement) {
+                displayElement.style.display = 'block';
+                editElement.style.display = 'none';
+            } else {
+                console.error('Elements not found');
+            }
         }
     </script>
 {% endmacro %}
@@ -226,6 +263,38 @@
             <div class="form-group">
                 <button type="submit" class="btn btn-primary">Enregistrer</button>
                 <button type="button" class="btn btn-secondary" onclick="cancelEdit({{ flan.id_flan }})">Annuler</button>
+            </div>
+        </form>
+    </div>
+{% endmacro %}
+
+{% macro afficher_formulaire_edition_etablissement(etablissement, form_etab, current_user) %}
+    <div id="etablissement-{{ etablissement.id_etab }}-edit" style="display: none;">
+        <form method="POST" action="{{ url_for('maps.modifier_etablissement', id_etab=etablissement.id_etab) }}" class="form-container">
+            {{ form_etab.hidden_tag() }}
+            {{ afficher_champ_formulaire(form_etab.nom) }}
+            {{ afficher_champ_formulaire(form_etab.adresse) }}
+            {{ afficher_champ_formulaire(form_etab.code_postal) }}
+            {{ afficher_champ_formulaire(form_etab.ville) }}
+            {{ afficher_champ_formulaire(form_etab.latitude) }}
+            {{ afficher_champ_formulaire(form_etab.longitude) }}
+            {{ afficher_champ_formulaire(form_etab.type_etab) }}
+            {% if current_user.is_admin %}
+                <div class="form-group">
+                    <label>Labellisé</label><br>
+                    <input type="radio" name="label" value="Oui" {% if form_etab.label.data == 'Oui' %}checked{% endif %}> Labellisé<br>
+                    <input type="radio" name="label" value="Non" {% if form_etab.label.data == 'Non' %}checked{% endif %}> Non labellisé
+                </div>
+                <div class="form-group">
+                    <label>Visité</label><br>
+                    <input type="radio" name="visite" value="Oui" {% if form_etab.visite.data == 'Oui' %}checked{% endif %}> Visité<br>
+                    <input type="radio" name="visite" value="Non" {% if form_etab.visite.data == 'Non' %}checked{% endif %}> Non visité
+                </div>
+            {% endif %}
+            {{ afficher_champ_formulaire(form_etab.description) }}
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                <button type="button" class="btn btn-secondary" onclick="cancelEdit({{ etablissement.id_etab }})">Annuler</button>
             </div>
         </form>
     </div>
@@ -333,7 +402,7 @@
 <!-- Afficher un objet, que ce soit sur sa page ou dans une grille -->
 {% macro afficher_objet(objet_type, objet, current_user=None, form=None) %}
     {% if objet_type == 'etablissement' %}
-        {{ afficher_etablissement(objet, current_user) }}
+        {{ afficher_etablissement(objet, current_user, form) }}
     {% elif objet_type == 'flan' %}
         {{ afficher_flan(objet, current_user, form) }}
     {% elif objet_type == 'evaluation' %}

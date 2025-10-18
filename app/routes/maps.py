@@ -121,48 +121,50 @@ def ajouter_etablissement():
 @login_required
 def modifier_etablissement(id_etab):
     etablissement = Etablissement.query.get_or_404(id_etab)
-    form = EtabForm()
-    form.type_etab.choices = [(type_etab.name, type_etab.value) for type_etab in TypeEtab]
+    form_etab = EtabForm()  # Créons le formulaire avec un nom plus explicite
+    form_etab.type_etab.choices = [(type_etab.name, type_etab.value) for type_etab in TypeEtab]
 
-    # Vérifier si l'utilisateur est l'auteur de l'établissement ou un admin
     if current_user.id_user != etablissement.id_user and not current_user.is_admin:
         flash('Vous n\'avez pas le droit de modifier cet établissement.', 'error')
         return redirect(url_for('main.index'))
 
     if request.method == 'GET':
-        # Pré-remplir le formulaire avec les données de l'établissement
-        form.nom.data = etablissement.nom
-        form.adresse.data = etablissement.adresse
-        form.code_postal.data = etablissement.code_postal
-        form.ville.data = etablissement.ville
-        form.latitude.data = etablissement.latitude
-        form.longitude.data = etablissement.longitude
-        form.type_etab.data = etablissement.type_etab.name  # Supposons que type_etab est un Enum
-        form.label.data = 'Oui' if etablissement.label else 'Non'
-        form.visite.data = 'Oui' if etablissement.visite else 'Non'
-        form.description.data = etablissement.description
+        # Pré-remplir le formulaire
+        form_etab.nom.data = etablissement.nom
+        form_etab.adresse.data = etablissement.adresse
+        form_etab.code_postal.data = etablissement.code_postal
+        form_etab.ville.data = etablissement.ville
+        form_etab.latitude.data = etablissement.latitude
+        form_etab.longitude.data = etablissement.longitude
+        form_etab.type_etab.data = etablissement.type_etab.name
+        form_etab.label.data = 'Oui' if etablissement.label else 'Non'
+        form_etab.visite.data = 'Oui' if etablissement.visite else 'Non'
+        form_etab.description.data = etablissement.description
 
     elif request.method == 'POST':
-        if form.validate_on_submit():
-            # Mettre à jour les données de l'établissement
-            etablissement.nom = form.nom.data
-            etablissement.adresse = form.adresse.data
-            etablissement.code_postal = form.code_postal.data
-            etablissement.ville = form.ville.data
+        if form_etab.validate_on_submit():
+            # Mise à jour des données
+            etablissement.nom = form_etab.nom.data
+            etablissement.adresse = form_etab.adresse.data
+            etablissement.code_postal = form_etab.code_postal.data
+            etablissement.ville = form_etab.ville.data
             etablissement.latitude = request.form.get('latitude')
             etablissement.longitude = request.form.get('longitude')
-            etablissement.type_etab = TypeEtab[form.type_etab.data]
-            etablissement.label = form.label.data == 'Oui'
-            etablissement.visite = form.visite.data == 'Oui'
-            etablissement.description = form.description.data
-
+            etablissement.type_etab = TypeEtab[form_etab.type_etab.data]
+            etablissement.label = form_etab.label.data == 'Oui'
+            etablissement.visite = form_etab.visite.data == 'Oui'
+            etablissement.description = form_etab.description.data
             db.session.commit()
             flash('Établissement mis à jour avec succès !', 'success')
             return redirect(url_for('main.index'))
 
     etablissements = Etablissement.query.all()
     etablissements, etablissements_json = afficher_etablissements(etablissements)
-    return render_template('liste_etablissements.html', form2=form, etablissements_json=etablissements_json, google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
+    return render_template('liste_etablissements.html',
+                         form_etab=form_etab,  # Passons le formulaire avec le nom explicite
+                         etablissements_json=etablissements_json,
+                         google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
+
 
 @maps_bp.route('/valider_etablissement/<int:id_etab>', methods=['POST'])
 @login_required
