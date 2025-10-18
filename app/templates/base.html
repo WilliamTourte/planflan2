@@ -84,9 +84,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const header = document.querySelector('header');
     const searchBar = document.querySelector('.search-bar');
 
-    window.addEventListener('scroll', function() {
+    function handleScroll() {
         const currentScroll = window.scrollY;
-
         if (currentScroll <= 0) {
             // Si on est en haut de la page, tout est visible
             header.classList.remove('hide');
@@ -103,8 +102,12 @@ document.addEventListener('DOMContentLoaded', function() {
             header.classList.remove('hide');
             searchBar.classList.remove('hide');
         }
-
         lastScroll = currentScroll;
+    }
+
+    // Utilisez requestAnimationFrame pour optimiser les performances
+    window.addEventListener('scroll', function() {
+        requestAnimationFrame(handleScroll);
     });
 });
 </script>

@@ -84,7 +84,7 @@ class Etablissement(db.Model):
     id_user = db.Column(db.Integer, db.ForeignKey('utilisateurs.id_user'), nullable=False, index=True)
 
     # Relations
-    flans = db.relationship('Flan', back_populates='etablissement', lazy=True)
+    flans = db.relationship('Flan', back_populates='etablissement', lazy=True,cascade="all, delete-orphan")
     photos = db.relationship('Photo', back_populates='etablissement', foreign_keys='Photo.id_etab')
     utilisateur = db.relationship('Utilisateur', back_populates='etablissements')
 
@@ -104,7 +104,7 @@ class Flan(db.Model):
     id_user = db.Column(db.Integer, db.ForeignKey('utilisateurs.id_user'), nullable=False, index=True)
 
     # Relations
-    evaluations = db.relationship('Evaluation', back_populates='flan', lazy=True)
+    evaluations = db.relationship('Evaluation', back_populates='flan', lazy=True, cascade="all, delete-orphan")
     photos = db.relationship('Photo', back_populates='flan', foreign_keys='Photo.id_flan')
     etablissement = db.relationship('Etablissement', back_populates='flans')
     utilisateur = db.relationship('Utilisateur', back_populates='flans')

@@ -26,14 +26,47 @@ def extraire_ville(adresse):
 
 def nettoyer_adresse(adresse):
     return adresse.split(',')[0].strip()
+@maps_bp.route('/verifier_etablissement', methods=['POST'])
+def verifier_etablissement():
+    print("Requête reçue pour /verifier_etablissement")
+    data = request.get_json()
+    print(f"Données reçues : {data}")
+    nom = data.get('nom')
+    print(f"Nom de l'établissement : {nom}")
+
+    # Vérifier si l'établissement existe déjà dans la base de données
+    etablissement = Etablissement.query.filter_by(nom=nom).first()
+    if etablissement:
+        print(f"Établissement trouvé : {etablissement.nom}, {etablissement.adresse}")
+        return jsonify({
+            'exists': True,
+            'message': 'Un établissement avec ce nom existe déjà.',
+            'etablissement': {
+                'id_etab': etablissement.id_etab,
+                'nom': etablissement.nom,
+                'adresse': etablissement.adresse,
+                'ville': etablissement.ville,
+                'code_postal': etablissement.code_postal,
+                'latitude': etablissement.latitude,
+                'longitude': etablissement.longitude,
+                'type_etab': etablissement.type_etab.value if etablissement.type_etab else None
+            }
+        })
+    else:
+        print("Aucun établissement trouvé avec ces critères.")
+        return jsonify({'exists': False})
 
 @maps_bp.route('/extraire_infos_adresse', methods=['POST'])
 def extraire_infos_adresse():
+    print("Requête reçue pour /extraire_infos_adresse")
     data = request.get_json()
+    print(f"Données reçues : {data}")
     adresse = data.get('adresse', '')
+    print(f"Adresse reçue : {adresse}")
     code_postal = extraire_code_postal(adresse)
     ville = extraire_ville(adresse)
     adresse_nettoyee = nettoyer_adresse(adresse)
+    print(f"Code postal extrait : {code_postal}, Ville extraite : {ville}, Adresse nettoyée : {adresse_nettoyee}")
     return jsonify({
         'code_postal': code_postal,
         'ville': ville,
@@ -42,27 +75,8 @@ def extraire_infos_adresse():
 
 
 
-
-@maps_bp.route('/verifier_etablissement', methods=['POST'])
-def verifier_etablissement():
-    data = request.get_json()
-    nom = data.get('nom')
-
-    # Vérifier si l'établissement existe déjà dans la base de données
-    etablissement = Etablissement.query.filter_by(nom=nom).first()
-    if etablissement:
-        print(f"Établissement trouvé : {etablissement.nom}, {etablissement.adresse}")
-        return jsonify({
-            'exists': True,
-            'url': url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab)
-        })
-    else:
-        print("Aucun établissement trouvé avec ces critères.")
-        return jsonify({'exists': False})
-
-
-@login_required
 @maps_bp.route('/ajouter_etablissement', methods=['GET', 'POST'])
+@login_required
 def ajouter_etablissement():
     form = EtabForm()
     form.type_etab.choices = [(type_etab.name, type_etab.value) for type_etab in TypeEtab]
@@ -107,7 +121,9 @@ def ajouter_etablissement():
                 label=label,
                 visite=visite
             )
+            print("Nouvel établissement créé :", new_etablissement)
             db.session.add(new_etablissement)
+            print("Établissement ajouté à la session")
             db.session.commit()
             print("Établissement ajouté avec succès")
             flash('Établissement ajouté avec succès !', 'success')
@@ -115,6 +131,7 @@ def ajouter_etablissement():
 
     print("Rendu du template")
     return render_template('liste_etablissements.html', form2=form, etablissements_json=etablissements_json, google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
+
 
 
 @maps_bp.route('/modifier_etablissement/<int:id_etab>', methods=['GET', 'POST'])

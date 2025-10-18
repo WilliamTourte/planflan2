@@ -29,11 +29,12 @@ header {
     position: sticky;
     top: 0;
     z-index: 100;
-    transition: transform 0.3s ease;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 header.hide {
-    transform: translateY(-100%);
+    opacity: 0;
+    visibility: hidden;
 }
 
 header .container {
@@ -70,12 +71,12 @@ header h1 {
     background-color: #fee10d;
     padding: 0.1rem 0;
     margin-bottom: 0;
-    transition: transform 0.3s ease;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
-/* Suppression du position: sticky pour .search-bar car il est maintenant dans le header */
 .search-bar.hide {
-    display: none; /* Changé de transform à display pour une meilleure intégration */
+    opacity: 0;
+    visibility: hidden;
 }
 
 .search-bar .container {
@@ -369,6 +370,7 @@ h1, h2, h3, h4, h5, h6 {
     color: inherit;
     display: block;
 }
+
 .card-header {
     display: flex;
     flex-direction: column;
