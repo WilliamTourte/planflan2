@@ -4,7 +4,7 @@
 <div class="container">
     <!-- Détails du flan -->
     <div class="etablissement-header">
-        {{ afficher_objet('flan', flan) }}
+        {{ afficher_objet('flan', flan, current_user, form_flan) }}
     </div>
     <!-- Grille des évaluations -->
     {{ afficher_grille('evaluation', flan.evaluations, current_user, form_eval, etablissement, flan) }}

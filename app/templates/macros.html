@@ -32,17 +32,16 @@
     {% endif %}
 {% endmacro %}
 
-{% macro afficher_boutons_actions(objet, current_user, id_field, modify_route, delete_route, validate_route) %}
+{% macro afficher_boutons_actions(objet, current_user, id_field, modify_route, delete_route, validate_route, type_objet) %}
     {# Vérifie si l'utilisateur est authentifié #}
     {% if current_user.is_authenticated %}
         {# Vérifie si l'utilisateur est le propriétaire de l'objet et que l'objet n'est pas validé #}
         {% if current_user.id_user == objet.id_user and not objet.statut.value == 'VALIDE' %}
             <div class="action-buttons d-flex gap-1">
-                {# Bouton de modification : appelle la fonction editEvaluation pour afficher le formulaire #}
-                <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editEvaluation({{ objet[id_field] }})">
-    <i class="bi bi-pencil"></i>
-</button>
-
+                {# Bouton de modification : appelle la fonction appropriée pour afficher le formulaire #}
+                <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
+                    <i class="bi bi-pencil"></i>
+                </button>
                 {# Bouton de suppression : utilise id_field pour identifier l'objet à supprimer #}
                 <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
                     <button type="submit" class="btn btn-danger btn-sm square-btn" title="Supprimer">
@@ -61,11 +60,10 @@
                             <i class="bi bi-check"></i>
                         </button>
                     </form>
-                    {# Bouton de modification : appelle la fonction editEvaluation pour afficher le formulaire #}
-                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editEvaluation({{ objet[id_field] }})">
-    <i class="bi bi-pencil"></i>
-</button>
-
+                    {# Bouton de modification : appelle la fonction appropriée pour afficher le formulaire #}
+                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
+                        <i class="bi bi-pencil"></i>
+                    </button>
                     {# Bouton de suppression : utilise id_field pour identifier l'objet à supprimer #}
                     <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
                         <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
@@ -76,11 +74,10 @@
             {# Si l'objet est déjà validé, affiche seulement les boutons de modification et de suppression #}
             {% else %}
                 <div class="action-buttons d-flex gap-1">
-                    {# Bouton de modification : appelle la fonction editEvaluation pour afficher le formulaire directement dans la carte #}
-                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="editEvaluation({{ objet[id_field] }})">
-    <i class="bi bi-pencil"></i>
-</button>
-
+                    {# Bouton de modification : appelle la fonction appropriée pour afficher le formulaire directement dans la carte #}
+                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
+                        <i class="bi bi-pencil"></i>
+                    </button>
                     {# Bouton de suppression : utilise id_field pour identifier l'objet à supprimer #}
                     <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
                         <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
@@ -92,6 +89,7 @@
         {% endif %}
     {% endif %}
 {% endmacro %}
+
 
 <!-- MACROS D'AFFICHAGE D'OBJETS -->
 {% macro afficher_etablissement(etablissement, current_user) %}
@@ -109,9 +107,20 @@
             {% if etablissement.flans %}
                 <p class="flans-count">{{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}</p>
             {% endif %}
-            {{ afficher_boutons_actions(etablissement, current_user, 'id_etab', 'maps.modifier_etablissement', 'maps.supprimer_etablissement', 'maps.valider_etablissement') }}
+            {{ afficher_boutons_actions(etablissement, current_user, 'id_etab', 'maps.modifier_etablissement', 'maps.supprimer_etablissement', 'maps.valider_etablissement', 'etablissement') }}
+
         </div>
     </a>
+    <script>
+    function cancelEdit(idFlan) {
+        document.getElementById('flan-' + idFlan + '-display').style.display = 'block';
+        document.getElementById('flan-' + idFlan + '-edit').style.display = 'none';
+    }
+    function editEtablissement(idEtablissement) {
+        document.getElementById('etablissement-' + idEtablissement + '-display').style.display = 'none';
+        document.getElementById('etablissement-' + idEtablissement + '-edit').style.display = 'block';
+    }
+    </script>
 {% endmacro %}
 
 {% macro afficher_flan(flan, current_user, form) %}
@@ -129,7 +138,8 @@
             <p class="type">Texture : {{ flan.type_texture.value | default("inconnue") }}</p>
             <p class="type">Description : {{ flan.description | default("Flantastique") }}</p>
             <p class="flan-price">Prix : {{ "%.2f"|format(flan.prix) }} €</p>
-            {{ afficher_boutons_actions(flan, current_user, 'id_flan', 'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan') }}
+            <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}"> Afficher plus</a>
+            {{ afficher_boutons_actions(flan, current_user, 'id_flan', 'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan', 'flan') }}
         </div>
     </div>
         <script>
@@ -161,7 +171,7 @@
             {% if current_user.is_authenticated and (current_user.id_user == evaluation.id_user or current_user.is_admin) %}
                 <div id="evaluation-{{ evaluation.id_eval }}-display">
                     {{ afficher_criteres_evaluation(evaluation) }}
-                    {{ afficher_boutons_actions(evaluation, current_user, 'id_eval', 'main.afficher_evaluation_unique', 'main.supprimer_evaluation', 'main.valider_evaluation') }}
+                    {{ afficher_boutons_actions(evaluation, current_user, 'id_eval', 'main.afficher_evaluation_unique', 'main.supprimer_evaluation', 'main.valider_evaluation', 'evaluation') }}
                 </div>
                 {{ afficher_formulaire_edition_evaluation(evaluation, form) }}
             {% else %}
