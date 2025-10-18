@@ -6,13 +6,19 @@
 <div class="container">
     <!-- Détails de l'établissement -->
     <div class="etablissement-header">
-        {{ afficher_objet('etablissement', etablissement) }}
+        {{ afficher_objet('etablissement',etablissement, current_user, form_etab) }}
+
     </div>
 
     <!-- Grille des flans -->
     {{ afficher_grille('flan', etablissement.flans, current_user, form_flan, etablissement) }}
 
     <!-- Bouton retour -->
-    <a href="#" onclick="window.history.back(); return false;" class="btn-back">← Retour à la liste</a>
+           <div>
+            <a href="{{ url_for('main.index') }}" class="btn btn-back btn-with-icon">
+                <i class="fas fa-arrow-left"></i>
+                Retour à l'accueil
+            </a>
+        </div>
 </div>
 {% endblock %}

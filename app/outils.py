@@ -5,6 +5,7 @@ def enlever_accents(text): # Enlève les accents parce que la police ne les gèr
     import unicodedata
     return unicodedata.normalize('NFD', text).encode('ascii', 'ignore').decode('utf-8')
 
+
 def afficher_etablissements(resultats):
     etablissements = resultats
 
