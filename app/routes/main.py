@@ -252,11 +252,9 @@ def afficher_flan_unique(id_flan):
     flan_unique = Flan.query.get_or_404(id_flan)
     form_eval = EvalForm()  # Formulaire pour évaluer le flan
     form_flan = NewFlanForm(obj=flan_unique)  # Formulaire pour modifier le flan
-
     if form_eval.validate_on_submit():  # Si le formulaire pour évaluer le flan est soumis
         evaluation = mise_a_jour_evaluation(form_eval, id_flan, current_user.id_user, current_user.is_admin)
         return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
-
     if form_flan.validate_on_submit():  # Si le formulaire pour modifier le flan est soumis
         flan_unique.nom = form_flan.nom.data
         flan_unique.description = form_flan.description.data
@@ -267,8 +265,8 @@ def afficher_flan_unique(id_flan):
         db.session.commit()
         flash('Le flan a été mis à jour avec succès!', 'success')
         return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
-
     return render_template('page_flan.html', flan=flan_unique, form_eval=form_eval, form_flan=form_flan, request=request)
+
 
 ### AUTOUR DU FLAN ###
 @main_bp.route('/etablissement/<int:id_etab>/proposer_flan', methods=['GET', 'POST'])
@@ -330,6 +328,7 @@ def modifier_flan(id_flan):
     else:
         flash('Le formulaire n\'a pas été validé. Veuillez vérifier les erreurs.', 'danger')
     return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
+
 
 @main_bp.route('/supprimer_flan/<int:id_flan>', methods=['POST'])
 @login_required

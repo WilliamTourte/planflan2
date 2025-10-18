@@ -91,6 +91,7 @@
 {% endmacro %}
 
 
+
 <!-- MACROS D'AFFICHAGE D'OBJETS -->
 {% macro afficher_etablissement(etablissement, current_user) %}
     <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}" class="carte" data-id="{{ etablissement.id_etab }}" data-lat="{{ etablissement.latitude }}" data-lng="{{ etablissement.longitude }}">
@@ -133,26 +134,45 @@
             <div class="card-header">
                 <h2>{{ flan.nom | enlever_accents }}</h2>
             </div>
-            <p class="type">Saveur : {{ flan.type_saveur.value | default("inconnue") }}</p>
-            <p class="type">Pâte : {{ flan.type_pate.value | default("inconnue") }}</p>
-            <p class="type">Texture : {{ flan.type_texture.value | default("inconnue") }}</p>
-            <p class="type">Description : {{ flan.description | default("Flantastique") }}</p>
-            <p class="flan-price">Prix : {{ "%.2f"|format(flan.prix) }} €</p>
-            <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}"> Afficher plus</a>
-            {{ afficher_boutons_actions(flan, current_user, 'id_flan', 'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan', 'flan') }}
+            <div id="flan-{{ flan.id_flan }}-display">
+                <p class="type">Saveur : {{ flan.type_saveur.value | default("inconnue") }}</p>
+                <p class="type">Pâte : {{ flan.type_pate.value | default("inconnue") }}</p>
+                <p class="type">Texture : {{ flan.type_texture.value | default("inconnue") }}</p>
+                <p class="type">Description : {{ flan.description | default("Flantastique") }}</p>
+                <p class="flan-price">Prix : {{ "%.2f"|format(flan.prix) }} €</p>
+                <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}"> Afficher plus</a>
+                {{ afficher_boutons_actions(flan, current_user, 'id_flan', 'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan', 'flan') }}
+            </div>
+            {{ afficher_formulaire_edition_flan(flan, form) }}
         </div>
     </div>
-        <script>
-        function editFlan(idFlan)  {
-            document.getElementById('flan-' + idFlan + '-display').style.display = 'none';
-            document.getElementById('flan-' + idFlan + '-edit').style.display = 'block';
+    <script>
+        function editFlan(idFlan) {
+            console.log('Editing flan with ID:', idFlan);
+            var displayElement = document.getElementById('flan-' + idFlan + '-display');
+            var editElement = document.getElementById('flan-' + idFlan + '-edit');
+            console.log('Display element:', displayElement);
+            console.log('Edit element:', editElement);
+            if (displayElement && editElement) {
+                displayElement.style.display = 'none';
+                editElement.style.display = 'block';
+            } else {
+                console.error('Elements not found');
+            }
         }
         function cancelEdit(idFlan) {
-            document.getElementById('flan-' + idFlan + '-display').style.display = 'block';
-            document.getElementById('flan-' + idFlan + '-edit').style.display = 'none';
+            var displayElement = document.getElementById('flan-' + idFlan + '-display');
+            var editElement = document.getElementById('flan-' + idFlan + '-edit');
+            if (displayElement && editElement) {
+                displayElement.style.display = 'block';
+                editElement.style.display = 'none';
+            } else {
+                console.error('Elements not found');
+            }
         }
     </script>
 {% endmacro %}
+
 
 
 {% macro afficher_evaluation(evaluation, current_user, form) %}
@@ -191,6 +211,26 @@
         }
     </script>
 {% endmacro %}
+
+{% macro afficher_formulaire_edition_flan(flan, form) %}
+    <div id="flan-{{ flan.id_flan }}-edit" style="display: none;">
+        <form method="POST" action="{{ url_for('main.modifier_flan', id_flan=flan.id_flan) }}" class="form-container">
+            {{ form.hidden_tag() }}
+            {{ afficher_champ_formulaire(form.nom) }}
+            {{ afficher_champ_formulaire(form.description) }}
+            {{ afficher_champ_formulaire(form.prix) }}
+            {{ afficher_champ_formulaire(form.type_pate) }}
+            {{ afficher_champ_formulaire(form.type_saveur) }}
+            {{ afficher_champ_formulaire(form.type_texture) }}
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                <button type="button" class="btn btn-secondary" onclick="cancelEdit({{ flan.id_flan }})">Annuler</button>
+            </div>
+        </form>
+    </div>
+{% endmacro %}
+
+
 
 {% macro afficher_criteres_evaluation(evaluation) %}
     <div class="criteria">
