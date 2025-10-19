@@ -111,10 +111,9 @@
             {% endif %}
             <p class="description">Description : {{ etablissement.description }}</p>
             {{ afficher_boutons_actions(etablissement, current_user, 'id_etab', 'maps.modifier_etablissement', 'maps.supprimer_etablissement', 'maps.valider_etablissement', 'etablissement') }}
-
         </div>
     <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}"> Afficher plus</a>
-
+    {{ afficher_formulaire_edition_etablissement(etablissement, form_etab, current_user) }}
     </div>
     <script>
     function cancelEdit(idEtab) {
@@ -172,7 +171,8 @@
     </div>
 {% endmacro %}
 
-<!-- FLAN -->
+<!-- FLAN ET FORMULAIRE -->
+
 {% macro afficher_flan(flan, current_user, form) %}
     <div class="carte">
         <div class="card-image-container">
@@ -240,7 +240,7 @@
     </div>
 {% endmacro %}
 
-<!-- EVALUATION -->>
+<!-- EVALUATION ET FORMULAIRE -->
 
 {% macro afficher_evaluation(evaluation, current_user, form) %}
     <div class="card">
@@ -327,6 +327,16 @@
     </div>
 {% endmacro %}
 
+
+
+
+
+
+
+
+
+
+
 {% macro afficher_criteres_evaluation(evaluation) %}
     <div class="criteria">
             <div class="criterion">
@@ -361,7 +371,6 @@
 
 
 
-<!-- GRILLE ET OBJET -->
 
 {% macro afficher_grille(objet_type, objets, current_user=None, form=None, etablissement=None, flan=None) %}
     {% if not objets %}
