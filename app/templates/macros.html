@@ -94,7 +94,7 @@
 
 <!-- MACROS D'AFFICHAGE D'OBJETS -->
 {% macro afficher_etablissement(etablissement, current_user, form_etab) %}
-    <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}" class="carte" data-id="{{ etablissement.id_etab }}" data-lat="{{ etablissement.latitude }}" data-lng="{{ etablissement.longitude }}">
+    <div class="carte">
         <div class="card-image-container">
             {{ afficher_image_ou_placeholder(etablissement) }}
             {{ afficher_badge_etablissement(etablissement) }}
@@ -108,10 +108,13 @@
             {% if etablissement.flans %}
                 <p class="flans-count">{{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}</p>
             {% endif %}
+            <p class="description">Description : {{ etablissement.description }}</p>
             {{ afficher_boutons_actions(etablissement, current_user, 'id_etab', 'maps.modifier_etablissement', 'maps.supprimer_etablissement', 'maps.valider_etablissement', 'etablissement') }}
 
         </div>
-    </a>
+    <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}"> Afficher plus</a>
+
+    </div>
     <script>
     function cancelEdit(idFlan) {
         document.getElementById('flan-' + idFlan + '-display').style.display = 'block';
