@@ -93,7 +93,7 @@
 
 
 <!-- MACROS D'AFFICHAGE D'OBJETS -->
-{% macro afficher_etablissement(etablissement, current_user) %}
+{% macro afficher_etablissement(etablissement, current_user, form_etab) %}
     <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}" class="carte" data-id="{{ etablissement.id_etab }}" data-lat="{{ etablissement.latitude }}" data-lng="{{ etablissement.longitude }}">
         <div class="card-image-container">
             {{ afficher_image_ou_placeholder(etablissement) }}
@@ -211,6 +211,51 @@
         }
     </script>
 {% endmacro %}
+
+{% macro afficher_formulaire_edition_etablissement(etablissement, form, current_user) %}
+    <div id="etablissement-{{ etablissement.id_etab }}-edit" style="display: none;">
+        <form method="POST" action="{{ url_for('maps.modifier_etablissement', id_etab=etablissement.id_etab) }}" class="form-container">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                <label for="type_etab-{{ etablissement.id_etab }}" class="form-label">Type d'établissement</label>
+                <select id="type_etab-{{ etablissement.id_etab }}" name="type_etab" class="form-control">
+                    {% for choice in form.type_etab.choices %}
+                        <option value="{{ choice[0] }}" {% if choice[0] == etablissement.type_etab.name %}selected{% endif %}>{{ choice[1] }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="description-{{ etablissement.id_etab }}" class="form-label">Description</label>
+                <textarea id="description-{{ etablissement.id_etab }}" name="description" class="form-control">{{ etablissement.description }}</textarea>
+            </div>
+            {% if current_user.is_admin %}
+                <div class="form-group">
+                    <label class="form-label">Labellisé</label>
+                    {% for choice in form.label.choices %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="label" id="label-{{ choice[0] }}-{{ etablissement.id_etab }}" value="{{ choice[0] }}" {% if choice[0] == ('Oui' if etablissement.label else 'Non') %}checked{% endif %}>
+                            <label class="form-check-label" for="label-{{ choice[0] }}-{{ etablissement.id_etab }}">{{ choice[1] }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Visité</label>
+                    {% for choice in form.visite.choices %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="visite" id="visite-{{ choice[0] }}-{{ etablissement.id_etab }}" value="{{ choice[0] }}" {% if choice[0] == ('Oui' if etablissement.visite else 'Non') %}checked{% endif %}>
+                            <label class="form-check-label" for="visite-{{ choice[0] }}-{{ etablissement.id_etab }}">{{ choice[1] }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                <button type="button" class="btn btn-secondary" onclick="cancelEdit({{ etablissement.id_etab }})">Annuler</button>
+            </div>
+        </form>
+    </div>
+{% endmacro %}
+
 
 
 {% macro afficher_formulaire_edition_flan(flan, form) %}
@@ -333,7 +378,7 @@
 <!-- Afficher un objet, que ce soit sur sa page ou dans une grille -->
 {% macro afficher_objet(objet_type, objet, current_user=None, form=None) %}
     {% if objet_type == 'etablissement' %}
-        {{ afficher_etablissement(objet, current_user) }}
+        {{ afficher_etablissement(objet, current_user, form) }}
     {% elif objet_type == 'flan' %}
         {{ afficher_flan(objet, current_user, form) }}
     {% elif objet_type == 'evaluation' %}
