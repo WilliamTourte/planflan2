@@ -94,7 +94,7 @@
 
 <!-- MACROS D'AFFICHAGE D'OBJETS -->
 <!-- ETABLISSEMENT -->
-{% macro afficher_etablissement(etablissement, current_user, form_etab) %}
+{% macro afficher_etablissement(etablissement, current_user, form_edit) %}
     <div class="carte">
         <div class="card-image-container">
             {{ afficher_image_ou_placeholder(etablissement) }}
@@ -113,6 +113,7 @@
             {{ afficher_boutons_actions(etablissement, current_user, 'id_etab', 'maps.modifier_etablissement', 'maps.supprimer_etablissement', 'maps.valider_etablissement', 'etablissement') }}
 
         </div>
+        {{ afficher_formulaire_edition_etablissement(etablissement, form_edit, current_user) }}
     <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}"> Afficher plus</a>
 
     </div>
@@ -364,7 +365,7 @@
 
 <!-- GRILLE ET OBJET -->
 
-{% macro afficher_grille(objet_type, objets, current_user=None, form=None, etablissement=None, flan=None) %}
+{% macro afficher_grille(objet_type, objets, current_user=None, form_edit=None, form_ajout=None, etablissement=None, flan=None) %}
     {% if not objets %}
         <div class="no-results">
             <p>Aucun {{ objet_type }} trouvé.</p>
@@ -372,32 +373,32 @@
     {% else %}
         <div class="grille">
             {% for objet in objets %}
-                {{ afficher_objet(objet_type, objet, current_user, form) }}
+                {{ afficher_objet(objet_type, objet, current_user, form_edit) }}
             {% endfor %}
         </div>
     {% endif %}
     <!-- Possibilité d'ajout toujours en fin de grille-->
-    {{ afficher_bouton_ajout(objet_type, current_user, etablissement, form, flan) }}
+    {{ afficher_bouton_ajout(objet_type, current_user, etablissement, form_ajout, flan) }}
 {% endmacro %}
 
 <!-- Afficher un objet, que ce soit sur sa page ou dans une grille -->
-{% macro afficher_objet(objet_type, objet, current_user=None, form=None) %}
+{% macro afficher_objet(objet_type, objet, current_user=None, form_edit=None) %}
     {% if objet_type == 'etablissement' %}
-        {{ afficher_etablissement(objet, current_user, form) }}
+        {{ afficher_etablissement(objet, current_user, form_edit) }}
     {% elif objet_type == 'flan' %}
-        {{ afficher_flan(objet, current_user, form) }}
+        {{ afficher_flan(objet, current_user, form_edit) }}
     {% elif objet_type == 'evaluation' %}
-        {{ afficher_evaluation(objet, current_user, form) }}
+        {{ afficher_evaluation(objet, current_user, form_edit) }}
     {% endif %}
 {% endmacro %}
 
 <!-- Déterminer si le bouton "Ajout" s'affiche ou si on propose de se connecter -->
-{% macro afficher_bouton_ajout(objet_type, current_user, etablissement=None, form=None, flan=None) %}
+{% macro afficher_bouton_ajout(objet_type, current_user, etablissement=None, form_ajout=None, flan=None) %}
     {% if objet_type == 'etablissement' %}
         <div class="card-content">
             <h3>Ajouter un etablissement</h3>
             {% if current_user.is_authenticated %}
-                {{ proposer_etablissement(form, url_for('maps.ajouter_etablissement'), current_user) }}
+                {{ proposer_etablissement(form_ajout, url_for('maps.ajouter_etablissement'), current_user) }}
             {% else %}
                 <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
                     Ajouter un établissement (connectez-vous)
@@ -408,7 +409,7 @@
         <div class="card-content">
             <h3>Ajouter un flan</h3>
             {% if current_user.is_authenticated %}
-                {{ proposer_flan(form, url_for('main.proposer_flan', id_etab=etablissement.id_etab)) }}
+                {{ proposer_flan(form_ajout, url_for('main.proposer_flan', id_etab=etablissement.id_etab)) }}
             {% else %}
                 <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
                     Ajouter un flan (connectez-vous)
@@ -419,7 +420,7 @@
         <div class="card-content">
             <h3>Ajouter une evaluation</h3>
             {% if current_user.is_authenticated %}
-                {{ proposer_evaluation(form, url_for('main.evaluer_flan', id_flan=flan.id_flan)) }}
+                {{ proposer_evaluation(form_ajout, url_for('main.evaluer_flan', id_flan=flan.id_flan)) }}
             {% else %}
                 <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
                     Ajouter une évaluation (connectez-vous)

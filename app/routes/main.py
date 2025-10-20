@@ -72,14 +72,17 @@ def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
 def index():
     from app.outils import afficher_etablissements
     # Redirection automatique vers la liste des établissements
-    form2 = EtabForm()
+    form_edit = EtabForm()
+    form_ajout = EtabForm()
+
     resultats = Etablissement.query.all()
     etablissements, etablissements_json = afficher_etablissements(resultats)
     return render_template('liste_etablissements.html',
                            etablissements=etablissements,
                            etablissements_json=etablissements_json,
                            google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
-                           form2=form2)
+                           form_edit=form_edit,
+                           form_ajout=form_ajout)
 
 @main_bp.route('/dashboard', methods=['GET', 'POST'])
 @login_required
