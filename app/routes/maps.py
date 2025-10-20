@@ -60,6 +60,7 @@ def verifier_etablissement():
         print("Aucun établissement trouvé avec ces critères.")
         return jsonify({'exists': False})
 
+
 from flask import request, current_app, flash
 
 @maps_bp.route('/ajouter_etablissement', methods=['GET', 'POST'])
