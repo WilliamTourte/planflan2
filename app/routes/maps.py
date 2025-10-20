@@ -60,61 +60,82 @@ def verifier_etablissement():
         print("Aucun établissement trouvé avec ces critères.")
         return jsonify({'exists': False})
 
+from flask import request, current_app, flash
 
-@login_required
 @maps_bp.route('/ajouter_etablissement', methods=['GET', 'POST'])
 def ajouter_etablissement():
-    form = EtabForm()
-    form.type_etab.choices = [(type_etab.name, type_etab.value) for type_etab in TypeEtab]
-    etablissements = Etablissement.query.all()
-    etablissements, etablissements_json = afficher_etablissements(etablissements)
+    # Instancie les formulaires avec les préfixes
+    form_ajout = EtabForm(prefix='ajout')
+    form_edit = EtabForm(prefix='edit')
 
     if request.method == 'POST':
-        print("Requête POST reçue")
-        print(f"Nom de l'établissement: {form.nom.data}")
+        print("\n--- NOUVELLE SOUMISSION POST ---")
 
-        etablissement_existe = Etablissement.query.filter_by(nom=form.nom.data).first()
-        if etablissement_existe:
-            flash('Un établissement avec ce nom existe déjà.', 'error')
-            return render_template('liste_etablissements.html', form=form, etablissements_json=etablissements_json, google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
+        # Affiche toutes les données brutes reçues dans la requête
+        print("Données brutes reçues (request.form):", dict(request.form))
 
-        if not form.validate_on_submit():
-            print("Erreurs de validation :", form.errors)  # Imprime les erreurs de validation
+        # Vérifie que le formulaire d'ajout est soumis
+        if form_ajout.validate_on_submit():
+            print("\n✅ Formulaire VALIDE !")
+            print("Données validées par WTForms :")
+            print("- Nom:", form_ajout.nom.data)
+            print("- Adresse:", form_ajout.adresse.data)
+            print("- Code postal:", form_ajout.code_postal.data)
+            print("- Ville:", form_ajout.ville.data)
+            print("- Latitude:", form_ajout.latitude.data)
+            print("- Longitude:", form_ajout.longitude.data)
+            print("- Type:", form_ajout.type_etab.data)
+            print("- Description:", form_ajout.description.data)
+            if hasattr(form_ajout, 'label'):
+                print("- Labellisé:", form_ajout.label.data)
+            if hasattr(form_ajout, 'visite'):
+                print("- Visité:", form_ajout.visite.data)
 
-        if form.validate_on_submit():
-            adresse = form.adresse.data
-            code_postal = form.code_postal.data
-            ville = form.ville.data
-            latitude = request.form.get('latitude')
-            longitude = request.form.get('longitude')
-            type_etab = form.type_etab.data
-            label = form.label.data == 'Oui'
-            visite = form.visite.data == 'Oui'
-            description = form.description.data
+            # Ici, tu peux ajouter la logique pour sauvegarder l'établissement
+            # Exemple :
+            # nouvel_etablissement = Etablissement(
+            #     nom=form_ajout.nom.data,
+            #     adresse=form_ajout.adresse.data,
+            #     ...
+            # )
+            # db.session.add(nouvel_etablissement)
+            # db.session.commit()
 
-            print("Données du formulaire validées")
-
-            new_etablissement = Etablissement(
-                nom=form.nom.data,
-                adresse=adresse,
-                code_postal=code_postal,
-                ville=ville,
-                latitude=latitude,
-                longitude=longitude,
-                type_etab=TypeEtab[type_etab],
-                id_user=current_user.id_user,
-                description=description,
-                label=label,
-                visite=visite
-            )
-            db.session.add(new_etablissement)
-            db.session.commit()
-            print("Établissement ajouté avec succès")
-            flash('Établissement ajouté avec succès !', 'success')
+            flash("Établissement ajouté avec succès !", "success")
             return redirect(url_for('main.index'))
 
-    print("Rendu du template")
-    return render_template('liste_etablissements.html', form2=form, etablissements_json=etablissements_json, google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
+        else:
+            print("\n❌ Erreurs de validation :", form_ajout.errors)
+            print("Données partiellement récupérées (même en cas d'erreur) :")
+            print("- Nom:", form_ajout.nom.data)
+            print("- Adresse:", form_ajout.adresse.data)
+            print("- Latitude:", form_ajout.latitude.data)
+            print("- Longitude:", form_ajout.longitude.data)
+
+            # En cas d'erreur, affiche à nouveau le formulaire avec les erreurs
+            etablissements = Etablissement.query.all()
+            etablissements_json = [e.to_json() for e in etablissements]
+            return render_template(
+                'liste_etablissements.html',
+                etablissements=etablissements,
+                etablissements_json=etablissements_json,
+                form_ajout=form_ajout,
+                form_edit=form_edit,
+                google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY']
+            )
+
+    # Pour une requête GET, rend simplement le template
+    print("\n--- AFFICHAGE DU FORMULAIRE (GET) ---")
+    etablissements = Etablissement.query.all()
+    etablissements_json = [e.to_json() for e in etablissements]
+    return render_template(
+        'liste_etablissements.html',
+        etablissements=etablissements,
+        etablissements_json=etablissements_json,
+        form_ajout=form_ajout,
+        form_edit=form_edit,
+        google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY']
+    )
 
 
 @maps_bp.route('/modifier_etablissement/<int:id_etab>', methods=['GET', 'POST'])

@@ -104,74 +104,72 @@
             <div class="card-header">
                 <h2>{{ etablissement.nom | enlever_accents }}</h2>
             </div>
-            <p class="type">{{ etablissement.type_etab.value }}</p>
-            <p class="adresse">{{ etablissement.adresse }}, {{ etablissement.ville }}</p>
-            {% if etablissement.flans %}
-                <p class="flans-count">{{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}</p>
-            {% endif %}
-            <p class="description">Description : {{ etablissement.description }}</p>
-            {{ afficher_boutons_actions(etablissement, current_user, 'id_etab', 'maps.modifier_etablissement', 'maps.supprimer_etablissement', 'maps.valider_etablissement', 'etablissement') }}
+            <div id="etablissement-{{ etablissement.id_etab }}-display">
+                <p class="type">{{ etablissement.type_etab.value }}</p>
+                <p class="adresse">{{ etablissement.adresse }}, {{ etablissement.ville }}</p>
+                {% if etablissement.flans %}
+                    <p class="flans-count">
+                        {{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}
+                    </p>
+                {% endif %}
+                <p class="description">Description : {{ etablissement.description }}</p>
+                {{ afficher_boutons_actions(etablissement, current_user, 'id_etab', 'maps.modifier_etablissement', 'maps.supprimer_etablissement', 'maps.valider_etablissement', 'etablissement') }}
+            </div>
 
+            <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}">Afficher plus</a>
         </div>
-        {{ afficher_formulaire_edition_etablissement(etablissement, form_edit, current_user) }}
-    <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}"> Afficher plus</a>
-
     </div>
     <script>
-    function cancelEdit(idEtab) {
-        document.getElementById('etablissement-' + idEtab + '-display').style.display = 'block';
-        document.getElementById('etablissement-' + idEtab + '-edit').style.display = 'none';
-    }
-    function editEtablissement(idEtab) {
-        document.getElementById('etablissement-' + idEtab + '-display').style.display = 'none';
-        document.getElementById('etablissement-' + idEtab + '-edit').style.display = 'block';
-    }
+        function cancelEdit(idEtab) {
+            document.getElementById('etablissement-' + idEtab + '-display').style.display = 'block';
+            document.getElementById('etablissement-' + idEtab + '-edit').style.display = 'none';
+        }
+        function editEtablissement(idEtab) {
+            document.getElementById('etablissement-' + idEtab + '-display').style.display = 'none';
+            document.getElementById('etablissement-' + idEtab + '-edit').style.display = 'block';
+        }
     </script>
 {% endmacro %}
 
-{% macro afficher_formulaire_edition_etablissement(etablissement, form, current_user) %}
+
+{% macro afficher_formulaire_edition_etablissement(etablissement, form_edit, current_user) %}
     <div id="etablissement-{{ etablissement.id_etab }}-edit" style="display: none;">
-        <form method="POST" action="{{ url_for('maps.modifier_etablissement', id_etab=etablissement.id_etab) }}" class="form-container">
-            {{ form.hidden_tag() }}
+        <form method="POST" action="{{ url_for('maps.valider_etablissement', id_etab=etablissement.id_etab) }}">
+            {{ form_edit.hidden_tag() }}
             <div class="form-group">
-                <label for="type_etab-{{ etablissement.id_etab }}" class="form-label">Type d'établissement</label>
-                <select id="type_etab-{{ etablissement.id_etab }}" name="type_etab" class="form-control">
-                    {% for choice in form.type_etab.choices %}
-                        <option value="{{ choice[0] }}" {% if choice[0] == etablissement.type_etab.name %}selected{% endif %}>{{ choice[1] }}</option>
-                    {% endfor %}
-                </select>
+                <label class="form-label" for="edit-nom">{{ form_edit.nom.label }}</label>
+                {{ form_edit.nom(class="form-control", id="edit-nom") }}
             </div>
             <div class="form-group">
-                <label for="description-{{ etablissement.id_etab }}" class="form-label">Description</label>
-                <textarea id="description-{{ etablissement.id_etab }}" name="description" class="form-control">{{ etablissement.description }}</textarea>
+                <label class="form-label" for="edit-adresse">{{ form_edit.adresse.label }}</label>
+                {{ form_edit.adresse(class="form-control", id="edit-adresse") }}
             </div>
-            {% if current_user.is_admin %}
-                <div class="form-group">
-                    <label class="form-label">Labellisé</label>
-                    {% for choice in form.label.choices %}
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="label" id="label-{{ choice[0] }}-{{ etablissement.id_etab }}" value="{{ choice[0] }}" {% if choice[0] == ('Oui' if etablissement.label else 'Non') %}checked{% endif %}>
-                            <label class="form-check-label" for="label-{{ choice[0] }}-{{ etablissement.id_etab }}">{{ choice[1] }}</label>
-                        </div>
-                    {% endfor %}
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Visité</label>
-                    {% for choice in form.visite.choices %}
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="visite" id="visite-{{ choice[0] }}-{{ etablissement.id_etab }}" value="{{ choice[0] }}" {% if choice[0] == ('Oui' if etablissement.visite else 'Non') %}checked{% endif %}>
-                            <label class="form-check-label" for="visite-{{ choice[0] }}-{{ etablissement.id_etab }}">{{ choice[1] }}</label>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
             <div class="form-group">
-                <button type="submit" class="btn btn-primary">Enregistrer</button>
-                <button type="button" class="btn btn-secondary" onclick="cancelEdit({{ etablissement.id_etab }})">Annuler</button>
+                <label class="form-label" for="edit-ville">{{ form_edit.ville.label }}</label>
+                {{ form_edit.ville(class="form-control", id="edit-ville") }}
             </div>
+            <div class="form-group">
+                <label class="form-label" for="edit-code_postal">{{ form_edit.code_postal.label }}</label>
+                {{ form_edit.code_postal(class="form-control", id="edit-code_postal") }}
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="edit-latitude">{{ form_edit.latitude.label }}</label>
+                {{ form_edit.latitude(class="form-control", id="edit-latitude") }}
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="edit-longitude">{{ form_edit.longitude.label }}</label>
+                {{ form_edit.longitude(class="form-control", id="edit-longitude") }}
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="edit-description">{{ form_edit.description.label }}</label>
+                {{ form_edit.description(class="form-control", id="edit-description") }}
+            </div>
+            <button type="submit" class="btn btn-primary">Valider</button>
+            <button type="button" class="btn btn-secondary" onclick="cancelEdit({{ etablissement.id_etab }})">Annuler</button>
         </form>
     </div>
 {% endmacro %}
+
 
 <!-- FLAN -->
 {% macro afficher_flan(flan, current_user, form) %}
@@ -227,12 +225,30 @@
     <div id="flan-{{ flan.id_flan }}-edit" style="display: none;">
         <form method="POST" action="{{ url_for('main.modifier_flan', id_flan=flan.id_flan) }}" class="form-container">
             {{ form.hidden_tag() }}
-            {{ afficher_champ_formulaire(form.nom) }}
-            {{ afficher_champ_formulaire(form.description) }}
-            {{ afficher_champ_formulaire(form.prix) }}
-            {{ afficher_champ_formulaire(form.type_pate) }}
-            {{ afficher_champ_formulaire(form.type_saveur) }}
-            {{ afficher_champ_formulaire(form.type_texture) }}
+            <div class="form-group">
+                <label class="form-label" for="edit-nom">{{ form.nom.label }}</label>
+                {{ form.nom(class="form-control", id="edit-nom") }}
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="edit-description">{{ form.description.label }}</label>
+                {{ form.description(class="form-control", id="edit-description") }}
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="edit-prix">{{ form.prix.label }}</label>
+                {{ form.prix(class="form-control", id="edit-prix") }}
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="edit-type_pate">{{ form.type_pate.label }}</label>
+                {{ form.type_pate(class="form-control", id="edit-type_pate") }}
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="edit-type_saveur">{{ form.type_saveur.label }}</label>
+                {{ form.type_saveur(class="form-control", id="edit-type_saveur") }}
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="edit-type_texture">{{ form.type_texture.label }}</label>
+                {{ form.type_texture(class="form-control", id="edit-type_texture") }}
+            </div>
             <div class="form-group">
                 <button type="submit" class="btn btn-primary">Enregistrer</button>
                 <button type="button" class="btn btn-secondary" onclick="cancelEdit({{ flan.id_flan }})">Annuler</button>
@@ -435,28 +451,33 @@
 {% macro afficher_champ_formulaire(field) %}
     <div class="form-group">
         {{ field.label(class="form-label") }}
-        {{ field(class="form-control") }}
+        {{ field(class="form-control", id=field.id) }}
         {% if field.errors %}
             <div class="error-message">{{ field.errors[0] }}</div>
         {% endif %}
     </div>
 {% endmacro %}
 
+
 <!-- Proposer un flan -->
 {% macro proposer_flan(form, action_url) %}
     <form method="POST" action="{{ action_url }}" class="form-container">
         {{ form.hidden_tag() }}
-        {{ afficher_champ_formulaire(form.nom) }}
-        {{ afficher_champ_formulaire(form.type_saveur) }}
-        {{ afficher_champ_formulaire(form.type_texture) }}
-        {{ afficher_champ_formulaire(form.type_pate) }}
-        {{ afficher_champ_formulaire(form.description) }}
-        {{ afficher_champ_formulaire(form.prix) }}
+        <div class="form-group">
+            <label class="form-label" for="ajout-nom">{{ form.nom.label }}</label>
+            {{ form.nom(class="form-control", id="ajout-nom") }}
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="ajout-description">{{ form.description.label }}</label>
+            {{ form.description(class="form-control", id="ajout-description") }}
+        </div>
+        <!-- Autres champs avec préfixe ajout- -->
         <div class="form-group">
             {{ form.submit(class="btn btn-proposer") }}
         </div>
     </form>
 {% endmacro %}
+
 
 <!-- Proposer un établissement -->
 {% macro proposer_etablissement(form, action_url, current_user) %}
@@ -471,27 +492,28 @@
         {% if current_user.is_admin %}
             <div class="form-group">
                 <label>Labellisé</label><br>
-                <input type="radio" name="label" value="Oui" {% if form.label.data == 'Oui' %}checked{% endif %}> Labellisé par la Flanterie<br>
-                <input type="radio" name="label" value="Non" {% if form.label.data == 'Non' %}checked{% endif %}> Non labellisé
+                <input type="radio" name="ajout-label" value="Oui" {% if form.label.data == 'Oui' %}checked{% endif %}> Labellisé<br>
+                <input type="radio" name="ajout-label" value="Non" {% if form.label.data == 'Non' %}checked{% endif %}> Non labellisé
             </div>
             <div class="form-group">
                 <label>Visité</label><br>
-                <input type="radio" name="visite" value="Oui" {% if form.visite.data == 'Oui' %}checked{% endif %}> Visité par la Flanterie<br>
-                <input type="radio" name="visite" value="Non" {% if form.visite.data == 'Non' %}checked{% endif %}> Non visité
+                <input type="radio" name="ajout-visite" value="Oui" {% if form.visite.data == 'Oui' %}checked{% endif %}> Visité<br>
+                <input type="radio" name="ajout-visite" value="Non" {% if form.visite.data == 'Non' %}checked{% endif %}> Non visité
             </div>
         {% endif %}
-        <!-- Champs cachés pour les données qui ne doivent pas être modifiées -->
-        <input type="hidden" id="nom" name="nom" value="{{ form.nom.data }}">
-        <input type="hidden" id="adresse" name="adresse" value="{{ form.adresse.data }}">
-        <input type="hidden" id="code_postal" name="code_postal" value="{{ form.code_postal.data }}">
-        <input type="hidden" id="ville" name="ville" value="{{ form.ville.data }}">
-        <input type="hidden" id="latitude" name="latitude" value="{{ form.latitude.data }}">
-        <input type="hidden" id="longitude" name="longitude" value="{{ form.longitude.data }}">
+        <!-- Champs cachés avec préfixe ajout- -->
+        <input type="hidden" id="ajout-nom" name="ajout-nom" value="{{ form.nom.data }}">
+        <input type="hidden" id="ajout-adresse" name="ajout-adresse" value="{{ form.adresse.data }}">
+        <input type="hidden" id="ajout-code_postal" name="ajout-code_postal" value="{{ form.code_postal.data }}">
+        <input type="hidden" id="ajout-ville" name="ajout-ville" value="{{ form.ville.data }}">
+        <input type="hidden" id="ajout-latitude" name="ajout-latitude" value="{{ form.latitude.data }}">
+        <input type="hidden" id="ajout-longitude" name="ajout-longitude" value="{{ form.longitude.data }}">
         <div class="form-group">
             {{ form.submit(class="btn btn-proposer") }}
         </div>
     </form>
 {% endmacro %}
+
 
 <!-- Proposer une évaluation -->
 {% macro proposer_evaluation(form, action_url) %}

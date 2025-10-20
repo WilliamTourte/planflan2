@@ -72,8 +72,8 @@ def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
 def index():
     from app.outils import afficher_etablissements
     # Redirection automatique vers la liste des établissements
-    form_edit = EtabForm()
-    form_ajout = EtabForm()
+    form_edit = EtabForm(prefix='edit')
+    form_ajout = EtabForm(prefix='ajout')
 
     resultats = Etablissement.query.all()
     etablissements, etablissements_json = afficher_etablissements(resultats)
