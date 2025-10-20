@@ -102,20 +102,21 @@
         </div>
         <div class="card-content">
             <div class="card-header">
-                <h2>{{ etablissement.nom | enlever_accents }}</h2>
+                <h2 id="etablissement-{{ etablissement.id_etab }}-nom">{{ etablissement.nom | enlever_accents }}</h2>
             </div>
             <div id="etablissement-{{ etablissement.id_etab }}-display">
                 <p class="type">{{ etablissement.type_etab.value }}</p>
-                <p class="adresse">{{ etablissement.adresse }}, {{ etablissement.ville }}</p>
+                <p class="adresse" id="etablissement-{{ etablissement.id_etab }}-adresse">{{ etablissement.adresse }}, {{ etablissement.ville }}</p>
                 {% if etablissement.flans %}
                     <p class="flans-count">
                         {{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}
                     </p>
                 {% endif %}
-                <p class="description">Description : {{ etablissement.description }}</p>
+                <p class="description" id="etablissement-{{ etablissement.id_etab }}-description">Description : {{ etablissement.description }}</p>
                 {{ afficher_boutons_actions(etablissement, current_user, 'id_etab', 'maps.modifier_etablissement', 'maps.supprimer_etablissement', 'maps.valider_etablissement', 'etablissement') }}
             </div>
-
+            <!-- Intégration du formulaire d'édition -->
+            {{ afficher_formulaire_edition_etablissement(etablissement, form_edit, current_user) }}
             <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}">Afficher plus</a>
         </div>
     </div>
@@ -125,11 +126,32 @@
             document.getElementById('etablissement-' + idEtab + '-edit').style.display = 'none';
         }
         function editEtablissement(idEtab) {
+            // Récupère les éléments par leur ID unique
+            const nomElement = document.getElementById('etablissement-' + idEtab + '-nom');
+            const adresseElement = document.getElementById('etablissement-' + idEtab + '-adresse');
+            const descriptionElement = document.getElementById('etablissement-' + idEtab + '-description');
+
+            // Vérifie que les éléments existent
+            if (!nomElement || !adresseElement || !descriptionElement) {
+                console.error("Un ou plusieurs éléments introuvables pour l'établissement", idEtab);
+                return;
+            }
+
+            // Remplit les champs du formulaire
+            document.getElementById('edit-nom').value = nomElement.textContent;
+            const adresseParts = adresseElement.textContent.split(',');
+            document.getElementById('edit-adresse').value = adresseParts[0].trim();
+            document.getElementById('edit-ville').value = adresseParts.length > 1 ? adresseParts[1].trim() : '';
+            document.getElementById('edit-description').value = descriptionElement.textContent.replace('Description : ', '').trim();
+
+            // Bascule l'affichage
             document.getElementById('etablissement-' + idEtab + '-display').style.display = 'none';
             document.getElementById('etablissement-' + idEtab + '-edit').style.display = 'block';
         }
     </script>
 {% endmacro %}
+
+
 
 
 {% macro afficher_formulaire_edition_etablissement(etablissement, form_edit, current_user) %}
