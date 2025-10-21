@@ -546,35 +546,6 @@
     </form>
 {% endmacro %}
 
-
-{% macro afficher_radio_field(field) %}
-    <div class="form-group">
-        <label>{{ field.label }}</label>
-        {% for subfield in field %}
-            <div class="form-check form-check-inline">
-                <!-- Debug -->
-                {% if debug %}
-                    <p>Name: {{ subfield.name }}, Value: {{ subfield.value }}, Checked: {{ subfield.checked }}</p>
-                {% endif %}
-                <input type="radio"
-                       id="{{ subfield.id }}"
-                       name="{{ subfield.name }}"
-                       value="{{ subfield.value }}"
-                       {% if subfield.checked %}checked{% endif %}
-                       class="form-check-input">
-                <label class="form-check-label" for="{{ subfield.id }}">{{ subfield.label }}</label>
-            </div>
-        {% endfor %}
-    </div>
-{% endmacro %}
-
-
-
-
-
-
-
-
 {% macro proposer_evaluation(form, action_url) %}
     <form method="POST" action="{{ action_url }}" class="form-container">
         {{ form.hidden_tag() }}

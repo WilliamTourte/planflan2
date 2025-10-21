@@ -279,7 +279,7 @@ h1, h2, h3, h4, h5, h6 {
 .badge-type-etab {
     top: 10px;
     left: 10px;
-    background-color: var(--couleur-badge); /* Couleur dynamique via la macro */
+
 }
 
 /* Badge labellisé (en haut à droite, bleu clair) */
@@ -469,7 +469,7 @@ h1, h2, h3, h4, h5, h6 {
     padding-top: 2px; /* Petit ajustement pour l'alignement */
 }
 
-}
+
 .form-group input:not(.form-check-input),
 .form-group textarea,
 .form-group select {
