@@ -104,64 +104,54 @@
             <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}">Afficher plus</a>
         </div>
     </div>
-    <script>
-        function cancelEdit(idEtab) {
-            document.getElementById('etablissement-' + idEtab + '-display').style.display = 'block';
-            document.getElementById('etablissement-' + idEtab + '-edit').style.display = 'none';
-        }
-        function editEtablissement(idEtab) {
-            const nomElement = document.getElementById('etablissement-' + idEtab + '-nom');
-            const adresseElement = document.getElementById('etablissement-' + idEtab + '-adresse');
-            const descriptionElement = document.getElementById('etablissement-' + idEtab + '-description');
+<script>
+    function cancelEdit(idEtab) {
+        document.getElementById('etablissement-' + idEtab + '-display').style.display = 'block';
+        document.getElementById('etablissement-' + idEtab + '-edit').style.display = 'none';
+    }
+    function editEtablissement(idEtab) {
+        document.getElementById('etablissement-' + idEtab + '-display').style.display = 'none';
+        document.getElementById('etablissement-' + idEtab + '-edit').style.display = 'block';
+    }
+</script>
 
-            if (!nomElement || !adresseElement || !descriptionElement) {
-                console.error("Un ou plusieurs éléments introuvables pour l'établissement", idEtab);
-                return;
-            }
-
-            document.getElementById('edit-etab-nom').value = nomElement.textContent;
-            const adresseParts = adresseElement.textContent.split(',');
-            document.getElementById('edit-etab-adresse').value = adresseParts[0].trim();
-            document.getElementById('edit-etab-ville').value = adresseParts.length > 1 ? adresseParts[1].trim() : '';
-            document.getElementById('edit-etab-description').value = descriptionElement.textContent.replace('Description : ', '').trim();
-
-            document.getElementById('etablissement-' + idEtab + '-display').style.display = 'none';
-            document.getElementById('etablissement-' + idEtab + '-edit').style.display = 'block';
-        }
-    </script>
 {% endmacro %}
 
 {% macro afficher_formulaire_edition_etablissement(etablissement, form_edit, current_user) %}
     <div id="etablissement-{{ etablissement.id_etab }}-edit" style="display: none;">
-        <form method="POST" action="{{ url_for('maps.valider_etablissement', id_etab=etablissement.id_etab) }}">
+        <form method="POST" action="{{ url_for('maps.modifier_etablissement', id_etab=etablissement.id_etab) }}">
             {{ form_edit.hidden_tag() }}
             <div class="form-group">
-                <label class="form-label" for="edit-etab-nom">{{ form_edit.nom.label }}</label>
-                {{ form_edit.nom(class="form-control", id="edit-etab-nom") }}
+                <label class="form-label">{{ form_edit.nom.label }}</label>
+                {{ form_edit.nom(class="form-control", value=etablissement.nom) }}
             </div>
             <div class="form-group">
-                <label class="form-label" for="edit-etab-adresse">{{ form_edit.adresse.label }}</label>
-                {{ form_edit.adresse(class="form-control", id="edit-etab-adresse") }}
+                <label class="form-label">{{ form_edit.adresse.label }}</label>
+                {{ form_edit.adresse(class="form-control", value=etablissement.adresse) }}
             </div>
             <div class="form-group">
-                <label class="form-label" for="edit-etab-ville">{{ form_edit.ville.label }}</label>
-                {{ form_edit.ville(class="form-control", id="edit-etab-ville") }}
+                <label class="form-label">{{ form_edit.code_postal.label }}</label>
+                {{ form_edit.code_postal(class="form-control", value=etablissement.code_postal) }}
             </div>
             <div class="form-group">
-                <label class="form-label" for="edit-etab-code_postal">{{ form_edit.code_postal.label }}</label>
-                {{ form_edit.code_postal(class="form-control", id="edit-etab-code_postal") }}
+                <label class="form-label">{{ form_edit.ville.label }}</label>
+                {{ form_edit.ville(class="form-control", value=etablissement.ville) }}
             </div>
             <div class="form-group">
-                <label class="form-label" for="edit-etab-latitude">{{ form_edit.latitude.label }}</label>
-                {{ form_edit.latitude(class="form-control", id="edit-etab-latitude") }}
+                <label class="form-label">{{ form_edit.latitude.label }}</label>
+                {{ form_edit.latitude(class="form-control", value=etablissement.latitude) }}
             </div>
             <div class="form-group">
-                <label class="form-label" for="edit-etab-longitude">{{ form_edit.longitude.label }}</label>
-                {{ form_edit.longitude(class="form-control", id="edit-etab-longitude") }}
+                <label class="form-label">{{ form_edit.longitude.label }}</label>
+                {{ form_edit.longitude(class="form-control", value=etablissement.longitude) }}
             </div>
             <div class="form-group">
-                <label class="form-label" for="edit-etab-description">{{ form_edit.description.label }}</label>
-                {{ form_edit.description(class="form-control", id="edit-etab-description") }}
+                <label class="form-label">{{ form_edit.type_etab.label }}</label>
+                {{ form_edit.type_etab(class="form-control", value=etablissement.type_etab.name) }}
+            </div>
+            <div class="form-group">
+                <label class="form-label">{{ form_edit.description.label }}</label>
+                {{ form_edit.description(class="form-control", value=etablissement.description) }}
             </div>
             {% if current_user.is_admin %}
                 <div class="form-group">
@@ -180,6 +170,7 @@
         </form>
     </div>
 {% endmacro %}
+
 
 <!-- FLAN -->
 {% macro afficher_flan(flan, current_user, form) %}

@@ -62,9 +62,7 @@ def verifier_etablissement():
         print("Aucun établissement trouvé avec ces critères.")
         return jsonify({'exists': False})
 
-from flask import request, current_app, flash, redirect, url_for, render_template
-from werkzeug.datastructures import MultiDict
-from app.outils import afficher_etablissements
+
 
 from flask import request, current_app, flash, redirect, url_for, render_template
 from werkzeug.datastructures import MultiDict
@@ -151,54 +149,70 @@ def ajouter_etablissement():
         google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY']
     )
 
-
-
 @maps_bp.route('/modifier_etablissement/<int:id_etab>', methods=['GET', 'POST'])
 @login_required
 def modifier_etablissement(id_etab):
     etablissement = Etablissement.query.get_or_404(id_etab)
-    form = EtabForm()
-    form.type_etab.choices = [(type_etab.name, type_etab.value) for type_etab in TypeEtab]
 
-    # Vérifier si l'utilisateur est l'auteur de l'établissement ou un admin
+    # Instanciation des formulaires avec leurs préfixes respectifs
+    form_edit = EtabForm(prefix='edit-etab')
+    form_ajout = EtabForm(prefix='ajout-etab')
+
+    # Définition des choix pour les deux formulaires
+    form_edit.type_etab.choices = [(type_etab.name, type_etab.value) for type_etab in TypeEtab]
+    form_ajout.type_etab.choices = [(type_etab.name, type_etab.value) for type_etab in TypeEtab]
+
+    # Vérification des droits
     if current_user.id_user != etablissement.id_user and not current_user.is_admin:
         flash('Vous n\'avez pas le droit de modifier cet établissement.', 'error')
         return redirect(url_for('main.index'))
 
     if request.method == 'GET':
-        # Pré-remplir le formulaire avec les données de l'établissement
-        form.nom.data = etablissement.nom
-        form.adresse.data = etablissement.adresse
-        form.code_postal.data = etablissement.code_postal
-        form.ville.data = etablissement.ville
-        form.latitude.data = etablissement.latitude
-        form.longitude.data = etablissement.longitude
-        form.type_etab.data = etablissement.type_etab.name  # Supposons que type_etab est un Enum
-        form.label.data = 'Oui' if etablissement.label else 'Non'
-        form.visite.data = 'Oui' if etablissement.visite else 'Non'
-        form.description.data = etablissement.description
+        # Pré-remplissage du formulaire d'édition
+        form_edit.nom.data = etablissement.nom
+        form_edit.adresse.data = etablissement.adresse
+        form_edit.code_postal.data = etablissement.code_postal
+        form_edit.ville.data = etablissement.ville
+        form_edit.latitude.data = etablissement.latitude
+        form_edit.longitude.data = etablissement.longitude
+        form_edit.type_etab.data = etablissement.type_etab.name
+        form_edit.label.data = 'Oui' if etablissement.label else 'Non'
+        form_edit.visite.data = 'Oui' if etablissement.visite else 'Non'
+        form_edit.description.data = etablissement.description
 
     elif request.method == 'POST':
-        if form.validate_on_submit():
-            # Mettre à jour les données de l'établissement
-            etablissement.nom = form.nom.data
-            etablissement.adresse = form.adresse.data
-            etablissement.code_postal = form.code_postal.data
-            etablissement.ville = form.ville.data
-            etablissement.latitude = request.form.get('latitude')
-            etablissement.longitude = request.form.get('longitude')
-            etablissement.type_etab = TypeEtab[form.type_etab.data]
-            etablissement.label = form.label.data == 'Oui'
-            etablissement.visite = form.visite.data == 'Oui'
-            etablissement.description = form.description.data
-
+        # Recréation du formulaire d'édition avec les données POST
+        form_edit = EtabForm(prefix='edit-etab', formdata=request.form)
+        if form_edit.validate_on_submit():
+            # Mise à jour des données de l'établissement
+            etablissement.nom = form_edit.nom.data
+            etablissement.adresse = form_edit.adresse.data
+            etablissement.code_postal = form_edit.code_postal.data
+            etablissement.ville = form_edit.ville.data
+            etablissement.latitude = form_edit.latitude.data  # Utilisation de form_edit au lieu de request.form
+            etablissement.longitude = form_edit.longitude.data  # Utilisation de form_edit au lieu de request.form
+            etablissement.type_etab = TypeEtab[form_edit.type_etab.data]
+            etablissement.label = form_edit.label.data == 'Oui'
+            etablissement.visite = form_edit.visite.data == 'Oui'
+            etablissement.description = form_edit.description.data
             db.session.commit()
             flash('Établissement mis à jour avec succès !', 'success')
             return redirect(url_for('main.index'))
 
+    # Récupération de tous les établissements pour l'affichage
     etablissements = Etablissement.query.all()
     etablissements, etablissements_json = afficher_etablissements(etablissements)
-    return render_template('liste_etablissements.html', form2=form, etablissements_json=etablissements_json, google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
+
+    # Rendement du template avec tous les éléments nécessaires
+    return render_template(
+        'liste_etablissements.html',
+        form_edit=form_edit,          # Formulaire d'édition pré-rempli
+        form_ajout=form_ajout,        # Formulaire d'ajout vide
+        etablissements_json=etablissements_json,
+        google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY']
+    )
+
+
 
 @maps_bp.route('/valider_etablissement/<int:id_etab>', methods=['POST'])
 @login_required
