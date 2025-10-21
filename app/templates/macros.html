@@ -116,7 +116,7 @@
                 'maps.modifier_etablissement', 'maps.supprimer_etablissement', 'maps.valider_etablissement', 'etablissement', current_page) }}
             </div>
             {{ afficher_formulaire_edition_etablissement(etablissement, form_edit, current_user) }}
-            <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}">Afficher plus</a>
+            <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}" class="btn btn-primary">Voir plus</a>
         </div>
     </div>
     <script>
@@ -208,7 +208,8 @@
             </div>
             {{ afficher_formulaire_edition_flan(flan, form) }}
         </div>
-        <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}">Afficher plus</a>
+        <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}" class="btn btn-primary">Voir plus</a>
+
     </div>
     <script>
         function editFlan(idFlan) {
