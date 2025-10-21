@@ -3,6 +3,7 @@
 <div class="container">
     <!-- Détails du flan -->
     <div class="etablissement-header">
+        {% set current_page = 'page_flan' %}
         {{ afficher_objet('flan', flan, current_user, form_flan) }}
     </div>
 

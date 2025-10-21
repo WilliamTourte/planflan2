@@ -5,7 +5,8 @@
 
 {% block content %}
   <div class="container">
-      <h1>Évaluation</h1>
+      <h1>Evaluation</h1>
+      {% set current_page = 'page_evaluation' %}
       {{ afficher_objet('evaluation', evaluation, current_user, form) }}
 
           <!-- Bouton retour -->

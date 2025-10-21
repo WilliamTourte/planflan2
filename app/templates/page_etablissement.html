@@ -3,6 +3,7 @@
 <div class="container">
     <!-- Détails de l'établissement -->
     <div class="etablissement-header">
+        {% set current_page = 'page_etablissement' %}
         {{ afficher_objet('etablissement', etablissement, current_user, form_etab) }}
     </div>
 

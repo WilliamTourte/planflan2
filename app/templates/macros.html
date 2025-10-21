@@ -31,48 +31,50 @@
         {% endif %}
     {% endif %}
 {% endmacro %}
-
-{% macro afficher_boutons_actions(objet, current_user, id_field, modify_route, delete_route, validate_route, type_objet) %}
+{% macro afficher_boutons_actions(objet, current_user, id_field, modify_route, delete_route, validate_route, type_objet, current_page) %}
     {% if current_user.is_authenticated %}
-        {% if current_user.id_user == objet.id_user and not objet.statut.value == 'VALIDE' %}
-            <div class="action-buttons d-flex gap-1">
-                <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
-                    <i class="bi bi-pencil"></i>
-                </button>
-                <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
-                    <button type="submit" class="btn btn-danger btn-sm square-btn" title="Supprimer">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </form>
-            </div>
-        {% elif current_user.is_admin %}
-            {% if objet.statut.value == 'EN_ATTENTE' %}
-                <div class="action-buttons d-flex gap-1">
-                    <form method="POST" action="{{ url_for(validate_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
-                        <button type="submit" class="btn btn-success square-btn" title="Valider">
-                            <i class="bi bi-check"></i>
-                        </button>
-                    </form>
-                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
-                        <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </form>
-                </div>
-            {% else %}
+        {% set page_attendue = 'page_' + type_objet %}
+        {% if current_page == page_attendue %}
+            {% if current_user.id_user == objet.id_user and not objet.statut.value == 'VALIDE' %}
                 <div class="action-buttons d-flex gap-1">
                     <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
                         <i class="bi bi-pencil"></i>
                     </button>
                     <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
-                        <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
+                        <button type="submit" class="btn btn-danger btn-sm square-btn" title="Supprimer">
                             <i class="bi bi-trash"></i>
                         </button>
                     </form>
                 </div>
+            {% elif current_user.is_admin %}
+                {% if objet.statut.value == 'EN_ATTENTE' %}
+                    <div class="action-buttons d-flex gap-1">
+                        <form method="POST" action="{{ url_for(validate_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
+                            <button type="submit" class="btn btn-success square-btn" title="Valider">
+                                <i class="bi bi-check"></i>
+                            </button>
+                        </form>
+                        <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
+                            <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                {% else %}
+                    <div class="action-buttons d-flex gap-1">
+                        <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
+                            <button type="submit" class="btn btn-danger square-btn" title="Supprimer">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                {% endif %}
             {% endif %}
         {% endif %}
     {% endif %}
@@ -98,24 +100,24 @@
                     </p>
                 {% endif %}
                 <p class="description" id="etablissement-{{ etablissement.id_etab }}-description">Description : {{ etablissement.description }}</p>
-                {{ afficher_boutons_actions(etablissement, current_user, 'id_etab', 'maps.modifier_etablissement', 'maps.supprimer_etablissement', 'maps.valider_etablissement', 'etablissement') }}
+                {{ afficher_boutons_actions(etablissement, current_user, 'id_etab', 'maps.modifier_etablissement', 'maps.supprimer_etablissement', 'maps.valider_etablissement', 'etablissement', current_page) }}
             </div>
             {{ afficher_formulaire_edition_etablissement(etablissement, form_edit, current_user) }}
             <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}">Afficher plus</a>
         </div>
     </div>
-<script>
-    function cancelEdit(idEtab) {
-        document.getElementById('etablissement-' + idEtab + '-display').style.display = 'block';
-        document.getElementById('etablissement-' + idEtab + '-edit').style.display = 'none';
-    }
-    function editEtablissement(idEtab) {
-        document.getElementById('etablissement-' + idEtab + '-display').style.display = 'none';
-        document.getElementById('etablissement-' + idEtab + '-edit').style.display = 'block';
-    }
-</script>
-
+    <script>
+        function cancelEdit(idEtab) {
+            document.getElementById('etablissement-' + idEtab + '-display').style.display = 'block';
+            document.getElementById('etablissement-' + idEtab + '-edit').style.display = 'none';
+        }
+        function editEtablissement(idEtab) {
+            document.getElementById('etablissement-' + idEtab + '-display').style.display = 'none';
+            document.getElementById('etablissement-' + idEtab + '-edit').style.display = 'block';
+        }
+    </script>
 {% endmacro %}
+
 
 {% macro afficher_formulaire_edition_etablissement(etablissement, form_edit, current_user) %}
     <div id="etablissement-{{ etablissement.id_etab }}-edit" style="display: none;">
@@ -188,7 +190,7 @@
                 <p class="type">Texture : {{ flan.type_texture.value | default("inconnue") }}</p>
                 <p class="type" id="flan-{{ flan.id_flan }}-description">Description : {{ flan.description | default("Flantastique") }}</p>
                 <p class="flan-price">Prix : {{ "%.2f"|format(flan.prix) }} €</p>
-                {{ afficher_boutons_actions(flan, current_user, 'id_flan', 'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan', 'flan') }}
+                {{ afficher_boutons_actions(flan, current_user, 'id_flan', 'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan', 'flan', current_page) }}
             </div>
             {{ afficher_formulaire_edition_flan(flan, form) }}
         </div>
@@ -200,7 +202,6 @@
             const editElement = document.getElementById('flan-' + idFlan + '-edit');
             const nomElement = document.getElementById('flan-' + idFlan + '-nom');
             const descriptionElement = document.getElementById('flan-' + idFlan + '-description');
-
             if (displayElement && editElement && nomElement && descriptionElement) {
                 document.getElementById('edit-flan-nom').value = nomElement.textContent;
                 document.getElementById('edit-flan-description').value = descriptionElement.textContent.replace('Description : ', '').trim();
@@ -222,6 +223,7 @@
         }
     </script>
 {% endmacro %}
+
 
 {% macro afficher_formulaire_edition_flan(flan, form) %}
     {% if form is not none %}
@@ -279,7 +281,7 @@
             {% if current_user.is_authenticated and (current_user.id_user == evaluation.id_user or current_user.is_admin) %}
                 <div id="evaluation-{{ evaluation.id_eval }}-display">
                     {{ afficher_criteres_evaluation(evaluation) }}
-                    {{ afficher_boutons_actions(evaluation, current_user, 'id_eval', 'main.afficher_evaluation_unique', 'main.supprimer_evaluation', 'main.valider_evaluation', 'evaluation') }}
+                    {{ afficher_boutons_actions(evaluation, current_user, 'id_eval', 'main.afficher_evaluation_unique', 'main.supprimer_evaluation', 'main.valider_evaluation', 'evaluation', current_page) }}
                 </div>
                 {{ afficher_formulaire_edition_evaluation(evaluation, form) }}
             {% else %}
@@ -473,26 +475,26 @@
         <div class="form-group">
             <label for="search" class="form-label">Recherche d'établissement</label>
             <input type="text" id="search" class="form-control" placeholder="Rechercher un établissement">
+
         </div>
         {{ afficher_champ_formulaire(form.description) }}
         {% if current_user.is_admin %}
-            <style>
-                .form-check {
-                    margin-bottom: 10px;
-                }
-                .form-check-input {
-                    margin-right: 8px;
-                }
-            </style>
-<div class="form-check">
-    {{ form.label(class="form-check-input") }}
-    <label class="form-check-label" for="{{ form.label.id }}">Labellisé</label>
-</div>
-<div class="form-check">
-    {{ form.visite(class="form-check-input") }}
-    <label class="form-check-label" for="{{ form.visite.id }}">Visité</label>
-</div>
-
+            <div class="form-group form-check">
+                <input type="checkbox"
+                       id="{{ form.label.id }}"
+                       name="{{ form.label.name }}"
+                       class="form-check-input"
+                       {{ form.label() }}>
+                <label class="form-check-label" for="{{ form.label.id }}">{{ form.label.label }}</label>
+            </div>
+            <div class="form-group form-check">
+                <input type="checkbox"
+                       id="{{ form.visite.id }}"
+                       name="{{ form.visite.name }}"
+                       class="form-check-input"
+                       {{ form.visite() }}>
+                <label class="form-check-label" for="{{ form.visite.id }}">{{ form.visite.label }}</label>
+            </div>
         {% endif %}
         <!-- Champs cachés avec préfixe -->
         <input type="hidden" id="ajout-etab-nom" name="ajout-etab-nom" value="{{ form.nom.data }}">
@@ -506,7 +508,6 @@
         </div>
     </form>
 {% endmacro %}
-
 
 
 {% macro afficher_radio_field(field) %}
