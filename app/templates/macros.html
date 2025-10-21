@@ -7,7 +7,6 @@
     {% endif %}
 {% endmacro %}
 
-<!-- BADGES -->
 {% macro afficher_badge_type_etab(etablissement) %}
     {% set couleurs = {
         'BOULANGERIE': '#F5DEB3',
@@ -15,31 +14,20 @@
         'RESTAURANT': '#87CEEB',
         'CAFE': '#D2B48C'
     } %}
-    {% set couleur = couleurs.get(etablissement.type_etab.name, '#D3D3D3') %} {# Gris par défaut #}
+    {% set couleur = couleurs.get(etablissement.type_etab.name, '#D3D3D3') %}
 
-    <div style="
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        background-color: {{ couleur }};
-        color: #333;
-        padding: 5px 10px;
-        border-radius: 15px;
-        font-size: 0.8em;
-        font-weight: bold;
-        text-transform: uppercase;
-        z-index: 10;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    ">
+    <div class="badge badge-type-etab" style="background-color: {{ couleur }};">
         {{ etablissement.type_etab.value }}
     </div>
 {% endmacro %}
 
+
 {% macro afficher_badge_etablissement(etablissement) %}
     {% if etablissement.label %}
-        <span class="badge">⭐ Labellisé</span>
+        <span class="badge badge-labellise">⭐ Labellisé</span>
     {% endif %}
 {% endmacro %}
+
 
 {% macro afficher_badge_flan(flan) %}
     {% if flan.prix is not none %}
