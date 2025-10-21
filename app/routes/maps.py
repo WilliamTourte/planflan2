@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
+from werkzeug.datastructures import MultiDict
+
 from app.config import Config
 from app.outils import enlever_accents, afficher_etablissements
 import re
@@ -60,83 +62,95 @@ def verifier_etablissement():
         print("Aucun établissement trouvé avec ces critères.")
         return jsonify({'exists': False})
 
+from flask import request, current_app, flash, redirect, url_for, render_template
+from werkzeug.datastructures import MultiDict
+from app.outils import afficher_etablissements
 
-from flask import request, current_app, flash
+from flask import request, current_app, flash, redirect, url_for, render_template
+from werkzeug.datastructures import MultiDict
+from app.outils import afficher_etablissements
 
 @maps_bp.route('/ajouter_etablissement', methods=['GET', 'POST'])
 def ajouter_etablissement():
-    # Instancie les formulaires avec les préfixes
-    form_ajout = EtabForm(prefix='ajout')
-    form_edit = EtabForm(prefix='edit')
-
+    form_ajout = EtabForm(prefix='ajout-etab')
     if request.method == 'POST':
-        print("\n--- NOUVELLE SOUMISSION POST ---")
+        print("\n" + "="*80)
+        print("NOUVELLE SOUMISSION POST")
+        print("="*80)
 
-        # Affiche toutes les données brutes reçues dans la requête
-        print("Données brutes reçues (request.form):", dict(request.form))
+        # 1. Afficher toutes les données brutes reçues
+        print("\n1. DONNÉES BRUTES REÇUES:")
+        form_data_raw = dict(request.form)
+        for key, value in form_data_raw.items():
+            print(f"   {key}: {value}")
 
-        # Vérifie que le formulaire d'ajout est soumis
-        if form_ajout.validate_on_submit():
-            print("\n✅ Formulaire VALIDE !")
-            print("Données validées par WTForms :")
-            print("- Nom:", form_ajout.nom.data)
-            print("- Adresse:", form_ajout.adresse.data)
-            print("- Code postal:", form_ajout.code_postal.data)
-            print("- Ville:", form_ajout.ville.data)
-            print("- Latitude:", form_ajout.latitude.data)
-            print("- Longitude:", form_ajout.longitude.data)
-            print("- Type:", form_ajout.type_etab.data)
-            print("- Description:", form_ajout.description.data)
-            if hasattr(form_ajout, 'label'):
-                print("- Labellisé:", form_ajout.label.data)
-            if hasattr(form_ajout, 'visite'):
-                print("- Visité:", form_ajout.visite.data)
+        # 2. Créer une nouvelle instance de formulaire DIRECTEMENT avec les données brutes (sans renommage)
+        form_ajout = EtabForm(prefix='ajout-etab', formdata=MultiDict(request.form))
 
-            # Ici, tu peux ajouter la logique pour sauvegarder l'établissement
-            # Exemple :
-            # nouvel_etablissement = Etablissement(
-            #     nom=form_ajout.nom.data,
-            #     adresse=form_ajout.adresse.data,
-            #     ...
-            # )
-            # db.session.add(nouvel_etablissement)
-            # db.session.commit()
-
+        # 3. Vérifier la validation
+        print("\n7. RÉSULTAT DE LA VALIDATION:")
+        if form_ajout.validate():
+            print("   ✅ FORMULAIRE VALIDE !")
+            # 8. Afficher les données validées
+            print("\n8. DONNÉES VALIDÉES:")
+            for field_name, field in form_ajout._fields.items():
+                print(f"   {field_name}: {getattr(form_ajout, field_name).data}")
+            # Créer et sauvegarder le nouvel établissement
+            nouvel_etablissement = Etablissement(
+                nom=form_ajout.nom.data,
+                adresse=form_ajout.adresse.data,
+                code_postal=form_ajout.code_postal.data,
+                ville=form_ajout.ville.data,
+                latitude=form_ajout.latitude.data,
+                longitude=form_ajout.longitude.data,
+                type_etab=form_ajout.type_etab.data,
+                description=form_ajout.description.data,
+                id_user=current_user.id_user
+            )
+            # Ajouter les champs admin si présents dans le formulaire
+            if hasattr(form_ajout, 'label') and form_ajout.label.data:
+                nouvel_etablissement.label = (form_ajout.label.data == 'Oui')
+                print(f"   Label: {nouvel_etablissement.label}")
+            if hasattr(form_ajout, 'visite') and form_ajout.visite.data:
+                nouvel_etablissement.visite = (form_ajout.visite.data == 'Oui')
+                print(f"   Visite: {nouvel_etablissement.visite}")
+            db.session.add(nouvel_etablissement)
+            db.session.commit()
             flash("Établissement ajouté avec succès !", "success")
             return redirect(url_for('main.index'))
-
         else:
-            print("\n❌ Erreurs de validation :", form_ajout.errors)
-            print("Données partiellement récupérées (même en cas d'erreur) :")
-            print("- Nom:", form_ajout.nom.data)
-            print("- Adresse:", form_ajout.adresse.data)
-            print("- Latitude:", form_ajout.latitude.data)
-            print("- Longitude:", form_ajout.longitude.data)
-
-            # En cas d'erreur, affiche à nouveau le formulaire avec les erreurs
-            etablissements = Etablissement.query.all()
-            etablissements_json = [e.to_json() for e in etablissements]
+            print("   ❌ FORMULAIRE INVALIDE !")
+            # 9. Afficher les erreurs de validation
+            print("\n9. ERREURS DE VALIDATION:")
+            for field_name, errors in form_ajout.errors.items():
+                print(f"   {field_name}: {errors}")
+            # 10. Vérifier les données du formulaire après validation échouée
+            print("\n10. DONNÉES DU FORMULAIRE APRES ÉCHEC:")
+            for field_name, field in form_ajout._fields.items():
+                print(f"   {field_name}: {getattr(form_ajout, field_name).data}")
+            resultats = Etablissement.query.all()
+            etablissements, etablissements_json = afficher_etablissements(resultats)
             return render_template(
                 'liste_etablissements.html',
                 etablissements=etablissements,
                 etablissements_json=etablissements_json,
                 form_ajout=form_ajout,
-                form_edit=form_edit,
+                form_edit=EtabForm(prefix='edit-etab'),
                 google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY']
             )
-
-    # Pour une requête GET, rend simplement le template
-    print("\n--- AFFICHAGE DU FORMULAIRE (GET) ---")
-    etablissements = Etablissement.query.all()
-    etablissements_json = [e.to_json() for e in etablissements]
+    # Pour une requête GET
+    print("\nREQUÊTE GET - Affichage du formulaire")
+    resultats = Etablissement.query.all()
+    etablissements, etablissements_json = afficher_etablissements(resultats)
     return render_template(
         'liste_etablissements.html',
         etablissements=etablissements,
         etablissements_json=etablissements_json,
         form_ajout=form_ajout,
-        form_edit=form_edit,
+        form_edit=EtabForm(prefix='edit-etab'),
         google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY']
     )
+
 
 
 @maps_bp.route('/modifier_etablissement/<int:id_etab>', methods=['GET', 'POST'])

@@ -4,11 +4,13 @@
 let autocomplete;
 let map;
 let markers = [];
+
 // Fonction pour initialiser l'autocomplétion et la carte
 window.initAll = function() {
     initAutocomplete();
     initMap();
 };
+
 window.initAutocomplete = function() {
     const input = document.getElementById('search');
     if (!input) {
@@ -19,14 +21,18 @@ window.initAutocomplete = function() {
         types: ['establishment'],
         componentRestrictions: {country: 'fr'}
     });
+
+    // Écouter les changements dans l'Autocomplete
     autocomplete.addListener('place_changed', function() {
         const place = autocomplete.getPlace();
         if (!place.geometry) return;
-        // Remplir les champs CACHÉS avec le préfixe "ajout-"
-        document.getElementById('ajout-nom').value = place.name || '';
-        document.getElementById('ajout-adresse').value = place.formatted_address || '';
-        document.getElementById('ajout-latitude').value = place.geometry.location.lat();
-        document.getElementById('ajout-longitude').value = place.geometry.location.lng();
+
+        // Remplir les champs CACHÉS avec le préfixe "ajout-etab-"
+        document.getElementById('ajout-etab-nom').value = place.name || '';
+        document.getElementById('ajout-etab-adresse').value = place.formatted_address || '';
+        document.getElementById('ajout-etab-latitude').value = place.geometry.location.lat();
+        document.getElementById('ajout-etab-longitude').value = place.geometry.location.lng();
+
         // Vérifier si le lieu est déjà dans la liste
         fetch('/verifier_etablissement', {
             method: 'POST',
@@ -45,7 +51,8 @@ window.initAutocomplete = function() {
             }
         })
         .catch(error => console.error('Erreur:', error));
-        // Extraire code postal et ville pour le formulaire d'AJOUT
+
+        // Envoyer l'adresse à une route AJAX pour extraire le code postal et la ville
         fetch('/extraire_infos_adresse', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -53,9 +60,9 @@ window.initAutocomplete = function() {
         })
         .then(response => response.json())
         .then(data => {
-            document.getElementById('ajout-code_postal').value = data.code_postal || '';
-            document.getElementById('ajout-ville').value = data.ville || '';
-            document.getElementById('ajout-adresse').value = data.adresse_nettoyee || '';
+            document.getElementById('ajout-etab-code_postal').value = data.code_postal || '';
+            document.getElementById('ajout-etab-ville').value = data.ville || '';
+            document.getElementById('ajout-etab-adresse').value = data.adresse_nettoyee || '';
         })
         .catch(error => console.error('Erreur:', error));
     });
@@ -73,19 +80,20 @@ window.initMap = function() {
         }
         return;
     }
+
     map = new google.maps.Map(mapElement, {
-        center: { lat: 46.2276, lng: 2.2137 }, // Coordonnées approximatives du centre de la France
-        zoom: 6, // Niveau de zoom pour afficher toute la France
+        center: { lat: 46.2276, lng: 2.2137 },
+        zoom: 6,
     });
+
     const etablissements = {{ etablissements_json|tojson|safe }};
     const infowindow = new google.maps.InfoWindow();
-    const isAdmin = {{ current_user.is_admin|tojson|safe if current_user.is_authenticated else 'false' }}; // Variable pour vérifier si l'utilisateur est admin
-    const bounds = new google.maps.LatLngBounds(); // Crée une nouvelle instance de LatLngBounds
+    const isAdmin = {{ current_user.is_admin|tojson|safe if current_user.is_authenticated else 'false' }};
+    const bounds = new google.maps.LatLngBounds();
+
     etablissements.forEach(etablissement => {
-        // L'icône change selon que le lieu a été visité et/ou labellisé
         let icon;
         if (isAdmin) {
-            // Logique pour les admins : afficher visité et labellisé
             if (etablissement.visite) {
                 icon = "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
             } else if (etablissement.label) {
@@ -94,20 +102,22 @@ window.initMap = function() {
                 icon = "https://maps.google.com/mapfiles/ms/icons/red-dot.png";
             }
         } else {
-            // Logique pour les non-admins : afficher labellisé
             if (etablissement.label) {
                 icon = "https://maps.google.com/mapfiles/ms/icons/blue-dot.png";
             } else {
                 icon = "https://maps.google.com/mapfiles/ms/icons/red-dot.png";
             }
         }
+
         const marker = new google.maps.Marker({
             position: { lat: etablissement.latitude, lng: etablissement.longitude },
             map: map,
             title: etablissement.nom,
             icon: icon
         });
-        bounds.extend(marker.position); // Ajoute la position du marqueur aux limites
+
+        bounds.extend(marker.position);
+
         const detailsUrl = `/etablissement/${etablissement.id_etab}?nom=${nom}&visite=${visite}&labellise=${labellise}`;
         const content = `
             <div class="infowindow">
@@ -118,29 +128,33 @@ window.initMap = function() {
                 <a href="${detailsUrl}">Voir la page</a>
             </div>
         `;
+
         marker.addListener("click", () => {
             setTimeout(() => {
                 infowindow.setContent(content);
                 infowindow.open(map, marker);
             }, 50);
         });
+
         markers.push(marker);
     });
+
     if (etablissements.length > 0) {
         if (etablissements.length === 1) {
             map.setCenter(markers[0].position);
-            map.setZoom(14); // Niveau de zoom pour un seul marqueur
+            map.setZoom(14);
         } else {
-            map.fitBounds(bounds); // Ajuster la carte aux limites
+            map.fitBounds(bounds);
         }
     }
-    // Créer un élément div pour la légende
+
+    // Légende
     const legend = document.createElement('div');
     legend.style.backgroundColor = 'white';
     legend.style.padding = '10px';
     legend.style.margin = '10px';
     legend.style.border = '1px solid #ccc';
-    // Ajouter le contenu de la légende
+
     if (isAdmin) {
         legend.innerHTML = `
             <h3>Legende</h3>
@@ -153,10 +167,11 @@ window.initMap = function() {
             <h3><img src="https://maps.google.com/mapfiles/ms/icons/blue-dot.png" alt="Labellisé">Labellise </h3>
         `;
     }
-    // Ajouter la légende à la carte
+
     map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(legend);
 };
-// Ajouter un écouteur d'événement pour DOMContentLoaded
+
+// Chargement de l'API Google Maps
 document.addEventListener('DOMContentLoaded', function() {
     const mapElement = document.getElementById("map");
     if (mapElement) {
@@ -169,6 +184,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error("Élément #map introuvable même après le chargement du DOM !");
     }
 });
+
 const nom = "{{ request.args.get('nom') }}";
 const visite = "{{ request.args.get('visite') }}";
 const labellise = "{{ request.args.get('labellise') }}";
