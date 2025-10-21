@@ -114,8 +114,11 @@ def dashboard():
 @main_bp.route('/rechercher', methods=['GET', 'POST'])
 def rechercher():
     from app.outils import afficher_etablissements
+    from flask import flash, redirect, url_for
+
     form_recherche = RechercheForm(prefix='recherche')
     form_ajout = EtabForm(prefix='ajout-etab')
+    form_edit = EtabForm(prefix='edit-etab')  # Formulaire générique pour l'édition
     query = Etablissement.query
 
     def apply_filters(query, params):
@@ -159,9 +162,11 @@ def rechercher():
         has_search_params = any(request.args.get(k) for k in ['nom', 'ville', 'type_saveur', 'type_pate', 'type_texture', 'prix', 'visite', 'labellise'])
         if has_search_params:
             query = apply_filters(query, request.args)
+            if query is None:
+                flash("Erreur lors de l'application des filtres.", "error")
+                return redirect(url_for('main.rechercher'))
         else:
-            return render_template('rechercher.html', form_recherche=form_recherche, form_ajout=form_ajout)
-
+            return render_template('rechercher.html', form_recherche=form_recherche, form_ajout=form_ajout, form_edit=form_edit)  # Passe un formulaire d'édition générique)
     elif form_recherche.validate_on_submit():
         query = apply_filters(query, {
             'nom': form_recherche.nom.data,
@@ -173,18 +178,29 @@ def rechercher():
             'visite': form_recherche.visite.data,
             'labellise': form_recherche.labellise.data
         })
-
+        if query is None:
+            flash("Erreur lors de l'application des filtres.", "error")
+            return redirect(url_for('main.rechercher'))
     else:
-        return render_template('rechercher.html', form_recherche=form_recherche, form_ajout=form_ajout)
+        return render_template('rechercher.html', form_recherche=form_recherche, form_ajout=form_ajout, form_edit=form_edit)
+
+    # Vérifie que query est bien une requête valide avant d'appeler .all()
+    if query is None:
+        flash("La requête est invalide.", "error")
+        return redirect(url_for('main.rechercher'))
 
     resultats = query.all()
+    if not resultats:
+        flash("Aucun établissement trouvé avec ces critères.", "info")
+
     etablissements, etablissements_json = afficher_etablissements(resultats)
     session['resultats_recherche'] = etablissements_json
     return render_template('liste_etablissements.html',
                            etablissements=etablissements,
                            etablissements_json=etablissements_json,
                            google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
-                           form_ajout=form_ajout)
+                           form_ajout=form_ajout, form_edit=form_edit)
+
 
 @main_bp.route('/etablissement/<int:id_etab>', methods=['GET', 'POST'])
 def afficher_etablissement_unique(id_etab):
