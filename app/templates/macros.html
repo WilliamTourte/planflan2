@@ -150,6 +150,7 @@
 
 
 {% macro afficher_formulaire_edition_etablissement(etablissement, form_edit, current_user) %}
+    {% if form_edit %}
     <div id="etablissement-{{ etablissement.id_etab }}-edit" style="display: none;">
         <form method="POST" action="{{ url_for('maps.modifier_etablissement', id_etab=etablissement.id_etab) }}">
             {{ form_edit.hidden_tag() }}
@@ -201,6 +202,7 @@
             <button type="button" class="btn btn-secondary" onclick="cancelEdit({{ etablissement.id_etab }})">Annuler</button>
         </form>
     </div>
+    {%  endif %}
 {% endmacro %}
 
 <!-- FLAN -->
@@ -258,7 +260,7 @@
 
 
 {% macro afficher_formulaire_edition_flan(flan, form) %}
-    {% if form is not none %}
+    {% if form %}
     <div id="flan-{{ flan.id_flan }}-edit" style="display: none;">
         <form method="POST" action="{{ url_for('main.modifier_flan', id_flan=flan.id_flan) }}" class="form-container">
             {{ form.hidden_tag() }}
