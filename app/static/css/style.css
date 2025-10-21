@@ -435,7 +435,42 @@ h1, h2, h3, h4, h5, h6 {
     color: #333;
     font-weight: bold;
 }
-.form-group input,
+
+/* Styles pour les cases à cocher */
+.form-check {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    width: auto;
+}
+/* Styles pour les cases à cocher (INLINE) */
+.form-check-inline {
+    display: inline-flex; /* Affichage en ligne */
+    align-items: center; /* Alignement vertical */
+    margin-right: 20px; /* Espace entre les cases */
+    margin-bottom: 0; /* Pas de marge en bas */
+    vertical-align: middle; /* Alignement vertical */
+}
+
+.form-check-input {
+    width: 18px; /* Largeur fixe */
+    height: 18px; /* Hauteur fixe */
+    margin: 0 8px 0 0; /* Marge à droite seulement */
+    vertical-align: middle; /* Alignement vertical */
+    appearance: auto; /* Style natif */
+    -webkit-appearance: checkbox; /* Pour Safari */
+}
+
+.form-check-label {
+    display: inline-block; /* Pour un alignement précis */
+    vertical-align: middle; /* Alignement vertical */
+    margin-bottom: 0; /* Pas de marge en bas */
+    line-height: 1; /* Hauteur de ligne ajustée */
+    padding-top: 2px; /* Petit ajustement pour l'alignement */
+}
+
+}
+.form-group input:not(.form-check-input),
 .form-group textarea,
 .form-group select {
     width: 100%;

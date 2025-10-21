@@ -437,12 +437,12 @@
 {% macro afficher_bouton_ajout(objet_type, current_user, etablissement=None, form_ajout=None, flan=None) %}
     {% if objet_type == 'etablissement' %}
         <div class="card-content">
-            <h3>Ajouter un établissement</h3>
+            <h3>Ajouter un etablissement</h3>
             {% if current_user.is_authenticated %}
                 {{ proposer_etablissement(form_ajout, url_for('maps.ajouter_etablissement'), current_user) }}
             {% else %}
                 <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
-                    Ajouter un établissement (connectez-vous)
+                    Ajouter un etablissement (connectez-vous)
                 </a>
             {% endif %}
         </div>
@@ -459,12 +459,12 @@
         </div>
     {% elif objet_type == 'evaluation' and flan %}
         <div class="card-content">
-            <h3>Ajouter une évaluation</h3>
+            <h3>Ajouter une evaluation</h3>
             {% if current_user.is_authenticated %}
                 {{ proposer_evaluation(form_ajout, url_for('main.evaluer_flan', id_flan=flan.id_flan)) }}
             {% else %}
                 <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
-                    Ajouter une évaluation (connectez-vous)
+                    Ajouter une evaluation (connectez-vous)
                 </a>
             {% endif %}
         </div>
@@ -514,22 +514,20 @@
         </div>
         {{ afficher_champ_formulaire(form.description) }}
         {% if current_user.is_admin %}
-            <div class="form-group form-check">
-                <input type="checkbox"
-                       id="{{ form.label.id }}"
-                       name="{{ form.label.name }}"
-                       class="form-check-input"
-                       {{ form.label() }}>
-                <label class="form-check-label" for="{{ form.label.id }}">{{ form.label.label }}</label>
-            </div>
-            <div class="form-group form-check">
-                <input type="checkbox"
-                       id="{{ form.visite.id }}"
-                       name="{{ form.visite.name }}"
-                       class="form-check-input"
-                       {{ form.visite() }}>
-                <label class="form-check-label" for="{{ form.visite.id }}">{{ form.visite.label }}</label>
-            </div>
+<!-- Utilise une div conteneur pour regrouper les cases -->
+<div class="form-check-container">
+    <div class="form-check-inline">
+        <input type="checkbox" id="{{ form.label.id }}" name="{{ form.label.name }}" class="form-check-input" {{ form.label() }}>
+        <label class="form-check-label" for="{{ form.label.id }}">{{ form.label.label }}</label>
+    </div>
+    <div class="form-check-inline">
+        <input type="checkbox" id="{{ form.visite.id }}" name="{{ form.visite.name }}" class="form-check-input" {{ form.visite() }}>
+        <label class="form-check-label" for="{{ form.visite.id }}">{{ form.visite.label }}</label>
+    </div>
+</div>
+
+
+
         {% endif %}
         <!-- Champs cachés avec préfixe -->
         <input type="hidden" id="ajout-etab-nom" name="ajout-etab-nom" value="{{ form.nom.data }}">
@@ -586,7 +584,6 @@
         </div>
     </form>
 {% endmacro %}
-
 {% macro modifier_etablissement(form, action_url) %}
     <form method="POST" action="{{ action_url }}" class="form-container">
         {{ form.hidden_tag() }}
@@ -598,23 +595,37 @@
         {{ afficher_champ_formulaire(form.latitude) }}
         {{ afficher_champ_formulaire(form.longitude) }}
         {{ afficher_champ_formulaire(form.type_etab) }}
+
         {% if current_user.is_admin %}
+            <!-- Labellisé (radios en ligne) -->
             <div class="form-group">
-                <label>Labellisé</label><br>
-                <input type="radio" name="label" value="Oui" {% if form.label.data == 'Oui' %}checked{% endif %}> Labellisé par la Flanterie<br>
-                <input type="radio" name="label" value="Non" {% if form.label.data == 'Non' %}checked{% endif %}> Non labellisé
+                <label class="form-label">Labellisé</label>
+                <div class="form-check form-check-inline">
+                    <input type="radio" id="label-oui" name="label" value="Oui" class="form-check-input" {% if form.label.data == 'Oui' %}checked{% endif %}>
+                    <label class="form-check-label" for="label-oui">Oui</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input type="radio" id="label-non" name="label" value="Non" class="form-check-input" {% if form.label.data == 'Non' %}checked{% endif %}>
+                    <label class="form-check-label" for="label-non">Non</label>
+                </div>
             </div>
+
+            <!-- Visité (radios en ligne) -->
             <div class="form-group">
-                <label>Visité</label><br>
-                <input type="radio" name="visite" value="Oui" {% if form.visite.data == 'Oui' %}checked{% endif %}> Visité par la Flanterie<br>
-                <input type="radio" name="visite" value="Non" {% if form.visite.data == 'Non' %}checked{% endif %}> Non visité
+                <label class="form-label">Visité</label>
+                <div class="form-check form-check-inline">
+                    <input type="radio" id="visite-oui" name="visite" value="Oui" class="form-check-input" {% if form.visite.data == 'Oui' %}checked{% endif %}>
+                    <label class="form-check-label" for="visite-oui">Oui</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input type="radio" id="visite-non" name="visite" value="Non" class="form-check-input" {% if form.visite.data == 'Non' %}checked{% endif %}>
+                    <label class="form-check-label" for="visite-non">Non</label>
+                </div>
             </div>
         {% endif %}
-        <div class="form-group">
-            {{ form.submit(class="btn btn-proposer") }}
-        </div>
     </form>
 {% endmacro %}
+
 
 {% macro modifier_flan(form, action_url) %}
     <form method="POST" action="{{ action_url }}" class="form-container">
