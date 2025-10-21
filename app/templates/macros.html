@@ -224,6 +224,7 @@
 {% endmacro %}
 
 {% macro afficher_formulaire_edition_flan(flan, form) %}
+    {% if form is not none %}
     <div id="flan-{{ flan.id_flan }}-edit" style="display: none;">
         <form method="POST" action="{{ url_for('main.modifier_flan', id_flan=flan.id_flan) }}" class="form-container">
             {{ form.hidden_tag() }}
@@ -257,7 +258,9 @@
             </div>
         </form>
     </div>
+    {% endif %}
 {% endmacro %}
+
 
 <!-- EVALUATION -->
 {% macro afficher_evaluation(evaluation, current_user, form) %}
