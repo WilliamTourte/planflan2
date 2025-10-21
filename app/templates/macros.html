@@ -121,7 +121,6 @@
                 <h2 id="etablissement-{{ etablissement.id_etab }}-nom">{{ etablissement.nom | enlever_accents }}</h2>
             </div>
             <div id="etablissement-{{ etablissement.id_etab }}-display">
-                <p class="type">{{ etablissement.type_etab.value }}</p>
                 <p class="adresse" id="etablissement-{{ etablissement.id_etab }}-adresse">{{ etablissement.adresse }}, {{ etablissement.ville }}</p>
                 {% if etablissement.flans %}
                     <p class="flans-count">
