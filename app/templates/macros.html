@@ -301,6 +301,7 @@
 {% endmacro %}
 
 {% macro afficher_formulaire_edition_evaluation(evaluation, form) %}
+    {% if form is not none %}
     <div id="evaluation-{{ evaluation.id_eval }}-edit" style="display: none;">
         <form method="POST" action="{{ url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval) }}" class="form-container">
             {{ form.hidden_tag() }}
@@ -330,6 +331,7 @@
             </div>
         </form>
     </div>
+    {% endif %}
 {% endmacro %}
 
 {% macro afficher_criteres_evaluation(evaluation) %}
@@ -373,12 +375,17 @@
     {% else %}
         <div class="grille">
             {% for objet in objets %}
-                {{ afficher_objet(objet_type, objet, current_user, form_edit) }}
+                {% if objet_type == 'evaluation' and form_edit is mapping and objet.id_eval in form_edit %}
+                    {{ afficher_objet(objet_type, objet, current_user, form_edit[objet.id_eval]) }}
+                {% else %}
+                    {{ afficher_objet(objet_type, objet, current_user, form_edit) }}
+                {% endif %}
             {% endfor %}
         </div>
     {% endif %}
     {{ afficher_bouton_ajout(objet_type, current_user, etablissement, form_ajout, flan) }}
 {% endmacro %}
+
 
 {% macro afficher_objet(objet_type, objet, current_user=None, form_edit=None) %}
     {% if objet_type == 'etablissement' %}

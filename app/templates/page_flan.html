@@ -9,7 +9,8 @@
     <!-- Grille des évaluations avec bouton d'ajout -->
     <div class="evaluations-section">
         <h3>Évaluations</h3>
-        {{ afficher_grille('evaluation', flan.evaluations, current_user, form_eval, etablissement, flan) }}
+         {{ afficher_grille('evaluation', flan.evaluations, current_user, eval_forms, form_eval, flan=flan) }}
+
     </div>
 
     <!-- Boutons d'action -->
