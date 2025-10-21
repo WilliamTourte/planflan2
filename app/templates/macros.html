@@ -402,8 +402,6 @@
     {% endif %}
     <p class="type">{{ evaluation.description }}</p>
 {% endmacro %}
-
-<!-- GRILLE ET OBJET -->
 {% macro afficher_grille(objet_type, objets, current_user=None, form_edit=None, form_ajout=None, etablissement=None, flan=None) %}
     {% if not objets %}
         <div class="no-results">
@@ -420,9 +418,11 @@
             {% endfor %}
         </div>
     {% endif %}
-    {{ afficher_bouton_ajout(objet_type, current_user, etablissement, form_ajout, flan) }}
+    {# On n'affiche le bouton d'ajout que si form_ajout est fourni #}
+    {% if form_ajout %}
+        {{ afficher_bouton_ajout(objet_type, current_user, etablissement, form_ajout, flan) }}
+    {% endif %}
 {% endmacro %}
-
 {% macro afficher_objet(objet_type, objet, current_user=None, form_edit=None, current_page='') %}
     {% if objet_type == 'etablissement' %}
         {{ afficher_etablissement(objet, current_user, form_edit, current_page) }}
@@ -432,6 +432,8 @@
         {{ afficher_evaluation(objet, current_user, form_edit, current_page) }}
     {% endif %}
 {% endmacro %}
+
+
 
 
 {% macro afficher_bouton_ajout(objet_type, current_user, etablissement=None, form_ajout=None, flan=None) %}

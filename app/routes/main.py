@@ -78,8 +78,12 @@ def dashboard():
     profile_form = UpdateProfileForm(prefix='profile')
     eval_form = EvalForm(prefix='dashboard-eval')
     pending_evaluations = []
+    pending_flans = []
+    pending_etablissements = []
     if current_user.is_admin:
         pending_evaluations = Evaluation.query.filter_by(statut='EN_ATTENTE').join(Utilisateur).filter(Utilisateur.is_admin == False).all()
+        pending_flans = Flan.query.filter_by(statut='EN_ATTENTE').join(Utilisateur).filter(Utilisateur.is_admin == False).all()
+        pending_etablissements = Etablissement.query.filter_by(statut='EN_ATTENTE').join(Utilisateur).filter(Utilisateur.is_admin == False).all()
 
     if request.method == 'POST' and profile_form.validate_on_submit():
         if profile_form.email.data and profile_form.email.data != current_user.email:
@@ -109,7 +113,9 @@ def dashboard():
                           title='Tableau de bord',
                           profile_form=profile_form,
                           eval_form=eval_form,
-                          pending_evaluations=pending_evaluations)
+                          pending_evaluations=pending_evaluations,
+                           pending_flans=pending_flans,
+                           pending_etablissements=pending_etablissements)
 
 @main_bp.route('/rechercher', methods=['GET', 'POST'])
 def rechercher():
