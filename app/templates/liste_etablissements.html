@@ -94,13 +94,14 @@ window.initMap = function() {
     etablissements.forEach(etablissement => {
         let icon;
         if (isAdmin) {
-            if (etablissement.visite) {
-                icon = "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png";
-            } else if (etablissement.label) {
-                icon = "https://maps.google.com/mapfiles/ms/icons/blue-dot.png";
-            } else {
-                icon = "https://maps.google.com/mapfiles/ms/icons/red-dot.png";
-            }
+if (etablissement.label) {
+    icon = "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"; // Labellisé
+} else if (etablissement.visite) {
+    icon = "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png"; // Visité
+} else {
+    icon = "https://maps.google.com/mapfiles/ms/icons/red-dot.png"; // Ni l'un ni l'autre
+}
+
         } else {
             if (etablissement.label) {
                 icon = "https://maps.google.com/mapfiles/ms/icons/blue-dot.png";

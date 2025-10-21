@@ -36,19 +36,23 @@ class LoginForm(FlaskForm):
     next = HiddenField()  # Champ caché pour stocker l'URL de redirection
     submit = SubmitField('Se connecter')
 
+from wtforms import BooleanField
+
 class EtabForm(FlaskForm):
     type_etab = SelectField("Type d'établissement", choices=[(choice.name, choice.value) for choice in TypeEtab],
-                            validators=[DataRequired()])
+                          validators=[DataRequired()])
     nom = HiddenField('Nom', validators=[DataRequired(), Length(min=3, max=100)])
     adresse = HiddenField('Adresse', validators=[DataRequired(), Length(min=3, max=50)])
     code_postal = HiddenField('Code Postal', validators=[DataRequired(), Length(min=5, max=5)])
     ville = HiddenField('Ville', validators=[DataRequired(), Length(min=3, max=50)])
     description = StringField('Description', validators=[Length(min=3, max=255)])
-    label = RadioField('Labellisé', choices=[('Oui', 'Labellisé'), ('Non', 'Non labellisé')], default='Non')
-    visite = RadioField('Visité', choices=[('Oui', 'Visité'), ('Non', 'Non visité')], default='Non')
+    label = BooleanField('Labellisé')
+    visite = BooleanField('Visité')
     latitude = HiddenField('Latitude')
     longitude = HiddenField('Longitude')
     submit = SubmitField('Proposer un établissement')
+
+
 
 
 

@@ -465,6 +465,7 @@
         </div>
     </form>
 {% endmacro %}
+
 {% macro proposer_etablissement(form, action_url, current_user) %}
     <form method="POST" action="{{ action_url }}" class="form-container">
         {{ form.hidden_tag() }}
@@ -474,20 +475,25 @@
             <input type="text" id="search" class="form-control" placeholder="Rechercher un établissement">
         </div>
         {{ afficher_champ_formulaire(form.description) }}
-
         {% if current_user.is_admin %}
-            <div class="form-group">
-                <label>Labellisé</label><br>
-                <input type="radio" name="ajout-label" value="Oui" {% if form.label.data == 'Oui' %}checked{% endif %}> Labellisé<br>
-                <input type="radio" name="ajout-visite" value="Non" {% if form.label.data == 'Non' %}checked{% endif %}> Non labellisé
-            </div>
-            <div class="form-group">
-                <label>Visité</label><br>
-                <input type="radio" name="ajout-visite" value="Oui" {% if form.visite.data == 'Oui' %}checked{% endif %}> Visité<br>
-                <input type="radio" name="ajout-visite" value="Non" {% if form.visite.data == 'Non' %}checked{% endif %}> Non visité
-            </div>
-        {% endif %}
+            <style>
+                .form-check {
+                    margin-bottom: 10px;
+                }
+                .form-check-input {
+                    margin-right: 8px;
+                }
+            </style>
+<div class="form-check">
+    {{ form.label(class="form-check-input") }}
+    <label class="form-check-label" for="{{ form.label.id }}">Labellisé</label>
+</div>
+<div class="form-check">
+    {{ form.visite(class="form-check-input") }}
+    <label class="form-check-label" for="{{ form.visite.id }}">Visité</label>
+</div>
 
+        {% endif %}
         <!-- Champs cachés avec préfixe -->
         <input type="hidden" id="ajout-etab-nom" name="ajout-etab-nom" value="{{ form.nom.data }}">
         <input type="hidden" id="ajout-etab-adresse" name="ajout-etab-adresse" value="{{ form.adresse.data }}">
@@ -495,14 +501,40 @@
         <input type="hidden" id="ajout-etab-ville" name="ajout-etab-ville" value="{{ form.ville.data }}">
         <input type="hidden" id="ajout-etab-latitude" name="ajout-etab-latitude" value="{{ form.latitude.data }}">
         <input type="hidden" id="ajout-etab-longitude" name="ajout-etab-longitude" value="{{ form.longitude.data }}">
-        <input type="hidden" id="ajout-etab-type_etab" name="ajout-etab-type_etab" value="{{ form.type_etab.data }}">
-        <input type="hidden" id="ajout-etab-description" name="ajout-etab-description" value="{{ form.description.data }}">
-
         <div class="form-group">
             {{ form.submit(class="btn btn-proposer") }}
         </div>
     </form>
 {% endmacro %}
+
+
+
+{% macro afficher_radio_field(field) %}
+    <div class="form-group">
+        <label>{{ field.label }}</label>
+        {% for subfield in field %}
+            <div class="form-check form-check-inline">
+                <!-- Debug -->
+                {% if debug %}
+                    <p>Name: {{ subfield.name }}, Value: {{ subfield.value }}, Checked: {{ subfield.checked }}</p>
+                {% endif %}
+                <input type="radio"
+                       id="{{ subfield.id }}"
+                       name="{{ subfield.name }}"
+                       value="{{ subfield.value }}"
+                       {% if subfield.checked %}checked{% endif %}
+                       class="form-check-input">
+                <label class="form-check-label" for="{{ subfield.id }}">{{ subfield.label }}</label>
+            </div>
+        {% endfor %}
+    </div>
+{% endmacro %}
+
+
+
+
+
+
 
 
 {% macro proposer_evaluation(form, action_url) %}

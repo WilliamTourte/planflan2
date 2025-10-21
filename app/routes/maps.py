@@ -63,37 +63,12 @@ def verifier_etablissement():
         return jsonify({'exists': False})
 
 
-
-from flask import request, current_app, flash, redirect, url_for, render_template
-from werkzeug.datastructures import MultiDict
-from app.outils import afficher_etablissements
-
 @maps_bp.route('/ajouter_etablissement', methods=['GET', 'POST'])
 def ajouter_etablissement():
     form_ajout = EtabForm(prefix='ajout-etab')
     if request.method == 'POST':
-        print("\n" + "="*80)
-        print("NOUVELLE SOUMISSION POST")
-        print("="*80)
-
-        # 1. Afficher toutes les données brutes reçues
-        print("\n1. DONNÉES BRUTES REÇUES:")
-        form_data_raw = dict(request.form)
-        for key, value in form_data_raw.items():
-            print(f"   {key}: {value}")
-
-        # 2. Créer une nouvelle instance de formulaire DIRECTEMENT avec les données brutes (sans renommage)
         form_ajout = EtabForm(prefix='ajout-etab', formdata=MultiDict(request.form))
-
-        # 3. Vérifier la validation
-        print("\n7. RÉSULTAT DE LA VALIDATION:")
         if form_ajout.validate():
-            print("   ✅ FORMULAIRE VALIDE !")
-            # 8. Afficher les données validées
-            print("\n8. DONNÉES VALIDÉES:")
-            for field_name, field in form_ajout._fields.items():
-                print(f"   {field_name}: {getattr(form_ajout, field_name).data}")
-            # Créer et sauvegarder le nouvel établissement
             nouvel_etablissement = Etablissement(
                 nom=form_ajout.nom.data,
                 adresse=form_ajout.adresse.data,
@@ -103,41 +78,19 @@ def ajouter_etablissement():
                 longitude=form_ajout.longitude.data,
                 type_etab=form_ajout.type_etab.data,
                 description=form_ajout.description.data,
-                id_user=current_user.id_user
+                id_user=current_user.id_user,
+                label=form_ajout.label.data,  # Directement un booléen
+                visite=form_ajout.visite.data  # Directement un booléen
             )
-            # Ajouter les champs admin si présents dans le formulaire
-            if hasattr(form_ajout, 'label') and form_ajout.label.data:
-                nouvel_etablissement.label = (form_ajout.label.data == 'Oui')
-                print(f"   Label: {nouvel_etablissement.label}")
-            if hasattr(form_ajout, 'visite') and form_ajout.visite.data:
-                nouvel_etablissement.visite = (form_ajout.visite.data == 'Oui')
-                print(f"   Visite: {nouvel_etablissement.visite}")
             db.session.add(nouvel_etablissement)
             db.session.commit()
             flash("Établissement ajouté avec succès !", "success")
             return redirect(url_for('main.index'))
         else:
-            print("   ❌ FORMULAIRE INVALIDE !")
-            # 9. Afficher les erreurs de validation
             print("\n9. ERREURS DE VALIDATION:")
             for field_name, errors in form_ajout.errors.items():
                 print(f"   {field_name}: {errors}")
-            # 10. Vérifier les données du formulaire après validation échouée
-            print("\n10. DONNÉES DU FORMULAIRE APRES ÉCHEC:")
-            for field_name, field in form_ajout._fields.items():
-                print(f"   {field_name}: {getattr(form_ajout, field_name).data}")
-            resultats = Etablissement.query.all()
-            etablissements, etablissements_json = afficher_etablissements(resultats)
-            return render_template(
-                'liste_etablissements.html',
-                etablissements=etablissements,
-                etablissements_json=etablissements_json,
-                form_ajout=form_ajout,
-                form_edit=EtabForm(prefix='edit-etab'),
-                google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY']
-            )
     # Pour une requête GET
-    print("\nREQUÊTE GET - Affichage du formulaire")
     resultats = Etablissement.query.all()
     etablissements, etablissements_json = afficher_etablissements(resultats)
     return render_template(
@@ -148,6 +101,7 @@ def ajouter_etablissement():
         form_edit=EtabForm(prefix='edit-etab'),
         google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY']
     )
+
 
 @maps_bp.route('/modifier_etablissement/<int:id_etab>', methods=['GET', 'POST'])
 @login_required
