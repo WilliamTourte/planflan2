@@ -8,6 +8,33 @@
 {% endmacro %}
 
 <!-- BADGES -->
+{% macro afficher_badge_type_etab(etablissement) %}
+    {% set couleurs = {
+        'BOULANGERIE': '#F5DEB3',
+        'PATISSERIE': '#FFB6C1',
+        'RESTAURANT': '#87CEEB',
+        'CAFE': '#D2B48C'
+    } %}
+    {% set couleur = couleurs.get(etablissement.type_etab.name, '#D3D3D3') %} {# Gris par défaut #}
+
+    <div style="
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background-color: {{ couleur }};
+        color: #333;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 0.8em;
+        font-weight: bold;
+        text-transform: uppercase;
+        z-index: 10;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    ">
+        {{ etablissement.type_etab.value }}
+    </div>
+{% endmacro %}
+
 {% macro afficher_badge_etablissement(etablissement) %}
     {% if etablissement.label %}
         <span class="badge">⭐ Labellisé</span>
@@ -31,6 +58,7 @@
         {% endif %}
     {% endif %}
 {% endmacro %}
+
 {% macro afficher_boutons_actions(objet, current_user, id_field, modify_route, delete_route, validate_route, type_objet, current_page) %}
     {# Debug : Affichage des valeurs pour vérification #}
     <!-- DEBUG: type_objet = "{{ type_objet }}" -->
@@ -97,6 +125,7 @@
     <div class="carte">
         <div class="card-image-container">
             {{ afficher_image_ou_placeholder(etablissement) }}
+            {{ afficher_badge_type_etab(etablissement) }}
             {{ afficher_badge_etablissement(etablissement) }}
         </div>
         <div class="card-content">
