@@ -3,11 +3,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, RadioField, HiddenField, \
     DecimalField
 from wtforms.validators import DataRequired, Length, Email, ValidationError, EqualTo, NumberRange, Optional
-
 from app import bcrypt
-from app.models import TypeEtab, TypePate, TypeSaveur, TypeTexture
-
-from app.models import Utilisateur
+from app.models import TypeEtab, TypePate, TypeSaveur, TypeTexture, Utilisateur
 
 # Formulaire pour créer un compte
 class RegistrationForm(FlaskForm):
@@ -36,8 +33,7 @@ class LoginForm(FlaskForm):
     next = HiddenField()  # Champ caché pour stocker l'URL de redirection
     submit = SubmitField('Se connecter')
 
-from wtforms import BooleanField
-
+# Formulaire proposer/modifier un établissement
 class EtabForm(FlaskForm):
     type_etab = SelectField("Type d'établissement", choices=[(choice.name, choice.value) for choice in TypeEtab],
                           validators=[DataRequired()])
@@ -52,13 +48,7 @@ class EtabForm(FlaskForm):
     longitude = HiddenField('Longitude')
     submit = SubmitField('Proposer un établissement')
 
-
-
-
-
-
-
-# Formulaire pour proposer un flan
+# Formulaire proposer/modifier un flan
 class NewFlanForm(FlaskForm):
     id_etab = HiddenField('ID Établissement')  # Champ caché pour l'id_etab
     nom = StringField('Nom', validators=[DataRequired(), Length(min=3, max=50)])
@@ -69,8 +59,7 @@ class NewFlanForm(FlaskForm):
     prix = DecimalField('Prix', validators=[DataRequired(), NumberRange(0,20, "Le prix doit être compris entre 0 et 20€") ])
     submit = SubmitField('Proposer un flan')
 
-
-# Formulaire pour proposer une évaluation
+# Formulaire pour proposer/modifier une évaluation
 class EvalForm(FlaskForm):
     choix=[(0,0), (0.5,0.5), (1,1),(1.5,1.5),(2,2),(2.5,2.5),(3,3),(3.5,3.5),(4,4),(4.5,4.5),(5,5)]
     visuel = SelectField("Visuel", choices=choix, validators=[DataRequired()] )
@@ -80,6 +69,7 @@ class EvalForm(FlaskForm):
     description = StringField('Description', validators=[Length(min=3, max=255)]) #Vérifier si obligatoire dans base de données
     submit = SubmitField('Proposer une évaluation')
 
+# Formulaire de recherche
 class RechercheForm(FlaskForm):
     nom = StringField('Nom', validators=[Optional(), Length(min=3, max=50)])
     ville = StringField('Ville', validators=[Optional(), Length(min=3, max=50)])
@@ -93,10 +83,7 @@ class RechercheForm(FlaskForm):
     visite = RadioField('Visité', choices=[('tous', 'Tous'), ('oui', 'Oui'), ('non', 'Non')], default='tous')
     labellise = RadioField('Labellisé', choices=[('tous', 'Tous'), ('oui', 'Oui'), ('non', 'Non')], default='tous')
 
-
-
-
-
+# Formulaire pour modifier le profil de l'utilisateur
 class UpdateProfileForm(FlaskForm):
     pseudo = StringField('Pseudo', validators=[Optional(), Length(min=4, max=50)])
     email = StringField('Email', validators=[Optional(), Email()])
