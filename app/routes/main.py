@@ -298,71 +298,36 @@ def supprimer_flan(id_flan):
         flash('Une erreur est survenue lors de la suppression du flan.', 'danger')
     return redirect(url_for('main.dashboard'))
 
+
 @main_bp.route('/flan/<int:id_flan>/evaluer', methods=['GET', 'POST'])
 @login_required
 def evaluer_flan(id_flan):
     flan_unique = Flan.query.get_or_404(id_flan)
-    form = EvalForm(prefix='flan-eval')
-    evaluation = Evaluation.query.filter_by(id_flan=id_flan, id_user=current_user.id_user).first()
-    if request.method == 'GET' and evaluation:
-        form.visuel.data = str(evaluation.visuel)
-        form.texture.data = str(evaluation.texture)
-        form.pate.data = str(evaluation.pate)
-        form.gout.data = str(evaluation.gout)
-        form.description.data = evaluation.description
+    form = EvalForm(prefix='ajout-eval')
+
     if form.validate_on_submit():
-        try:
-            evaluation = mise_a_jour_evaluation(form, id_flan, current_user.id_user, current_user.is_admin)
-            flash('Votre évaluation a été mise à jour avec succès!', 'success')
-            return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
-        except Exception as e:
-            print("Error during form submission:", e)
-            flash('Une erreur est survenue lors de la mise à jour de l\'évaluation: ' + str(e), 'danger')
-    else:
-        if request.method == 'POST':
-            print("Form validation errors:", form.errors)
-            flash('Le formulaire n\'a pas été validé correctement. Veuillez vérifier les erreurs.', 'danger')
-    return render_template('page_flan.html', id_flan=id_flan, form=form, flan=flan_unique, evaluation=evaluation)
-
-
-def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
-    # Récupération des données du formulaire (déjà validées)
-    visuel = form.visuel.data
-    texture = form.texture.data
-    pate = form.pate.data
-    gout = form.gout.data
-    description = form.description.data or ''
-
-    # Calcul de la moyenne
-    moyenne = (float(visuel) + float(texture) + float(pate) + float(gout)) / 4
-
-    # Mise à jour ou création de l'évaluation
-    evaluation = Evaluation.query.filter_by(id_flan=id_flan, id_user=id_user).first()
-    if evaluation:
-        evaluation.visuel = visuel
-        evaluation.texture = texture
-        evaluation.pate = pate
-        evaluation.gout = gout
-        evaluation.description = description
-        evaluation.moyenne = moyenne
-    else:
+        moyenne = (float(form.visuel.data) + float(form.texture.data) + float(form.pate.data) + float(
+            form.gout.data)) / 4
         evaluation = Evaluation(
-            visuel=visuel,
-            texture=texture,
-            pate=pate,
-            gout=gout,
-            description=description,
+            visuel=form.visuel.data,
+            texture=form.texture.data,
+            pate=form.pate.data,
+            gout=form.gout.data,
+            description=form.description.data,
             id_flan=id_flan,
-            id_user=id_user,
+            id_user=current_user.id_user,
             moyenne=moyenne
         )
+        db.session.add(evaluation)
+        db.session.commit()
+        flash('Votre évaluation a été proposée avec succès!', 'success')
+        return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
 
-    if is_admin:
-        evaluation.statut = 'VALIDE'
-
-    db.session.add(evaluation)
-    db.session.commit()
-    return evaluation
+    return render_template(
+        'page_flan.html',
+        flan=flan_unique,
+        form=form
+    )
 
 
 @main_bp.route('/evaluation/<int:id_eval>', methods=['GET', 'POST'])
@@ -370,47 +335,64 @@ def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
 def afficher_evaluation_unique(id_eval):
     evaluation = Evaluation.query.get_or_404(id_eval)
     flan_unique = Flan.query.get_or_404(evaluation.id_flan)
-    form = EvalForm(prefix='eval-detail')
-    print("Valeurs en base quand on arrive :", evaluation.visuel, evaluation.texture, evaluation.pate, evaluation.gout)
 
-    if request.method == 'POST':
-        print("Données soumises POST :", request.form)
-        print("Valeurs en base POST :", evaluation.visuel, evaluation.texture, evaluation.pate, evaluation.gout)
-        print("Erreurs :", form.errors)
+    # Formulaire pour modifier l'évaluation existante
+    form_eval = EvalForm(prefix=f'eval-edit-{id_eval}', obj=evaluation)
 
-    if request.method == 'GET':
-        print("Valeurs en base GET :", evaluation.visuel, evaluation.texture, evaluation.pate, evaluation.gout)
+    # Traitement de la soumission du formulaire d'édition de l'évaluation
+    if form_eval.validate_on_submit():
+        evaluation.visuel = form_eval.visuel.data
+        evaluation.texture = form_eval.texture.data
+        evaluation.pate = form_eval.pate.data
+        evaluation.gout = form_eval.gout.data
+        evaluation.description = form_eval.description.data
 
-        form.visuel.data = evaluation.visuel
-        form.texture.data = evaluation.texture
-        form.pate.data = evaluation.pate
-        form.gout.data = evaluation.gout
-        form.description.data = evaluation.description
+        # Recalculer la moyenne
+        moyenne = (float(evaluation.visuel) + float(evaluation.texture) + float(evaluation.pate) + float(evaluation.gout)) / 4
+        evaluation.moyenne = moyenne
 
-    if form.validate_on_submit():
-        mise_a_jour_evaluation(form, flan_unique.id_flan, current_user.id_user, current_user.is_admin)
+        db.session.commit()
         flash('L\'évaluation a été mise à jour avec succès!', 'success')
-        return redirect(url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval))
+        return redirect(url_for('main.afficher_evaluation_unique', id_eval=id_eval))
 
-    return render_template('page_evaluation.html', evaluation=evaluation, form=form, current_user=current_user)
+    return render_template(
+        'page_evaluation.html',
+        evaluation=evaluation,
+        flan=flan_unique,
+        form=form_eval,
+        current_user=current_user
+    )
 
 
-@main_bp.route('/evaluation/<int:id_eval>/modifier', methods=['GET', 'POST'])
+@main_bp.route('/flan/<int:id_flan>/proposer_evaluation', methods=['GET', 'POST'])
 @login_required
-def modifier_evaluation(id_eval):
-    evaluation = Evaluation.query.get_or_404(id_eval)
-    form = EvalForm(prefix='eval-detail')
-    if request.method == 'GET':
-        form.visuel.data = evaluation.visuel
-        form.texture.data = evaluation.texture
-        form.pate.data = evaluation.pate
-        form.gout.data = evaluation.gout
-        form.description.data = evaluation.description
+def proposer_evaluation(id_flan):
+    flan_unique = Flan.query.get_or_404(id_flan)
+    form = EvalForm(prefix='ajout-eval')
+
     if form.validate_on_submit():
-        mise_a_jour_evaluation(form, evaluation.id_flan, current_user.id_user, current_user.is_admin)
-        flash('L\'évaluation a été mise à jour avec succès!', 'success')
-        return redirect(url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval))
-    return redirect(url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval, form=form))
+        moyenne = (float(form.visuel.data) + float(form.texture.data) + float(form.pate.data) + float(form.gout.data)) / 4
+        evaluation = Evaluation(
+            visuel=form.visuel.data,
+            texture=form.texture.data,
+            pate=form.pate.data,
+            gout=form.gout.data,
+            description=form.description.data,
+            id_flan=id_flan,
+            id_user=current_user.id_user,
+            moyenne=moyenne
+        )
+        db.session.add(evaluation)
+        db.session.commit()
+        flash('Votre évaluation a été proposée avec succès!', 'success')
+        return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
+
+    return render_template(
+        'page_flan.html',
+        flan=flan_unique,
+        form=form
+    )
+
 
 
 @main_bp.route('/valider_evaluation/<int:id_eval>', methods=['POST'])
