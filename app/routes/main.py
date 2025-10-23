@@ -326,55 +326,44 @@ def evaluer_flan(id_flan):
 
 
 def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
-    print("Form data received:", form.data)
-    visuel = float(str(form.visuel.data).replace(',', '.')) if form.visuel.data else None
-    texture = float(str(form.texture.data).replace(',', '.')) if form.texture.data else None
-    pate = float(str(form.pate.data).replace(',', '.')) if form.pate.data else None
-    gout = float(str(form.gout.data).replace(',', '.')) if form.gout.data else None
-    print(f"Converted values - visuel: {visuel}, texture: {texture}, pate: {pate}, gout: {gout}")
+    # Récupération des données du formulaire (déjà validées)
+    visuel = form.visuel.data
+    texture = form.texture.data
+    pate = form.pate.data
+    gout = form.gout.data
+    description = form.description.data or ''
 
+    # Calcul de la moyenne
+    moyenne = (float(visuel) + float(texture) + float(pate) + float(gout)) / 4
+
+    # Mise à jour ou création de l'évaluation
     evaluation = Evaluation.query.filter_by(id_flan=id_flan, id_user=id_user).first()
     if evaluation:
-        if visuel is not None:
-            evaluation.visuel = visuel
-        if texture is not None:
-            evaluation.texture = texture
-        if pate is not None:
-            evaluation.pate = pate
-        if gout is not None:
-            evaluation.gout = gout
-        if form.description.data is not None and form.description.data != '':
-            evaluation.description = form.description.data
-        if visuel is not None or texture is not None or pate is not None or gout is not None:
-            moyenne = (
-                float(evaluation.visuel or 0) +
-                float(evaluation.texture or 0) +
-                float(evaluation.pate or 0) +
-                float(evaluation.gout or 0)
-            ) / 4
-            evaluation.moyenne = moyenne
+        evaluation.visuel = visuel
+        evaluation.texture = texture
+        evaluation.pate = pate
+        evaluation.gout = gout
+        evaluation.description = description
+        evaluation.moyenne = moyenne
     else:
-        moyenne = (
-            float(visuel or 0) +
-            float(texture or 0) +
-            float(pate or 0) +
-            float(gout or 0)
-        ) / 4
         evaluation = Evaluation(
             visuel=visuel,
             texture=texture,
             pate=pate,
             gout=gout,
-            description=form.description.data or '',
+            description=description,
             id_flan=id_flan,
             id_user=id_user,
             moyenne=moyenne
         )
+
     if is_admin:
         evaluation.statut = 'VALIDE'
+
     db.session.add(evaluation)
     db.session.commit()
     return evaluation
+
 
 @main_bp.route('/evaluation/<int:id_eval>', methods=['GET', 'POST'])
 @login_required
@@ -382,17 +371,21 @@ def afficher_evaluation_unique(id_eval):
     evaluation = Evaluation.query.get_or_404(id_eval)
     flan_unique = Flan.query.get_or_404(evaluation.id_flan)
     form = EvalForm(prefix='eval-detail')
+
     if request.method == 'GET':
         form.visuel.data = evaluation.visuel
         form.texture.data = evaluation.texture
         form.pate.data = evaluation.pate
         form.gout.data = evaluation.gout
         form.description.data = evaluation.description
+
     if form.validate_on_submit():
-        evaluation = mise_a_jour_evaluation(form, flan_unique.id_flan, current_user.id_user, current_user.is_admin)
+        mise_a_jour_evaluation(form, flan_unique.id_flan, current_user.id_user, current_user.is_admin)
         flash('L\'évaluation a été mise à jour avec succès!', 'success')
         return redirect(url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval))
+
     return render_template('page_evaluation.html', evaluation=evaluation, form=form, current_user=current_user)
+
 
 @main_bp.route('/valider_evaluation/<int:id_eval>', methods=['POST'])
 @login_required
