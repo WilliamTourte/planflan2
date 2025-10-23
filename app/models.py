@@ -2,7 +2,6 @@ from enum import Enum
 from app import db
 from flask_login import UserMixin
 
-
 # Enumérations
 class TypeEtab(Enum):
     BOULANGERIE = 'Boulangerie'

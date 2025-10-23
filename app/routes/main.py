@@ -1,62 +1,14 @@
 from flask import Blueprint, session, render_template, redirect, url_for, request, current_app, flash
 from flask_login import login_required, current_user
 from sqlalchemy.exc import IntegrityError
+
+from app import db, bcrypt
 from app.forms import EvalForm, NewFlanForm, RechercheForm, UpdateProfileForm, EtabForm
 from app.models import Etablissement, Flan, Evaluation, Utilisateur
-from app import db, bcrypt
+from app.outils import afficher_etablissements
 
 main_bp = Blueprint('main', __name__)
 
-def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
-    print("Form data received:", form.data)
-    visuel = float(str(form.visuel.data).replace(',', '.')) if form.visuel.data else None
-    texture = float(str(form.texture.data).replace(',', '.')) if form.texture.data else None
-    pate = float(str(form.pate.data).replace(',', '.')) if form.pate.data else None
-    gout = float(str(form.gout.data).replace(',', '.')) if form.gout.data else None
-    print(f"Converted values - visuel: {visuel}, texture: {texture}, pate: {pate}, gout: {gout}")
-
-    evaluation = Evaluation.query.filter_by(id_flan=id_flan, id_user=id_user).first()
-    if evaluation:
-        if visuel is not None:
-            evaluation.visuel = visuel
-        if texture is not None:
-            evaluation.texture = texture
-        if pate is not None:
-            evaluation.pate = pate
-        if gout is not None:
-            evaluation.gout = gout
-        if form.description.data is not None and form.description.data != '':
-            evaluation.description = form.description.data
-        if visuel is not None or texture is not None or pate is not None or gout is not None:
-            moyenne = (
-                float(evaluation.visuel or 0) +
-                float(evaluation.texture or 0) +
-                float(evaluation.pate or 0) +
-                float(evaluation.gout or 0)
-            ) / 4
-            evaluation.moyenne = moyenne
-    else:
-        moyenne = (
-            float(visuel or 0) +
-            float(texture or 0) +
-            float(pate or 0) +
-            float(gout or 0)
-        ) / 4
-        evaluation = Evaluation(
-            visuel=visuel,
-            texture=texture,
-            pate=pate,
-            gout=gout,
-            description=form.description.data or '',
-            id_flan=id_flan,
-            id_user=id_user,
-            moyenne=moyenne
-        )
-    if is_admin:
-        evaluation.statut = 'VALIDE'
-    db.session.add(evaluation)
-    db.session.commit()
-    return evaluation
 
 @main_bp.route('/')
 def index():
@@ -75,6 +27,10 @@ def index():
 @main_bp.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
+    for eval in current_user.evaluations:
+        print(
+            f"Evaluation {eval.id_eval}: flan={eval.flan}, etablissement={eval.flan.etablissement if eval.flan else None}, nom={eval.flan.etablissement.nom if eval.flan and eval.flan.etablissement else None}")
+
     profile_form = UpdateProfileForm(prefix='profile')
     eval_form = EvalForm(prefix='dashboard-eval')
     pending_evaluations = []
@@ -119,9 +75,6 @@ def dashboard():
 
 @main_bp.route('/rechercher', methods=['GET', 'POST'])
 def rechercher():
-    from app.outils import afficher_etablissements
-    from flask import flash, redirect, url_for
-
     form_recherche = RechercheForm(prefix='recherche')
     form_ajout = EtabForm(prefix='ajout-etab')
     form_edit = EtabForm(prefix='edit-etab')  # Formulaire générique pour l'édition
@@ -215,22 +168,6 @@ def afficher_etablissement_unique(id_etab):
     form_flan.id_etab.data = id_etab
     form_etab = EtabForm(prefix='edit-etab', obj=etablissement)
 
-    if form_flan.validate_on_submit():
-        flan = Flan(
-            nom=form_flan.nom.data,
-            description=form_flan.description.data,
-            prix=form_flan.prix.data,
-            type_pate=form_flan.type_pate.data,
-            type_saveur=form_flan.type_saveur.data,
-            type_texture=form_flan.type_texture.data,
-            id_etab=id_etab,
-            id_user=current_user.id_user
-        )
-        db.session.add(flan)
-        db.session.commit()
-        flash('Votre flan a été proposé avec succès !', 'success')
-        return redirect(url_for('main.afficher_etablissement_unique', id_etab=id_etab))
-
     if form_etab.validate_on_submit():
         etablissement.nom = form_etab.nom.data
         etablissement.description = form_etab.description.data
@@ -258,11 +195,6 @@ def afficher_flan_unique(id_flan):
     flan_unique = Flan.query.get_or_404(id_flan)
     form_eval = EvalForm(prefix='flan-eval')
     form_flan = NewFlanForm(prefix='edit-flan', obj=flan_unique)
-
-    # Traitement de la soumission du formulaire d'ajout d'évaluation
-    if form_eval.validate_on_submit():
-        evaluation = mise_a_jour_evaluation(form_eval, id_flan, current_user.id_user, current_user.is_admin)
-        return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
 
     # Traitement de la soumission du formulaire d'édition du flan
     if form_flan.validate_on_submit():
@@ -392,6 +324,58 @@ def evaluer_flan(id_flan):
             flash('Le formulaire n\'a pas été validé correctement. Veuillez vérifier les erreurs.', 'danger')
     return render_template('page_flan.html', id_flan=id_flan, form=form, flan=flan_unique, evaluation=evaluation)
 
+
+def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
+    print("Form data received:", form.data)
+    visuel = float(str(form.visuel.data).replace(',', '.')) if form.visuel.data else None
+    texture = float(str(form.texture.data).replace(',', '.')) if form.texture.data else None
+    pate = float(str(form.pate.data).replace(',', '.')) if form.pate.data else None
+    gout = float(str(form.gout.data).replace(',', '.')) if form.gout.data else None
+    print(f"Converted values - visuel: {visuel}, texture: {texture}, pate: {pate}, gout: {gout}")
+
+    evaluation = Evaluation.query.filter_by(id_flan=id_flan, id_user=id_user).first()
+    if evaluation:
+        if visuel is not None:
+            evaluation.visuel = visuel
+        if texture is not None:
+            evaluation.texture = texture
+        if pate is not None:
+            evaluation.pate = pate
+        if gout is not None:
+            evaluation.gout = gout
+        if form.description.data is not None and form.description.data != '':
+            evaluation.description = form.description.data
+        if visuel is not None or texture is not None or pate is not None or gout is not None:
+            moyenne = (
+                float(evaluation.visuel or 0) +
+                float(evaluation.texture or 0) +
+                float(evaluation.pate or 0) +
+                float(evaluation.gout or 0)
+            ) / 4
+            evaluation.moyenne = moyenne
+    else:
+        moyenne = (
+            float(visuel or 0) +
+            float(texture or 0) +
+            float(pate or 0) +
+            float(gout or 0)
+        ) / 4
+        evaluation = Evaluation(
+            visuel=visuel,
+            texture=texture,
+            pate=pate,
+            gout=gout,
+            description=form.description.data or '',
+            id_flan=id_flan,
+            id_user=id_user,
+            moyenne=moyenne
+        )
+    if is_admin:
+        evaluation.statut = 'VALIDE'
+    db.session.add(evaluation)
+    db.session.commit()
+    return evaluation
+
 @main_bp.route('/evaluation/<int:id_eval>', methods=['GET', 'POST'])
 @login_required
 def afficher_evaluation_unique(id_eval):
@@ -441,20 +425,3 @@ def supprimer_evaluation(id_eval):
         db.session.rollback()
         flash('Une erreur est survenue lors de la suppression de l\'évaluation.', 'danger')
     return redirect(url_for('main.dashboard'))
-
-@main_bp.route('/modifier_evaluation_grille/<int:id_eval>', methods=['POST'])
-@login_required
-def modifier_evaluation_grille(id_eval):
-    evaluation = Evaluation.query.get_or_404(id_eval)
-    if current_user.id_user != evaluation.id_user and not current_user.is_admin:
-        flash('Vous n\'avez pas le droit de modifier cette évaluation.', 'danger')
-        return redirect(url_for('main.afficher_flan_unique', id_flan=evaluation.id_flan))
-
-    form = EvalForm(prefix=f'eval-edit-{id_eval}')
-    if form.validate_on_submit():
-        evaluation = mise_a_jour_evaluation(form, evaluation.id_flan, current_user.id_user, current_user.is_admin)
-        flash('L\'évaluation a été mise à jour avec succès !', 'success')
-    else:
-        flash('Le formulaire n\'a pas été validé. Veuillez vérifier les erreurs.', 'danger')
-
-    return redirect(url_for('main.afficher_flan_unique', id_flan=evaluation.id_flan))
