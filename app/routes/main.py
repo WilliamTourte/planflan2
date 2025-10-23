@@ -371,8 +371,16 @@ def afficher_evaluation_unique(id_eval):
     evaluation = Evaluation.query.get_or_404(id_eval)
     flan_unique = Flan.query.get_or_404(evaluation.id_flan)
     form = EvalForm(prefix='eval-detail')
+    print("Valeurs en base quand on arrive :", evaluation.visuel, evaluation.texture, evaluation.pate, evaluation.gout)
+
+    if request.method == 'POST':
+        print("Données soumises POST :", request.form)
+        print("Valeurs en base POST :", evaluation.visuel, evaluation.texture, evaluation.pate, evaluation.gout)
+        print("Erreurs :", form.errors)
 
     if request.method == 'GET':
+        print("Valeurs en base GET :", evaluation.visuel, evaluation.texture, evaluation.pate, evaluation.gout)
+
         form.visuel.data = evaluation.visuel
         form.texture.data = evaluation.texture
         form.pate.data = evaluation.pate
@@ -385,6 +393,24 @@ def afficher_evaluation_unique(id_eval):
         return redirect(url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval))
 
     return render_template('page_evaluation.html', evaluation=evaluation, form=form, current_user=current_user)
+
+
+@main_bp.route('/evaluation/<int:id_eval>/modifier', methods=['GET', 'POST'])
+@login_required
+def modifier_evaluation(id_eval):
+    evaluation = Evaluation.query.get_or_404(id_eval)
+    form = EvalForm(prefix='eval-detail')
+    if request.method == 'GET':
+        form.visuel.data = evaluation.visuel
+        form.texture.data = evaluation.texture
+        form.pate.data = evaluation.pate
+        form.gout.data = evaluation.gout
+        form.description.data = evaluation.description
+    if form.validate_on_submit():
+        mise_a_jour_evaluation(form, evaluation.id_flan, current_user.id_user, current_user.is_admin)
+        flash('L\'évaluation a été mise à jour avec succès!', 'success')
+        return redirect(url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval))
+    return redirect(url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval, form=form))
 
 
 @main_bp.route('/valider_evaluation/<int:id_eval>', methods=['POST'])
