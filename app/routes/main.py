@@ -330,6 +330,35 @@ def evaluer_flan(id_flan):
     )
 
 
+@main_bp.route('/flan/<int:id_flan>/proposer_evaluation', methods=['GET', 'POST'])
+@login_required
+def proposer_evaluation(id_flan):
+    flan_unique = Flan.query.get_or_404(id_flan)
+    form = EvalForm(prefix='ajout-eval')
+
+    if form.validate_on_submit():
+        moyenne = (float(form.visuel.data) + float(form.texture.data) + float(form.pate.data) + float(form.gout.data)) / 4
+        evaluation = Evaluation(
+            visuel=form.visuel.data,
+            texture=form.texture.data,
+            pate=form.pate.data,
+            gout=form.gout.data,
+            description=form.description.data,
+            id_flan=id_flan,
+            id_user=current_user.id_user,
+            moyenne=moyenne
+        )
+        db.session.add(evaluation)
+        db.session.commit()
+        flash('Votre évaluation a été proposée avec succès!', 'success')
+        return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
+
+    return render_template(
+        'page_flan.html',
+        flan=flan_unique,
+        form=form
+    )
+
 @main_bp.route('/evaluation/<int:id_eval>', methods=['GET', 'POST'])
 @login_required
 def afficher_evaluation_unique(id_eval):
@@ -362,38 +391,6 @@ def afficher_evaluation_unique(id_eval):
         form=form_eval,
         current_user=current_user
     )
-
-
-@main_bp.route('/flan/<int:id_flan>/proposer_evaluation', methods=['GET', 'POST'])
-@login_required
-def proposer_evaluation(id_flan):
-    flan_unique = Flan.query.get_or_404(id_flan)
-    form = EvalForm(prefix='ajout-eval')
-
-    if form.validate_on_submit():
-        moyenne = (float(form.visuel.data) + float(form.texture.data) + float(form.pate.data) + float(form.gout.data)) / 4
-        evaluation = Evaluation(
-            visuel=form.visuel.data,
-            texture=form.texture.data,
-            pate=form.pate.data,
-            gout=form.gout.data,
-            description=form.description.data,
-            id_flan=id_flan,
-            id_user=current_user.id_user,
-            moyenne=moyenne
-        )
-        db.session.add(evaluation)
-        db.session.commit()
-        flash('Votre évaluation a été proposée avec succès!', 'success')
-        return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
-
-    return render_template(
-        'page_flan.html',
-        flan=flan_unique,
-        form=form
-    )
-
-
 
 @main_bp.route('/valider_evaluation/<int:id_eval>', methods=['POST'])
 @login_required
