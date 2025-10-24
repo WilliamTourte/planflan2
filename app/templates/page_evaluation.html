@@ -3,11 +3,12 @@
 
 
 
+
 {% block content %}
   <div class="container">
       <h1>Evaluation</h1>
       {% set current_page = 'page_evaluation' %}
-      {{ afficher_objet('evaluation', evaluation, current_user, form, current_page) }}
+      {{ afficher_objet('evaluation', evaluation, current_user, form, current_page, delete_form, validate_form) }}
 
           <!-- Bouton retour -->
         <div>

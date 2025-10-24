@@ -1,7 +1,7 @@
 from flask import Blueprint, session, render_template, redirect, url_for, request, current_app, flash
 from flask_login import login_required, current_user
 from sqlalchemy.exc import IntegrityError
-from app.forms import EvalForm, NewFlanForm, RechercheForm, UpdateProfileForm, EtabForm
+from app.forms import EvalForm, NewFlanForm, RechercheForm, UpdateProfileForm, EtabForm, DeleteForm, ValidateForm
 from app.models import Etablissement, Flan, Evaluation, Utilisateur
 from app import db, bcrypt
 
@@ -393,6 +393,10 @@ def afficher_evaluation_unique(id_eval):
     evaluation = Evaluation.query.get_or_404(id_eval)
     flan_unique = Flan.query.get_or_404(evaluation.id_flan)
     form = EvalForm(prefix='eval-detail')
+    delete_form = DeleteForm()  # <-- Ajoute cette ligne
+    validate_form = ValidateForm() if current_user.is_admin else None  # <-- Ajoute cette ligne
+
+
     if request.method == 'GET':
         form.visuel.data = evaluation.visuel
         form.texture.data = evaluation.texture
@@ -403,7 +407,11 @@ def afficher_evaluation_unique(id_eval):
         evaluation = mise_a_jour_evaluation(form, flan_unique.id_flan, current_user.id_user, current_user.is_admin)
         flash('L\'évaluation a été mise à jour avec succès!', 'success')
         return redirect(url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval))
-    return render_template('page_evaluation.html', evaluation=evaluation, form=form, current_user=current_user)
+    return render_template('page_evaluation.html',
+                           evaluation=evaluation, form=form, current_user=current_user,
+                           delete_form=delete_form,  # <-- Passe delete_form au template
+                            validate_form=validate_form,
+                           current_page='page_evaluation')
 
 @main_bp.route('/valider_evaluation/<int:id_eval>', methods=['POST'])
 @login_required
