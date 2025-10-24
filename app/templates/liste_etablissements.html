@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block scripts_head %}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 <script>
 let autocomplete;
 let map;
@@ -32,30 +33,51 @@ window.initAutocomplete = function() {
         document.getElementById('ajout-etab-adresse').value = place.formatted_address || '';
         document.getElementById('ajout-etab-latitude').value = place.geometry.location.lat();
         document.getElementById('ajout-etab-longitude').value = place.geometry.location.lng();
+// Vérifier si le lieu est déjà dans la liste
+fetch('/verifier_etablissement', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').content // À ajouter si tu utilises CSRF
+    },
+    body: JSON.stringify({ nom: place.name }),
+})
+.then(async response => {
+    if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Erreur serveur: ${errorText}`);
+    }
+    return response.json();
+})
+.then(data => {
+    if (data.error) {
+        console.error("Erreur:", data.error);
+        return;
+    }
+    if (data.exists) {
+        const previousMessages = document.querySelectorAll('.alert-warning');
+        previousMessages.forEach(msg => msg.remove());
+        const message = document.createElement('div');
+        message.className = 'alert alert-warning';
+        message.innerHTML = `Cet établissement est déjà dans la liste. <a href="${data.url}">Voir la page</a>`;
+        document.querySelector('.form-container').prepend(message);
+    }
+})
+.catch(error => {
+    console.error('Erreur:', error);
+    // Optionnel: afficher un message d'erreur à l'utilisateur
+    const errorMessage = document.createElement('div');
+    errorMessage.className = 'alert alert-danger';
+    errorMessage.textContent = `Erreur: ${error.message}`;
+    document.querySelector('.form-container').prepend(errorMessage);
+});
 
-        // Vérifier si le lieu est déjà dans la liste
-        fetch('/verifier_etablissement', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ nom: place.name }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.exists) {
-                const previousMessages = document.querySelectorAll('.alert-warning');
-                previousMessages.forEach(msg => msg.remove());
-                const message = document.createElement('div');
-                message.className = 'alert alert-warning';
-                message.innerHTML = `Cet établissement est déjà dans la liste. <a href="${data.url}">Voir la page</a>`;
-                document.querySelector('.form-container').prepend(message);
-            }
-        })
-        .catch(error => console.error('Erreur:', error));
 
         // Envoyer l'adresse à une route AJAX pour extraire le code postal et la ville
         fetch('/extraire_infos_adresse', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
+            headers: {'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').content    },
             body: JSON.stringify({ adresse: place.formatted_address }),
         })
         .then(response => response.json())

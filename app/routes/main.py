@@ -285,7 +285,6 @@ def afficher_flan_unique(id_flan):
                           eval_forms=eval_forms)
 
 
-
 @main_bp.route('/etablissement/<int:id_etab>/proposer_flan', methods=['GET', 'POST'])
 @login_required
 def proposer_flan(id_etab):

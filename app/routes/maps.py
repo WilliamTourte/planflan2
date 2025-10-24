@@ -31,37 +31,51 @@ def nettoyer_adresse(adresse):
 
 @maps_bp.route('/extraire_infos_adresse', methods=['POST'])
 def extraire_infos_adresse():
-    data = request.get_json()
-    adresse = data.get('adresse', '')
-    code_postal = extraire_code_postal(adresse)
-    ville = extraire_ville(adresse)
-    adresse_nettoyee = nettoyer_adresse(adresse)
-    return jsonify({
-        'code_postal': code_postal,
-        'ville': ville,
-        'adresse_nettoyee': adresse_nettoyee
-    })
+    try:
+        data = request.get_json()
+        if not data or 'adresse' not in data:
+            return jsonify({'error': 'Adresse manquante'}), 400
+        adresse = data['adresse']
+        code_postal = extraire_code_postal(adresse)
+        ville = extraire_ville(adresse)
+        adresse_nettoyee = nettoyer_adresse(adresse)
+        return jsonify({
+            'code_postal': code_postal,
+            'ville': ville,
+            'adresse_nettoyee': adresse_nettoyee
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
 
 
 
 
 @maps_bp.route('/verifier_etablissement', methods=['POST'])
 def verifier_etablissement():
-    data = request.get_json()
-    nom = data.get('nom')
+    try:
+        data = request.get_json()
+        if not data or 'nom' not in data:
+            current_app.logger.error("Données manquantes ou mal formatées")
+            return jsonify({'error': 'Le nom de l\'établissement est requis'}), 400
 
-    # Vérifier si l'établissement existe déjà dans la base de données
-    etablissement = Etablissement.query.filter_by(nom=nom).first()
-    if etablissement:
-        print(f"Établissement trouvé : {etablissement.nom}, {etablissement.adresse}")
-        return jsonify({
-            'exists': True,
-            'url': url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab)
-        })
-    else:
-        print("Aucun établissement trouvé avec ces critères.")
-        return jsonify({'exists': False})
+        nom = data['nom']
+        if not nom or not nom.strip():
+            return jsonify({'error': 'Le nom ne peut pas être vide'}), 400
 
+        etablissement = Etablissement.query.filter_by(nom=nom).first()
+        if etablissement:
+            current_app.logger.info(f"Établissement trouvé : {etablissement.nom}")
+            return jsonify({
+                'exists': True,
+                'url': url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab, _external=True)
+            })
+        else:
+            current_app.logger.info("Aucun établissement trouvé avec ce nom.")
+            return jsonify({'exists': False})
+
+    except Exception as e:
+        current_app.logger.error(f"Erreur serveur: {str(e)}\n{traceback.format_exc()}")
+        return jsonify({'error': 'Une erreur est survenue côté serveur'}), 500
 
 @maps_bp.route('/ajouter_etablissement', methods=['GET', 'POST'])
 def ajouter_etablissement():
