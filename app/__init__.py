@@ -1,11 +1,15 @@
-from flask import Flask
+from flask import Flask, g
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user
 from flask_bcrypt import Bcrypt
 from flask_wtf.csrf import CSRFProtect
 from app.config import Config
 from app.outils import enlever_accents
 from flask_migrate import Migrate
+
+
+from app.forms import DeleteForm, ValidateForm  # Assure-toi que ces formulaires existent dans app/forms.py
+
 
 # Initialisation des extensions (une seule fois)
 db = SQLAlchemy() # Doit être la SEULE instance de SQLAlchemy
