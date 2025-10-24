@@ -11,10 +11,12 @@
           <div style="text-align: right;">
               <button id="edit-profile-btn" class="btn btn-primary">Modifier le profil</button>
               <form method="POST" action="{{ url_for('auth.supprimer_compte') }}" style="display: inline-block;">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                   <button type="submit" class="btn btn-danger">Supprimer le compte</button>
               </form>
           </div>
       </div>
+  <!-- FORMULAIRE POUR EDITER PROFIL -->
       <div id="edit-profile-form" style="display: none;">
           <form method="POST" action="" class="form">
               {{ profile_form.hidden_tag() }}
