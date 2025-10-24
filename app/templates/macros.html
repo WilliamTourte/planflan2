@@ -48,11 +48,15 @@
 {% endmacro %}
 
 {% macro afficher_boutons_actions(objet, current_user, id_field, modify_route, delete_route, validate_route, type_objet, current_page) %}
-
+    {# Debug : Affichage des valeurs pour vérification #}
+    <!-- DEBUG: type_objet = "{{ type_objet }}" -->
+    <!-- DEBUG: current_page = "{{ current_page }}" -->
     {% set page_attendue = 'page_' + type_objet %}
+    <!-- DEBUG: page_attendue = "{{ page_attendue }}" -->
 
     {% if current_user.is_authenticated %}
         {% if current_page == page_attendue %}
+            <!-- DEBUG: Les pages correspondent ({{ current_page }} == {{ page_attendue }}) -->
             {% if current_user.id_user == objet.id_user and not objet.statut.value == 'VALIDE' %}
                 <div class="action-buttons d-flex gap-1">
                     <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
@@ -94,13 +98,13 @@
                     </div>
                 {% endif %}
             {% else %}
-
+                <!-- DEBUG: Utilisateur authentifié mais pas sur la bonne page (current_page="{{ current_page }}" vs page_attendue="{{ page_attendue }}") -->
             {% endif %}
         {% else %}
-
+            <!-- DEBUG: Les pages NE correspondent PAS (current_page="{{ current_page }}" vs page_attendue="{{ page_attendue }}") -->
         {% endif %}
     {% else %}
-
+        <!-- DEBUG: Utilisateur non authentifié -->
     {% endif %}
 {% endmacro %}
 
@@ -312,7 +316,7 @@
                 <div id="evaluation-{{ evaluation.id_eval }}-display">
                     {{ afficher_criteres_evaluation(evaluation) }}
                     {{ afficher_boutons_actions(evaluation, current_user,
-                    'id_eval', 'main.modifier_evaluation', 'main.supprimer_evaluation', 'main.valider_evaluation',
+                    'id_eval', 'main.afficher_evaluation_unique', 'main.supprimer_evaluation', 'main.valider_evaluation',
                     'evaluation', current_page) }}
                 </div>
                 {{ afficher_formulaire_edition_evaluation(evaluation, form) }}
