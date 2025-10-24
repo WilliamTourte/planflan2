@@ -1,6 +1,6 @@
-from flask import Flask, has_request_context
+from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager, current_user
+from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from flask_wtf.csrf import CSRFProtect
 from app.config import Config
@@ -31,16 +31,6 @@ def create_app():
     bcrypt.init_app(app)
     csrf.init_app(app)
 
-    # Enregistrement du context processor
-    @app.context_processor
-    def inject_forms():
-        from app.forms import DeleteForm, ValidateForm
-        print("Context processor appelé !")  # <-- Log
-        delete_form = DeleteForm()
-        validate_form = ValidateForm() if has_request_context() and current_user.is_authenticated and hasattr(
-            current_user, 'is_admin') and current_user.is_admin else None
-        print(f"delete_form = {delete_form}, validate_form = {validate_form}")
-        return dict(delete_form=delete_form, validate_form=validate_form)
 
     @login_manager.user_loader
     def load_user(user_id):

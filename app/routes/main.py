@@ -210,6 +210,8 @@ def afficher_etablissement_unique(id_etab):
     form_flan = NewFlanForm(prefix='ajout-flan')
     form_flan.id_etab.data = id_etab
     form_etab = EtabForm(prefix='edit-etab', obj=etablissement)
+    delete_form = DeleteForm()
+    validate_form = ValidateForm() if current_user.is_admin else None
 
     if form_flan.validate_on_submit():
         flan = Flan(
@@ -247,13 +249,17 @@ def afficher_etablissement_unique(id_etab):
                           etablissement=etablissement,
                           form_flan=form_flan,
                           form_etab=form_etab,
-                          current_user=current_user)
+                          current_user=current_user,
+                           delete_form=delete_form,
+                           validate_form=validate_form)
 
 @main_bp.route('/flan/<int:id_flan>', methods=['GET', 'POST'])
 def afficher_flan_unique(id_flan):
     flan_unique = Flan.query.get_or_404(id_flan)
     form_eval = EvalForm(prefix='flan-eval')
     form_flan = NewFlanForm(prefix='edit-flan', obj=flan_unique)
+    delete_form = DeleteForm()
+    validate_form = ValidateForm() if current_user.is_admin else None
 
     # Traitement de la soumission du formulaire d'ajout d'évaluation
     if form_eval.validate_on_submit():
@@ -282,7 +288,10 @@ def afficher_flan_unique(id_flan):
                           flan=flan_unique,
                           form_eval=form_eval,
                           form_flan=form_flan,
-                          eval_forms=eval_forms)
+                          eval_forms=eval_forms,
+                           delete_form=delete_form,
+                           validate_form=validate_form
+                           )
 
 
 @main_bp.route('/etablissement/<int:id_etab>/proposer_flan', methods=['GET', 'POST'])
@@ -393,8 +402,8 @@ def afficher_evaluation_unique(id_eval):
     evaluation = Evaluation.query.get_or_404(id_eval)
     flan_unique = Flan.query.get_or_404(evaluation.id_flan)
     form = EvalForm(prefix='eval-detail')
-    delete_form = DeleteForm()  # <-- Ajoute cette ligne
-    validate_form = ValidateForm() if current_user.is_admin else None  # <-- Ajoute cette ligne
+    delete_form = DeleteForm()
+    validate_form = ValidateForm() if current_user.is_admin else None
 
 
     if request.method == 'GET':
