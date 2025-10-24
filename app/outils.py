@@ -3,6 +3,8 @@ from flask import url_for
 
 def enlever_accents(text): # Enlève les accents parce que la police ne les gère pas bien
     import unicodedata
+    if text is None:
+        return ''
     return unicodedata.normalize('NFD', text).encode('ascii', 'ignore').decode('utf-8')
 
 
