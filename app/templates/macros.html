@@ -50,10 +50,9 @@
 {% macro afficher_boutons_actions(objet, current_user, id_field, modify_route, delete_route, validate_route, type_objet, current_page,
 delete_form, validate_form) %}
     {% set page_attendue = 'page_' + type_objet %}
-
     {% if current_user.is_authenticated %}
         {% if current_page == page_attendue %}
-            <!-- DEBUG: Les pages correspondent ({{ current_page }} == {{ page_attendue }}) -->
+
             {% if current_user.id_user == objet.id_user and not objet.statut.value == 'VALIDE' %}
                 <div class="action-buttons d-flex gap-1">
                     <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
@@ -99,17 +98,12 @@ delete_form, validate_form) %}
                     </div>
                 {% endif %}
             {% else %}
-                <!-- DEBUG: Utilisateur authentifié mais pas sur la bonne page (current_page="{{ current_page }}" vs page_attendue="{{ page_attendue }}") -->
             {% endif %}
         {% else %}
-            <!-- DEBUG: Les pages NE correspondent PAS (current_page="{{ current_page }}" vs page_attendue="{{ page_attendue }}") -->
         {% endif %}
     {% else %}
-        <!-- DEBUG: Utilisateur non authentifié -->
     {% endif %}
-
 {% endmacro %}
-
 
 <!-- ETABLISSEMENT -->
 {% macro afficher_etablissement(etablissement, current_user, form_edit, current_page, delete_form, validate_form) %}
@@ -150,8 +144,6 @@ delete_form, validate_form) %}
         }
     </script>
 {% endmacro %}
-
-
 
 {% macro afficher_formulaire_edition_etablissement(etablissement, form_edit, current_user) %}
     {% if form_edit %}

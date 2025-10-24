@@ -204,6 +204,7 @@ def rechercher():
                            form_ajout=form_ajout, form_edit=form_edit)
 
 
+
 @main_bp.route('/etablissement/<int:id_etab>', methods=['GET', 'POST'])
 def afficher_etablissement_unique(id_etab):
     etablissement = Etablissement.query.get_or_404(id_etab)
@@ -292,7 +293,6 @@ def afficher_flan_unique(id_flan):
                            delete_form=delete_form,
                            validate_form=validate_form
                            )
-
 
 @main_bp.route('/etablissement/<int:id_etab>/proposer_flan', methods=['GET', 'POST'])
 @login_required
@@ -453,20 +453,3 @@ def supprimer_evaluation(id_eval):
         db.session.rollback()
         flash('Une erreur est survenue lors de la suppression de l\'évaluation.', 'danger')
     return redirect(url_for('main.dashboard'))
-
-@main_bp.route('/modifier_evaluation_grille/<int:id_eval>', methods=['POST'])
-@login_required
-def modifier_evaluation_grille(id_eval):
-    evaluation = Evaluation.query.get_or_404(id_eval)
-    if current_user.id_user != evaluation.id_user and not current_user.is_admin:
-        flash('Vous n\'avez pas le droit de modifier cette évaluation.', 'danger')
-        return redirect(url_for('main.afficher_flan_unique', id_flan=evaluation.id_flan))
-
-    form = EvalForm(prefix=f'eval-edit-{id_eval}')
-    if form.validate_on_submit():
-        evaluation = mise_a_jour_evaluation(form, evaluation.id_flan, current_user.id_user, current_user.is_admin)
-        flash('L\'évaluation a été mise à jour avec succès !', 'success')
-    else:
-        flash('Le formulaire n\'a pas été validé. Veuillez vérifier les erreurs.', 'danger')
-
-    return redirect(url_for('main.afficher_flan_unique', id_flan=evaluation.id_flan))
