@@ -1,5 +1,5 @@
 from flask import Blueprint, session, render_template, redirect, url_for, request, current_app, flash
-from flask_login import login_required, current_user
+from flask_login import login_required, current_user, AnonymousUserMixin
 from sqlalchemy.exc import IntegrityError
 from app.forms import EvalForm, NewFlanForm, RechercheForm, UpdateProfileForm, EtabForm, DeleteForm, ValidateForm
 from app.models import Etablissement, Flan, Evaluation, Utilisateur
@@ -212,7 +212,7 @@ def afficher_etablissement_unique(id_etab):
     form_flan.id_etab.data = id_etab
     form_etab = EtabForm(prefix='edit-etab', obj=etablissement)
     delete_form = DeleteForm()
-    validate_form = ValidateForm() if current_user.is_admin else None
+    validate_form = ValidateForm()
 
     if form_flan.validate_on_submit():
         flan = Flan(
@@ -260,7 +260,7 @@ def afficher_flan_unique(id_flan):
     form_eval = EvalForm(prefix='flan-eval')
     form_flan = NewFlanForm(prefix='edit-flan', obj=flan_unique)
     delete_form = DeleteForm()
-    validate_form = ValidateForm() if current_user.is_admin else None
+    validate_form = ValidateForm()
 
     # Traitement de la soumission du formulaire d'ajout d'évaluation
     if form_eval.validate_on_submit():
@@ -403,7 +403,7 @@ def afficher_evaluation_unique(id_eval):
     flan_unique = Flan.query.get_or_404(evaluation.id_flan)
     form = EvalForm(prefix='eval-detail')
     delete_form = DeleteForm()
-    validate_form = ValidateForm() if current_user.is_admin else None
+    validate_form = ValidateForm()
 
 
     if request.method == 'GET':
