@@ -207,13 +207,13 @@ def rechercher():
 
 @main_bp.route('/etablissement/<int:id_etab>', methods=['GET', 'POST'])
 def afficher_etablissement_unique(id_etab):
-    etablissement = Etablissement.query.get_or_404(id_etab)
-    form_flan = NewFlanForm(prefix='ajout-flan')
+    etablissement = Etablissement.query.get_or_404(id_etab) #Récupération du flan par l'id_etab, ou 404 si non trouvé
+
+    form_flan = NewFlanForm(prefix='ajout-flan') #Initialisation des formulaires
     form_flan.id_etab.data = id_etab
     form_etab = EtabForm(prefix='edit-etab', obj=etablissement)
 
-
-    if form_flan.validate_on_submit():
+    if form_flan.validate_on_submit():  #Si le formulaire d'ajout de flan à la page de l'établissement est validé
         flan = Flan(
             nom=form_flan.nom.data,
             description=form_flan.description.data,
@@ -224,12 +224,12 @@ def afficher_etablissement_unique(id_etab):
             id_etab=id_etab,
             id_user=current_user.id_user
         )
-        db.session.add(flan)
+        db.session.add(flan)    # Ajout à la base de données
         db.session.commit()
         flash('Votre flan a été proposé avec succès !', 'success')
         return redirect(url_for('main.afficher_etablissement_unique', id_etab=id_etab))
 
-    if form_etab.validate_on_submit():
+    if form_etab.validate_on_submit(): # Pour mise à jour de l'établissement
         etablissement.nom = form_etab.nom.data
         etablissement.description = form_etab.description.data
         etablissement.adresse = form_etab.adresse.data
@@ -253,10 +253,9 @@ def afficher_etablissement_unique(id_etab):
 
 @main_bp.route('/flan/<int:id_flan>', methods=['GET', 'POST'])
 def afficher_flan_unique(id_flan):
-    flan_unique = Flan.query.get_or_404(id_flan)
+    flan_unique = Flan.query.get_or_404(id_flan) # Récupération du flan par l'id_flan
     form_eval = EvalForm(prefix='flan-eval')
     form_flan = NewFlanForm(prefix='edit-flan', obj=flan_unique)
-
 
     # Traitement de la soumission du formulaire d'ajout d'évaluation
     if form_eval.validate_on_submit():

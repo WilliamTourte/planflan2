@@ -11,14 +11,10 @@ window.initAll = function() {
     initAutocomplete();
     initMap();
 };
-
+// Gestion de l'autocomplete
 window.initAutocomplete = function() {
     const input = document.getElementById('search');
-    if (!input) {
-        console.error("Élément #search introuvable !");
-        return;
-    }
-    autocomplete = new google.maps.places.Autocomplete(input, {
+    const autocomplete = new google.maps.places.Autocomplete(input, {
         types: ['establishment'],
         componentRestrictions: {country: 'fr'}
     });
@@ -26,19 +22,41 @@ window.initAutocomplete = function() {
     // Écouter les changements dans l'Autocomplete
     autocomplete.addListener('place_changed', function() {
         const place = autocomplete.getPlace();
-        if (!place.geometry) return;
+        const allowedTypes = ['bakery', 'cafe', 'bar', 'meal_takeaway', 'restaurant'];
 
-        // Remplir les champs CACHÉS avec le préfixe "ajout-etab-"
+        // Si aucun lieu n'est sélectionné ou pas de géométrie, on sort
+        if (!place.geometry) {
+            window.alert("Aucun détail disponible pour cette sélection.");
+            return;
+        }
+
+        // Vérifier si le type du lieu est dans la liste autorisée
+        if (place.types) {
+            const isAllowed = place.types.some(type => allowedTypes.includes(type));
+            if (!isAllowed) {
+                window.alert("Seuls les boulangeries, patisseries, cafés et restaurants sont autorisés. Si vous pensez que ce lieu devrait être autorisé, écrivez à contact@planflan.com");
+                input.value = ''; // Effacer la sélection
+                // Réinitialiser les champs cachés
+                document.getElementById('ajout-etab-nom').value = '';
+                document.getElementById('ajout-etab-adresse').value = '';
+                document.getElementById('ajout-etab-latitude').value = '';
+                document.getElementById('ajout-etab-longitude').value = '';
+                return; // Arrêter l'exécution si le type n'est pas autorisé
+            }
+        }
+
+        // Si le type d'établissement est autorisé, remplir les champs cachés
         document.getElementById('ajout-etab-nom').value = place.name || '';
         document.getElementById('ajout-etab-adresse').value = place.formatted_address || '';
         document.getElementById('ajout-etab-latitude').value = place.geometry.location.lat();
         document.getElementById('ajout-etab-longitude').value = place.geometry.location.lng();
+
     // Vérifier si le lieu est déjà dans la liste
     fetch('/verifier_etablissement', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').content // À ajouter si tu utilises CSRF
+            'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').content
         },
         body: JSON.stringify({ nom: place.name }),
     })
@@ -65,14 +83,13 @@ window.initAutocomplete = function() {
     })
     .catch(error => {
         console.error('Erreur:', error);
-        // Optionnel: afficher un message d'erreur à l'utilisateur
         const errorMessage = document.createElement('div');
         errorMessage.className = 'alert alert-danger';
         errorMessage.textContent = `Erreur: ${error.message}`;
         document.querySelector('.form-container').prepend(errorMessage);
     });
 
-        // Envoyer l'adresse à une route AJAX pour extraire le code postal et la ville
+        // Envoie l'adresse pour extraire le code postal et la ville
         fetch('/extraire_infos_adresse', {
             method: 'POST',
             headers: {'Content-Type': 'application/json',
@@ -89,6 +106,7 @@ window.initAutocomplete = function() {
     });
 };
 
+// Gestion de la carte
 window.initMap = function() {
     const mapElement = document.getElementById("map");
     if (!mapElement) {
@@ -124,12 +142,12 @@ if (etablissement.label) {
 }
         } else {
             if (etablissement.label) {
-                icon = "https://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+                icon = "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"; // Labellisé
             } else {
-                icon = "https://maps.google.com/mapfiles/ms/icons/red-dot.png";
+                icon = "https://maps.google.com/mapfiles/ms/icons/red-dot.png"; // Non labellisé
             }
         }
-
+        // Création d'un marqueur
         const marker = new google.maps.Marker({
             position: { lat: etablissement.latitude, lng: etablissement.longitude },
             map: map,
@@ -138,15 +156,16 @@ if (etablissement.label) {
         });
 
         bounds.extend(marker.position);
-
+        // Adresse de la page de l'établissement
         const detailsUrl = `/etablissement/${etablissement.id_etab}?nom=${nom}&visite=${visite}&labellise=${labellise}`;
+        // Contenu de la carte
         const content = `
             <div class="infowindow">
                 <h3>${etablissement.nom}</h3>
                 <p class="type">${etablissement.type_etab}</p>
                 <p class="adresse">${etablissement.adresse}, ${etablissement.ville}</p>
                 ${etablissement.flans_count ? `<p class="flans-count">${etablissement.flans_count} flan${etablissement.flans_count > 1 ? 's' : ''}</p>` : ''}
-                <a href="${detailsUrl}">Voir la page</a>
+                <a href="${detailsUrl}" class="btn btn-primary">Voir plus</a>
             </div>
         `;
 
@@ -156,19 +175,17 @@ if (etablissement.label) {
                 infowindow.open(map, marker);
             }, 50);
         });
-
         markers.push(marker);
     });
-
+    // Adaptation du zoom selon le nombre d'établissements affichés
     if (etablissements.length > 0) {
         if (etablissements.length === 1) {
             map.setCenter(markers[0].position);
-            map.setZoom(14);
+            map.setZoom(18); // Quelques rues autour de l'établissement unique
         } else {
-            map.fitBounds(bounds);
+            map.fitBounds(bounds); // S'adaote au nombre d'établissements
         }
     }
-
     // Légende
     const legend = document.createElement('div');
     legend.style.backgroundColor = 'white';
@@ -179,7 +196,7 @@ if (etablissement.label) {
     if (isAdmin) {
         legend.innerHTML = `
             <h3>Legende</h3>
-            <p><img src="https://maps.google.com/mapfiles/ms/icons/blue-dot.png" alt="Labellisé"> Labellisé</p>
+            <p><img src="https://maps.google.com/mapfiles/ms/icons/blue-dot.png" alt="Labellisé"> Labellise</p>
             <p><img src="https://maps.google.com/mapfiles/ms/icons/yellow-dot.png" alt="Visité"> Visité</p>
             <p><img src="https://maps.google.com/mapfiles/ms/icons/red-dot.png" alt="Non visité"> Non visité</p>
         `;
@@ -188,7 +205,7 @@ if (etablissement.label) {
             <h3><img src="https://maps.google.com/mapfiles/ms/icons/blue-dot.png" alt="Labellisé">Labellise </h3>
         `;
     }
-
+    // Légende en bas à gauche
     map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(legend);
 };
 
@@ -205,25 +222,12 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error("Élément #map introuvable même après le chargement du DOM !");
     }
 });
-
 const nom = "{{ request.args.get('nom') }}";
 const visite = "{{ request.args.get('visite') }}";
 const labellise = "{{ request.args.get('labellise') }}";
 </script>
-<style>
-    .form-container { padding: 10px; }
-    .form-group { margin-bottom: 10px; }
-    .form-label { display: block; margin-bottom: 5px; }
-    .form-control { width: 100%; padding: 5px; }
-    .error-message { color: red; }
-    .btn-proposer { background-color: #4CAF50; color: white; padding: 10px 15px; border: none; cursor: pointer; }
-    .btn-proposer:hover { background-color: #45a049; }
-    #map { height: 80vh; width: 100%; background-color: #f5f5f5; }
-    .infowindow h3 { margin: 0 0 5px 0; color: #333; }
-    .infowindow a { color: #1a73e8; text-decoration: none; }
-    .map-container { margin-bottom: 2rem; width: 100%; padding: 0; }
-    @media (max-width: 768px) { #map { height: 60vh; } }
-</style>
+
+
 {% endblock %}
 {% block content %}
 <div class="container">

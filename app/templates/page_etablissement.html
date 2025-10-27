@@ -7,11 +7,10 @@
         {{ afficher_objet('etablissement', etablissement, current_user, form_etab, current_page) }}
     </div>
 
-    <!-- Grille des flans avec bouton d'ajout -->
+    <!-- Grille des flans avec bouton d'ajout en fin de grille -->
     <div class="flans-section">
-        <h3>Flans proposés</h3>
+        <h3>Flans proposes</h3>
         {{ afficher_grille('flan', etablissement.flans, current_user, None, form_flan, etablissement) }}
-
     </div>
 
     <!-- Bouton retour -->

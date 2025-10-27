@@ -3,6 +3,7 @@ import json
 import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from app.models import Etablissement
 
 # Configuration de l'application Flask en standalone
 app = Flask(__name__)
@@ -11,18 +12,6 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialisation de SQLAlchemy
 db = SQLAlchemy(app)
-
-# Définition des modèles directement dans le script
-class Etablissement(db.Model):
-    __tablename__ = 'etablissements'
-    id_etab = db.Column(db.Integer, primary_key=True)
-    nom = db.Column(db.String(100), nullable=False)
-    adresse = db.Column(db.String(200), nullable=False)
-    code_postal = db.Column(db.String(5), nullable=False)
-    ville = db.Column(db.String(100), nullable=False)
-    latitude = db.Column(db.Float)
-    longitude = db.Column(db.Float)
-    type_etab = db.Column(db.String(50), nullable=False)
 
 def extraire_code_postal(adresse):
     match = re.search(r'(\d{5})', adresse)

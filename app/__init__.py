@@ -17,25 +17,20 @@ bcrypt = Bcrypt()
 csrf = CSRFProtect()
 
 def create_app():
-    app = Flask(__name__)  # crée l'application
+    app = Flask(__name__)           # crée l'application
     app.config.from_object(Config)  # la configure
 
-    import logging
-    logging.basicConfig(level=logging.INFO)
-    app.logger.setLevel(logging.INFO)
-
     # Initialisation des extensions
-    db.init_app(app)
-    migrate.init_app(app, db)
-    login_manager.init_app(app)
-    bcrypt.init_app(app)
-    csrf.init_app(app)
-
+    db.init_app(app)            #SQLAlchemy
+    migrate.init_app(app, db)   #Migrate
+    login_manager.init_app(app) #Login_Manager
+    bcrypt.init_app(app)        #Bcrypt
+    csrf.init_app(app)          #CSRF
 
     @login_manager.user_loader
     def load_user(user_id):
         from app.models import Utilisateur
-        return Utilisateur.query.get(int(user_id))
+        return Utilisateur.query.get(int(user_id))  #Pour utiliser user_id plutôt que id tout court
 
     @app.template_filter('enlever_accents')  # filtre Jinja2 pour enlever les accents
     def filtre_enlever_accents(text):

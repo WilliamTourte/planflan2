@@ -180,8 +180,6 @@ def modifier_etablissement(id_etab):
         google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY']
     )
 
-
-
 @maps_bp.route('/valider_etablissement/<int:id_etab>', methods=['POST'])
 @login_required
 def valider_etablissement(id_etab):
