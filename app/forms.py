@@ -95,3 +95,9 @@ class UpdateProfileForm(FlaskForm):
     def validate_current_password(self, current_password):
         if not bcrypt.check_password_hash(current_user.password, current_password.data):
             raise ValidationError('Current password is incorrect.')
+
+class DeleteForm(FlaskForm):
+        submit = SubmitField('Supprimer')
+
+class ValidateForm(FlaskForm):
+        submit = SubmitField('Valider')

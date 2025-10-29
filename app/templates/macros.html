@@ -47,17 +47,19 @@
     {% endif %}
 {% endmacro %}
 
-{% macro afficher_boutons_actions(objet, current_user, id_field, modify_route, delete_route, validate_route, type_objet, current_page) %}
+{% macro afficher_boutons_actions(objet, current_user, id_field, modify_route, delete_route, validate_route, type_objet, current_page,
+delete_form, validate_form) %}
     {% set page_attendue = 'page_' + type_objet %}
     {% if current_user.is_authenticated %}
         {% if current_page == page_attendue %}
+
             {% if current_user.id_user == objet.id_user and not objet.statut.value == 'VALIDE' %}
                 <div class="action-buttons d-flex gap-1">
                     <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
                         <i class="bi bi-pencil"></i>
                     </button>
                     <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        {{ delete_form.hidden_tag() }}
                         <button type="submit" class="btn btn-danger btn-sm square-btn" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
                             <i class="bi bi-trash"></i>
                         </button>
@@ -67,7 +69,7 @@
                 {% if objet.statut.value == 'EN_ATTENTE' %}
                     <div class="action-buttons d-flex gap-1">
                         <form method="POST" action="{{ url_for(validate_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            {{ validate_form.hidden_tag() }}
                             <button type="submit" class="btn btn-success square-btn" title="Valider">
                                 <i class="bi bi-check"></i>
                             </button>
@@ -76,7 +78,7 @@
                             <i class="bi bi-pencil"></i>
                         </button>
                         <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            {{ delete_form.hidden_tag() }}
                             <button type="submit" class="btn btn-danger square-btn" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
                                 <i class="bi bi-trash"></i>
                             </button>
@@ -88,7 +90,7 @@
                             <i class="bi bi-pencil"></i>
                         </button>
                         <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            {{ delete_form.hidden_tag() }}
                             <button type="submit" class="btn btn-danger square-btn" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
                                 <i class="bi bi-trash"></i>
                             </button>
@@ -104,7 +106,7 @@
 {% endmacro %}
 
 <!-- ETABLISSEMENT -->
-{% macro afficher_etablissement(etablissement, current_user, form_edit, current_page) %}
+{% macro afficher_etablissement(etablissement, current_user, form_edit, current_page, delete_form, validate_form) %}
     <div class="carte">
         <div class="card-image-container">
             {{ afficher_image_ou_placeholder(etablissement) }}
@@ -124,7 +126,8 @@
                 {% endif %}
                 <p class="description" id="etablissement-{{ etablissement.id_etab }}-description">Description : {{ etablissement.description }}</p>
                 {{ afficher_boutons_actions(etablissement, current_user, 'id_etab',
-                'maps.modifier_etablissement', 'maps.supprimer_etablissement', 'maps.valider_etablissement', 'etablissement', current_page) }}
+                'maps.modifier_etablissement', 'maps.supprimer_etablissement', 'maps.valider_etablissement', 'etablissement', current_page,
+                        delete_form, validate_form) }}
             </div>
             {{ afficher_formulaire_edition_etablissement(etablissement, form_edit, current_user) }}
             <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}" class="btn btn-primary">Voir plus</a>
@@ -140,6 +143,22 @@
             document.getElementById('etablissement-' + idEtab + '-edit').style.display = 'block';
         }
     </script>
+{% endmacro %}
+
+{% macro afficher_etablissement_infowindow(etablissement, details_url) %}
+    <div class="infowindow">
+        <h3>{{ etablissement.nom | enlever_accents }}</h3>
+        {{ afficher_badge_etablissement(etablissement) }}
+        {{ afficher_badge_type_etab(etablissement) }}
+        <p class="adresse">{{ etablissement.adresse }}, {{ etablissement.ville }}</p>
+        {% if etablissement.flans %}
+            <p class="flans-count">
+                {{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}
+            </p>
+        {% endif %}
+        <a href="{{ details_url }}" class="btn btn-primary">Voir plus</a>
+        <button class="infowindow-close" onclick="closeInfoWindow()">Fermer</button>
+    </div>
 {% endmacro %}
 
 {% macro afficher_formulaire_edition_etablissement(etablissement, form_edit, current_user) %}
@@ -199,7 +218,7 @@
 {% endmacro %}
 
 <!-- FLAN -->
-{% macro afficher_flan(flan, current_user, form, current_page) %}
+{% macro afficher_flan(flan, current_user, form, current_page, delete_form, validate_form) %}
     <div class="carte">
         <div class="card-image-container">
             {{ afficher_image_ou_placeholder(flan) }}
@@ -216,7 +235,8 @@
                 <p class="type" id="flan-{{ flan.id_flan }}-description">Description : {{ flan.description | default("Flantastique") }}</p>
                 <p class="flan-price">Prix : {{ "%.2f"|format(flan.prix) }} €</p>
                 {{ afficher_boutons_actions(flan, current_user, 'id_flan',
-                'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan', 'flan', current_page) }}
+                'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan', 'flan', current_page,
+                        delete_form, validate_form) }}
             </div>
             {{ afficher_formulaire_edition_flan(flan, form) }}
         </div>
@@ -292,7 +312,7 @@
 
 
 <!-- EVALUATION -->
-{% macro afficher_evaluation(evaluation, current_user, form, current_page) %}
+{% macro afficher_evaluation(evaluation, current_user, form, current_page, delete_form, validate_form) %}
     <div class="card">
         <div class="card-content">
             <div class="card-header">
@@ -310,7 +330,8 @@
                     {{ afficher_criteres_evaluation(evaluation) }}
                     {{ afficher_boutons_actions(evaluation, current_user,
                     'id_eval', 'main.afficher_evaluation_unique', 'main.supprimer_evaluation', 'main.valider_evaluation',
-                    'evaluation', current_page) }}
+                    'evaluation', current_page,
+                            delete_form, validate_form) }}
                 </div>
                 {{ afficher_formulaire_edition_evaluation(evaluation, form) }}
             {% else %}
@@ -399,7 +420,7 @@
     <p class="type">{{ evaluation.description }}</p>
 {% endmacro %}
 
-{% macro afficher_grille(objet_type, objets, current_user=None, form_edit=None, form_ajout=None, etablissement=None, flan=None) %}
+{% macro afficher_grille(objet_type, objets, current_user=None, form_edit=None, form_ajout=None, etablissement=None, flan=None, delete_form=None, validate_form=None) %}
     {% if not objets %}
         <div class="no-results">
             <p>Aucun {{ objet_type }} trouvé.</p>
@@ -408,9 +429,9 @@
         <div class="grille">
             {% for objet in objets %}
                 {% if objet_type == 'evaluation' and form_edit is mapping and objet.id_eval in form_edit %}
-                    {{ afficher_objet(objet_type, objet, current_user, form_edit[objet.id_eval], current_page) }}
+                    {{ afficher_objet(objet_type, objet, current_user, form_edit[objet.id_eval], current_page, delete_form, validate_form) }}
                 {% else %}
-                    {{ afficher_objet(objet_type, objet, current_user, form_edit, current_page) }}
+                    {{ afficher_objet(objet_type, objet, current_user, form_edit, current_page, delete_form, validate_form) }}
                 {% endif %}
             {% endfor %}
         </div>
@@ -422,13 +443,13 @@
 {% endmacro %}
 
 
-{% macro afficher_objet(objet_type, objet, current_user=None, form_edit=None, current_page='') %}
+{% macro afficher_objet(objet_type, objet, current_user=None, form_edit=None, current_page='', delete_form=None, validate_form=None) %}
     {% if objet_type == 'etablissement' %}
-        {{ afficher_etablissement(objet, current_user, form_edit, current_page) }}
+        {{ afficher_etablissement(objet, current_user, form_edit, current_page, delete_form, validate_form) }}
     {% elif objet_type == 'flan' %}
-        {{ afficher_flan(objet, current_user, form_edit, current_page) }}
+        {{ afficher_flan(objet, current_user, form_edit, current_page, delete_form, validate_form) }}
     {% elif objet_type == 'evaluation' %}
-        {{ afficher_evaluation(objet, current_user, form_edit, current_page) }}
+        {{ afficher_evaluation(objet, current_user, form_edit, current_page, delete_form, validate_form) }}
     {% endif %}
 {% endmacro %}
 

@@ -4,15 +4,14 @@
     <!-- Détails de l'établissement -->
     <div class="etablissement-header">
         {% set current_page = 'page_etablissement' %}
-        {{ afficher_objet('etablissement', etablissement, current_user, form_etab, current_page) }}
+        {{ afficher_objet('etablissement', etablissement, current_user, form_etab, current_page, delete_form, validate_form) }}
     </div>
 
-    <!-- Grille des flans avec bouton d'ajout en fin de grille -->
+    <!-- Grille des flans avec bouton d'ajout -->
     <div class="flans-section">
-        <h3>Flans proposes</h3>
+        <h3>Flans</h3>
         {{ afficher_grille('flan', etablissement.flans, current_user, None, form_flan, etablissement) }}
     </div>
-
     <!-- Bouton retour -->
     <div>
         <a href="{{ url_for('main.index') }}" class="btn btn-back btn-with-icon">
