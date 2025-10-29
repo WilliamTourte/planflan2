@@ -1,9 +1,9 @@
 import re
 import json
 import os
+import flask
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from app.models import Etablissement
 
 # Configuration de l'application Flask en standalone
 app = Flask(__name__)
@@ -12,6 +12,19 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialisation de SQLAlchemy
 db = SQLAlchemy(app)
+
+# Définition des modèles directement dans le script
+class Etablissement(db.Model):
+    __tablename__ = 'etablissements'
+    id_etab = db.Column(db.Integer, primary_key=True)
+    nom = db.Column(db.String(100), nullable=False)
+    adresse = db.Column(db.String(200), nullable=False)
+    code_postal = db.Column(db.String(5), nullable=False)
+    ville = db.Column(db.String(100), nullable=False)
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+    type_etab = db.Column(db.String(50), nullable=False)
+    id_user = db.Column(db.Integer)
 
 def extraire_code_postal(adresse):
     match = re.search(r'(\d{5})', adresse)
@@ -53,7 +66,8 @@ def importer_lieux(fichier_json):
                                 ville=ville,
                                 latitude=latitude,
                                 longitude=longitude,
-                                type_etab='BOULANGERIE'
+                                type_etab='BOULANGERIE',
+                                id_user=1
                             )
                             db.session.add(lieu)
                             print(f"✅ Ajout : {nom}")
@@ -69,4 +83,4 @@ def importer_lieux(fichier_json):
 
 if __name__ == '__main__':
     print("🔧 Exécution en mode complètement standalone...")
-    importer_lieux(r'C:\Users\dhugonnard2025\Desktop\lieux_test.json')
+    importer_lieux(r'/home/damien/Bureau/Dossier Soutenance/Ressources/lieux_test.json')
