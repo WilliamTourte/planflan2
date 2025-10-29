@@ -145,6 +145,22 @@ delete_form, validate_form) %}
     </script>
 {% endmacro %}
 
+{% macro afficher_etablissement_infowindow(etablissement, details_url) %}
+    <div class="infowindow">
+        <h3>{{ etablissement.nom | enlever_accents }}</h3>
+        {{ afficher_badge_etablissement(etablissement) }}
+        {{ afficher_badge_type_etab(etablissement) }}
+        <p class="adresse">{{ etablissement.adresse }}, {{ etablissement.ville }}</p>
+        {% if etablissement.flans %}
+            <p class="flans-count">
+                {{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}
+            </p>
+        {% endif %}
+        <a href="{{ details_url }}">Voir la page</a>
+    </div>
+{% endmacro %}
+
+
 {% macro afficher_formulaire_edition_etablissement(etablissement, form_edit, current_user) %}
     {% if form_edit %}
     <div id="etablissement-{{ etablissement.id_etab }}-edit" style="display: none;">

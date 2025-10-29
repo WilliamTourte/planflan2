@@ -1,56 +1,44 @@
 {% extends "base.html" %}
+{% from 'macros.html' import afficher_etablissement_infowindow %}
 {% block scripts_head %}
     <meta name="csrf-token" content="{{ csrf_token() }}">
 <script>
 let autocomplete;
 let map;
 let markers = [];
+let infowindowContents = {}; // Objet pour stocker le HTML de chaque infowindow
+
+// Génération côté serveur du HTML pour chaque infowindow
+{% for etablissement in etablissements %}
+    {% set detailsUrl = '/etablissement/' ~ etablissement.id_etab ~ '?nom=' ~ nom ~ '&visite=' ~ visite ~ '&labellise=' ~ labellise %}
+    infowindowContents[{{ etablissement.id_etab }}] = {{ afficher_etablissement_infowindow(etablissement, detailsUrl)|tojson|safe }};
+{% endfor %}
 
 // Fonction pour initialiser l'autocomplétion et la carte
 window.initAll = function() {
     initAutocomplete();
     initMap();
 };
-// Gestion de l'autocomplete
+
 window.initAutocomplete = function() {
     const input = document.getElementById('search');
-    const autocomplete = new google.maps.places.Autocomplete(input, {
+    if (!input) {
+        console.error("Élément #search introuvable !");
+        return;
+    }
+    autocomplete = new google.maps.places.Autocomplete(input, {
         types: ['establishment'],
         componentRestrictions: {country: 'fr'}
     });
-
     // Écouter les changements dans l'Autocomplete
     autocomplete.addListener('place_changed', function() {
         const place = autocomplete.getPlace();
-        const allowedTypes = ['bakery', 'cafe', 'bar', 'meal_takeaway', 'restaurant'];
-
-        // Si aucun lieu n'est sélectionné ou pas de géométrie, on sort
-        if (!place.geometry) {
-            window.alert("Aucun détail disponible pour cette sélection.");
-            return;
-        }
-
-        // Vérifier si le type du lieu est dans la liste autorisée
-        if (place.types) {
-            const isAllowed = place.types.some(type => allowedTypes.includes(type));
-            if (!isAllowed) {
-                window.alert("Seuls les boulangeries, patisseries, cafés et restaurants sont autorisés. Si vous pensez que ce lieu devrait être autorisé, écrivez à contact@planflan.com");
-                input.value = ''; // Effacer la sélection
-                // Réinitialiser les champs cachés
-                document.getElementById('ajout-etab-nom').value = '';
-                document.getElementById('ajout-etab-adresse').value = '';
-                document.getElementById('ajout-etab-latitude').value = '';
-                document.getElementById('ajout-etab-longitude').value = '';
-                return; // Arrêter l'exécution si le type n'est pas autorisé
-            }
-        }
-
-        // Si le type d'établissement est autorisé, remplir les champs cachés
+        if (!place.geometry) return;
+        // Remplir les champs CACHÉS avec le préfixe "ajout-etab-"
         document.getElementById('ajout-etab-nom').value = place.name || '';
         document.getElementById('ajout-etab-adresse').value = place.formatted_address || '';
         document.getElementById('ajout-etab-latitude').value = place.geometry.location.lat();
         document.getElementById('ajout-etab-longitude').value = place.geometry.location.lng();
-
     // Vérifier si le lieu est déjà dans la liste
     fetch('/verifier_etablissement', {
         method: 'POST',
@@ -88,8 +76,7 @@ window.initAutocomplete = function() {
         errorMessage.textContent = `Erreur: ${error.message}`;
         document.querySelector('.form-container').prepend(errorMessage);
     });
-
-        // Envoie l'adresse pour extraire le code postal et la ville
+        // Envoyer l'adresse à une route AJAX pour extraire le code postal et la ville
         fetch('/extraire_infos_adresse', {
             method: 'POST',
             headers: {'Content-Type': 'application/json',
@@ -106,7 +93,6 @@ window.initAutocomplete = function() {
     });
 };
 
-// Gestion de la carte
 window.initMap = function() {
     const mapElement = document.getElementById("map");
     if (!mapElement) {
@@ -119,12 +105,10 @@ window.initMap = function() {
         }
         return;
     }
-
     map = new google.maps.Map(mapElement, {
         center: { lat: 46.2276, lng: 2.2137 },
         zoom: 6,
     });
-
     const etablissements = {{ etablissements_json|tojson|safe }};
     const infowindow = new google.maps.InfoWindow();
     const isAdmin = {{ current_user.is_admin|tojson|safe if current_user.is_authenticated else 'false' }};
@@ -133,70 +117,57 @@ window.initMap = function() {
     etablissements.forEach(etablissement => {
         let icon;
         if (isAdmin) {
-if (etablissement.label) {
-    icon = "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"; // Labellisé
-} else if (etablissement.visite) {
-    icon = "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png"; // Visité
-} else {
-    icon = "https://maps.google.com/mapfiles/ms/icons/red-dot.png"; // Ni l'un ni l'autre
-}
-        } else {
             if (etablissement.label) {
                 icon = "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"; // Labellisé
+            } else if (etablissement.visite) {
+                icon = "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png"; // Visité
             } else {
-                icon = "https://maps.google.com/mapfiles/ms/icons/red-dot.png"; // Non labellisé
+                icon = "https://maps.google.com/mapfiles/ms/icons/red-dot.png"; // Ni l'un ni l'autre
+            }
+        } else {
+            if (etablissement.label) {
+                icon = "https://maps.google.com/mapfiles/ms/icons/blue-dot.png";
+            } else {
+                icon = "https://maps.google.com/mapfiles/ms/icons/red-dot.png";
             }
         }
-        // Création d'un marqueur
         const marker = new google.maps.Marker({
             position: { lat: etablissement.latitude, lng: etablissement.longitude },
             map: map,
             title: etablissement.nom,
             icon: icon
         });
-
         bounds.extend(marker.position);
-        // Adresse de la page de l'établissement
-        const detailsUrl = `/etablissement/${etablissement.id_etab}?nom=${nom}&visite=${visite}&labellise=${labellise}`;
-        // Contenu de la carte
-        const content = `
-            <div class="infowindow">
-                <h3>${etablissement.nom}</h3>
-                <p class="type">${etablissement.type_etab}</p>
-                <p class="adresse">${etablissement.adresse}, ${etablissement.ville}</p>
-                ${etablissement.flans_count ? `<p class="flans-count">${etablissement.flans_count} flan${etablissement.flans_count > 1 ? 's' : ''}</p>` : ''}
-                <a href="${detailsUrl}" class="btn btn-primary">Voir plus</a>
-            </div>
-        `;
 
+        // Utilisation du HTML pré-généré
         marker.addListener("click", () => {
             setTimeout(() => {
-                infowindow.setContent(content);
+                infowindow.setContent(infowindowContents[etablissement.id_etab]);
                 infowindow.open(map, marker);
             }, 50);
         });
         markers.push(marker);
     });
-    // Adaptation du zoom selon le nombre d'établissements affichés
+
     if (etablissements.length > 0) {
         if (etablissements.length === 1) {
             map.setCenter(markers[0].position);
-            map.setZoom(18); // Quelques rues autour de l'établissement unique
+            map.setZoom(14);
         } else {
-            map.fitBounds(bounds); // S'adaote au nombre d'établissements
+            map.fitBounds(bounds);
         }
     }
+
     // Légende
     const legend = document.createElement('div');
     legend.style.backgroundColor = 'white';
     legend.style.padding = '10px';
     legend.style.margin = '10px';
     legend.style.border = '1px solid #ccc';
-
     if (isAdmin) {
         legend.innerHTML = `
             <h3>Legende</h3>
-            <p><img src="https://maps.google.com/mapfiles/ms/icons/blue-dot.png" alt="Labellisé"> Labellise</p>
+            <p><img src="https://maps.google.com/mapfiles/ms/icons/blue-dot.png" alt="Labellisé"> Labellisé</p>
             <p><img src="https://maps.google.com/mapfiles/ms/icons/yellow-dot.png" alt="Visité"> Visité</p>
             <p><img src="https://maps.google.com/mapfiles/ms/icons/red-dot.png" alt="Non visité"> Non visité</p>
         `;
@@ -205,10 +176,8 @@ if (etablissement.label) {
             <h3><img src="https://maps.google.com/mapfiles/ms/icons/blue-dot.png" alt="Labellisé">Labellise </h3>
         `;
     }
-    // Légende en bas à gauche
     map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(legend);
 };
-
 
 // Chargement de l'API Google Maps
 document.addEventListener('DOMContentLoaded', function() {
@@ -223,12 +192,27 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error("Élément #map introuvable même après le chargement du DOM !");
     }
 });
+
 const nom = "{{ request.args.get('nom') }}";
 const visite = "{{ request.args.get('visite') }}";
 const labellise = "{{ request.args.get('labellise') }}";
 </script>
 
 
+<style>
+    .form-container { padding: 10px; }
+    .form-group { margin-bottom: 10px; }
+    .form-label { display: block; margin-bottom: 5px; }
+    .form-control { width: 100%; padding: 5px; }
+    .error-message { color: red; }
+    .btn-proposer { background-color: #4CAF50; color: white; padding: 10px 15px; border: none; cursor: pointer; }
+    .btn-proposer:hover { background-color: #45a049; }
+    #map { height: 80vh; width: 100%; background-color: #f5f5f5; }
+    .infowindow h3 { margin: 0 0 5px 0; color: #333; }
+    .infowindow a { color: #1a73e8; text-decoration: none; }
+    .map-container { margin-bottom: 2rem; width: 100%; padding: 0; }
+    @media (max-width: 768px) { #map { height: 60vh; } }
+</style>
 {% endblock %}
 {% block content %}
 <div class="container">
