@@ -156,7 +156,8 @@ delete_form, validate_form) %}
                 {{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}
             </p>
         {% endif %}
-        <a href="{{ details_url }}">Voir la page</a>
+        <a href="{{ details_url }}" class="btn btn-primary">Voir plus</a>
+        <button class="infowindow-close" onclick="closeInfoWindow()">Fermer</button>
     </div>
 {% endmacro %}
 

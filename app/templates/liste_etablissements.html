@@ -6,7 +6,12 @@
 let autocomplete;
 let map;
 let markers = [];
-let infowindowContents = {}; // Objet pour stocker le HTML de chaque infowindow
+let infowindowContents = {};
+let infowindow;
+
+function closeInfoWindow() {
+    infowindow.close();
+}
 
 // Génération côté serveur du HTML pour chaque infowindow
 {% for etablissement in etablissements %}
@@ -110,7 +115,7 @@ window.initMap = function() {
         zoom: 6,
     });
     const etablissements = {{ etablissements_json|tojson|safe }};
-    const infowindow = new google.maps.InfoWindow();
+    infowindow = new google.maps.InfoWindow();
     const isAdmin = {{ current_user.is_admin|tojson|safe if current_user.is_authenticated else 'false' }};
     const bounds = new google.maps.LatLngBounds();
 
@@ -139,7 +144,6 @@ window.initMap = function() {
         });
         bounds.extend(marker.position);
 
-        // Utilisation du HTML pré-généré
         marker.addListener("click", () => {
             setTimeout(() => {
                 infowindow.setContent(infowindowContents[etablissement.id_etab]);
@@ -197,8 +201,6 @@ const nom = "{{ request.args.get('nom') }}";
 const visite = "{{ request.args.get('visite') }}";
 const labellise = "{{ request.args.get('labellise') }}";
 </script>
-
-
 <style>
     .form-container { padding: 10px; }
     .form-group { margin-bottom: 10px; }
@@ -208,8 +210,26 @@ const labellise = "{{ request.args.get('labellise') }}";
     .btn-proposer { background-color: #4CAF50; color: white; padding: 10px 15px; border: none; cursor: pointer; }
     .btn-proposer:hover { background-color: #45a049; }
     #map { height: 80vh; width: 100%; background-color: #f5f5f5; }
-    .infowindow h3 { margin: 0 0 5px 0; color: #333; }
-    .infowindow a { color: #1a73e8; text-decoration: none; }
+    .infowindow-content h3 { margin: 0 0 5px 0; color: #333; }
+    .infowindow-content a { color: #1a73e8; text-decoration: none; }
+    .infowindow-content {
+        position: relative;
+        padding: 10px;
+    }
+    .infowindow-close {
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        background-color: #f1f1f1;
+        border: none;
+        border-radius: 3px;
+        padding: 3px 8px;
+        cursor: pointer;
+        font-size: 12px;
+    }
+    .infowindow-close:hover {
+        background-color: #e0e0e0;
+    }
     .map-container { margin-bottom: 2rem; width: 100%; padding: 0; }
     @media (max-width: 768px) { #map { height: 60vh; } }
 </style>
@@ -223,4 +243,3 @@ const labellise = "{{ request.args.get('labellise') }}";
 <!-- Grille des établissements -->
 {{ afficher_grille('etablissement', etablissements, current_user, form_edit, form_ajout) }}
 {% endblock %}
-
