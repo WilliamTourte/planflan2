@@ -208,27 +208,10 @@ def rechercher():
 @main_bp.route('/etablissement/<int:id_etab>', methods=['GET', 'POST'])
 def afficher_etablissement_unique(id_etab):
     etablissement = Etablissement.query.get_or_404(id_etab)
-    form_flan = NewFlanForm(prefix='ajout-flan')
-    form_flan.id_etab.data = id_etab
     form_etab = EtabForm(prefix='edit-etab', obj=etablissement)
     delete_form = DeleteForm()
     validate_form = ValidateForm()
-
-    if form_flan.validate_on_submit():
-        flan = Flan(
-            nom=form_flan.nom.data,
-            description=form_flan.description.data,
-            prix=form_flan.prix.data,
-            type_pate=form_flan.type_pate.data,
-            type_saveur=form_flan.type_saveur.data,
-            type_texture=form_flan.type_texture.data,
-            id_etab=id_etab,
-            id_user=current_user.id_user
-        )
-        db.session.add(flan)
-        db.session.commit()
-        flash('Votre flan a été proposé avec succès !', 'success')
-        return redirect(url_for('main.afficher_etablissement_unique', id_etab=id_etab))
+    form_flan = NewFlanForm(prefix='ajout-flan')
 
     if form_etab.validate_on_submit():
         etablissement.nom = form_etab.nom.data
@@ -248,7 +231,8 @@ def afficher_etablissement_unique(id_etab):
 
     return render_template('page_etablissement.html',
                           etablissement=etablissement,
-                          form_flan=form_flan,
+                           form_flan=form_flan,
+
                           form_etab=form_etab,
                           current_user=current_user,
                            delete_form=delete_form,
@@ -262,10 +246,7 @@ def afficher_flan_unique(id_flan):
     delete_form = DeleteForm()
     validate_form = ValidateForm()
 
-    # Traitement de la soumission du formulaire d'ajout d'évaluation
-    if form_eval.validate_on_submit():
-        evaluation = mise_a_jour_evaluation(form_eval, id_flan, current_user.id_user, current_user.is_admin)
-        return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
+
 
     # Traitement de la soumission du formulaire d'édition du flan
     if form_flan.validate_on_submit():
@@ -279,17 +260,15 @@ def afficher_flan_unique(id_flan):
         flash('Le flan a été mis à jour avec succès!', 'success')
         return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
 
-    # Création d'un dictionnaire de formulaires d'édition pour chaque évaluation
-    eval_forms = {}
-    for eval in flan_unique.evaluations:
-        prefix = f'eval-edit-{eval.id_eval}'
-        eval_forms[eval.id_eval] = EvalForm(prefix=prefix, obj=eval)
+
 
     return render_template('page_flan.html',
                           flan=flan_unique,
-                          form_eval=form_eval,
+
+                           form_eval=form_eval,
                           form_flan=form_flan,
-                          eval_forms=eval_forms,
+
+                            current_user=current_user,
                            delete_form=delete_form,
                            validate_form=validate_form
                            )
@@ -369,7 +348,6 @@ def supprimer_flan(id_flan):
         db.session.rollback()
         flash('Une erreur est survenue lors de la suppression du flan.', 'danger')
     return redirect(url_for('main.dashboard'))
-
 @main_bp.route('/flan/<int:id_flan>/evaluer', methods=['GET', 'POST'])
 @login_required
 def evaluer_flan(id_flan):
@@ -386,7 +364,6 @@ def evaluer_flan(id_flan):
         try:
             evaluation = mise_a_jour_evaluation(form, id_flan, current_user.id_user, current_user.is_admin)
             flash('Votre évaluation a été mise à jour avec succès!', 'success')
-            return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
         except Exception as e:
             print("Error during form submission:", e)
             flash('Une erreur est survenue lors de la mise à jour de l\'évaluation: ' + str(e), 'danger')
@@ -394,7 +371,8 @@ def evaluer_flan(id_flan):
         if request.method == 'POST':
             print("Form validation errors:", form.errors)
             flash('Le formulaire n\'a pas été validé correctement. Veuillez vérifier les erreurs.', 'danger')
-    return render_template('page_flan.html', id_flan=id_flan, form=form, flan=flan_unique, evaluation=evaluation)
+    return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
+
 
 @main_bp.route('/evaluation/<int:id_eval>', methods=['GET', 'POST'])
 @login_required

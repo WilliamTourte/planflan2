@@ -424,26 +424,17 @@
 {% endmacro %}
 
 {% macro afficher_grille(objet_type, objets, current_user=None, form_edit=None, form_ajout=None, etablissement=None, flan=None, delete_form=None, validate_form=None) %}
+    <div class="grille">
     {% if not objets %}
-        <div class="no-results">
-            <p>Aucun {{ objet_type }} trouvé.</p>
-        </div>
-    {% else %}
-        <div class="grille">
-            {% for objet in objets %}
-                {% if objet_type == 'evaluation' and form_edit is mapping and objet.id_eval in form_edit %}
-                    {{ afficher_objet(objet_type, objet, current_user, form_edit[objet.id_eval], current_page, delete_form, validate_form) }}
-                {% else %}
-                    {{ afficher_objet(objet_type, objet, current_user, form_edit, current_page, delete_form, validate_form) }}
-                {% endif %}
-            {% endfor %}
-        </div>
-    {% endif %}
-    {# On n'affiche le bouton d'ajout que si form_ajout est fourni #}
-    {% if form_ajout %}
-        {{ afficher_bouton_ajout(objet_type, current_user, etablissement, form_ajout, flan) }}
-    {% endif %}
+    <p>Vide, contribuez !</p>
+    {%  endif %}
+        {% for objet in objets %}
+            {{ afficher_objet(objet_type, objet, current_user, form_ajout, current_page, delete_form, validate_form) }}
+        {% endfor %}
+    </div>
+    {{ afficher_bouton_ajout(objet_type, current_user, etablissement, form_ajout, flan) }}
 {% endmacro %}
+
 
 
 {% macro afficher_objet(objet_type, objet, current_user=None, form_edit=None, current_page='', delete_form=None, validate_form=None) %}
@@ -467,7 +458,7 @@
             {% if current_user.is_authenticated %}
                 {{ proposer_etablissement(form_ajout, url_for('maps.ajouter_etablissement'), current_user) }}
             {% else %}
-                <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
+                <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn btn-primary">
                     Ajouter un etablissement (connectez-vous)
                 </a>
             {% endif %}
@@ -478,7 +469,7 @@
             {% if current_user.is_authenticated %}
                 {{ proposer_flan(form_ajout, url_for('main.proposer_flan', id_etab=etablissement.id_etab)) }}
             {% else %}
-                <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
+                <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn btn-primary">
                     Ajouter un flan (connectez-vous)
                 </a>
             {% endif %}
@@ -489,7 +480,7 @@
             {% if current_user.is_authenticated %}
                 {{ proposer_evaluation(form_ajout, url_for('main.evaluer_flan', id_flan=flan.id_flan)) }}
             {% else %}
-                <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn-proposer">
+                <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn btn-primary">
                     Ajouter une evaluation (connectez-vous)
                 </a>
             {% endif %}
@@ -510,7 +501,7 @@
 
 {% macro proposer_flan(form, action_url) %}
     <form method="POST" action="{{ action_url }}" class="form-container">
-        {{ form.hidden_tag() }}
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="form-group">
             <label class="form-label" for="ajout-flan-nom">{{ form.nom.label }}</label>
             {{ form.nom(class="form-control", id="ajout-flan-nom") }}

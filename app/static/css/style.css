@@ -203,7 +203,7 @@ input[type="submit"]:active,
 .btn-primary,
 button.primary,
 input.primary {
-    background-color: #799dcb;
+    background-color:#45a049;
     color: white;
 }
 .btn-primary:hover,
