@@ -1,6 +1,3 @@
-/* =============================================
-   POLICES ET RESET GLOBAL
-============================================= */
 /* Déclaration de la police personnalisée */
 @font-face {
     font-family: 'Bubblegum';
@@ -8,26 +5,20 @@
     font-weight: bold;
     font-style: normal;
 }
-
 /* Reset basique et styles globaux */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
-
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
     margin: 0;
     padding: 0;
-    background-color: #799dcb; /* Bleu clair pour le fond global */
+    background-color: #799dcb;
     color: #333;
 }
-
-/* =============================================
-   EN-TÊTE (HEADER) ET BARRE DE RECHERCHE
-============================================= */
 header {
     background-color: #799dcb;
     color: white;
@@ -37,11 +28,9 @@ header {
     z-index: 100;
     transition: transform 0.3s ease;
 }
-
 header.hide {
     transform: translateY(-100%);
 }
-
 header .top-bar {
     display: flex;
     justify-content: space-between;
@@ -50,7 +39,6 @@ header .top-bar {
     padding: 0 20px;
     margin-bottom: 0.3rem;
 }
-
 header h1 {
     font-family: 'Bubblegum', cursive !important;
     text-align: center;
@@ -58,7 +46,6 @@ header h1 {
     color: white;
     font-size: 2rem;
 }
-
 .btn-icon {
     background: transparent;
     border: none;
@@ -68,26 +55,22 @@ header h1 {
     cursor: pointer;
     transition: all 0.2s;
 }
-
 .btn-icon:hover {
-    color: #fee10d; /* Jaune pour le survol */
+    color: #fee10d;
     transform: scale(1.1);
 }
-
 /* Barre de recherche */
 .search-bar {
-    background-color: #fee10d; /* Jaune vif */
+    background-color: #fee10d;
     padding: 0.4rem 0;
     margin-bottom: 0;
     transition: transform 0.3s ease, opacity 0.3s ease;
     width: 100%;
 }
-
 .search-bar.hide {
     transform: translateY(-100%);
     opacity: 0;
 }
-
 .search-bar .container {
     display: flex;
     justify-content: center;
@@ -97,14 +80,12 @@ header h1 {
     padding: 0;
     max-width: 100%;
 }
-
 .search-bar form {
     display: flex;
     align-items: center;
     margin: 0;
     padding: 0;
 }
-
 .search-bar .form-control {
     border-radius: 25px;
     border: none;
@@ -116,14 +97,13 @@ header h1 {
     margin: 0;
     line-height: 1.2;
 }
-
 .btn-search-icon {
     width: 36px;
     height: 36px;
     padding: 0;
     margin: 0;
     border-radius: 4px;
-    background-color: #799dcb; /* Bleu pour le bouton */
+    background-color: #799dcb;
     border: none;
     display: flex;
     align-items: center;
@@ -131,28 +111,21 @@ header h1 {
     font-size: 1rem;
     flex-shrink: 0;
 }
-
 .btn-search-icon i {
     margin: 0;
     position: relative;
     top: 1px;
 }
-
-/* =============================================
-   CONTAINERS ET MISE EN PAGE
-============================================= */
 .container {
     width: 90%;
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 10px;
 }
-
 main {
     padding: 20px 0;
     margin-top: 20px;
 }
-
 footer {
     background-color: #799dcb;
     color: white;
@@ -161,26 +134,24 @@ footer {
     bottom: 0;
     width: 100%;
 }
-
-/* =============================================
-   TYPOGRAPHIE
-============================================= */
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Bubblegum', cursive !important;
 }
-
-/* =============================================
-   BOUTONS (STYLES GÉNÉRAUX ET SPÉCIFIQUES)
-============================================= */
-/* Styles de base pour tous les boutons */
-.btn, .btn-primary, .btn-success, .btn-info, .btn-back,
-.btn-details, .btn-proposer, .btn-evaluate, .btn-submit {
+/* Boutons */
+/* ===== STYLES DE BASE POUR TOUS LES BOUTONS ===== */
+.btn,
+button,
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+.a-btn, /* Si tu utilises des liens stylisés en boutons */
+.action-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 12px 25px;
+    padding: 10px 20px; /* Padding légèrement réduit pour les petits boutons */
     text-decoration: none;
-    border-radius: 25px;
+    border-radius: 25px !important; /* Arrondi forcé */
     border: none;
     cursor: pointer;
     font-weight: bold;
@@ -188,153 +159,148 @@ h1, h2, h3, h4, h5, h6 {
     transition: all 0.3s ease;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     text-align: center;
-    min-width: 120px;
-    height: 44px;
-    margin: 8px 0;
+    min-width: 100px; /* Largeur minimale réduite pour les petits boutons */
+    height: 40px; /* Hauteur fixe pour tous */
+    margin: 4px;
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-/* Effets de survol et clic pour tous les boutons */
-.btn:hover, .btn-primary:hover, .btn-success:hover,
-.btn-info:hover, .btn-back:hover, .btn-details:hover,
-.btn-proposer:hover, .btn-evaluate:hover, .btn-submit:hover {
+/* Boutons dans les grilles ou listes (ex: edit, valider, supprimer) */
+.btn-edit,
+.btn-validate,
+.btn-delete,
+.btn-small {
+    padding: 8px 16px; /* Plus petits */
+    min-width: 80px;
+    height: 36px;
+    font-size: 0.9em;
+}
+
+/* Effets hover/active pour tous les boutons */
+.btn:hover,
+button:hover,
+input[type="button"]:hover,
+input[type="submit"]:hover,
+.a-btn:hover,
+.action-btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
 }
-
-.btn:active, .btn-primary:active, .btn-success:active,
-.btn-info:active, .btn-back:active, .btn-details:active,
-.btn-proposer:active, .btn-evaluate:active, .btn-submit:active {
+.btn:active,
+button:active,
+input[type="button"]:active,
+input[type="submit"]:active,
+.a-btn:active,
+.action-btn:active {
     transform: translateY(0);
     box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* Bouton "Proposer" (vert) */
-.btn-proposer {
-    background-color: #4CAF50;
-    color: white;
-}
-
-.btn-proposer:hover {
-    background-color: #45a049;
-}
-
-/* Autres styles de boutons */
-.btn-primary {
+/* Couleurs par type de bouton */
+.btn-primary,
+button.primary,
+input.primary {
     background-color: #799dcb;
     color: white;
 }
-
-.btn-primary:hover {
+.btn-primary:hover,
+button.primary:hover,
+input.primary:hover {
     background-color: #6a8bc0;
 }
 
-.btn-success {
+.btn-success,
+button.success,
+input.success,
+.btn-validate {
     background-color: #4CAF50;
     color: white;
 }
-
-.btn-success:hover {
+.btn-success:hover,
+button.success:hover,
+input.success:hover,
+.btn-validate:hover {
     background-color: #45a049;
 }
 
-.btn-info {
-    background-color: #3498db;
-    color: white;
-}
-
-.btn-info:hover {
-    background-color: #2980b9;
-}
-
-.btn-back {
-    background-color: #7f8c8d;
-    color: white;
-}
-
-.btn-back:hover {
-    background-color: #6c7a7d;
-}
-
-.btn-details {
-    background-color: #3498db;
-    color: white;
-    padding: 8px 18px;
-    min-width: 100px;
-}
-
-.btn-evaluate {
-    background-color: #4CAF50;
-    color: white;
-    min-width: 200px;
-}
-
-.btn-submit {
-    background-color: #4CAF50;
-    color: white;
-    width: 100%;
-    max-width: 200px;
-    margin: 20px auto 0;
-}
-
-.btn-danger {
+.btn-danger,
+button.danger,
+input.danger,
+.btn-delete {
     background-color: #e74c3c;
     color: white;
 }
-
-.btn-danger:hover {
+.btn-danger:hover,
+button.danger:hover,
+input.danger:hover,
+.btn-delete:hover {
     background-color: #c0392b;
 }
 
-/* Boutons carrés (pour les icônes) */
-.square-btn {
-    width: 45px;
-    height: 45px;
-    display: inline-flex;
-    align-items: center;
+.btn-info,
+button.info,
+input.info,
+.btn-edit {
+    background-color: #3498db;
+    color: white;
+}
+.btn-info:hover,
+button.info:hover,
+input.info:hover,
+.btn-edit:hover {
+    background-color: #2980b9;
+}
+
+.btn-back,
+button.back,
+input.back {
+    background-color: #7f8c8d;
+    color: white;
+}
+.btn-back:hover,
+button.back:hover,
+input.back:hover {
+    background-color: #6c7a7d;
+}
+
+
+/* Groupe de boutons (pour aligner plusieurs boutons) */
+.btn-group {
+    display: flex;
     justify-content: center;
-    padding: 0;
-    border-radius: 4px;
-    font-size: 16px;
-    margin: 0;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin: 10px 0;
 }
 
-.square-btn i {
-    margin: 0;
-}
-
+/* Boutons dans les actions de grille (ex: en ligne) */
 .action-buttons {
     display: flex;
-    gap: 10px;
-    align-items: center;
+    gap: 8px;
     justify-content: flex-end;
-    width: 100%;
-    max-width: 100%;
-    margin: 0;
-    padding: 0;
+}
+.action-buttons .btn {
+    margin: 0; /* Pas de marge supplémentaire */
 }
 
-/* =============================================
-   MESSAGES FLASH (ALERTES)
-============================================= */
+/* Flash messages */
 .alert {
     padding: 10px;
     margin: 10px 0;
     border-radius: 4px;
 }
-
 .alert-success {
     background-color: #4caf50;
     color: white;
 }
-
 .alert-danger {
     background-color: #f44336;
     color: white;
 }
-
-/* =============================================
-   BADGES (ÉTIQUETTES)
-============================================= */
+/* Badges */
 .badge {
     position: absolute;
     display: inline-block;
@@ -349,13 +315,14 @@ h1, h2, h3, h4, h5, h6 {
     z-index: 20;
 }
 
-/* Badge de type d'établissement */
+/* Badge de type d'établissement (en haut à gauche) */
 .badge-type-etab {
     top: 10px;
     left: 10px;
+
 }
 
-/* Badge "Labellisé" */
+/* Badge labellisé (en haut à droite, bleu clair) */
 .badge-labellise {
     top: 10px;
     right: 10px;
@@ -377,9 +344,15 @@ h1, h2, h3, h4, h5, h6 {
     right: 10px;
 }
 
-/* =============================================
-   CARTES (CARDS)
-============================================= */
+/* Conteneur des badges (ajusté pour éviter les conflits) */
+.card-image-container {
+    position: relative;
+    display: block;
+    height: 180px;
+    overflow: hidden; /* Remis à hidden, mais z-index: 20 permet au badge de dépasser */
+}
+
+/* Cartes */
 .carte {
     text-decoration: none;
     color: inherit;
@@ -391,26 +364,22 @@ h1, h2, h3, h4, h5, h6 {
     display: block;
     height: 100%;
 }
-
 .carte:hover {
     transform: translateY(-7px);
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
     color: inherit;
 }
-
 .card-image-container {
     position: relative;
     display: block;
     height: 180px;
     overflow: hidden;
 }
-
 .card-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
-
 .card-image.placeholder {
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     display: flex;
@@ -420,19 +389,16 @@ h1, h2, h3, h4, h5, h6 {
     font-style: italic;
     height: 100%;
 }
-
 .card-content {
     padding: 20px;
     position: relative;
     min-height: 160px;
 }
-
 .card-content-link {
     text-decoration: none;
     color: inherit;
     display: block;
 }
-
 .card-header {
     display: flex;
     flex-direction: column;
@@ -440,47 +406,40 @@ h1, h2, h3, h4, h5, h6 {
     align-items: flex-start;
     margin-bottom: 10px;
 }
-
 .carte h2, .carte h3 {
     margin: 0 0 8px 0;
     font-size: 1.3rem;
     color: #333 !important;
 }
-
 .type {
     color: #7f8c8d;
     font-style: italic;
     font-size: 0.9rem;
     margin: 5px 0;
 }
-
 .adresse {
     color: #34495e;
     font-size: 0.9rem;
     margin: 10px 0;
     line-height: 1.4;
 }
-
 .description {
     color: #555;
     font-size: 0.9rem;
     line-height: 1.4;
     margin: 10px 0;
 }
-
 .flans-count {
     color: #e74c3c;
     font-weight: bold;
     font-size: 0.9rem;
     margin: 10px 0;
 }
-
 .flan-price {
     color: #e74c3c;
     font-weight: bold;
     margin: 10px 0;
 }
-
 .arrow {
     position: absolute;
     bottom: 20px;
@@ -489,24 +448,17 @@ h1, h2, h3, h4, h5, h6 {
     color: #3498db;
     transition: all 0.2s;
 }
-
 .carte:hover .arrow {
     transform: translateX(5px);
 }
-
-/* =============================================
-   GRILLE (GRID LAYOUT)
-============================================= */
+/* Grille */
 .grille {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 25px;
     margin-top: 20px;
 }
-
-/* =============================================
-   FORMULAIRES
-============================================= */
+/* Formulaires */
 .form-container {
     background: white;
     padding: 20px;
@@ -514,82 +466,71 @@ h1, h2, h3, h4, h5, h6 {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     margin-top: 20px;
 }
-
 .form-group {
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
 }
-
-.form-label {
+.form-group label {
     display: block;
     margin-bottom: 5px;
     color: #333;
     font-weight: bold;
 }
 
-.form-control {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.4;
-}
-
-.form-control:focus {
-    outline: none;
-    border-color: #799dcb;
-    box-shadow: 0 0 0 2px rgba(121, 157, 203, 0.2);
-}
-
-.error-message {
-    color: #e74c36;
-    font-size: 0.9rem;
-    margin-top: 5px;
-}
-
-/* Cases à cocher */
+/* Styles pour les cases à cocher */
 .form-check {
     display: flex;
     align-items: center;
     margin-bottom: 0.5rem;
     width: auto;
 }
-
+/* Styles pour les cases à cocher (INLINE) */
 .form-check-inline {
-    display: inline-flex;
-    align-items: center;
-    margin-right: 20px;
-    margin-bottom: 0;
-    vertical-align: middle;
+    display: inline-flex; /* Affichage en ligne */
+    align-items: center; /* Alignement vertical */
+    margin-right: 20px; /* Espace entre les cases */
+    margin-bottom: 0; /* Pas de marge en bas */
+    vertical-align: middle; /* Alignement vertical */
 }
 
 .form-check-input {
-    width: 18px;
-    height: 18px;
-    margin: 0 8px 0 0;
-    vertical-align: middle;
-    appearance: auto;
-    -webkit-appearance: checkbox;
+    width: 18px; /* Largeur fixe */
+    height: 18px; /* Hauteur fixe */
+    margin: 0 8px 0 0; /* Marge à droite seulement */
+    vertical-align: middle; /* Alignement vertical */
+    appearance: auto; /* Style natif */
+    -webkit-appearance: checkbox; /* Pour Safari */
 }
 
 .form-check-label {
-    display: inline-block;
-    vertical-align: middle;
-    margin-bottom: 0;
-    line-height: 1;
-    padding-top: 2px;
+    display: inline-block; /* Pour un alignement précis */
+    vertical-align: middle; /* Alignement vertical */
+    margin-bottom: 0; /* Pas de marge en bas */
+    line-height: 1; /* Hauteur de ligne ajustée */
+    padding-top: 2px; /* Petit ajustement pour l'alignement */
 }
 
-/* =============================================
-   ÉVALUATIONS
-============================================= */
+
+.form-group input:not(.form-check-input),
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.error-message {
+    color: #e74c36;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+/* Évaluations */
 .criteria {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
     gap: 10px;
     margin: 15px 0;
 }
-
 .criterion {
     display: flex;
     justify-content: space-between;
@@ -597,22 +538,18 @@ h1, h2, h3, h4, h5, h6 {
     padding: 8px 0;
     border-bottom: 1px solid #eee;
 }
-
 .criterion-name {
     font-weight: bold;
     color: #333;
 }
-
 .criterion-value {
     color: #3498db;
     font-weight: bold;
 }
-
 .moyenne {
     text-align: center;
     margin: 15px 0;
 }
-
 .moyenne-value {
     background: #e8f5e9;
     padding: 5px 15px;
@@ -620,7 +557,6 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: bold;
     color: #4CAF50;
 }
-
 .evaluation-date {
     color: #7f8c8d;
     font-size: 0.9em;
@@ -629,10 +565,7 @@ h1, h2, h3, h4, h5, h6 {
     display: block;
     margin-bottom: 10px;
 }
-
-/* =============================================
-   AUCUN RÉSULTAT
-============================================= */
+/* No results */
 .no-results {
     grid-column: 1 / -1;
     text-align: center;
@@ -641,89 +574,44 @@ h1, h2, h3, h4, h5, h6 {
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
-
 .no-results p {
     margin-bottom: 15px;
     color: #7f8c8d;
 }
-
-/* =============================================
-   CARTE ET CONTEUR DE MAP
-============================================= */
-.map-container {
-    margin-bottom: 2rem;
-    width: 100%;
-    padding: 0;
-}
-
-#map {
-    height: 80vh;
-    width: 100%;
-    background-color: #f5f5f5;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
-.infowindow h3 {
-    margin: 0 0 5px 0;
-    color: #333;
-    font-family: 'Bubblegum', cursive;
-}
-
-.infowindow a {
-    color: #1a73e8;
-    text-decoration: none;
-}
-
-/* =============================================
-   RESPONSIVE DESIGN
-============================================= */
+/* Responsive */
 @media (max-width: 768px) {
     .grille {
         grid-template-columns: 1fr;
     }
-
     .carte {
         border-radius: 8px;
     }
-
     .card-content {
         padding: 15px;
     }
-
     header h1 {
         font-size: 1.5rem;
     }
-
     .search-bar .form-control {
         width: 180px;
     }
-
     .btn-search-icon {
         width: 32px;
         height: 32px;
         font-size: 0.9rem;
     }
-
-    #map {
-        height: 60vh;
-    }
 }
-
 @media (max-width: 480px) {
     .container {
         padding: 0 5px;
     }
-
     .search-bar .container {
         flex-wrap: wrap;
         gap: 0.3rem;
     }
-
     .search-bar .form-control {
         width: 160px;
     }
-
     .btn-search-icon {
         width: 28px;
         height: 28px;
