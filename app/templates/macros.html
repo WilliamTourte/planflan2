@@ -15,19 +15,16 @@
         'CAFE': '#D2B48C'
     } %}
     {% set couleur = couleurs.get(etablissement.type_etab.name, '#D3D3D3') %}
-
     <div class="badge badge-type-etab" style="background-color: {{ couleur }};">
         {{ etablissement.type_etab.value }}
     </div>
 {% endmacro %}
-
 
 {% macro afficher_badge_etablissement(etablissement) %}
     {% if etablissement.label %}
         <span class="badge badge-labellise">⭐ Labellisé</span>
     {% endif %}
 {% endmacro %}
-
 
 {% macro afficher_badge_flan(flan) %}
     {% if flan.prix is not none %}
@@ -273,8 +270,6 @@
     </script>
 {% endmacro %}
 
-
-
 {% macro afficher_formulaire_edition_flan(flan, form) %}
     {% if form %}
     <div id="flan-{{ flan.id_flan }}-edit" style="display: none;">
@@ -312,7 +307,6 @@
     </div>
     {% endif %}
 {% endmacro %}
-
 
 <!-- EVALUATION -->
 {% macro afficher_evaluation(evaluation, current_user, form, current_page, delete_form, validate_form) %}
@@ -354,8 +348,6 @@
         }
     </script>
 {% endmacro %}
-
-
 
 {% macro afficher_formulaire_edition_evaluation(evaluation, form) %}
     {% if form is not none %}
@@ -445,7 +437,6 @@
     {% endif %}
 {% endmacro %}
 
-
 {% macro afficher_objet(objet_type, objet, current_user=None, form_edit=None, current_page='', delete_form=None, validate_form=None) %}
     {% if objet_type == 'etablissement' %}
         {{ afficher_etablissement(objet, current_user, form_edit, current_page, delete_form, validate_form) }}
@@ -455,10 +446,6 @@
         {{ afficher_evaluation(objet, current_user, form_edit, current_page, delete_form, validate_form) }}
     {% endif %}
 {% endmacro %}
-
-
-
-
 
 {% macro afficher_bouton_ajout(objet_type, current_user, etablissement=None, form_ajout=None, flan=None) %}
     {% if objet_type == 'etablissement' %}
@@ -536,7 +523,6 @@
         <div class="form-group">
             <label for="search" class="form-label">Recherche d'établissement</label>
             <input type="text" id="search" class="form-control" placeholder="Rechercher un établissement">
-
         </div>
         {{ afficher_champ_formulaire(form.description) }}
         {% if current_user.is_admin %}
@@ -551,9 +537,6 @@
         <label class="form-check-label" for="{{ form.visite.id }}">{{ form.visite.label }}</label>
     </div>
 </div>
-
-
-
         {% endif %}
         <!-- Champs cachés avec préfixe -->
         <input type="hidden" id="ajout-etab-nom" name="ajout-etab-nom" value="{{ form.nom.data }}">
@@ -581,6 +564,7 @@
         </div>
     </form>
 {% endmacro %}
+
 {% macro modifier_etablissement(form, action_url) %}
     <form method="POST" action="{{ action_url }}" class="form-container">
         {{ form.hidden_tag() }}
@@ -592,7 +576,6 @@
         {{ afficher_champ_formulaire(form.latitude) }}
         {{ afficher_champ_formulaire(form.longitude) }}
         {{ afficher_champ_formulaire(form.type_etab) }}
-
         {% if current_user.is_admin %}
             <!-- Labellisé (radios en ligne) -->
             <div class="form-group">
@@ -606,7 +589,6 @@
                     <label class="form-check-label" for="label-non">Non</label>
                 </div>
             </div>
-
             <!-- Visité (radios en ligne) -->
             <div class="form-group">
                 <label class="form-label">Visité</label>
@@ -622,7 +604,6 @@
         {% endif %}
     </form>
 {% endmacro %}
-
 
 {% macro modifier_flan(form, action_url) %}
     <form method="POST" action="{{ action_url }}" class="form-container">

@@ -14,7 +14,6 @@ def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
     pate = float(str(form.pate.data).replace(',', '.')) if form.pate.data is not None else None
     gout = float(str(form.gout.data).replace(',', '.')) if form.gout.data is not None else None
     description = form.description.data if form.description.data is not None else ''
-
     evaluation = Evaluation.query.filter_by(id_flan=id_flan, id_user=id_user).first()
     if evaluation:
         # Toujours mettre à jour tous les champs, même s'ils n'ont pas changé
@@ -53,7 +52,6 @@ def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
     db.session.commit()
     return evaluation
 
-
 @main_bp.route('/')
 def index():
     from app.outils import afficher_etablissements
@@ -80,14 +78,12 @@ def dashboard():
         pending_evaluations = Evaluation.query.filter_by(statut='EN_ATTENTE').join(Utilisateur).filter(Utilisateur.is_admin == False).all()
         pending_flans = Flan.query.filter_by(statut='EN_ATTENTE').join(Utilisateur).filter(Utilisateur.is_admin == False).all()
         pending_etablissements = Etablissement.query.filter_by(statut='EN_ATTENTE').join(Utilisateur).filter(Utilisateur.is_admin == False).all()
-
     if request.method == 'POST' and profile_form.validate_on_submit():
         if profile_form.email.data and profile_form.email.data != current_user.email:
             existing_user = Utilisateur.query.filter(Utilisateur.email == profile_form.email.data).first()
             if existing_user and existing_user.id_user != current_user.id_user:
                 flash('Cet email est déjà utilisé par un autre utilisateur.', 'danger')
                 return redirect(url_for('main.dashboard'))
-
         current_user.pseudo = profile_form.pseudo.data
         if profile_form.email.data:
             current_user.email = profile_form.email.data
@@ -100,11 +96,9 @@ def dashboard():
             db.session.rollback()
             flash('Une erreur est survenue lors de la mise à jour de votre profil.', 'danger')
         return redirect(url_for('main.dashboard'))
-
     elif request.method == 'GET':
         profile_form.pseudo.data = current_user.pseudo
         profile_form.email.data = current_user.email
-
     return render_template('dashboard.html',
                           title='Tableau de bord',
                           profile_form=profile_form,
@@ -117,12 +111,10 @@ def dashboard():
 def rechercher():
     from app.outils import afficher_etablissements
     from flask import flash, redirect, url_for
-
     form_recherche = RechercheForm(prefix='recherche')
     form_ajout = EtabForm(prefix='ajout-etab')
     form_edit = EtabForm(prefix='edit-etab')  # Formulaire générique pour l'édition
     query = Etablissement.query
-
     def apply_filters(query, params):
         search_term = params.get('nom')
         if search_term:
@@ -159,7 +151,6 @@ def rechercher():
         elif params.get('labellise') == 'non':
             query = query.filter(Etablissement.label == 0)
         return query
-
     if request.method == 'GET':
         has_search_params = any(request.args.get(k) for k in ['nom', 'ville', 'type_saveur', 'type_pate', 'type_texture', 'prix', 'visite', 'labellise'])
         if has_search_params:
@@ -185,16 +176,13 @@ def rechercher():
             return redirect(url_for('main.rechercher'))
     else:
         return render_template('rechercher.html', form_recherche=form_recherche, form_ajout=form_ajout, form_edit=form_edit)
-
     # Vérifie que query est bien une requête valide avant d'appeler .all()
     if query is None:
         flash("La requête est invalide.", "error")
         return redirect(url_for('main.rechercher'))
-
     resultats = query.all()
     if not resultats:
         flash("Aucun établissement trouvé avec ces critères.", "info")
-
     etablissements, etablissements_json = afficher_etablissements(resultats)
     session['resultats_recherche'] = etablissements_json
     return render_template('liste_etablissements.html',
@@ -202,8 +190,6 @@ def rechercher():
                            etablissements_json=etablissements_json,
                            google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
                            form_ajout=form_ajout, form_edit=form_edit)
-
-
 
 @main_bp.route('/etablissement/<int:id_etab>', methods=['GET', 'POST'])
 def afficher_etablissement_unique(id_etab):
@@ -213,7 +199,6 @@ def afficher_etablissement_unique(id_etab):
     form_etab = EtabForm(prefix='edit-etab', obj=etablissement)
     delete_form = DeleteForm()
     validate_form = ValidateForm()
-
     if form_flan.validate_on_submit():
         flan = Flan(
             nom=form_flan.nom.data,
@@ -229,7 +214,6 @@ def afficher_etablissement_unique(id_etab):
         db.session.commit()
         flash('Votre flan a été proposé avec succès !', 'success')
         return redirect(url_for('main.afficher_etablissement_unique', id_etab=id_etab))
-
     if form_etab.validate_on_submit():
         etablissement.nom = form_etab.nom.data
         etablissement.description = form_etab.description.data
@@ -245,7 +229,6 @@ def afficher_etablissement_unique(id_etab):
         db.session.commit()
         flash('L\'établissement a été mis à jour avec succès!', 'success')
         return redirect(url_for('main.afficher_etablissement_unique', id_etab=id_etab))
-
     return render_template('page_etablissement.html',
                           etablissement=etablissement,
                           form_flan=form_flan,
@@ -261,12 +244,10 @@ def afficher_flan_unique(id_flan):
     form_flan = NewFlanForm(prefix='edit-flan', obj=flan_unique)
     delete_form = DeleteForm()
     validate_form = ValidateForm()
-
     # Traitement de la soumission du formulaire d'ajout d'évaluation
     if form_eval.validate_on_submit():
         evaluation = mise_a_jour_evaluation(form_eval, id_flan, current_user.id_user, current_user.is_admin)
         return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
-
     # Traitement de la soumission du formulaire d'édition du flan
     if form_flan.validate_on_submit():
         flan_unique.nom = form_flan.nom.data
@@ -278,13 +259,11 @@ def afficher_flan_unique(id_flan):
         db.session.commit()
         flash('Le flan a été mis à jour avec succès!', 'success')
         return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
-
     # Création d'un dictionnaire de formulaires d'édition pour chaque évaluation
     eval_forms = {}
     for eval in flan_unique.evaluations:
         prefix = f'eval-edit-{eval.id_eval}'
         eval_forms[eval.id_eval] = EvalForm(prefix=prefix, obj=eval)
-
     return render_template('page_flan.html',
                           flan=flan_unique,
                           form_eval=form_eval,
@@ -404,8 +383,6 @@ def afficher_evaluation_unique(id_eval):
     form = EvalForm(prefix='eval-detail')
     delete_form = DeleteForm()
     validate_form = ValidateForm()
-
-
     if request.method == 'GET':
         form.visuel.data = evaluation.visuel
         form.texture.data = evaluation.texture
