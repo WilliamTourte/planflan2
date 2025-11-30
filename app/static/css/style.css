@@ -617,4 +617,23 @@ input.back:hover {
         height: 28px;
         font-size: 0.8rem;
     }
+        .emoji-marker {
+        font-size: 24px;
+        text-align: center;
+        line-height: 30px;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.8);
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    }
+    .label-icon {
+        color: #2196F3; /* Bleu */
+    }
+    .visited-icon {
+        color: #4CAF50; /* Vert */
+    }
+    .unvisited-icon {
+        color: #F44336; /* Rouge */
+    }
 }

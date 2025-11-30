@@ -129,32 +129,44 @@
         const etablissements = {{ etablissements_json|tojson|safe }};
         const isAdmin = {{ current_user.is_admin|tojson|safe if current_user.is_authenticated else 'false' }};
         const bounds = L.latLngBounds();
+// Définition des icônes personnalisées avec emojis
+const createEmojiIcon = (emoji, className) => {
+    return L.divIcon({
+        html: `<div class="emoji-marker ${className}">${emoji}</div>`,
+        className: 'emoji-icon',
+        iconSize: [30, 30], // Taille de l'icône
+        iconAnchor: [15, 15] // Point d'ancrage (centre de l'emoji)
+    });
+};
 
-        // Icônes personnalisées
-        const blueIcon = L.icon({ iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png', iconSize: [25, 41], iconAnchor: [12, 41] });
-        const yellowIcon = L.icon({ iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-yellow.png', iconSize: [25, 41], iconAnchor: [12, 41] });
-        const redIcon = L.icon({ iconUrl: 'https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png', iconSize: [25, 41], iconAnchor: [12, 41] });
+const blueIcon = createEmojiIcon('🏆', 'label-icon');
+const yellowIcon = createEmojiIcon('✅', 'visited-icon');
+const redIcon = createEmojiIcon('❌', 'unvisited-icon');
 
-        etablissements.forEach(etablissement => {
-            let icon;
-            if (isAdmin) {
-                if (etablissement.label) {
-                    icon = blueIcon;
-                } else if (etablissement.visite) {
-                    icon = yellowIcon;
-                } else {
-                    icon = redIcon;
-                }
-            } else {
-                icon = etablissement.label ? blueIcon : redIcon;
-            }
+// Ajout des marqueurs avec les emojis
+etablissements.forEach(etablissement => {
+    let icon;
+    if (isAdmin) {
+        if (etablissement.label) {
+            icon = blueIcon;
+        } else if (etablissement.visite) {
+            icon = yellowIcon;
+        } else {
+            icon = redIcon;
+        }
+    } else {
+        icon = etablissement.label ? blueIcon : redIcon;
+    }
 
-            const marker = L.marker([etablissement.latitude, etablissement.longitude], { icon: icon, title: etablissement.nom })
-                .addTo(map)
-                .bindPopup(infowindowContents[etablissement.id_etab]);
+    const marker = L.marker([etablissement.latitude, etablissement.longitude], {
+        icon: icon,
+        title: etablissement.nom
+    })
+    .addTo(map)
+    .bindPopup(infowindowContents[etablissement.id_etab]);
 
-            bounds.extend(marker.getLatLng());
-        });
+    bounds.extend(marker.getLatLng());
+});
 
         if (etablissements.length > 0) {
             if (etablissements.length === 1) {
@@ -165,25 +177,16 @@
         }
 
         // Légende
-        const legend = L.control({ position: 'bottomleft' });
+        const legend = L.control({ position: 'bottomright' });
         legend.onAdd = function() {
             const div = L.DomUtil.create('div', 'info legend');
             div.style.backgroundColor = 'white';
             div.style.padding = '10px';
             div.style.margin = '10px';
             div.style.border = '1px solid #ccc';
-            if (isAdmin) {
-                div.innerHTML = `
-                    <h3>Légende</h3>
-                    <p><img src="https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png" alt="Labellisé"> Labellisé</p>
-                    <p><img src="https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-yellow.png" alt="Visité"> Visité</p>
-                    <p><img src="https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png" alt="Non visité"> Non visité</p>
-                `;
-            } else {
-                div.innerHTML = `
-                    <h3><img src="https://cdn.rawgit.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png" alt="Labellisé"> Labellisé</h3>
-                `;
-            }
+                div.innerHTML = `🏆 Labellisé ✅ Visité ❌ Non visité
+               `;
+            
             return div;
         };
         legend.addTo(map);
