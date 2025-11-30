@@ -112,15 +112,14 @@ def dashboard():
                           pending_evaluations=pending_evaluations,
                            pending_flans=pending_flans,
                            pending_etablissements=pending_etablissements)
-
 @main_bp.route('/rechercher', methods=['GET', 'POST'])
 def rechercher():
     from app.outils import afficher_etablissements
     from flask import flash, redirect, url_for
-
     form_recherche = RechercheForm(prefix='recherche')
     form_ajout = EtabForm(prefix='ajout-etab')
-    form_edit = EtabForm(prefix='edit-etab')  # Formulaire générique pour l'édition
+    form_edit = EtabForm(prefix='edit-etab')
+
     query = Etablissement.query
 
     def apply_filters(query, params):
@@ -133,23 +132,28 @@ def rechercher():
         ville = params.get('ville')
         if ville:
             query = query.filter(Etablissement.ville.ilike(f'%{ville}%'))
-        type_saveur = params.get('type_saveur')
-        if type_saveur and type_saveur != 'tous':
-            query = query.join(Flan).filter(Flan.type_saveur == type_saveur)
-        type_pate = params.get('type_pate')
-        if type_pate and type_pate != 'tous':
-            query = query.join(Flan).filter(Flan.type_pate == type_pate)
-        type_texture = params.get('type_texture')
-        if type_texture and type_texture != 'tous':
-            query = query.join(Flan).filter(Flan.type_texture == type_texture)
+
+        # On joint Flan une seule fois, si au moins un filtre sur Flan est présent
+        flan_filters = []
+        if params.get('type_saveur') and params.get('type_saveur') != 'tous':
+            flan_filters.append(Flan.type_saveur == params.get('type_saveur'))
+        if params.get('type_pate') and params.get('type_pate') != 'tous':
+            flan_filters.append(Flan.type_pate == params.get('type_pate'))
+        if params.get('type_texture') and params.get('type_texture') != 'tous':
+            flan_filters.append(Flan.type_texture == params.get('type_texture'))
         prix = params.get('prix')
         if prix and prix != 'tous':
             if prix == '0':
-                query = query.join(Flan).filter(Flan.prix < 2.5)
+                flan_filters.append(Flan.prix < 2.5)
             elif prix == '2.5':
-                query = query.join(Flan).filter(Flan.prix >= 2.5, Flan.prix < 5)
+                flan_filters.append(Flan.prix >= 2.5)
+                flan_filters.append(Flan.prix < 5)
             elif prix == '5':
-                query = query.join(Flan).filter(Flan.prix >= 5)
+                flan_filters.append(Flan.prix >= 5)
+
+        if flan_filters:
+            query = query.join(Flan).filter(*flan_filters)
+
         if params.get('visite') == 'oui':
             query = query.filter(Etablissement.visite == 1)
         elif params.get('visite') == 'non':
@@ -158,6 +162,7 @@ def rechercher():
             query = query.filter(Etablissement.label == 1)
         elif params.get('labellise') == 'non':
             query = query.filter(Etablissement.label == 0)
+
         return query
 
     if request.method == 'GET':
@@ -168,7 +173,7 @@ def rechercher():
                 flash("Erreur lors de l'application des filtres.", "error")
                 return redirect(url_for('main.rechercher'))
         else:
-            return render_template('rechercher.html', form_recherche=form_recherche, form_ajout=form_ajout, form_edit=form_edit)  # Passe un formulaire d'édition générique)
+            return render_template('rechercher.html', form_recherche=form_recherche, form_ajout=form_ajout, form_edit=form_edit)
     elif form_recherche.validate_on_submit():
         query = apply_filters(query, {
             'nom': form_recherche.nom.data,
@@ -202,8 +207,6 @@ def rechercher():
                            etablissements_json=etablissements_json,
                            google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
                            form_ajout=form_ajout, form_edit=form_edit)
-
-
 
 @main_bp.route('/etablissement/<int:id_etab>', methods=['GET', 'POST'])
 def afficher_etablissement_unique(id_etab):
