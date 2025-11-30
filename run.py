@@ -1,6 +1,6 @@
-from app import create_app # dans __init__.py
+from app import create_app
 
-app = create_app() # Pendant le développement
+app = create_app()
 
-if __name__ == '__main__': # Lance le serveur seulement quand j'exécute le fichier
+if __name__ == '__main__':
     app.run(debug=True)
