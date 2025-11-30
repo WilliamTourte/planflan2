@@ -147,22 +147,30 @@
         }
     </script>
 {% endmacro %}
-
 {% macro afficher_etablissement_infowindow(etablissement, details_url) %}
-    <div class="infowindow">
-        <h3>{{ etablissement.nom | enlever_accents }}</h3>
-        {{ afficher_badge_etablissement(etablissement) }}
-        {{ afficher_badge_type_etab(etablissement) }}
-        <p class="adresse">{{ etablissement.adresse }}, {{ etablissement.ville }}</p>
-        {% if etablissement.flans %}
-            <p class="flans-count">
-                {{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}
-            </p>
-        {% endif %}
-        <a href="{{ details_url }}" class="btn btn-primary">Voir plus</a>
-        <button class="infowindow-close" onclick="closeInfoWindow()">Fermer</button>
+    <div class="infowindow-content">
+        <div class="infowindow-header">
+            <h3>{{ etablissement.nom | enlever_accents }}</h3>
+            <div class="infowindow-badges">
+                {{ afficher_badge_etablissement(etablissement) }}
+                {{ afficher_badge_type_etab(etablissement) }}
+            </div>
+        </div>
+        <div class="infowindow-body">
+            <p class="adresse">{{ etablissement.adresse }}, {{ etablissement.ville }}</p>
+            {% if etablissement.flans %}
+                <p class="flans-count">
+                    {{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}
+                </p>
+            {% endif %}
+        </div>
+        <div class="infowindow-footer">
+            <a href="{{ details_url }}" class="btn btn-primary btn-small">Voir plus</a>
+        </div>
+        
     </div>
 {% endmacro %}
+
 
 {% macro afficher_formulaire_edition_etablissement(etablissement, form_edit, current_user) %}
     {% if form_edit %}

@@ -139,23 +139,23 @@ const createEmojiIcon = (emoji, className) => {
     });
 };
 
-const blueIcon = createEmojiIcon('🏆', 'label-icon');
-const yellowIcon = createEmojiIcon('✅', 'visited-icon');
-const redIcon = createEmojiIcon('❌', 'unvisited-icon');
+const labelIcon = createEmojiIcon('🏆', 'label-icon');
+const visiteIcon = createEmojiIcon('✅', 'visited-icon');
+const nonvisiteIcon = createEmojiIcon('❌', 'unvisited-icon');
 
 // Ajout des marqueurs avec les emojis
 etablissements.forEach(etablissement => {
     let icon;
     if (isAdmin) {
         if (etablissement.label) {
-            icon = blueIcon;
+            icon = labelIcon;
         } else if (etablissement.visite) {
-            icon = yellowIcon;
+            icon = visiteIcon;
         } else {
-            icon = redIcon;
+            icon = nonvisiteIcon;
         }
     } else {
-        icon = etablissement.label ? blueIcon : redIcon;
+        icon = etablissement.label ? labelIcon : nonvisiteIcon;
     }
 
     const marker = L.marker([etablissement.latitude, etablissement.longitude], {
@@ -167,7 +167,6 @@ etablissements.forEach(etablissement => {
 
     bounds.extend(marker.getLatLng());
 });
-
         if (etablissements.length > 0) {
             if (etablissements.length === 1) {
                 map.setView([etablissements[0].latitude, etablissements[0].longitude], 14);
@@ -184,9 +183,7 @@ etablissements.forEach(etablissement => {
             div.style.padding = '10px';
             div.style.margin = '10px';
             div.style.border = '1px solid #ccc';
-                div.innerHTML = `🏆 Labellisé ✅ Visité ❌ Non visité
-               `;
-            
+                div.innerHTML = `🏆 Labellisé ✅ Visité ❌ Non visité`;
             return div;
         };
         legend.addTo(map);
@@ -205,38 +202,7 @@ etablissements.forEach(etablissement => {
     const visite = "{{ request.args.get('visite') }}";
     const labellise = "{{ request.args.get('labellise') }}";
     </script>
-    <style>
-        .form-container { padding: 10px; }
-        .form-group { margin-bottom: 10px; }
-        .form-label { display: block; margin-bottom: 5px; }
-        .form-control { width: 100%; padding: 5px; }
-        .error-message { color: red; }
-        .btn-primary { background-color: #4CAF50; color: white; padding: 10px 15px; border: none; cursor: pointer; }
-        .btn-primary:hover { background-color: #45a049; }
-        #map { height: 80vh; width: 100%; background-color: #f5f5f5; }
-        .infowindow-content h3 { margin: 0 0 5px 0; color: #333; }
-        .infowindow-content a { color: #1a73e8; text-decoration: none; }
-        .infowindow-content {
-            position: relative;
-            padding: 10px;
-        }
-        .infowindow-close {
-            position: absolute;
-            bottom: 5px;
-            right: 5px;
-            background-color: #f1f1f1;
-            border: none;
-            border-radius: 3px;
-            padding: 3px 8px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        .infowindow-close:hover {
-            background-color: #e0e0e0;
-        }
-        .map-container { margin-bottom: 2rem; width: 100%; padding: 0; }
-        @media (max-width: 768px) { #map { height: 60vh; } }
-    </style>
+
 {% endblock %}
 
 {% block content %}
