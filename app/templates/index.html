@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="container-fluid bg-primary d-flex flex-column align-items-center justify-content-center vh-100 p-4">
+        <h1 class="text-white display-1 fw-bold mb-5" style="font-family: 'Comic Sans MS', cursive, sans-serif; text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);">
+            PLANFLAN
+        </h1>
+
+        <div class="d-flex flex-column align-items-center w-100" style="max-width: 400px;">
+            <form action="{{ url_for('main.rechercher') }}" method="GET" class="w-100">
+                <div class="mb-3 w-100">
+                    <select name="ville" class="form-select py-2 rounded-3 border-0 mb-3" style="background-color: rgba(255, 255, 255, 0.9);">
+                        <option selected disabled>Lyon</option>
+                        <option value="lyon">Lyon</option>
+                    </select>
+
+                    <select name="type" class="form-select py-2 rounded-3 border-0 mb-3" style="background-color: rgba(255, 255, 255, 0.9);">
+                        <option selected disabled>Flan pâtissier</option>
+                        <option value="flan_patissier">Flan pâtissier</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-warning btn-lg text-white fw-bold w-100 py-2 mb-3 rounded-3">
+                    Rechercher
+                </button>
+            </form>
+
+            <button class="btn btn-warning btn-lg text-white fw-bold w-100 py-2 rounded-3">
+                Proposer une adresse
+            </button>
+        </div>
+    </div>
+
+    <style>
+        .bg-primary {
+            background-color: #799dcb !important;
+        }
+        .btn-warning {
+            background-color: #ffcf40;
+            border-color: #ffcf40;
+        }
+        .btn-warning:hover {
+            background-color: #f1c40f;
+            border-color: #f1c40f;
+        }
+        .form-select {
+            font-size: 1.1rem;
+        }
+    </style>
+{% endblock %}

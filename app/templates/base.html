@@ -22,8 +22,7 @@
             <a class="btn btn-icon" href="{{ url_for('main.index') }}">
                 <i class="bi bi-house-door"></i>
             </a>
-            <!-- Titre centré -->
-            <h1 class="mb-0">PLANFLAN</h1>
+            
             <!-- Bouton connexion/déconnexion à droite -->
             <div>
                 {% if current_user.is_authenticated %}
@@ -40,22 +39,7 @@
                 {% endif %}
             </div>
         </div>
-        <!-- Barre de recherche centrale -->
-        <nav class="search-bar">
-            <div class="container d-flex justify-content-center align-items-center flex-nowrap">
-                <form action="{{ url_for('main.rechercher') }}" method="GET" class="d-flex align-items-center">
-                    <input type="text" name="nom" placeholder="Rechercher un établissement, une ville..." class="form-control me-2">
-                    <button type="submit" class="btn btn-primary btn-search-icon">
-                        <i class="bi bi-search"></i>
-                    </button>
-                </form>
-                <form action="{{ url_for('main.rechercher') }}" method="GET" class="d-flex align-items-center ms-2">
-                    <button type="submit" class="btn btn-primary btn-search-icon">
-                        <i class="bi bi-gear"></i>
-                    </button>
-                </form>
-            </div>
-        </nav>
+        
 
         </nav>
     </header>

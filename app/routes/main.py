@@ -7,6 +7,21 @@ from app import db, bcrypt
 
 main_bp = Blueprint('main', __name__)
 
+
+@main_bp.route('/')
+def index():
+    from app.outils import afficher_etablissements
+    form_edit = EtabForm(prefix='edit-etab')
+    form_ajout = EtabForm(prefix='ajout-etab')
+    resultats = Etablissement.query.all()
+    etablissements, etablissements_json = afficher_etablissements(resultats)
+    return render_template('index.html',
+                           etablissements=etablissements,
+                           etablissements_json=etablissements_json,
+                           google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
+                           form_edit=form_edit,
+                           form_ajout=form_ajout)
+
 def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
     print("Form data received:", form.data)
     visuel = float(str(form.visuel.data).replace(',', '.')) if form.visuel.data is not None else None
@@ -54,19 +69,6 @@ def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
     return evaluation
 
 
-@main_bp.route('/')
-def index():
-    from app.outils import afficher_etablissements
-    form_edit = EtabForm(prefix='edit-etab')
-    form_ajout = EtabForm(prefix='ajout-etab')
-    resultats = Etablissement.query.all()
-    etablissements, etablissements_json = afficher_etablissements(resultats)
-    return render_template('liste_etablissements.html',
-                           etablissements=etablissements,
-                           etablissements_json=etablissements_json,
-                           google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
-                           form_edit=form_edit,
-                           form_ajout=form_ajout)
 
 @main_bp.route('/dashboard', methods=['GET', 'POST'])
 @login_required
