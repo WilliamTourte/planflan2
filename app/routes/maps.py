@@ -48,6 +48,13 @@ def extraire_infos_adresse():
         return jsonify({'error': str(e)}), 400
 
 
+@maps_bp.route('/proposer_etablissement', methods=['GET', 'POST'])
+def proposer_etablissement():
+    form = EtabForm(prefix='ajout-etab')
+    return render_template('proposer_etablissement.html',
+                           form=form,
+                           google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
+
 
 
 @maps_bp.route('/verifier_etablissement', methods=['POST'])
