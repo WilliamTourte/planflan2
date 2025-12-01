@@ -700,22 +700,11 @@ input.back:hover {
 .infowindow-badges {
     position: absolute;
     top: 0;
-    left: 0;
-    right: 0;
+    width: 100%;
     display: flex;
     justify-content: space-between;
+    pointer-events: none; /* Permet de cliquer "à travers" les badges */
 }
-
-.badge-type-etab {
-    left: 0 !important; /* Force le badge à gauche */
-    top: 0 !important;
-}
-
-.badge-labellise {
-    right: 0 !important; /* Force le badge à droite */
-    top: 0 !important;
-}
-
 
 .infowindow-badges .badge {
     font-size: 0.7rem; /* Taille de police plus petite */

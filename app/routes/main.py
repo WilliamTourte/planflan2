@@ -71,6 +71,7 @@ def index():
 @main_bp.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
+    form_ajout = EtabForm()  # Instancie le formulaire
     profile_form = UpdateProfileForm(prefix='profile')
     eval_form = EvalForm(prefix='dashboard-eval')
     pending_evaluations = []
@@ -107,6 +108,7 @@ def dashboard():
 
     return render_template('dashboard.html',
                           title='Tableau de bord',
+                          form_ajout=form_ajout,
                           profile_form=profile_form,
                           eval_form=eval_form,
                           pending_evaluations=pending_evaluations,
