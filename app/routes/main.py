@@ -11,16 +11,16 @@ main_bp = Blueprint('main', __name__)
 @main_bp.route('/')
 def index():
     from app.outils import afficher_etablissements
-    form_edit = EtabForm(prefix='edit-etab')
-    form_ajout = EtabForm(prefix='ajout-etab')
+    form_recherche=RechercheForm()
+ 
     resultats = Etablissement.query.all()
     etablissements, etablissements_json = afficher_etablissements(resultats)
     return render_template('index.html',
                            etablissements=etablissements,
                            etablissements_json=etablissements_json,
                            google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
-                           form_edit=form_edit,
-                           form_ajout=form_ajout)
+
+                           form_recherche=form_recherche)
 
 def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
     print("Form data received:", form.data)
@@ -155,10 +155,6 @@ def rechercher():
 
 @main_bp.route('/liste_etablissements', methods=['GET'])
 def liste_etablissements():
-    form_ajout=EtabForm()
-
-    current_app.logger.info(f"Type de form_ajout: {form_ajout.__class__.__name__ if form_ajout else 'None'}")
-    current_app.logger.info(f"CSRF activé: {form_ajout.csrf_token if form_ajout else 'Non'}")
     # Récupère les paramètres de recherche depuis l'URL
     ville = request.args.get('ville', '')
     type_flan = request.args.get('type', '')
@@ -170,17 +166,14 @@ def liste_etablissements():
     if type_flan:
         query = query.join(Flan).filter(Flan.type == type_flan)
 
-
     resultats = query.all()
     etablissements, etablissements_json = afficher_etablissements(resultats)
-
 
     return render_template(
         'liste_etablissements.html',
         etablissements=etablissements,
         etablissements_json=etablissements_json,
-        google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
-        form_ajout=form_ajout
+        google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY']
     )
 
 

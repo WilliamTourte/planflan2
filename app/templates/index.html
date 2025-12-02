@@ -5,23 +5,26 @@
             PLANFLAN
         </h1>
 
-    <div class="d-flex flex-column align-items-center w-100" style="max-width: 400px;">
-        <form action="{{ url_for('main.liste_etablissements') }}" method="GET" class="w-100">
-            <div class="mb-3 w-100">
-                <select name="ville" class="form-select py-2 rounded-3 border-0 mb-3" style="background-color: rgba(255, 255, 255, 0.9);">
-                    <option value="" selected>Toutes les villes</option>
-                    <option value="lyon">Lyon</option>
-                </select>
-                <select name="type" class="form-select py-2 rounded-3 border-0 mb-3" style="background-color: rgba(255, 255, 255, 0.9);">
-                    <option value="" selected>Tous les types</option>
-                    <option value="flan_patissier">Flan pâtissier</option>
-                </select>
-            </div>
-            <button type="submit" class="btn btn-warning btn-lg text-white fw-bold w-100 py-2 mb-3 rounded-3">
-                Rechercher
-            </button>
-        </form>
-    </div>
+<div class="d-flex flex-column align-items-center w-100" style="max-width: 400px;">
+    <form action="{{ url_for('main.liste_etablissements') }}" method="GET" class="w-100">
+        <!-- Champ "ville" généré par Flask-WTF -->
+        {{ form_recherche.hidden_tag() }}
+        <div class="mb-3 w-100">
+            
+            {{ form_recherche.ville(class="form-control py-2 rounded-3 border-0 mb-3", style="background-color: rgba(255, 255, 255, 0.9);", placeholder="Lyon") }}
+        </div>
+        <!-- Champ "type_saveur" (exemple) -->
+        <div class="mb-3 w-100">
+            {{ form_recherche.type_saveur.label(class="form-label") }}
+            {{ form_recherche.type_saveur(class="form-select py-2 rounded-3 border-0 mb-3", style="background-color: rgba(255, 255, 255, 0.9);", placeholder="Flan pâtissier") }}
+        </div>
+        <!-- Bouton de soumission -->
+        <button type="submit" class="btn btn-warning btn-lg text-white fw-bold w-100 py-2 mb-3 rounded-3">
+            {{ form_recherche.submit.label }}
+        </button>
+    </form>
+</div>
+
 
 <a href="{{ url_for('maps.proposer_etablissement') }}" class="btn btn-warning btn-lg text-white fw-bold w-100 py-2 mb-3 rounded-3" role="button">
     Proposer une adresse

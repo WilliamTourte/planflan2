@@ -444,7 +444,6 @@
 {% endmacro %}
 
 
-
 {% macro afficher_objet(objet_type, objet, current_user=None, form_edit=None, current_page='', delete_form=None, validate_form=None) %}
     {% if objet_type == 'etablissement' %}
         {{ afficher_etablissement(objet, current_user, form_edit, current_page, delete_form, validate_form) }}
