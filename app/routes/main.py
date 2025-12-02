@@ -155,6 +155,10 @@ def rechercher():
 
 @main_bp.route('/liste_etablissements', methods=['GET'])
 def liste_etablissements():
+    form_ajout=EtabForm()
+
+    current_app.logger.info(f"Type de form_ajout: {form_ajout.__class__.__name__ if form_ajout else 'None'}")
+    current_app.logger.info(f"CSRF activé: {form_ajout.csrf_token if form_ajout else 'Non'}")
     # Récupère les paramètres de recherche depuis l'URL
     ville = request.args.get('ville', '')
     type_flan = request.args.get('type', '')
@@ -175,7 +179,8 @@ def liste_etablissements():
         'liste_etablissements.html',
         etablissements=etablissements,
         etablissements_json=etablissements_json,
-        google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY']
+        google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
+        form_ajout=form_ajout
     )
 
 
