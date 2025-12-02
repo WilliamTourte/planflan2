@@ -41,7 +41,7 @@ async function updateMapAndMarkers(nom = '', visite = '', labellise = '') {
         return;
     }
 
-    // Effacer les anciens marqueurs
+    // Efface les anciens marqueurs
     if (map) {
         map.eachLayer(layer => {
             if (layer instanceof L.Marker) {
@@ -50,11 +50,11 @@ async function updateMapAndMarkers(nom = '', visite = '', labellise = '') {
         });
     }
 
-    // Mettre à jour la variable globale
+    // Met à jour les données globales
     etablissements = newEtablissements;
-    const bounds = L.latLngBounds();
 
-    // Définition des icônes personnalisées avec emojis
+    // Réutilise la logique d'initialisation des marqueurs
+    const bounds = L.latLngBounds();
     const createEmojiIcon = (emoji, className) => {
         return L.divIcon({
             html: `<div class="emoji-marker ${className}">${emoji}</div>`,
@@ -67,7 +67,6 @@ async function updateMapAndMarkers(nom = '', visite = '', labellise = '') {
     const visiteIcon = createEmojiIcon('✅', 'visited-icon');
     const nonvisiteIcon = createEmojiIcon('❌', 'unvisited-icon');
 
-    // Ajout des nouveaux marqueurs
     etablissements.forEach(etablissement => {
         let icon;
         if (isAdmin) {
@@ -90,7 +89,7 @@ async function updateMapAndMarkers(nom = '', visite = '', labellise = '') {
         bounds.extend(marker.getLatLng());
     });
 
-    // Ajuster la vue de la carte
+    // Ajuste la vue
     if (etablissements.length > 0) {
         if (etablissements.length === 1) {
             map.setView([etablissements[0].latitude, etablissements[0].longitude], 14);
@@ -178,20 +177,58 @@ window.initMap = function() {
     const mapElement = document.getElementById("map");
     if (!mapElement) {
         console.error("Élément #map introuvable !");
-        const mapContainer = document.getElementById("map-container");
-        if (mapContainer) {
-            mapContainer.innerHTML = "<p style='color: red;'>Erreur : Impossible de charger la carte.</p>";
-        } else {
-            console.error("Élément #map-container introuvable !");
-        }
         return;
     }
     // Initialisation de la carte Leaflet
     map = L.map('map').setView([46.2276, 2.2137], 6);
-    // Ajout de la couche OpenStreetMap
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
+
+    // Ajoute les marqueurs initiaux SI les données existent
+    if (window.etablissements && window.etablissements.length > 0) {
+        const bounds = L.latLngBounds();
+        const createEmojiIcon = (emoji, className) => {
+            return L.divIcon({
+                html: `<div class="emoji-marker ${className}">${emoji}</div>`,
+                className: 'emoji-icon',
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            });
+        };
+        const labelIcon = createEmojiIcon('🏆', 'label-icon');
+        const visiteIcon = createEmojiIcon('✅', 'visited-icon');
+        const nonvisiteIcon = createEmojiIcon('❌', 'unvisited-icon');
+
+        window.etablissements.forEach(etablissement => {
+            let icon;
+            if (isAdmin) {
+                if (etablissement.label) {
+                    icon = labelIcon;
+                } else if (etablissement.visite) {
+                    icon = visiteIcon;
+                } else {
+                    icon = nonvisiteIcon;
+                }
+            } else {
+                icon = etablissement.label ? labelIcon : nonvisiteIcon;
+            }
+            const marker = L.marker([etablissement.latitude, etablissement.longitude], {
+                icon: icon,
+                title: etablissement.nom
+            })
+            .addTo(map)
+            .bindPopup(infowindowContents[etablissement.id_etab] || "Détails non disponibles");
+            bounds.extend(marker.getLatLng());
+        });
+
+        // Ajuste la vue de la carte
+        if (window.etablissements.length === 1) {
+            map.setView([window.etablissements[0].latitude, window.etablissements[0].longitude], 14);
+        } else {
+            map.fitBounds(bounds);
+        }
+    }
 
     // Légende
     const legend = L.control({ position: 'bottomright' });
@@ -206,6 +243,7 @@ window.initMap = function() {
     };
     legend.addTo(map);
 };
+
 
 // Fonction pour initialiser l'autocomplétion et la carte
 window.initAll = function() {

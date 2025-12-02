@@ -1,21 +1,15 @@
 {% extends "base.html" %}
 
 {% block scripts_head %}
-
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-
-    <style>
-        #map { height: 500px; }
-    </style>
 {% endblock %}
 
 {% block content %}
     <div class="container">
-        <h2>Résultats de la recherche</h2>
+        <h2>Resultats de la recherche</h2>
+    <div id="map"></div>
         {% if etablissements %}
-            <div id="map"></div>
             {{ afficher_grille('etablissement', etablissements, current_user) }}
         {% else %}
             <p>Aucun établissement trouvé.</p>
