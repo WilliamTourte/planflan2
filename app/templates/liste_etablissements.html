@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% from 'macros.html' import afficher_etablissement_infowindow %}
+
 {% block scripts_head %}
-    <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- Leaflet CSS & JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
           integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
@@ -9,208 +9,53 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
             integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
             crossorigin=""></script>
-    <script>
-    let autocomplete;
-    let map;
-    let markers = [];
-    let infowindowContents = {};
-    let infowindow;
-
-    function closeInfoWindow() {
-        // Leaflet gère la fermeture des popups automatiquement
-    }
-
-    // Génération côté serveur du HTML pour chaque infowindow
-    {% for etablissement in etablissements %}
-        {% set detailsUrl = '/etablissement/' ~ etablissement.id_etab ~ '?nom=' ~ nom ~ '&visite=' ~ visite ~ '&labellise=' ~ labellise %}
-        infowindowContents[{{ etablissement.id_etab }}] = {{ afficher_etablissement_infowindow(etablissement, detailsUrl)|tojson|safe }};
-    {% endfor %}
-
-    // Fonction pour initialiser l'autocomplétion et la carte
-    window.initAll = function() {
-        initAutocomplete();
-        initMap();
-    };
-
-    window.initAutocomplete = function() {
-        const input = document.getElementById('search');
-        if (!input) {
-            console.error("Élément #search introuvable !");
-            return;
+    <!-- CSS pour la carte et les filtres -->
+    <style>
+        .map-container {
+            height: 500px;
+            margin-bottom: 20px;
         }
-        autocomplete = new google.maps.places.Autocomplete(input, {
-            types: ['establishment'],
-            componentRestrictions: {country: 'fr'}
-        });
-        // Écouter les changements dans l'Autocomplete
-        autocomplete.addListener('place_changed', function() {
-            const place = autocomplete.getPlace();
-            if (!place.geometry) return;
-            // Remplir les champs CACHÉS avec le préfixe "ajout-etab-"
-            document.getElementById('ajout-etab-nom').value = place.name || '';
-            document.getElementById('ajout-etab-adresse').value = place.formatted_address || '';
-            document.getElementById('ajout-etab-latitude').value = place.geometry.location.lat();
-            document.getElementById('ajout-etab-longitude').value = place.geometry.location.lng();
-            // Vérifier si le lieu est déjà dans la liste
-            fetch('/verifier_etablissement', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: JSON.stringify({ nom: place.name }),
-            })
-            .then(async response => {
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    throw new Error(`Erreur serveur: ${errorText}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.error) {
-                    console.error("Erreur:", data.error);
-                    return;
-                }
-                if (data.exists) {
-                    const previousMessages = document.querySelectorAll('.alert-warning');
-                    previousMessages.forEach(msg => msg.remove());
-                    const message = document.createElement('div');
-                    message.className = 'alert alert-warning';
-                    message.innerHTML = `Cet établissement est déjà dans la liste. <a href="${data.url}">Voir la page</a>`;
-                    document.querySelector('.form-container').prepend(message);
-                }
-            })
-            .catch(error => {
-                console.error('Erreur:', error);
-                const errorMessage = document.createElement('div');
-                errorMessage.className = 'alert alert-danger';
-                errorMessage.textContent = `Erreur: ${error.message}`;
-                document.querySelector('.form-container').prepend(errorMessage);
-            });
-            // Envoyer l'adresse à une route AJAX pour extraire le code postal et la ville
-            fetch('/extraire_infos_adresse', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').content    },
-                body: JSON.stringify({ adresse: place.formatted_address }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('ajout-etab-code_postal').value = data.code_postal || '';
-                document.getElementById('ajout-etab-ville').value = data.ville || '';
-                document.getElementById('ajout-etab-adresse').value = data.adresse_nettoyee || '';
-            })
-            .catch(error => console.error('Erreur:', error));
-        });
-    };
-
-    window.initMap = function() {
-        const mapElement = document.getElementById("map");
-        if (!mapElement) {
-            console.error("Élément #map introuvable !");
-            const mapContainer = document.getElementById("map-container");
-            if (mapContainer) {
-                mapContainer.innerHTML = "<p style='color: red;'>Erreur : Impossible de charger la carte.</p>";
-            } else {
-                console.error("Élément #map-container introuvable !");
-            }
-            return;
+        #map {
+            width: 100%;
+            height: 100%;
         }
-
-        // Initialisation de la carte Leaflet
-        map = L.map('map').setView([46.2276, 2.2137], 6);
-
-        // Ajout de la couche OpenStreetMap
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-
-        const etablissements = {{ etablissements_json|tojson|safe }};
-        const isAdmin = {{ current_user.is_admin|tojson|safe if current_user.is_authenticated else 'false' }};
-        const bounds = L.latLngBounds();
-// Définition des icônes personnalisées avec emojis
-const createEmojiIcon = (emoji, className) => {
-    return L.divIcon({
-        html: `<div class="emoji-marker ${className}">${emoji}</div>`,
-        className: 'emoji-icon',
-        iconSize: [30, 30], // Taille de l'icône
-        iconAnchor: [15, 15] // Point d'ancrage (centre de l'emoji)
-    });
-};
-
-const labelIcon = createEmojiIcon('🏆', 'label-icon');
-const visiteIcon = createEmojiIcon('✅', 'visited-icon');
-const nonvisiteIcon = createEmojiIcon('❌', 'unvisited-icon');
-
-// Ajout des marqueurs avec les emojis
-etablissements.forEach(etablissement => {
-    let icon;
-    if (isAdmin) {
-        if (etablissement.label) {
-            icon = labelIcon;
-        } else if (etablissement.visite) {
-            icon = visiteIcon;
-        } else {
-            icon = nonvisiteIcon;
+        .filters {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
-    } else {
-        icon = etablissement.label ? labelIcon : nonvisiteIcon;
-    }
-
-    const marker = L.marker([etablissement.latitude, etablissement.longitude], {
-        icon: icon,
-        title: etablissement.nom
-    })
-    .addTo(map)
-    .bindPopup(infowindowContents[etablissement.id_etab]);
-
-    bounds.extend(marker.getLatLng());
-});
-        if (etablissements.length > 0) {
-            if (etablissements.length === 1) {
-                map.setView([etablissements[0].latitude, etablissements[0].longitude], 14);
-            } else {
-                map.fitBounds(bounds);
-            }
+        .filters input, .filters select {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
         }
-
-        // Légende
-        const legend = L.control({ position: 'bottomright' });
-        legend.onAdd = function() {
-            const div = L.DomUtil.create('div', 'info legend');
-            div.style.backgroundColor = 'white';
-            div.style.padding = '10px';
-            div.style.margin = '10px';
-            div.style.border = '1px solid #ccc';
-                div.innerHTML = `🏆 Labellisé ✅ Visité ❌ Non visité`;
-            return div;
-        };
-        legend.addTo(map);
-    };
-
-    // Chargement de l'API Google Maps (uniquement pour l'autocomplete)
-    document.addEventListener('DOMContentLoaded', function() {
-        const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places&callback=initAll&v=weekly&loading=async`;
-        script.async = true;
-        script.defer = true;
-        document.head.appendChild(script);
-    });
-
-    const nom = "{{ request.args.get('nom') }}";
-    const visite = "{{ request.args.get('visite') }}";
-    const labellise = "{{ request.args.get('labellise') }}";
-    </script>
-
+    </style>
 {% endblock %}
 
 {% block content %}
-<div id="map-container" class="map-container">
-    <div id="map"></div>
-</div>
-<div class="container">
-    {{ afficher_grille('etablissement', etablissements, current_user, form_edit, form_ajout) }}
-</div>
-{% endblock %}
+    <!-- Filtres pour la carte -->
+    <div class="filters">
+        <input type="text" id="filter-nom" placeholder="Filtrer par nom..." value="{{ request.args.get('nom', '') }}">
+        <select id="filter-visite">
+            <option value="">Tous (visité/non visité)</option>
+            <option value="true" {% if request.args.get('visite') == 'true' %}selected{% endif %}>Visités</option>
+            <option value="false" {% if request.args.get('visite') == 'false' %}selected{% endif %}>Non visités</option>
+        </select>
+        <select id="filter-labellise">
+            <option value="">Tous (labellisé/non labellisé)</option>
+            <option value="true" {% if request.args.get('labellise') == 'true' %}selected{% endif %}>Labellisés</option>
+            <option value="false" {% if request.args.get('labellise') == 'false' %}selected{% endif %}>Non labellisés</option>
+        </select>
+    </div>
 
+    <!-- Conteneur de la carte -->
+    <div id="map-container" class="map-container">
+        <div id="map"></div>
+    </div>
+
+    <!-- Grille des établissements -->
+    <div class="container">
+        {{ afficher_grille('etablissement', etablissements, current_user, form_edit, form_ajout) }}
+    </div>
+{% endblock %}

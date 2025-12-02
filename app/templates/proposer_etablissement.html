@@ -1,13 +1,37 @@
 {% extends "base.html" %}
+
+{% block scripts_head %}
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+{% endblock %}
+
 {% block content %}
     <div class="container-fluid bg-primary d-flex flex-column align-items-center justify-content-start min-vh-100 p-4">
         <div class="bg-white p-4 rounded-4 shadow-sm w-100" style="max-width: 500px;">
             <form method="POST" action="{{ action_url }}" class="w-100">
                 {{ form.hidden_tag() }}
+
+                <!-- Champ de recherche pour l'autocomplete Google Maps -->
                 <div class="mb-3">
                     <label for="search" class="form-label text-dark fw-bold">Recherche d'établissement</label>
                     <input type="text" id="search" class="form-control" placeholder="Rechercher un établissement">
                 </div>
+
+                <!-- Champs cachés pour les coordonnées et l'adresse (remplis par le script) -->
+                <div class="d-none">
+                    {{ form.nom(id="ajout-etab-nom") }}
+                    {{ form.adresse(id="ajout-etab-adresse") }}
+                    {{ form.latitude(id="ajout-etab-latitude") }}
+                    {{ form.longitude(id="ajout-etab-longitude") }}
+                    {{ form.code_postal(id="ajout-etab-code_postal") }}
+                    {{ form.ville(id="ajout-etab-ville") }}
+                </div>
+
                 <div class="mb-3">
                     {{ form.type_etab.label(class="form-label text-dark fw-bold") }}
                     {{ form.type_etab(class="form-control form-control-lg rounded-3") }}
@@ -31,6 +55,11 @@
                 </button>
             </form>
         </div>
+
+        <!-- Conteneur pour la carte (caché par défaut, affiché après sélection d'un établissement) -->
+        <div id="map-container" class="mt-4 bg-white p-3 rounded-4 shadow-sm w-100" style="max-width: 500px; display: none;">
+            <div id="map" style="height: 300px; width: 100%;"></div>
+        </div>
     </div>
 
     <style>
@@ -53,5 +82,4 @@
             box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
         }
     </style>
-
 {% endblock %}

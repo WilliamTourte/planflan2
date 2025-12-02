@@ -116,15 +116,20 @@ def dashboard():
                           pending_evaluations=pending_evaluations,
                            pending_flans=pending_flans,
                            pending_etablissements=pending_etablissements)
+
 @main_bp.route('/rechercher', methods=['GET', 'POST'])
 def rechercher():
     from app.outils import afficher_etablissements
     from flask import flash, redirect, url_for
+
     form_recherche = RechercheForm(prefix='recherche')
     form_ajout = EtabForm(prefix='ajout-etab')
     form_edit = EtabForm(prefix='edit-etab')
 
+    # Récupère tous les établissements par défaut
     query = Etablissement.query
+    etablissements = []
+    etablissements_json = []
 
     def apply_filters(query, params):
         search_term = params.get('nom')
@@ -137,7 +142,7 @@ def rechercher():
         if ville:
             query = query.filter(Etablissement.ville.ilike(f'%{ville}%'))
 
-        # On joint Flan une seule fois, si au moins un filtre sur Flan est présent
+        # Filtres sur Flan
         flan_filters = []
         if params.get('type_saveur') and params.get('type_saveur') != 'tous':
             flan_filters.append(Flan.type_saveur == params.get('type_saveur'))
@@ -154,7 +159,6 @@ def rechercher():
                 flan_filters.append(Flan.prix < 5)
             elif prix == '5':
                 flan_filters.append(Flan.prix >= 5)
-
         if flan_filters:
             query = query.join(Flan).filter(*flan_filters)
 
@@ -166,18 +170,23 @@ def rechercher():
             query = query.filter(Etablissement.label == 1)
         elif params.get('labellise') == 'non':
             query = query.filter(Etablissement.label == 0)
-
         return query
 
     if request.method == 'GET':
         has_search_params = any(request.args.get(k) for k in ['nom', 'ville', 'type_saveur', 'type_pate', 'type_texture', 'prix', 'visite', 'labellise'])
         if has_search_params:
             query = apply_filters(query, request.args)
-            if query is None:
-                flash("Erreur lors de l'application des filtres.", "error")
-                return redirect(url_for('main.rechercher'))
-        else:
-            return render_template('rechercher.html', form_recherche=form_recherche, form_ajout=form_ajout, form_edit=form_edit)
+        resultats = query.all()
+        etablissements, etablissements_json = afficher_etablissements(resultats)
+        if not etablissements:
+            flash("Aucun établissement trouvé avec ces critères.", "info")
+        return render_template('rechercher.html',
+                               form_recherche=form_recherche,
+                               form_ajout=form_ajout,
+                               form_edit=form_edit,
+                               etablissements=etablissements,
+                               etablissements_json=etablissements_json)
+
     elif form_recherche.validate_on_submit():
         query = apply_filters(query, {
             'nom': form_recherche.nom.data,
@@ -189,28 +198,19 @@ def rechercher():
             'visite': form_recherche.visite.data,
             'labellise': form_recherche.labellise.data
         })
-        if query is None:
-            flash("Erreur lors de l'application des filtres.", "error")
-            return redirect(url_for('main.rechercher'))
-    else:
-        return render_template('rechercher.html', form_recherche=form_recherche, form_ajout=form_ajout, form_edit=form_edit)
+        resultats = query.all()
+        etablissements, etablissements_json = afficher_etablissements(resultats)
+        if not etablissements:
+            flash("Aucun établissement trouvé avec ces critères.", "info")
+        return render_template('rechercher.html',
+                               form_recherche=form_recherche,
+                               form_ajout=form_ajout,
+                               form_edit=form_edit,
+                               etablissements=etablissements,
+                               etablissements_json=etablissements_json)
 
-    # Vérifie que query est bien une requête valide avant d'appeler .all()
-    if query is None:
-        flash("La requête est invalide.", "error")
-        return redirect(url_for('main.rechercher'))
-
-    resultats = query.all()
-    if not resultats:
-        flash("Aucun établissement trouvé avec ces critères.", "info")
-
-    etablissements, etablissements_json = afficher_etablissements(resultats)
-    session['resultats_recherche'] = etablissements_json
-    return render_template('liste_etablissements.html',
-                           etablissements=etablissements,
-                           etablissements_json=etablissements_json,
-                           google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
-                           form_ajout=form_ajout, form_edit=form_edit)
+    # Cas par défaut (ne devrait jamais arriver)
+    return redirect(url_for('main.rechercher'))
 
 @main_bp.route('/etablissement/<int:id_etab>', methods=['GET', 'POST'])
 def afficher_etablissement_unique(id_etab):
