@@ -5,31 +5,30 @@
             PLANFLAN
         </h1>
 
-        <div class="d-flex flex-column align-items-center w-100" style="max-width: 400px;">
-            <form action="{{ url_for('main.rechercher') }}" method="GET" class="w-100">
-                <div class="mb-3 w-100">
-                    <select name="ville" class="form-select py-2 rounded-3 border-0 mb-3" style="background-color: rgba(255, 255, 255, 0.9);">
-                        <option selected disabled>Lyon</option>
-                        <option value="lyon">Lyon</option>
-                    </select>
-
-                    <select name="type" class="form-select py-2 rounded-3 border-0 mb-3" style="background-color: rgba(255, 255, 255, 0.9);">
-                        <option selected disabled>Flan pâtissier</option>
-                        <option value="flan_patissier">Flan pâtissier</option>
-                    </select>
-                </div>
-
-                <button type="submit" class="btn btn-warning btn-lg text-white fw-bold w-100 py-2 mb-3 rounded-3">
-                    Rechercher
-                </button>
-            </form>
+    <div class="d-flex flex-column align-items-center w-100" style="max-width: 400px;">
+        <form action="{{ url_for('main.liste_etablissements') }}" method="GET" class="w-100">
+            <div class="mb-3 w-100">
+                <select name="ville" class="form-select py-2 rounded-3 border-0 mb-3" style="background-color: rgba(255, 255, 255, 0.9);">
+                    <option value="" selected>Toutes les villes</option>
+                    <option value="lyon">Lyon</option>
+                </select>
+                <select name="type" class="form-select py-2 rounded-3 border-0 mb-3" style="background-color: rgba(255, 255, 255, 0.9);">
+                    <option value="" selected>Tous les types</option>
+                    <option value="flan_patissier">Flan pâtissier</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-warning btn-lg text-white fw-bold w-100 py-2 mb-3 rounded-3">
+                Rechercher
+            </button>
+        </form>
+    </div>
 
 <a href="{{ url_for('maps.proposer_etablissement') }}" class="btn btn-warning btn-lg text-white fw-bold w-100 py-2 mb-3 rounded-3" role="button">
     Proposer une adresse
 </a>
 
-        </div>
     </div>
+
 
     <style>
         .bg-primary {

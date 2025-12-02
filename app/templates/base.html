@@ -87,25 +87,47 @@
 
     <!-- Blocs pour les scripts spécifiques aux pages -->
     {% block scripts %}
-        {% if request.endpoint in ['main.proposer_etablissement', 'main.rechercher', ] %}
-            <script>
-                // Passer les variables Jinja2 vers le script externe
-                window.etablissements = {{ etablissements_json|tojson|safe }};
-                window.isAdmin = {{ current_user.is_admin|tojson|safe if current_user.is_authenticated else 'false' }};
-                window.googleMapsApiKey = "{{ google_maps_api_key }}";
-                window.csrfToken = document.querySelector('meta[name="csrf-token"]').content;
-                window.nom = "{{ request.args.get('nom', '') }}";
-                window.visite = "{{ request.args.get('visite', '') }}";
-                window.labellise = "{{ request.args.get('labellise', '') }}";
-                // Génération côté serveur du HTML pour chaque infowindow
-                window.infowindowContents = {};
+        {% if etablissements_json is defined %}
+        <script>
+            window.etablissements = {{ etablissements_json|tojson|safe }};
+            window.isAdmin = {{ current_user.is_authenticated and current_user.is_admin|tojson|safe or 'false' }};
+            window.googleMapsApiKey = "{{ google_maps_api_key|default('') }}";
+            window.csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+            window.nom = "{{ request.args.get('nom', '') }}";
+            window.visite = "{{ request.args.get('visite', '') }}";
+            window.labellise = "{{ request.args.get('labellise', '') }}";
+            window.infowindowContents = {};
+            {% if etablissements is defined %}
                 {% for etablissement in etablissements %}
                     {% set detailsUrl = '/etablissement/' ~ etablissement.id_etab ~ '?nom=' ~ nom ~ '&visite=' ~ visite ~ '&labellise=' ~ labellise %}
                     window.infowindowContents[{{ etablissement.id_etab }}] = {{ afficher_etablissement_infowindow(etablissement, detailsUrl)|tojson|safe }};
                 {% endfor %}
-            </script>
+            {% endif %}
+        </script>
+        {% if request.endpoint in ['main.liste_etablissements', 'main.proposer_etablissement'] %}
             <script src="{{ url_for('static', filename='js/maps_autocomplete.js') }}"></script>
         {% endif %}
+    {% endif %}
+
+    {% if request.endpoint in ['main.proposer_etablissement', 'main.rechercher', ] %}
+        <script>
+            // Passer les variables Jinja2 vers le script externe
+            window.etablissements = {{ etablissements_json|tojson|safe }};
+            window.isAdmin = {{ current_user.is_admin|tojson|safe if current_user.is_authenticated else 'false' }};
+            window.googleMapsApiKey = "{{ google_maps_api_key }}";
+            window.csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+            window.nom = "{{ request.args.get('nom', '') }}";
+            window.visite = "{{ request.args.get('visite', '') }}";
+            window.labellise = "{{ request.args.get('labellise', '') }}";
+            // Génération côté serveur du HTML pour chaque infowindow
+            window.infowindowContents = {};
+            {% for etablissement in etablissements %}
+                {% set detailsUrl = '/etablissement/' ~ etablissement.id_etab ~ '?nom=' ~ nom ~ '&visite=' ~ visite ~ '&labellise=' ~ labellise %}
+                window.infowindowContents[{{ etablissement.id_etab }}] = {{ afficher_etablissement_infowindow(etablissement, detailsUrl)|tojson|safe }};
+            {% endfor %}
+        </script>
+        <script src="{{ url_for('static', filename='js/maps_autocomplete.js') }}"></script>
+    {% endif %}
     {% endblock %}
 </body>
 </html>

@@ -104,7 +104,7 @@ async function updateMapAndMarkers(nom = '', visite = '', labellise = '') {
 window.initAutocomplete = function() {
     const input = document.getElementById('search');
     if (!input) {
-        console.error("Élément #search introuvable !");
+        console.log("Élément #search absent : pas d'autocomplete.");
         return;
     }
     autocomplete = new google.maps.places.Autocomplete(input, {

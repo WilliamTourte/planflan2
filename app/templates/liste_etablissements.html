@@ -1,61 +1,24 @@
 {% extends "base.html" %}
-{% from 'macros.html' import afficher_etablissement_infowindow %}
 
 {% block scripts_head %}
-    <!-- Leaflet CSS & JS -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-          crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-            crossorigin=""></script>
-    <!-- CSS pour la carte et les filtres -->
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+
     <style>
-        .map-container {
-            height: 500px;
-            margin-bottom: 20px;
-        }
-        #map {
-            width: 100%;
-            height: 100%;
-        }
-        .filters {
-            margin-bottom: 20px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-        .filters input, .filters select {
-            padding: 8px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-        }
+        #map { height: 500px; }
     </style>
 {% endblock %}
 
 {% block content %}
-    <!-- Filtres pour la carte -->
-    <div class="filters">
-        <input type="text" id="filter-nom" placeholder="Filtrer par nom..." value="{{ request.args.get('nom', '') }}">
-        <select id="filter-visite">
-            <option value="">Tous (visité/non visité)</option>
-            <option value="true" {% if request.args.get('visite') == 'true' %}selected{% endif %}>Visités</option>
-            <option value="false" {% if request.args.get('visite') == 'false' %}selected{% endif %}>Non visités</option>
-        </select>
-        <select id="filter-labellise">
-            <option value="">Tous (labellisé/non labellisé)</option>
-            <option value="true" {% if request.args.get('labellise') == 'true' %}selected{% endif %}>Labellisés</option>
-            <option value="false" {% if request.args.get('labellise') == 'false' %}selected{% endif %}>Non labellisés</option>
-        </select>
-    </div>
-
-    <!-- Conteneur de la carte -->
-    <div id="map-container" class="map-container">
-        <div id="map"></div>
-    </div>
-
-    <!-- Grille des établissements -->
     <div class="container">
-        {{ afficher_grille('etablissement', etablissements, current_user, form_edit, form_ajout) }}
+        <h2>Résultats de la recherche</h2>
+        {% if etablissements %}
+            <div id="map"></div>
+            {{ afficher_grille('etablissement', etablissements, current_user) }}
+        {% else %}
+            <p>Aucun établissement trouvé.</p>
+        {% endif %}
     </div>
 {% endblock %}

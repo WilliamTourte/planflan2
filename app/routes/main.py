@@ -117,100 +117,67 @@ def dashboard():
                            pending_flans=pending_flans,
                            pending_etablissements=pending_etablissements)
 
+from flask import redirect, url_for, request
+from app.outils import afficher_etablissements
+
 @main_bp.route('/rechercher', methods=['GET', 'POST'])
 def rechercher():
-    from app.outils import afficher_etablissements
-    from flask import flash, redirect, url_for
-
     form_recherche = RechercheForm(prefix='recherche')
-    form_ajout = EtabForm(prefix='ajout-etab')
-    form_edit = EtabForm(prefix='edit-etab')
 
     # Récupère tous les établissements par défaut
-    query = Etablissement.query
-    etablissements = []
-    etablissements_json = []
+    resultats = Etablissement.query.all()
+    etablissements, etablissements_json = afficher_etablissements(resultats)
 
-    def apply_filters(query, params):
-        search_term = params.get('nom')
-        if search_term:
-            query = query.filter(
-                (Etablissement.nom.ilike(f'%{search_term}%')) |
-                (Etablissement.ville.ilike(f'%{search_term}%'))
-            )
-        ville = params.get('ville')
+    if form_recherche.validate_on_submit() or (request.method == 'GET' and any(request.args.get(k) for k in ['ville', 'type'])):
+        # Récupère les paramètres de recherche
+        ville = request.args.get('ville') or (form_recherche.ville.data if form_recherche.validate_on_submit() else None)
+        type_flan = request.args.get('type') or (form_recherche.type.data if form_recherche.validate_on_submit() else None)
+
+        # Applique les filtres
+        query = Etablissement.query
         if ville:
             query = query.filter(Etablissement.ville.ilike(f'%{ville}%'))
+        if type_flan:
+            query = query.join(Flan).filter(Flan.type == type_flan)
 
-        # Filtres sur Flan
-        flan_filters = []
-        if params.get('type_saveur') and params.get('type_saveur') != 'tous':
-            flan_filters.append(Flan.type_saveur == params.get('type_saveur'))
-        if params.get('type_pate') and params.get('type_pate') != 'tous':
-            flan_filters.append(Flan.type_pate == params.get('type_pate'))
-        if params.get('type_texture') and params.get('type_texture') != 'tous':
-            flan_filters.append(Flan.type_texture == params.get('type_texture'))
-        prix = params.get('prix')
-        if prix and prix != 'tous':
-            if prix == '0':
-                flan_filters.append(Flan.prix < 2.5)
-            elif prix == '2.5':
-                flan_filters.append(Flan.prix >= 2.5)
-                flan_filters.append(Flan.prix < 5)
-            elif prix == '5':
-                flan_filters.append(Flan.prix >= 5)
-        if flan_filters:
-            query = query.join(Flan).filter(*flan_filters)
-
-        if params.get('visite') == 'oui':
-            query = query.filter(Etablissement.visite == 1)
-        elif params.get('visite') == 'non':
-            query = query.filter(Etablissement.visite == 0)
-        if params.get('labellise') == 'oui':
-            query = query.filter(Etablissement.label == 1)
-        elif params.get('labellise') == 'non':
-            query = query.filter(Etablissement.label == 0)
-        return query
-
-    if request.method == 'GET':
-        has_search_params = any(request.args.get(k) for k in ['nom', 'ville', 'type_saveur', 'type_pate', 'type_texture', 'prix', 'visite', 'labellise'])
-        if has_search_params:
-            query = apply_filters(query, request.args)
         resultats = query.all()
         etablissements, etablissements_json = afficher_etablissements(resultats)
-        if not etablissements:
-            flash("Aucun établissement trouvé avec ces critères.", "info")
-        return render_template('rechercher.html',
-                               form_recherche=form_recherche,
-                               form_ajout=form_ajout,
-                               form_edit=form_edit,
-                               etablissements=etablissements,
-                               etablissements_json=etablissements_json)
 
-    elif form_recherche.validate_on_submit():
-        query = apply_filters(query, {
-            'nom': form_recherche.nom.data,
-            'ville': form_recherche.ville.data,
-            'type_saveur': form_recherche.type_saveur.data,
-            'type_pate': form_recherche.type_pate.data,
-            'type_texture': form_recherche.type_texture.data,
-            'prix': form_recherche.prix.data,
-            'visite': form_recherche.visite.data,
-            'labellise': form_recherche.labellise.data
-        })
-        resultats = query.all()
-        etablissements, etablissements_json = afficher_etablissements(resultats)
-        if not etablissements:
-            flash("Aucun établissement trouvé avec ces critères.", "info")
-        return render_template('rechercher.html',
-                               form_recherche=form_recherche,
-                               form_ajout=form_ajout,
-                               form_edit=form_edit,
-                               etablissements=etablissements,
-                               etablissements_json=etablissements_json)
+        # Redirige vers liste_etablissements avec les résultats
+        return redirect(url_for('main.liste_etablissements', **request.args))
 
-    # Cas par défaut (ne devrait jamais arriver)
-    return redirect(url_for('main.rechercher'))
+    return render_template(
+        'rechercher.html',
+        form_recherche=form_recherche,
+        etablissements=etablissements,
+        etablissements_json=etablissements_json  # Toujours défini
+    )
+
+@main_bp.route('/liste_etablissements', methods=['GET'])
+def liste_etablissements():
+    # Récupère les paramètres de recherche depuis l'URL
+    ville = request.args.get('ville', '')
+    type_flan = request.args.get('type', '')
+
+    # Applique les filtres (identique à la route /rechercher)
+    query = Etablissement.query
+    if ville:
+        query = query.filter(Etablissement.ville.ilike(f'%{ville}%'))
+    if type_flan:
+        query = query.join(Flan).filter(Flan.type == type_flan)
+
+
+    resultats = query.all()
+    etablissements, etablissements_json = afficher_etablissements(resultats)
+
+
+    return render_template(
+        'liste_etablissements.html',
+        etablissements=etablissements,
+        etablissements_json=etablissements_json,
+        google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY']
+    )
+
 
 @main_bp.route('/etablissement/<int:id_etab>', methods=['GET', 'POST'])
 def afficher_etablissement_unique(id_etab):
