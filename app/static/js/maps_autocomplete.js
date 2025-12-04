@@ -2,19 +2,14 @@
 let autocomplete;
 let map;
 let markers = [];
-let infowindowContents = {};
 let etablissements = [];
-let isAdmin = false;
-let googleMapsApiKey = '';
-let csrfToken = '';
-let nom = '';
-let visite = '';
-let labellise = '';
-let activeFilters = {
-    type_pate: 'tous',
-    type_saveur: 'tous',
-    prix: 'tous'
-};
+let isAdmin = window.isAdmin;
+let googleMapsApiKey = window.googleMapsApiKey;
+let csrfToken = window.csrfToken;
+let nom = window.filterSettings.nom;
+let visite = window.filterSettings.visite;
+let labellise = window.filterSettings.labellise;
+let activeFilters = window.filterSettings.activeFilters;
 
 // Fonction utilitaire pour limiter le nombre de requêtes (debounce)
 function debounce(func, wait) {
@@ -31,6 +26,15 @@ async function loadEtablissements() {
     try {
         document.getElementById('loading-spinner').style.display = 'block';
         const params = new URLSearchParams();
+        // Récupère les paramètres de recherche depuis l'URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const ville = urlParams.get('ville');
+        const type_flan = urlParams.get('type');
+
+        // Ajoute les filtres de recherche à la requête API
+        if (ville) params.append('ville', ville);
+        if (type_flan) params.append('type_flan', type_flan);
+        // Ajoute les autres filtres existants
         if (nom) params.append('nom', nom);
         if (visite) params.append('visite', visite);
         if (labellise) params.append('labellise', labellise);
@@ -79,33 +83,20 @@ async function updateMapAndMarkers() {
     const nonvisiteIcon = createEmojiIcon('❌', 'unvisited-icon');
 
     etablissements.forEach(etablissement => {
-        const labelIcon = createEmojiIcon('🏆', 'label-icon');
-const visiteIcon = createEmojiIcon('✅', 'visited-icon');
-const nonvisiteIcon = createEmojiIcon('❌', 'unvisited-icon');
-
-etablissements.forEach(etablissement => {
-    let icon;
-    if (etablissement.label) {
-        icon = labelIcon;  // Priorité au label
-    } else if (etablissement.visite) {
-        icon = visiteIcon;  // Si visité mais pas labellisé
-    } else {
-        icon = nonvisiteIcon;  // Ni visité ni labellisé
-    }
-    // Utilise `icon` pour le marqueur
-    const marker = L.marker([etablissement.latitude, etablissement.longitude], { icon: icon, title: etablissement.nom })
-        .addTo(map)
-        .bindPopup(infowindowContents[etablissement.id_etab] || "Détails non disponibles");
-});
-
-
+        let icon;
+        if (etablissement.label) {
+            icon = labelIcon;
+        } else if (etablissement.visite) {
+            icon = visiteIcon;
+        } else {
+            icon = nonvisiteIcon;
+        }
         const marker = L.marker([etablissement.latitude, etablissement.longitude], {
             icon: icon,
             title: etablissement.nom
         })
         .addTo(map)
-        .bindPopup(infowindowContents[etablissement.id_etab] || "Détails non disponibles");
-
+        .bindPopup(window.infowindowContents[etablissement.id_etab] || "Détails non disponibles");
         markers.push(marker);
         bounds.extend(marker.getLatLng());
     });
@@ -131,16 +122,13 @@ window.initAutocomplete = function() {
         types: ['establishment'],
         componentRestrictions: {country: 'fr'}
     });
-
     autocomplete.addListener('place_changed', function() {
         const place = autocomplete.getPlace();
         if (!place.geometry) return;
-
         document.getElementById('ajout-etab-nom').value = place.name || '';
         document.getElementById('ajout-etab-adresse').value = place.formatted_address || '';
         document.getElementById('ajout-etab-latitude').value = place.geometry.location.lat();
         document.getElementById('ajout-etab-longitude').value = place.geometry.location.lng();
-
         fetch('/verifier_etablissement', {
             method: 'POST',
             headers: {
@@ -177,7 +165,6 @@ window.initAutocomplete = function() {
             errorMessage.textContent = `Erreur: ${error.message}`;
             document.querySelector('.form-container').prepend(errorMessage);
         });
-
         fetch('/extraire_infos_adresse', {
             method: 'POST',
             headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrfToken},
@@ -200,7 +187,6 @@ window.initMap = function() {
         console.error("Élément #map introuvable !");
         return;
     }
-
     map = L.map('map').setView([46.2276, 2.2137], 6);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -226,16 +212,13 @@ document.addEventListener('DOMContentLoaded', function() {
         button.addEventListener('click', function() {
             const filter = this.dataset.filter;
             const value = this.dataset.value;
-
             // Met à jour les filtres actifs
             activeFilters[filter] = value;
-
             // Met à jour l'apparence des boutons
             document.querySelectorAll(`.filter-bubble[data-filter="${filter}"]`).forEach(b => {
                 b.classList.remove('active');
             });
             this.classList.add('active');
-
             // Met à jour la carte
             updateMapAndMarkers();
         });
@@ -245,21 +228,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const nomFilter = document.getElementById('filter-nom');
     const visiteFilter = document.getElementById('filter-visite');
     const labelliseFilter = document.getElementById('filter-labellise');
-
     if (nomFilter) {
         nomFilter.addEventListener('input', debounce(function() {
             nom = this.value;
             updateMapAndMarkers();
         }, 500));
     }
-
     if (visiteFilter) {
         visiteFilter.addEventListener('change', function() {
             visite = this.value;
             updateMapAndMarkers();
         });
     }
-
     if (labelliseFilter) {
         labelliseFilter.addEventListener('change', function() {
             labellise = this.value;

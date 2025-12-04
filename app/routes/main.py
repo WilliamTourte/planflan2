@@ -67,13 +67,15 @@ def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
     db.session.add(evaluation)
     db.session.commit()
     return evaluation
-
+    
 @main_bp.route('/api/etablissements', methods=['GET'])
 def api_etablissements():
-    # Récupère les paramètres de filtre
+    # Récupère TOUS les paramètres de filtre
     nom = request.args.get('nom', '')
     visite = request.args.get('visite', '')
     labellise = request.args.get('labellise', '')
+    ville = request.args.get('ville', '')
+    type_flan = request.args.get('type_flan', '')
     type_pate = request.args.get('type_pate', 'tous')
     type_saveur = request.args.get('type_saveur', 'tous')
     prix = request.args.get('prix', 'tous')
@@ -90,6 +92,10 @@ def api_etablissements():
         query = query.filter(Etablissement.label == True)
     elif labellise == 'non':
         query = query.filter(Etablissement.label == False)
+    if ville:
+        query = query.filter(Etablissement.ville.ilike(f'%{ville}%'))
+    if type_flan:
+        query = query.filter(Flan.type == type_flan)
     if type_pate != 'tous':
         query = query.filter(Flan.type_pate == type_pate)
     if type_saveur != 'tous':
@@ -105,10 +111,7 @@ def api_etablissements():
     # Récupère les résultats
     resultats = query.all()
     etablissements, etablissements_json = afficher_etablissements(resultats)
-
     return etablissements_json
-
-
 
 
 
