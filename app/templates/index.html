@@ -10,10 +10,10 @@
         <!-- Champ "ville" généré par Flask-WTF -->
         {{ form_recherche.hidden_tag() }}
         <div class="mb-3 w-100">
-            
+
             {{ form_recherche.ville(class="form-control py-2 rounded-3 border-0 mb-3", style="background-color: rgba(255, 255, 255, 0.9);", placeholder="Lyon") }}
         </div>
-        <!-- Champ "type_saveur" (exemple) -->
+        <!-- Champ "type_saveur" -->
         <div class="mb-3 w-100">
             {{ form_recherche.type_saveur.label(class="form-label") }}
             {{ form_recherche.type_saveur(class="form-select py-2 rounded-3 border-0 mb-3", style="background-color: rgba(255, 255, 255, 0.9);", placeholder="Flan pâtissier") }}

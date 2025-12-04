@@ -6,11 +6,50 @@
 {% endblock %}
 
 {% block content %}
-<!-- Debug temporaire -->
+<!-- Bulles de filtre -->
+<div id="filter-bubbles">
+    <!-- Filtre par type de pâte -->
+    <div class="filter-group">
+        <span class="fw-bold">Pâte :</span>
+        <div class="d-flex flex-wrap gap-1">
+            <button type="button" class="btn btn-sm filter-bubble active" data-filter="type_pate" data-value="tous">Tous</button>
+            {% for pate in TypePate %}
+                <button type="button" class="btn btn-sm filter-bubble" data-filter="type_pate" data-value="{{ pate.name }}">{{ pate.value }}</button>
+            {% endfor %}
+        </div>
+    </div>
+    <!-- Filtre par type de saveur -->
+    <div class="filter-group mt-2">
+        <span class="fw-bold">Saveur :</span>
+        <div class="d-flex flex-wrap gap-1">
+            <button type="button" class="btn btn-sm filter-bubble active" data-filter="type_saveur" data-value="tous">Tous</button>
+            {% for saveur in TypeSaveur %}
+                <button type="button" class="btn btn-sm filter-bubble" data-filter="type_saveur" data-value="{{ saveur.name }}">{{ saveur.value }}</button>
+            {% endfor %}
+        </div>
+    </div>
+    <!-- Filtre par prix -->
+    <div class="filter-group mt-2">
+        <span class="fw-bold">Prix :</span>
+        <div class="d-flex flex-wrap gap-1">
+            <button type="button" class="btn btn-sm filter-bubble active" data-filter="prix" data-value="tous">Tous</button>
+            <button type="button" class="btn btn-sm filter-bubble" data-filter="prix" data-value="0">Moins de 2€50</button>
+            <button type="button" class="btn btn-sm filter-bubble" data-filter="prix" data-value="2.5">2€50 - 5€</button>
+            <button type="button" class="btn btn-sm filter-bubble" data-filter="prix" data-value="5">Plus de 5€</button>
+        </div>
+    </div>
+</div>
+
+<!-- Indicateur de chargement -->
+<div id="loading-spinner" class="loading-spinner"></div>
+
+<!-- Carte Leaflet -->
+<div id="map"></div>
+
+
 
     <div class="container">
         <h2>Resultats de la recherche</h2>
-    <div id="map"></div>
         {% if etablissements %}
             {{ afficher_grille('etablissement', etablissements, current_user) }}
         {% else %}

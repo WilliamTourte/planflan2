@@ -68,6 +68,48 @@ def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
     db.session.commit()
     return evaluation
 
+@main_bp.route('/api/etablissements', methods=['GET'])
+def api_etablissements():
+    # Récupère les paramètres de filtre
+    nom = request.args.get('nom', '')
+    visite = request.args.get('visite', '')
+    labellise = request.args.get('labellise', '')
+    type_pate = request.args.get('type_pate', 'tous')
+    type_saveur = request.args.get('type_saveur', 'tous')
+    prix = request.args.get('prix', 'tous')
+
+    # Applique les filtres
+    query = Etablissement.query.join(Flan)
+    if nom:
+        query = query.filter(Etablissement.nom.ilike(f'%{nom}%'))
+    if visite == 'oui':
+        query = query.filter(Etablissement.visite == True)
+    elif visite == 'non':
+        query = query.filter(Etablissement.visite == False)
+    if labellise == 'oui':
+        query = query.filter(Etablissement.label == True)
+    elif labellise == 'non':
+        query = query.filter(Etablissement.label == False)
+    if type_pate != 'tous':
+        query = query.filter(Flan.type_pate == type_pate)
+    if type_saveur != 'tous':
+        query = query.filter(Flan.type_saveur == type_saveur)
+    if prix != 'tous':
+        if prix == '0':
+            query = query.filter(Flan.prix < 2.5)
+        elif prix == '2.5':
+            query = query.filter(Flan.prix >= 2.5, Flan.prix < 5)
+        elif prix == '5':
+            query = query.filter(Flan.prix >= 5)
+
+    # Récupère les résultats
+    resultats = query.all()
+    etablissements, etablissements_json = afficher_etablissements(resultats)
+
+    return etablissements_json
+
+
+
 
 
 @main_bp.route('/dashboard', methods=['GET', 'POST'])

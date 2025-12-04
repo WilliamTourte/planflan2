@@ -1,8 +1,8 @@
+// Variables globales
 let autocomplete;
 let map;
 let markers = [];
 let infowindowContents = {};
-let infowindow;
 let etablissements = [];
 let isAdmin = false;
 let googleMapsApiKey = '';
@@ -10,6 +10,11 @@ let csrfToken = '';
 let nom = '';
 let visite = '';
 let labellise = '';
+let activeFilters = {
+    type_pate: 'tous',
+    type_saveur: 'tous',
+    prix: 'tous'
+};
 
 // Fonction utilitaire pour limiter le nombre de requêtes (debounce)
 function debounce(func, wait) {
@@ -22,33 +27,39 @@ function debounce(func, wait) {
 }
 
 // Fonction pour recharger les établissements selon les filtres
-async function loadEtablissements(nom = '', visite = '', labellise = '') {
+async function loadEtablissements() {
     try {
-        const response = await fetch(`/api/etablissements?nom=${encodeURIComponent(nom)}&visite=${visite}&labellise=${labellise}`);
+        document.getElementById('loading-spinner').style.display = 'block';
+        const params = new URLSearchParams();
+        if (nom) params.append('nom', nom);
+        if (visite) params.append('visite', visite);
+        if (labellise) params.append('labellise', labellise);
+        if (activeFilters.type_pate !== 'tous') params.append('type_pate', activeFilters.type_pate);
+        if (activeFilters.type_saveur !== 'tous') params.append('type_saveur', activeFilters.type_saveur);
+        if (activeFilters.prix !== 'tous') params.append('prix', activeFilters.prix);
+
+        const response = await fetch(`/api/etablissements?${params.toString()}`);
         if (!response.ok) throw new Error("Erreur lors du chargement des établissements.");
         return await response.json();
     } catch (error) {
         console.error("Erreur:", error);
         return [];
+    } finally {
+        document.getElementById('loading-spinner').style.display = 'none';
     }
 }
 
 // Fonction pour mettre à jour la carte avec de nouveaux établissements
-async function updateMapAndMarkers(nom = '', visite = '', labellise = '') {
-    const newEtablissements = await loadEtablissements(nom, visite, labellise);
+async function updateMapAndMarkers() {
+    const newEtablissements = await loadEtablissements();
     if (!newEtablissements || newEtablissements.length === 0) {
         console.warn("Aucun établissement trouvé avec ces filtres.");
         return;
     }
 
     // Efface les anciens marqueurs
-    if (map) {
-        map.eachLayer(layer => {
-            if (layer instanceof L.Marker) {
-                map.removeLayer(layer);
-            }
-        });
-    }
+    markers.forEach(marker => map.removeLayer(marker));
+    markers = [];
 
     // Met à jour les données globales
     etablissements = newEtablissements;
@@ -68,24 +79,34 @@ async function updateMapAndMarkers(nom = '', visite = '', labellise = '') {
     const nonvisiteIcon = createEmojiIcon('❌', 'unvisited-icon');
 
     etablissements.forEach(etablissement => {
-        let icon;
-        if (isAdmin) {
-            if (etablissement.label) {
-                icon = labelIcon;
-            } else if (etablissement.visite) {
-                icon = visiteIcon;
-            } else {
-                icon = nonvisiteIcon;
-            }
-        } else {
-            icon = etablissement.label ? labelIcon : nonvisiteIcon;
-        }
+        const labelIcon = createEmojiIcon('🏆', 'label-icon');
+const visiteIcon = createEmojiIcon('✅', 'visited-icon');
+const nonvisiteIcon = createEmojiIcon('❌', 'unvisited-icon');
+
+etablissements.forEach(etablissement => {
+    let icon;
+    if (etablissement.label) {
+        icon = labelIcon;  // Priorité au label
+    } else if (etablissement.visite) {
+        icon = visiteIcon;  // Si visité mais pas labellisé
+    } else {
+        icon = nonvisiteIcon;  // Ni visité ni labellisé
+    }
+    // Utilise `icon` pour le marqueur
+    const marker = L.marker([etablissement.latitude, etablissement.longitude], { icon: icon, title: etablissement.nom })
+        .addTo(map)
+        .bindPopup(infowindowContents[etablissement.id_etab] || "Détails non disponibles");
+});
+
+
         const marker = L.marker([etablissement.latitude, etablissement.longitude], {
             icon: icon,
             title: etablissement.nom
         })
         .addTo(map)
         .bindPopup(infowindowContents[etablissement.id_etab] || "Détails non disponibles");
+
+        markers.push(marker);
         bounds.extend(marker.getLatLng());
     });
 
@@ -110,16 +131,16 @@ window.initAutocomplete = function() {
         types: ['establishment'],
         componentRestrictions: {country: 'fr'}
     });
-    // Écouter les changements dans l'Autocomplete
+
     autocomplete.addListener('place_changed', function() {
         const place = autocomplete.getPlace();
         if (!place.geometry) return;
-        // Remplir les champs CACHÉS avec le préfixe "ajout-etab-"
+
         document.getElementById('ajout-etab-nom').value = place.name || '';
         document.getElementById('ajout-etab-adresse').value = place.formatted_address || '';
         document.getElementById('ajout-etab-latitude').value = place.geometry.location.lat();
         document.getElementById('ajout-etab-longitude').value = place.geometry.location.lng();
-        // Vérifier si le lieu est déjà dans la liste
+
         fetch('/verifier_etablissement', {
             method: 'POST',
             headers: {
@@ -156,7 +177,7 @@ window.initAutocomplete = function() {
             errorMessage.textContent = `Erreur: ${error.message}`;
             document.querySelector('.form-container').prepend(errorMessage);
         });
-        // Envoyer l'adresse à une route AJAX pour extraire le code postal et la ville
+
         fetch('/extraire_infos_adresse', {
             method: 'POST',
             headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrfToken},
@@ -179,109 +200,83 @@ window.initMap = function() {
         console.error("Élément #map introuvable !");
         return;
     }
-    // Initialisation de la carte Leaflet
+
     map = L.map('map').setView([46.2276, 2.2137], 6);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
 
-    // Ajoute les marqueurs initiaux SI les données existent
-    if (window.etablissements && window.etablissements.length > 0) {
-        const bounds = L.latLngBounds();
-        const createEmojiIcon = (emoji, className) => {
-            return L.divIcon({
-                html: `<div class="emoji-marker ${className}">${emoji}</div>`,
-                className: 'emoji-icon',
-                iconSize: [30, 30],
-                iconAnchor: [15, 15]
-            });
-        };
-        const labelIcon = createEmojiIcon('🏆', 'label-icon');
-        const visiteIcon = createEmojiIcon('✅', 'visited-icon');
-        const nonvisiteIcon = createEmojiIcon('❌', 'unvisited-icon');
-
-        window.etablissements.forEach(etablissement => {
-            let icon;
-            if (isAdmin) {
-                if (etablissement.label) {
-                    icon = labelIcon;
-                } else if (etablissement.visite) {
-                    icon = visiteIcon;
-                } else {
-                    icon = nonvisiteIcon;
-                }
-            } else {
-                icon = etablissement.label ? labelIcon : nonvisiteIcon;
-            }
-            const marker = L.marker([etablissement.latitude, etablissement.longitude], {
-                icon: icon,
-                title: etablissement.nom
-            })
-            .addTo(map)
-            .bindPopup(infowindowContents[etablissement.id_etab] || "Détails non disponibles");
-            bounds.extend(marker.getLatLng());
-        });
-
-        // Ajuste la vue de la carte
-        if (window.etablissements.length === 1) {
-            map.setView([window.etablissements[0].latitude, window.etablissements[0].longitude], 14);
-        } else {
-            map.fitBounds(bounds);
-        }
-    }
-
     // Légende
     const legend = L.control({ position: 'bottomright' });
     legend.onAdd = function() {
         const div = L.DomUtil.create('div', 'info legend');
-        div.style.backgroundColor = 'white';
-        div.style.padding = '10px';
-        div.style.margin = '10px';
-        div.style.border = '1px solid #ccc';
         div.innerHTML = `🏆 Labellisé ✅ Visité ❌ Non visité`;
         return div;
     };
     legend.addTo(map);
+
+    // Charge les établissements initiaux
+    updateMapAndMarkers();
 };
 
-
-// Fonction pour initialiser l'autocomplétion et la carte
-window.initAll = function() {
-    initAutocomplete();
-    initMap();
-    // Charger la carte avec les données initiales
-    updateMapAndMarkers(nom, visite, labellise);
-};
-
-// Écouter les changements sur les filtres
+// Écouteurs pour les bulles de filtre
 document.addEventListener('DOMContentLoaded', function() {
-    // Chargement de l'API Google Maps (uniquement pour l'autocomplete)
-    const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}&libraries=places&callback=initAll&v=weekly&loading=async`;
-    script.async = true;
-    script.defer = true;
-    document.head.appendChild(script);
+    // Écouteurs pour les bulles de filtre
+    document.querySelectorAll('.filter-bubble').forEach(button => {
+        button.addEventListener('click', function() {
+            const filter = this.dataset.filter;
+            const value = this.dataset.value;
 
-    // Écouter les filtres
+            // Met à jour les filtres actifs
+            activeFilters[filter] = value;
+
+            // Met à jour l'apparence des boutons
+            document.querySelectorAll(`.filter-bubble[data-filter="${filter}"]`).forEach(b => {
+                b.classList.remove('active');
+            });
+            this.classList.add('active');
+
+            // Met à jour la carte
+            updateMapAndMarkers();
+        });
+    });
+
+    // Écouteurs pour les filtres existants
     const nomFilter = document.getElementById('filter-nom');
     const visiteFilter = document.getElementById('filter-visite');
     const labelliseFilter = document.getElementById('filter-labellise');
 
     if (nomFilter) {
         nomFilter.addEventListener('input', debounce(function() {
-            updateMapAndMarkers(this.value, visiteFilter?.value, labelliseFilter?.value);
+            nom = this.value;
+            updateMapAndMarkers();
         }, 500));
     }
 
     if (visiteFilter) {
         visiteFilter.addEventListener('change', function() {
-            updateMapAndMarkers(nomFilter?.value, this.value, labelliseFilter?.value);
+            visite = this.value;
+            updateMapAndMarkers();
         });
     }
 
     if (labelliseFilter) {
         labelliseFilter.addEventListener('change', function() {
-            updateMapAndMarkers(nomFilter?.value, visiteFilter?.value, this.value);
+            labellise = this.value;
+            updateMapAndMarkers();
         });
     }
+
+    // Chargement de l'API Google Maps (uniquement pour l'autocomplete)
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}&libraries=places&callback=initAll&v=weekly&loading=async`;
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
 });
+
+// Fonction pour initialiser l'autocomplétion et la carte
+window.initAll = function() {
+    initAutocomplete();
+    initMap();
+};
