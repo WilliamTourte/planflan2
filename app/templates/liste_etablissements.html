@@ -3,7 +3,6 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        /* Style pour les bulles de filtre */
         #filter-bubbles {
             position: absolute;
             top: 10px;
@@ -86,7 +85,6 @@
     </style>
 {% endblock %}
 {% block content %}
-    <!-- Initialisation des variables globales -->
     <script>
         window.infowindowContents = {
             {% for etablissement in etablissements %}
@@ -112,7 +110,6 @@
                 prix: 'tous'
             }
         };
-        // Texte des filtres pour affichage
         window.filterLabels = {
             type_pate: {
                 tous: 'Pâte',
@@ -138,21 +135,15 @@
             }
         };
     </script>
-
-    <!-- Indicateur de chargement -->
     <div id="loading-spinner" class="loading-spinner">
         <div class="spinner-border text-primary" role="status">
             <span class="visually-hidden">Chargement...</span>
         </div>
     </div>
-
-    <!-- Carte Leaflet -->
     <div id="map">
-        <!-- Bulles de filtre -->
         <div id="filter-bubbles">
-            <!-- Filtre par type de pâte -->
             <div class="filter-group">
-                <button class="filter-main-btn" data-filter="type_pate" id="pate-btn">Pâte</button>
+                <button class="filter-main-btn" data-filter="type_pate" id="type_pate-btn">Pâte</button>
                 <div class="filter-options" data-filter="type_pate">
                     <button class="filter-option active" data-filter="type_pate" data-value="tous">Tous</button>
                     <button class="filter-option" data-filter="type_pate" data-value="FEUILLETEE">Feuilletée</button>
@@ -162,9 +153,8 @@
                     <button class="filter-option" data-filter="type_pate" data-value="MIXTE">Mixte</button>
                 </div>
             </div>
-            <!-- Filtre par type de saveur -->
             <div class="filter-group">
-                <button class="filter-main-btn" data-filter="type_saveur" id="saveur-btn">Saveur</button>
+                <button class="filter-main-btn" data-filter="type_saveur" id="type_saveur-btn">Saveur</button>
                 <div class="filter-options" data-filter="type_saveur">
                     <button class="filter-option active" data-filter="type_saveur" data-value="tous">Tous</button>
                     <button class="filter-option" data-filter="type_saveur" data-value="VANILLE">Vanille</button>
@@ -174,7 +164,6 @@
                     <button class="filter-option" data-filter="type_saveur" data-value="NATURE">Nature</button>
                 </div>
             </div>
-            <!-- Filtre par prix -->
             <div class="filter-group">
                 <button class="filter-main-btn" data-filter="prix" id="prix-btn">Prix</button>
                 <div class="filter-options" data-filter="prix">
@@ -186,8 +175,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Conteneur pour les résultats -->
     <div class="container" style="margin-top: 20px;">
         <h2>Résultats de la recherche</h2>
         <div id="results-grid">
@@ -198,15 +185,36 @@
             {% endif %}
         </div>
     </div>
-
-    <!-- Script pour gérer les filtres -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Mise à jour du texte du bouton principal
+            // Mise à jour sécurisée du texte du bouton principal
             function updateMainButton(filterType, value) {
                 const btn = document.querySelector(`#${filterType}-btn`);
-                const label = window.filterLabels[filterType][value];
+                if (!btn) {
+                    console.error(`Bouton #${filterType}-btn introuvable`);
+                    return;
+                }
+                const label = window.filterLabels[filterType] && window.filterLabels[filterType][value];
+                if (!label) {
+                    console.error(`Label introuvable pour ${filterType}=${value}`);
+                    return;
+                }
                 btn.textContent = label;
+            }
+
+            // Fonction pour filtrer les établissements
+            function filterEtablissements() {
+                const { type_pate, type_saveur, prix } = window.filterSettings.activeFilters;
+                return window.etablissementsInitiaux.filter(etab => {
+                    return (
+                        (type_pate === 'tous' || etab.type_pate === type_pate) &&
+                        (type_saveur === 'tous' || etab.type_saveur === type_saveur) &&
+                        (prix === 'tous' ||
+                         (prix === '0' && parseFloat(etab.prix) < 2.5) ||
+                         (prix === '2.5' && parseFloat(etab.prix) >= 2.5 && parseFloat(etab.prix) < 5) ||
+                         (prix === '5' && parseFloat(etab.prix) >= 5))
+                    );
+                });
             }
 
             // Gestion des clics sur les boutons principaux
@@ -215,13 +223,9 @@
                     e.stopPropagation();
                     const filterType = this.getAttribute('data-filter');
                     const options = document.querySelector(`.filter-options[data-filter="${filterType}"]`);
-
-                    // Fermer les autres menus
                     document.querySelectorAll('.filter-options').forEach(opt => {
                         if (opt !== options) opt.style.display = 'none';
                     });
-
-                    // Afficher/masquer le menu
                     options.style.display = options.style.display === 'block' ? 'none' : 'block';
                 });
             });
@@ -239,23 +243,16 @@
                     e.stopPropagation();
                     const filterType = this.getAttribute('data-filter');
                     const value = this.getAttribute('data-value');
+                    console.log(`Filtre sélectionné: ${filterType}=${value}`);
 
-                    // Mettre à jour l'état actif
                     document.querySelectorAll(`.filter-option[data-filter="${filterType}"]`).forEach(opt => {
                         opt.classList.remove('active');
                     });
                     this.classList.add('active');
-
-                    // Mettre à jour le bouton principal
                     updateMainButton(filterType, value);
-
-                    // Fermer le menu
                     this.parentElement.style.display = 'none';
-
-                    // Mettre à jour les filtres globaux
                     window.filterSettings.activeFilters[filterType] = value;
 
-                    // Déclencher la mise à jour
                     if (typeof updateMapAndMarkers === 'function') {
                         updateMapAndMarkers();
                     }
@@ -263,7 +260,5 @@
             });
         });
     </script>
-
-    <!-- Chargement du script JS externe -->
     <script src="{{ url_for('static', filename='js/maps_autocomplete.js') }}"></script>
 {% endblock %}
