@@ -30,7 +30,6 @@ async function loadEtablissements() {
         const urlParams = new URLSearchParams(window.location.search);
         const ville = urlParams.get('ville');
         const type_flan = urlParams.get('type');
-
         // Ajoute les filtres de recherche à la requête API
         if (ville) params.append('ville', ville);
         if (type_flan) params.append('type_flan', type_flan);
@@ -38,9 +37,9 @@ async function loadEtablissements() {
         if (nom) params.append('nom', nom);
         if (visite) params.append('visite', visite);
         if (labellise) params.append('labellise', labellise);
-        if (activeFilters.type_pate !== 'tous') params.append('type_pate', activeFilters.type_pate);
-        if (activeFilters.type_saveur !== 'tous') params.append('type_saveur', activeFilters.type_saveur);
-        if (activeFilters.prix !== 'tous') params.append('prix', activeFilters.prix);
+        if (activeFilters.type_pate && activeFilters.type_pate !== 'tous') params.append('type_pate', activeFilters.type_pate);
+        if (activeFilters.type_saveur && activeFilters.type_saveur !== 'tous') params.append('type_saveur', activeFilters.type_saveur);
+        if (activeFilters.prix && activeFilters.prix !== 'tous') params.append('prix', activeFilters.prix);
 
         const response = await fetch(`/api/etablissements?${params.toString()}`);
         if (!response.ok) throw new Error("Erreur lors du chargement des établissements.");
@@ -207,18 +206,25 @@ window.initMap = function() {
 
 // Écouteurs pour les bulles de filtre
 document.addEventListener('DOMContentLoaded', function() {
-    // Écouteurs pour les bulles de filtre
+    // Écouteurs pour les bulles de filtre (pâte, saveur, prix)
     document.querySelectorAll('.filter-bubble').forEach(button => {
         button.addEventListener('click', function() {
             const filter = this.dataset.filter;
             const value = this.dataset.value;
-            // Met à jour les filtres actifs
-            activeFilters[filter] = value;
+
+            // Si c'est "Tous", réinitialise le filtre
+            if (value === 'tous') {
+                activeFilters[filter] = 'tous';
+            } else {
+                activeFilters[filter] = value;
+            }
+
             // Met à jour l'apparence des boutons
             document.querySelectorAll(`.filter-bubble[data-filter="${filter}"]`).forEach(b => {
                 b.classList.remove('active');
             });
             this.classList.add('active');
+
             // Met à jour la carte
             updateMapAndMarkers();
         });
@@ -228,6 +234,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const nomFilter = document.getElementById('filter-nom');
     const visiteFilter = document.getElementById('filter-visite');
     const labelliseFilter = document.getElementById('filter-labellise');
+
     if (nomFilter) {
         nomFilter.addEventListener('input', debounce(function() {
             nom = this.value;

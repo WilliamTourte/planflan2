@@ -2,83 +2,268 @@
 {% block scripts_head %}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        /* Style pour les bulles de filtre */
+        #filter-bubbles {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            background: transparent;
+            font-family: Arial, sans-serif;
+        }
+        .filter-group {
+            margin-bottom: 8px;
+            position: relative;
+        }
+        .filter-main-btn {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 12px;
+            border: none;
+            background: rgba(255, 255, 255, 0.8);
+            color: #333;
+            cursor: pointer;
+            width: 120px;
+            text-align: left;
+            position: relative;
+        }
+        .filter-main-btn:hover {
+            background: rgba(255, 255, 255, 1);
+        }
+        .filter-main-btn::after {
+            content: "▼";
+            position: absolute;
+            right: 8px;
+            font-size: 10px;
+        }
+        .filter-options {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            z-index: 1001;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            padding: 6px;
+            display: none;
+            width: 120px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .filter-option {
+            display: block;
+            width: 100%;
+            padding: 4px 8px;
+            margin-bottom: 4px;
+            font-size: 11px;
+            border-radius: 4px;
+            border: none;
+            background: transparent;
+            color: #333;
+            text-align: left;
+        }
+        .filter-option:hover {
+            background: rgba(0, 123, 255, 0.1);
+        }
+        .filter-option.active {
+            background: #007bff;
+            color: white;
+        }
+        #map {
+            height: 500px;
+            width: 100%;
+            position: relative;
+        }
+        .loading-spinner {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2000;
+            display: none;
+        }
+    </style>
 {% endblock %}
 {% block content %}
-<!-- Bulles de filtre -->
-<div id="filter-bubbles">
-    <!-- Filtre par type de pâte -->
-    <div class="filter-group">
-        <span class="fw-bold">Pâte :</span>
-        <div class="d-flex flex-wrap gap-1">
-            <button type="button" class="btn btn-sm filter-bubble active" data-filter="type_pate" data-value="tous">Tous</button>
-            {% for pate in TypePate %}
-                <button type="button" class="btn btn-sm filter-bubble" data-filter="type_pate" data-value="{{ pate.name }}">{{ pate.value }}</button>
+    <!-- Initialisation des variables globales -->
+    <script>
+        window.infowindowContents = {
+            {% for etablissement in etablissements %}
+                {{ etablissement.id_etab }}: `{{
+                    afficher_etablissement_infowindow(
+                        etablissement,
+                        url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab)
+                    )
+                }}`{% if not loop.last %},{% endif %}
             {% endfor %}
+        };
+        window.etablissementsInitiaux = {{ etablissements_json|tojson|safe }};
+        window.isAdmin = {{ current_user.is_admin|tojson|lower }};
+        window.googleMapsApiKey = "{{ google_maps_api_key }}";
+        window.csrfToken = "{{ csrf_token() }}";
+        window.filterSettings = {
+            nom: '',
+            visite: '',
+            labellise: '',
+            activeFilters: {
+                type_pate: 'tous',
+                type_saveur: 'tous',
+                prix: 'tous'
+            }
+        };
+        // Texte des filtres pour affichage
+        window.filterLabels = {
+            type_pate: {
+                tous: 'Pâte',
+                FEUILLETEE: 'Feuilletée',
+                BRISEE: 'Brisée',
+                SUCREE: 'Sucrée',
+                SABLEE: 'Sablée',
+                MIXTE: 'Mixte'
+            },
+            type_saveur: {
+                tous: 'Saveur',
+                VANILLE: 'Vanille',
+                NOIX: 'Noix',
+                FRUITS: 'Fruits',
+                INSOLITE: 'Insolite',
+                NATURE: 'Nature'
+            },
+            prix: {
+                tous: 'Prix',
+                '0': 'Moins de 2€50',
+                '2.5': '2€50 - 5€',
+                '5': 'Plus de 5€'
+            }
+        };
+    </script>
+
+    <!-- Indicateur de chargement -->
+    <div id="loading-spinner" class="loading-spinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Chargement...</span>
         </div>
     </div>
-    <!-- Filtre par type de saveur -->
-    <div class="filter-group mt-2">
-        <span class="fw-bold">Saveur :</span>
-        <div class="d-flex flex-wrap gap-1">
-            <button type="button" class="btn btn-sm filter-bubble active" data-filter="type_saveur" data-value="tous">Tous</button>
-            {% for saveur in TypeSaveur %}
-                <button type="button" class="btn btn-sm filter-bubble" data-filter="type_saveur" data-value="{{ saveur.name }}">{{ saveur.value }}</button>
-            {% endfor %}
+
+    <!-- Carte Leaflet -->
+    <div id="map">
+        <!-- Bulles de filtre -->
+        <div id="filter-bubbles">
+            <!-- Filtre par type de pâte -->
+            <div class="filter-group">
+                <button class="filter-main-btn" data-filter="type_pate" id="pate-btn">Pâte</button>
+                <div class="filter-options" data-filter="type_pate">
+                    <button class="filter-option active" data-filter="type_pate" data-value="tous">Tous</button>
+                    <button class="filter-option" data-filter="type_pate" data-value="FEUILLETEE">Feuilletée</button>
+                    <button class="filter-option" data-filter="type_pate" data-value="BRISEE">Brisée</button>
+                    <button class="filter-option" data-filter="type_pate" data-value="SUCREE">Sucrée</button>
+                    <button class="filter-option" data-filter="type_pate" data-value="SABLEE">Sablée</button>
+                    <button class="filter-option" data-filter="type_pate" data-value="MIXTE">Mixte</button>
+                </div>
+            </div>
+            <!-- Filtre par type de saveur -->
+            <div class="filter-group">
+                <button class="filter-main-btn" data-filter="type_saveur" id="saveur-btn">Saveur</button>
+                <div class="filter-options" data-filter="type_saveur">
+                    <button class="filter-option active" data-filter="type_saveur" data-value="tous">Tous</button>
+                    <button class="filter-option" data-filter="type_saveur" data-value="VANILLE">Vanille</button>
+                    <button class="filter-option" data-filter="type_saveur" data-value="NOIX">Noix</button>
+                    <button class="filter-option" data-filter="type_saveur" data-value="FRUITS">Fruits</button>
+                    <button class="filter-option" data-filter="type_saveur" data-value="INSOLITE">Insolite</button>
+                    <button class="filter-option" data-filter="type_saveur" data-value="NATURE">Nature</button>
+                </div>
+            </div>
+            <!-- Filtre par prix -->
+            <div class="filter-group">
+                <button class="filter-main-btn" data-filter="prix" id="prix-btn">Prix</button>
+                <div class="filter-options" data-filter="prix">
+                    <button class="filter-option active" data-filter="prix" data-value="tous">Tous</button>
+                    <button class="filter-option" data-filter="prix" data-value="0">Moins de 2€50</button>
+                    <button class="filter-option" data-filter="prix" data-value="2.5">2€50 - 5€</button>
+                    <button class="filter-option" data-filter="prix" data-value="5">Plus de 5€</button>
+                </div>
+            </div>
         </div>
     </div>
-    <!-- Filtre par prix -->
-    <div class="filter-group mt-2">
-        <span class="fw-bold">Prix :</span>
-        <div class="d-flex flex-wrap gap-1">
-            <button type="button" class="btn btn-sm filter-bubble active" data-filter="prix" data-value="tous">Tous</button>
-            <button type="button" class="btn btn-sm filter-bubble" data-filter="prix" data-value="0">Moins de 2€50</button>
-            <button type="button" class="btn btn-sm filter-bubble" data-filter="prix" data-value="2.5">2€50 - 5€</button>
-            <button type="button" class="btn btn-sm filter-bubble" data-filter="prix" data-value="5">Plus de 5€</button>
+
+    <!-- Conteneur pour les résultats -->
+    <div class="container" style="margin-top: 20px;">
+        <h2>Résultats de la recherche</h2>
+        <div id="results-grid">
+            {% if etablissements %}
+                {{ afficher_grille('etablissement', etablissements, current_user) }}
+            {% else %}
+                <p>Aucun établissement trouvé.</p>
+            {% endif %}
         </div>
     </div>
-</div>
 
-<!-- Initialisation des variables globales pour le script JS -->
-<script>
-    window.infowindowContents = {
-        {% for etablissement in etablissements %}
-            {{ etablissement.id_etab }}: `{{
-                afficher_etablissement_infowindow(
-                    etablissement,
-                    url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab)
-                )
-            }}`{% if not loop.last %},{% endif %}
-        {% endfor %}
-    };
-    window.etablissementsInitiaux = {{ etablissements_json|tojson|safe }};
-    window.isAdmin = {{ current_user.is_admin|tojson|lower }};
-    window.googleMapsApiKey = "{{ google_maps_api_key }}";
-    window.csrfToken = "{{ csrf_token() }}";
-    window.filterSettings = {
-        nom: '',
-        visite: '',
-        labellise: '',
-        activeFilters: {
-            type_pate: 'tous',
-            type_saveur: 'tous',
-            prix: 'tous'
-        }
-    };
-</script>
+    <!-- Script pour gérer les filtres -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mise à jour du texte du bouton principal
+            function updateMainButton(filterType, value) {
+                const btn = document.querySelector(`#${filterType}-btn`);
+                const label = window.filterLabels[filterType][value];
+                btn.textContent = label;
+            }
 
-<!-- Indicateur de chargement -->
-<div id="loading-spinner" class="loading-spinner"></div>
-<!-- Carte Leaflet -->
-<div id="map"></div>
-<div class="container">
-    <h2>Résultats de la recherche</h2>
-    {% if etablissements %}
-        {{ afficher_grille('etablissement', etablissements, current_user) }}
-    {% else %}
-        <p>Aucun établissement trouvé.</p>
-    {% endif %}
-</div>
+            // Gestion des clics sur les boutons principaux
+            document.querySelectorAll('.filter-main-btn').forEach(mainBtn => {
+                mainBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const filterType = this.getAttribute('data-filter');
+                    const options = document.querySelector(`.filter-options[data-filter="${filterType}"]`);
 
-<!-- Chargement du script JS externe -->
-<script src="{{ url_for('static', filename='js/maps_autocomplete.js') }}"></script>
+                    // Fermer les autres menus
+                    document.querySelectorAll('.filter-options').forEach(opt => {
+                        if (opt !== options) opt.style.display = 'none';
+                    });
+
+                    // Afficher/masquer le menu
+                    options.style.display = options.style.display === 'block' ? 'none' : 'block';
+                });
+            });
+
+            // Fermer les menus si clic ailleurs
+            document.addEventListener('click', function() {
+                document.querySelectorAll('.filter-options').forEach(opt => {
+                    opt.style.display = 'none';
+                });
+            });
+
+            // Gestion de la sélection des options
+            document.querySelectorAll('.filter-option').forEach(option => {
+                option.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const filterType = this.getAttribute('data-filter');
+                    const value = this.getAttribute('data-value');
+
+                    // Mettre à jour l'état actif
+                    document.querySelectorAll(`.filter-option[data-filter="${filterType}"]`).forEach(opt => {
+                        opt.classList.remove('active');
+                    });
+                    this.classList.add('active');
+
+                    // Mettre à jour le bouton principal
+                    updateMainButton(filterType, value);
+
+                    // Fermer le menu
+                    this.parentElement.style.display = 'none';
+
+                    // Mettre à jour les filtres globaux
+                    window.filterSettings.activeFilters[filterType] = value;
+
+                    // Déclencher la mise à jour
+                    if (typeof updateMapAndMarkers === 'function') {
+                        updateMapAndMarkers();
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!-- Chargement du script JS externe -->
+    <script src="{{ url_for('static', filename='js/maps_autocomplete.js') }}"></script>
 {% endblock %}
