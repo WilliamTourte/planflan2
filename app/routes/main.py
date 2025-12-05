@@ -221,6 +221,25 @@ def liste_etablissements():
         google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY']
     )
 
+from flask import render_template_string
+
+@main_bp.route('/get_infowindow_content')
+def get_infowindow_content():
+    id_etab = request.args.get('id_etab', type=int)
+    etablissement = Etablissement.query.get(id_etab)
+    if not etablissement:
+        return "Détails non disponibles", 404
+
+    # Génère le contenu de l'infowindow
+    content = render_template_string("""
+        {% from 'macros.html' import afficher_etablissement_infowindow %}
+        {{ afficher_etablissement_infowindow(
+            etablissement,
+            url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab)
+        ) }}
+    """, etablissement=etablissement)
+    return content
+
 
 @main_bp.route('/etablissement/<int:id_etab>', methods=['GET', 'POST'])
 def afficher_etablissement_unique(id_etab):

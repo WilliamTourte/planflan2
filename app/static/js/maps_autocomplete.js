@@ -1,15 +1,17 @@
-// Variables globales (déclarées une seule fois)
+// Variables globales (déjà définies dans le template)
 let autocomplete;
 let map;
 let markers = [];
-let etablissements = [];
+let etablissements = [...(window.etablissementsInitiaux || [])];
 let isAdmin = window.isAdmin || false;
 let googleMapsApiKey = window.googleMapsApiKey || '';
 let csrfToken = window.csrfToken || '';
-let visite = (window.filterSettings && window.filterSettings.visite) || false;
-let labellise = (window.filterSettings && window.filterSettings.labellise) || false;
-let activeFilters = (window.filterSettings && window.filterSettings.activeFilters) || { type_pate: 'tous', type_saveur: 'tous', prix: 'tous' };
-let nom = (window.filterSettings && window.filterSettings.nom) || '';
+let visite = window.filterSettings?.visite || '';
+let labellise = window.filterSettings?.labellise || '';
+let activeFilters = window.filterSettings?.activeFilters || { type_pate: 'tous', type_saveur: 'tous', prix: 'tous' };
+let nom = window.filterSettings?.nom || '';
+let infowindowContents = window.infowindowContents || {};
+let filterLabels = window.filterLabels || {};
 
 // Fonction utilitaire pour limiter le nombre de requêtes (debounce)
 function debounce(func, wait) {
@@ -28,26 +30,11 @@ function updateMainButton(filterType, value) {
         console.error(`Bouton #${filterType}-btn introuvable`);
         return;
     }
-    if (!window.filterLabels || !window.filterLabels[filterType] || !window.filterLabels[filterType][value]) {
+    if (!filterLabels[filterType]?.[value]) {
         console.error(`Label introuvable pour ${filterType}=${value}`);
         return;
     }
-    btn.textContent = window.filterLabels[filterType][value];
-}
-
-// Fonction pour filtrer les établissements
-function filterEtablissements() {
-    const { type_pate, type_saveur, prix } = activeFilters;
-    return window.etablissementsInitiaux.filter(etab => {
-        return (
-            (type_pate === 'tous' || etab.type_pate === type_pate) &&
-            (type_saveur === 'tous' || etab.type_saveur === type_saveur) &&
-            (prix === 'tous' ||
-             (prix === '0' && parseFloat(etab.prix) < 2.5) ||
-             (prix === '2.5' && parseFloat(etab.prix) >= 2.5 && parseFloat(etab.prix) < 5) ||
-             (prix === '5' && parseFloat(etab.prix) >= 5))
-        );
-    });
+    btn.textContent = filterLabels[filterType][value];
 }
 
 // Gestion des clics sur les boutons principaux et options de filtre
@@ -93,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Fonction pour recharger les établissements selon les filtres
 async function loadEtablissements() {
     try {
-        document.getElementById('loading-spinner').style.display = 'block';
+
         const params = new URLSearchParams();
         const urlParams = new URLSearchParams(window.location.search);
         const ville = urlParams.get('ville');
@@ -113,50 +100,78 @@ async function loadEtablissements() {
         console.error("Erreur:", error);
         return [];
     } finally {
-        document.getElementById('loading-spinner').style.display = 'none';
+
     }
 }
 
-// Fonction pour mettre à jour la carte avec de nouveaux établissements
 async function updateMapAndMarkers() {
     const newEtablissements = await loadEtablissements();
     if (!newEtablissements || newEtablissements.length === 0) {
         console.warn("Aucun établissement trouvé avec ces filtres.");
         return;
     }
-    if (markers.length > 0) {
-        markers.forEach(marker => map.removeLayer(marker));
-        markers = [];
-    }
+
+    // Supprime les anciens marqueurs
+    markers.forEach(marker => map.removeLayer(marker));
+    markers = [];
     etablissements = newEtablissements;
-    const bounds = L.latLngBounds();
-    const createEmojiIcon = (emoji, className) => {
-        return L.divIcon({
-            html: `<div class="emoji-marker ${className}">${emoji}</div>`,
-            className: 'emoji-icon',
-            iconSize: [30, 30],
-            iconAnchor: [15, 15]
-        });
-    };
+
+    // Reconstruit infowindowContents pour les nouveaux établissements
+    const newInfowindowContents = {};
+    for (const etablissement of etablissements) {
+        try {
+            const response = await fetch(`/get_infowindow_content?id_etab=${etablissement.id_etab}`);
+            if (response.ok) {
+                const content = await response.text();
+                newInfowindowContents[etablissement.id_etab] = content;
+            } else {
+                newInfowindowContents[etablissement.id_etab] = "Détails non disponibles";
+            }
+        } catch (error) {
+            console.error(`Erreur lors du chargement du contenu pour l'ID ${etablissement.id_etab}:`, error);
+            newInfowindowContents[etablissement.id_etab] = "Détails non disponibles";
+        }
+    }
+
+    // Met à jour infowindowContents
+    infowindowContents = newInfowindowContents;
+
+    // Crée les icônes
+    const createEmojiIcon = (emoji, className) => L.divIcon({
+        html: `<div class="emoji-marker ${className}">${emoji}</div>`,
+        className: 'emoji-icon',
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
+    });
     const labelIcon = createEmojiIcon('🏆', 'label-icon');
     const visiteIcon = createEmojiIcon('✅', 'visited-icon');
     const nonvisiteIcon = createEmojiIcon('❌', 'unvisited-icon');
+
+    // Ajoute les marqueurs à la carte
+    const bounds = L.latLngBounds();
     etablissements.forEach(etablissement => {
+        const idEtab = etablissement.id_etab.toString();
+        const content = infowindowContents[idEtab] || "Détails non disponibles";
         let icon = nonvisiteIcon;
+
         if (etablissement.label) {
             icon = labelIcon;
         } else if (etablissement.visite) {
             icon = visiteIcon;
         }
+
         const marker = L.marker([etablissement.latitude, etablissement.longitude], {
             icon: icon,
             title: etablissement.nom
         })
         .addTo(map)
-        .bindPopup(window.infowindowContents[etablissement.id_etab] || "Détails non disponibles");
+        .bindPopup(content, { maxWidth: 'auto' });
+
         markers.push(marker);
         bounds.extend(marker.getLatLng());
     });
+
+    // Ajuste la vue de la carte
     if (etablissements.length > 0) {
         if (etablissements.length === 1) {
             map.setView([etablissements[0].latitude, etablissements[0].longitude], 14);
@@ -262,11 +277,12 @@ window.initMap = function() {
 
 // Fonction pour initialiser l'autocomplétion et la carte
 window.initAll = function() {
-    if (!googleMapsApiKey) {
-        console.error("Clé API Google Maps manquante ou invalide. L'autocomplete ne fonctionnera pas.");
-    }
     initMap();
-    initAutocomplete();
+    if (googleMapsApiKey) {
+        initAutocomplete();
+    } else {
+        console.error("Clé API Google Maps non définie. L'autocomplete ne sera pas disponible.");
+    }
 };
 
 // Chargement de l'API Google Maps (si clé valide)
@@ -278,7 +294,6 @@ document.addEventListener('DOMContentLoaded', function() {
         script.defer = true;
         document.head.appendChild(script);
     } else {
-        console.error("Clé API Google Maps non définie. L'autocomplete ne sera pas disponible.");
         initMap(); // Initialise au moins la carte
     }
 });

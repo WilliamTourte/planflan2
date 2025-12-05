@@ -2,111 +2,18 @@
 {% block scripts_head %}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <style>
-        #filter-bubbles {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            z-index: 1000;
-            background: transparent;
-            font-family: Arial, sans-serif;
-        }
-        .filter-group {
-            margin-bottom: 8px;
-            position: relative;
-        }
-        .filter-main-btn {
-            padding: 6px 12px;
-            font-size: 12px;
-            border-radius: 12px;
-            border: none;
-            background: rgba(255, 255, 255, 0.8);
-            color: #333;
-            cursor: pointer;
-            width: 120px;
-            text-align: left;
-            position: relative;
-        }
-        .filter-main-btn:hover {
-            background: rgba(255, 255, 255, 1);
-        }
-        .filter-main-btn::after {
-            content: "▼";
-            position: absolute;
-            right: 8px;
-            font-size: 10px;
-        }
-        .filter-options {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            z-index: 1001;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-            padding: 6px;
-            display: none;
-            width: 120px;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        .filter-option {
-            display: block;
-            width: 100%;
-            padding: 4px 8px;
-            margin-bottom: 4px;
-            font-size: 11px;
-            border-radius: 4px;
-            border: none;
-            background: transparent;
-            color: #333;
-            text-align: left;
-        }
-        .filter-option:hover {
-            background: rgba(0, 123, 255, 0.1);
-        }
-        .filter-option.active {
-            background: #007bff;
-            color: white;
-        }
-        #map {
-            height: 500px;
-            width: 100%;
-            position: relative;
-        }
-        .loading-spinner {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 2000;
-            display: none;
-        }
-    </style>
 {% endblock %}
 {% block content %}
-    <!-- Champ de recherche pour l'autocomplétion (optionnel) -->
-    <input type="text" id="search" placeholder="Rechercher un établissement..." style="margin-bottom: 10px; padding: 8px; width: 300px;" />
-
+    <!-- Données passées à JavaScript -->
     <script>
-        window.infowindowContents = {
-            {% for etablissement in etablissements %}
-                {{ etablissement.id_etab }}: `{{
-                    afficher_etablissement_infowindow(
-                        etablissement,
-                        url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab)
-                    )
-                }}`{% if not loop.last %},{% endif %}
-            {% endfor %}
-        };
-        window.etablissementsInitiaux = {{ etablissements_json|safe }};
+        window.etablissementsInitiaux = {{ etablissements_json|tojson|safe }};
         window.isAdmin = {{ current_user.is_admin|lower }};
         window.googleMapsApiKey = "{{ google_maps_api_key }}";
         window.csrfToken = "{{ csrf_token() }}";
         window.filterSettings = {
-            nom: '',
-            visite: {{ current_user.visite|lower if current_user.visite is defined else 'false' }},
-            labellise: {{ current_user.labellise|lower if current_user.labellise is defined else 'false' }},
+            nom: "{{ request.args.get('nom', '') }}",
+            visite: "{{ request.args.get('visite', '') }}",
+            labellise: "{{ request.args.get('labellise', '') }}",
             activeFilters: {
                 type_pate: 'tous',
                 type_saveur: 'tous',
@@ -137,13 +44,18 @@
                 '5': 'Plus de 5€'
             }
         };
+        window.infowindowContents = {
+        {% for etablissement in etablissements %}
+            "{{ etablissement.id_etab }}": {{ afficher_etablissement_infowindow(
+                etablissement,
+                url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab)
+            ) | tojson | safe }}{% if not loop.last %},{% endif %}
+        {% endfor %}
+    };
+    console.log("Contenu de infowindowContents après génération :", window.infowindowContents);
     </script>
 
-    <div id="loading-spinner" class="loading-spinner">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Chargement...</span>
-        </div>
-    </div>
+
     <div id="map">
         <div id="filter-bubbles">
             <div class="filter-group">
@@ -189,5 +101,8 @@
             {% endif %}
         </div>
     </div>
+{% endblock %}
+
+{% block scripts %}
     <script src="{{ url_for('static', filename='js/maps_autocomplete.js') }}"></script>
 {% endblock %}
