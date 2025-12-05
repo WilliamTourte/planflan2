@@ -1,15 +1,15 @@
-// Variables globales
+// Variables globales (déclarées une seule fois)
 let autocomplete;
 let map;
 let markers = [];
 let etablissements = [];
-let isAdmin = window.isAdmin;
-let googleMapsApiKey = window.googleMapsApiKey;
-let csrfToken = window.csrfToken;
-let nom = window.filterSettings.nom;
-let visite = window.filterSettings.visite;
-let labellise = window.filterSettings.labellise;
-let activeFilters = window.filterSettings.activeFilters;
+let isAdmin = window.isAdmin || false;
+let googleMapsApiKey = window.googleMapsApiKey || '';
+let csrfToken = window.csrfToken || '';
+let visite = (window.filterSettings && window.filterSettings.visite) || false;
+let labellise = (window.filterSettings && window.filterSettings.labellise) || false;
+let activeFilters = (window.filterSettings && window.filterSettings.activeFilters) || { type_pate: 'tous', type_saveur: 'tous', prix: 'tous' };
+let nom = (window.filterSettings && window.filterSettings.nom) || '';
 
 // Fonction utilitaire pour limiter le nombre de requêtes (debounce)
 function debounce(func, wait) {
@@ -21,26 +21,91 @@ function debounce(func, wait) {
     };
 }
 
+// Mise à jour sécurisée du texte du bouton principal
+function updateMainButton(filterType, value) {
+    const btn = document.querySelector(`#${filterType}-btn`);
+    if (!btn) {
+        console.error(`Bouton #${filterType}-btn introuvable`);
+        return;
+    }
+    if (!window.filterLabels || !window.filterLabels[filterType] || !window.filterLabels[filterType][value]) {
+        console.error(`Label introuvable pour ${filterType}=${value}`);
+        return;
+    }
+    btn.textContent = window.filterLabels[filterType][value];
+}
+
+// Fonction pour filtrer les établissements
+function filterEtablissements() {
+    const { type_pate, type_saveur, prix } = activeFilters;
+    return window.etablissementsInitiaux.filter(etab => {
+        return (
+            (type_pate === 'tous' || etab.type_pate === type_pate) &&
+            (type_saveur === 'tous' || etab.type_saveur === type_saveur) &&
+            (prix === 'tous' ||
+             (prix === '0' && parseFloat(etab.prix) < 2.5) ||
+             (prix === '2.5' && parseFloat(etab.prix) >= 2.5 && parseFloat(etab.prix) < 5) ||
+             (prix === '5' && parseFloat(etab.prix) >= 5))
+        );
+    });
+}
+
+// Gestion des clics sur les boutons principaux et options de filtre
+document.addEventListener('DOMContentLoaded', function() {
+    // Gestion des boutons principaux
+    document.querySelectorAll('.filter-main-btn').forEach(mainBtn => {
+        mainBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const filterType = this.getAttribute('data-filter');
+            const options = document.querySelector(`.filter-options[data-filter="${filterType}"]`);
+            document.querySelectorAll('.filter-options').forEach(opt => {
+                if (opt !== options) opt.style.display = 'none';
+            });
+            options.style.display = options.style.display === 'block' ? 'none' : 'block';
+        });
+    });
+
+    // Fermer les menus si clic ailleurs
+    document.addEventListener('click', function() {
+        document.querySelectorAll('.filter-options').forEach(opt => {
+            opt.style.display = 'none';
+        });
+    });
+
+    // Gestion de la sélection des options
+    document.querySelectorAll('.filter-option').forEach(option => {
+        option.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const filterType = this.getAttribute('data-filter');
+            const value = this.getAttribute('data-value');
+            document.querySelectorAll(`.filter-option[data-filter="${filterType}"]`).forEach(opt => {
+                opt.classList.remove('active');
+            });
+            this.classList.add('active');
+            updateMainButton(filterType, value);
+            this.parentElement.style.display = 'none';
+            activeFilters[filterType] = value;
+            updateMapAndMarkers();
+        });
+    });
+});
+
 // Fonction pour recharger les établissements selon les filtres
 async function loadEtablissements() {
     try {
         document.getElementById('loading-spinner').style.display = 'block';
         const params = new URLSearchParams();
-        // Récupère les paramètres de recherche depuis l'URL
         const urlParams = new URLSearchParams(window.location.search);
         const ville = urlParams.get('ville');
         const type_flan = urlParams.get('type');
-        // Ajoute les filtres de recherche à la requête API
         if (ville) params.append('ville', ville);
         if (type_flan) params.append('type_flan', type_flan);
-        // Ajoute les autres filtres existants
         if (nom) params.append('nom', nom);
         if (visite) params.append('visite', visite);
         if (labellise) params.append('labellise', labellise);
         if (activeFilters.type_pate && activeFilters.type_pate !== 'tous') params.append('type_pate', activeFilters.type_pate);
         if (activeFilters.type_saveur && activeFilters.type_saveur !== 'tous') params.append('type_saveur', activeFilters.type_saveur);
         if (activeFilters.prix && activeFilters.prix !== 'tous') params.append('prix', activeFilters.prix);
-
         const response = await fetch(`/api/etablissements?${params.toString()}`);
         if (!response.ok) throw new Error("Erreur lors du chargement des établissements.");
         return await response.json();
@@ -59,15 +124,11 @@ async function updateMapAndMarkers() {
         console.warn("Aucun établissement trouvé avec ces filtres.");
         return;
     }
-
-    // Efface les anciens marqueurs
-    markers.forEach(marker => map.removeLayer(marker));
-    markers = [];
-
-    // Met à jour les données globales
+    if (markers.length > 0) {
+        markers.forEach(marker => map.removeLayer(marker));
+        markers = [];
+    }
     etablissements = newEtablissements;
-
-    // Réutilise la logique d'initialisation des marqueurs
     const bounds = L.latLngBounds();
     const createEmojiIcon = (emoji, className) => {
         return L.divIcon({
@@ -80,15 +141,12 @@ async function updateMapAndMarkers() {
     const labelIcon = createEmojiIcon('🏆', 'label-icon');
     const visiteIcon = createEmojiIcon('✅', 'visited-icon');
     const nonvisiteIcon = createEmojiIcon('❌', 'unvisited-icon');
-
     etablissements.forEach(etablissement => {
-        let icon;
+        let icon = nonvisiteIcon;
         if (etablissement.label) {
             icon = labelIcon;
         } else if (etablissement.visite) {
             icon = visiteIcon;
-        } else {
-            icon = nonvisiteIcon;
         }
         const marker = L.marker([etablissement.latitude, etablissement.longitude], {
             icon: icon,
@@ -99,8 +157,6 @@ async function updateMapAndMarkers() {
         markers.push(marker);
         bounds.extend(marker.getLatLng());
     });
-
-    // Ajuste la vue
     if (etablissements.length > 0) {
         if (etablissements.length === 1) {
             map.setView([etablissements[0].latitude, etablissements[0].longitude], 14);
@@ -115,6 +171,10 @@ window.initAutocomplete = function() {
     const input = document.getElementById('search');
     if (!input) {
         console.log("Élément #search absent : pas d'autocomplete.");
+        return;
+    }
+    if (!googleMapsApiKey) {
+        console.error("Clé API Google Maps manquante pour l'autocomplete.");
         return;
     }
     autocomplete = new google.maps.places.Autocomplete(input, {
@@ -190,8 +250,6 @@ window.initMap = function() {
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
-
-    // Légende
     const legend = L.control({ position: 'bottomright' });
     legend.onAdd = function() {
         const div = L.DomUtil.create('div', 'info legend');
@@ -199,71 +257,28 @@ window.initMap = function() {
         return div;
     };
     legend.addTo(map);
-
-    // Charge les établissements initiaux
     updateMapAndMarkers();
 };
 
-// Écouteurs pour les bulles de filtre
-document.addEventListener('DOMContentLoaded', function() {
-    // Écouteurs pour les bulles de filtre (pâte, saveur, prix)
-    document.querySelectorAll('.filter-bubble').forEach(button => {
-        button.addEventListener('click', function() {
-            const filter = this.dataset.filter;
-            const value = this.dataset.value;
-
-            // Si c'est "Tous", réinitialise le filtre
-            if (value === 'tous') {
-                activeFilters[filter] = 'tous';
-            } else {
-                activeFilters[filter] = value;
-            }
-
-            // Met à jour l'apparence des boutons
-            document.querySelectorAll(`.filter-bubble[data-filter="${filter}"]`).forEach(b => {
-                b.classList.remove('active');
-            });
-            this.classList.add('active');
-
-            // Met à jour la carte
-            updateMapAndMarkers();
-        });
-    });
-
-    // Écouteurs pour les filtres existants
-    const nomFilter = document.getElementById('filter-nom');
-    const visiteFilter = document.getElementById('filter-visite');
-    const labelliseFilter = document.getElementById('filter-labellise');
-
-    if (nomFilter) {
-        nomFilter.addEventListener('input', debounce(function() {
-            nom = this.value;
-            updateMapAndMarkers();
-        }, 500));
-    }
-    if (visiteFilter) {
-        visiteFilter.addEventListener('change', function() {
-            visite = this.value;
-            updateMapAndMarkers();
-        });
-    }
-    if (labelliseFilter) {
-        labelliseFilter.addEventListener('change', function() {
-            labellise = this.value;
-            updateMapAndMarkers();
-        });
-    }
-
-    // Chargement de l'API Google Maps (uniquement pour l'autocomplete)
-    const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}&libraries=places&callback=initAll&v=weekly&loading=async`;
-    script.async = true;
-    script.defer = true;
-    document.head.appendChild(script);
-});
-
 // Fonction pour initialiser l'autocomplétion et la carte
 window.initAll = function() {
-    initAutocomplete();
+    if (!googleMapsApiKey) {
+        console.error("Clé API Google Maps manquante ou invalide. L'autocomplete ne fonctionnera pas.");
+    }
     initMap();
+    initAutocomplete();
 };
+
+// Chargement de l'API Google Maps (si clé valide)
+document.addEventListener('DOMContentLoaded', function() {
+    if (googleMapsApiKey) {
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}&libraries=places&callback=initAll&v=weekly`;
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+    } else {
+        console.error("Clé API Google Maps non définie. L'autocomplete ne sera pas disponible.");
+        initMap(); // Initialise au moins la carte
+    }
+});

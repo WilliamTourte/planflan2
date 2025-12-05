@@ -85,6 +85,9 @@
     </style>
 {% endblock %}
 {% block content %}
+    <!-- Champ de recherche pour l'autocomplétion (optionnel) -->
+    <input type="text" id="search" placeholder="Rechercher un établissement..." style="margin-bottom: 10px; padding: 8px; width: 300px;" />
+
     <script>
         window.infowindowContents = {
             {% for etablissement in etablissements %}
@@ -96,14 +99,14 @@
                 }}`{% if not loop.last %},{% endif %}
             {% endfor %}
         };
-        window.etablissementsInitiaux = {{ etablissements_json|tojson|safe }};
-        window.isAdmin = {{ current_user.is_admin|tojson|lower }};
+        window.etablissementsInitiaux = {{ etablissements_json|safe }};
+        window.isAdmin = {{ current_user.is_admin|lower }};
         window.googleMapsApiKey = "{{ google_maps_api_key }}";
         window.csrfToken = "{{ csrf_token() }}";
         window.filterSettings = {
             nom: '',
-            visite: '',
-            labellise: '',
+            visite: {{ current_user.visite|lower if current_user.visite is defined else 'false' }},
+            labellise: {{ current_user.labellise|lower if current_user.labellise is defined else 'false' }},
             activeFilters: {
                 type_pate: 'tous',
                 type_saveur: 'tous',
@@ -135,6 +138,7 @@
             }
         };
     </script>
+
     <div id="loading-spinner" class="loading-spinner">
         <div class="spinner-border text-primary" role="status">
             <span class="visually-hidden">Chargement...</span>
@@ -185,80 +189,5 @@
             {% endif %}
         </div>
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Mise à jour sécurisée du texte du bouton principal
-            function updateMainButton(filterType, value) {
-                const btn = document.querySelector(`#${filterType}-btn`);
-                if (!btn) {
-                    console.error(`Bouton #${filterType}-btn introuvable`);
-                    return;
-                }
-                const label = window.filterLabels[filterType] && window.filterLabels[filterType][value];
-                if (!label) {
-                    console.error(`Label introuvable pour ${filterType}=${value}`);
-                    return;
-                }
-                btn.textContent = label;
-            }
-
-            // Fonction pour filtrer les établissements
-            function filterEtablissements() {
-                const { type_pate, type_saveur, prix } = window.filterSettings.activeFilters;
-                return window.etablissementsInitiaux.filter(etab => {
-                    return (
-                        (type_pate === 'tous' || etab.type_pate === type_pate) &&
-                        (type_saveur === 'tous' || etab.type_saveur === type_saveur) &&
-                        (prix === 'tous' ||
-                         (prix === '0' && parseFloat(etab.prix) < 2.5) ||
-                         (prix === '2.5' && parseFloat(etab.prix) >= 2.5 && parseFloat(etab.prix) < 5) ||
-                         (prix === '5' && parseFloat(etab.prix) >= 5))
-                    );
-                });
-            }
-
-            // Gestion des clics sur les boutons principaux
-            document.querySelectorAll('.filter-main-btn').forEach(mainBtn => {
-                mainBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const filterType = this.getAttribute('data-filter');
-                    const options = document.querySelector(`.filter-options[data-filter="${filterType}"]`);
-                    document.querySelectorAll('.filter-options').forEach(opt => {
-                        if (opt !== options) opt.style.display = 'none';
-                    });
-                    options.style.display = options.style.display === 'block' ? 'none' : 'block';
-                });
-            });
-
-            // Fermer les menus si clic ailleurs
-            document.addEventListener('click', function() {
-                document.querySelectorAll('.filter-options').forEach(opt => {
-                    opt.style.display = 'none';
-                });
-            });
-
-            // Gestion de la sélection des options
-            document.querySelectorAll('.filter-option').forEach(option => {
-                option.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const filterType = this.getAttribute('data-filter');
-                    const value = this.getAttribute('data-value');
-                    console.log(`Filtre sélectionné: ${filterType}=${value}`);
-
-                    document.querySelectorAll(`.filter-option[data-filter="${filterType}"]`).forEach(opt => {
-                        opt.classList.remove('active');
-                    });
-                    this.classList.add('active');
-                    updateMainButton(filterType, value);
-                    this.parentElement.style.display = 'none';
-                    window.filterSettings.activeFilters[filterType] = value;
-
-                    if (typeof updateMapAndMarkers === 'function') {
-                        updateMapAndMarkers();
-                    }
-                });
-            });
-        });
-    </script>
     <script src="{{ url_for('static', filename='js/maps_autocomplete.js') }}"></script>
 {% endblock %}
