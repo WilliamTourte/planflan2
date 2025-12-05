@@ -1007,3 +1007,170 @@ input.back:hover {
     animation: spin 0.8s ease-in-out infinite;
 }
 
+/* Formulaire d'ajout d'établissement */
+.etablissement-form-container {
+    min-height: 100vh;
+    padding: var(--padding-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    background-color: var(--color-primary);
+}
+
+.etablissement-form-card {
+    width: 100%;
+    max-width: 500px;
+    padding: var(--padding-lg);
+    background: var(--color-white);
+    border-radius: var(--border-radius-card);
+    box-shadow: var(--box-shadow);
+    margin-bottom: var(--margin-lg);
+}
+
+.etablissement-form {
+    width: 100%;
+}
+
+.etablissement-form-group {
+    margin-bottom: var(--margin-md);
+}
+
+.etablissement-form-label {
+    display: block;
+    margin-bottom: var(--margin-sm);
+    color: var(--color-text);
+    font-weight: bold;
+    font-family: var(--font-primary);
+}
+
+.etablissement-form-input,
+.etablissement-form-select {
+    width: 100%;
+    padding: var(--padding-sm) var(--padding-md);
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    font-family: var(--font-primary);
+    font-size: var(--font-size-md);
+    transition: var(--transition);
+}
+
+.etablissement-form-input:focus,
+.etablissement-form-select:focus {
+    outline: none;
+    border-color: var(--color-secondary);
+    box-shadow: 0 0 0 2px rgba(254, 225, 13, 0.2);
+}
+
+.etablissement-hidden-fields {
+    display: none;
+}
+
+.etablissement-checkbox-group {
+    display: flex;
+    gap: var(--gap-md);
+    margin-bottom: var(--margin-md);
+}
+
+.etablissement-form-check {
+    display: flex;
+    align-items: center;
+}
+
+.etablissement-form-check-input {
+    width: 18px;
+    height: 18px;
+    margin-right: var(--margin-sm);
+    vertical-align: middle;
+}
+
+.etablissement-form-check-label {
+    font-family: var(--font-primary);
+    color: var(--color-text);
+    font-size: var(--font-size-md);
+}
+
+.etablissement-form-submit {
+    width: 100%;
+    padding: var(--padding-sm) var(--padding-md);
+    font-size: var(--font-size-md);
+    font-weight: bold;
+    color: var(--color-white);
+    background-color: var(--color-secondary);
+    border: none;
+    border-radius: var(--border-radius-btn);
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: var(--box-shadow);
+    margin-top: var(--margin-sm);
+}
+
+.etablissement-form-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--box-shadow-hover);
+    background-color: #e6c900; /* Version plus foncée du jaune */
+}
+
+.etablissement-form-submit:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+}
+
+.etablissement-map-container {
+    width: 100%;
+    max-width: 500px;
+    padding: var(--padding-md);
+    background: var(--color-white);
+    border-radius: var(--border-radius-card);
+    box-shadow: var(--box-shadow);
+    display: none;
+    margin-top: var(--margin-md);
+}
+
+.etablissement-map {
+    height: 300px;
+    width: 100%;
+    border-radius: var(--border-radius);
+}
+
+/* Style pour l'autocomplete Google Maps */
+#search {
+    width: 100%;
+    padding: var(--padding-sm) var(--padding-md);
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius-btn);
+    font-family: var(--font-primary);
+    font-size: var(--font-size-md);
+    transition: var(--transition);
+}
+
+#search:focus {
+    outline: none;
+    border-color: var(--color-secondary);
+    box-shadow: 0 0 0 2px rgba(254, 225, 13, 0.2);
+}
+
+/* Style pour les messages d'erreur */
+.error-message {
+    color: var(--color-danger);
+    font-size: var(--font-size-sm);
+    margin-top: var(--margin-sm);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .etablissement-form-container {
+        padding: var(--padding-md);
+    }
+
+    .etablissement-form-card,
+    .etablissement-map-container {
+        padding: var(--padding-md);
+    }
+
+    .etablissement-checkbox-group {
+        flex-direction: column;
+        gap: var(--gap-sm);
+    }
+}
+

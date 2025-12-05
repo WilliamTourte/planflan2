@@ -223,6 +223,7 @@ def liste_etablissements():
 
 from flask import render_template_string
 
+#Route pour générer le CONTENT d'une infowindow, utilisé dans maps_autocomplete.js
 @main_bp.route('/get_infowindow_content')
 def get_infowindow_content():
     id_etab = request.args.get('id_etab', type=int)

@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-
 {% block scripts_head %}
     <!-- Leaflet CSS & JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -9,21 +8,18 @@
             integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
             crossorigin=""></script>
 {% endblock %}
-
 {% block content %}
-    <div class="container-fluid bg-primary d-flex flex-column align-items-center justify-content-start min-vh-100 p-4">
-        <div class="bg-white p-4 rounded-4 shadow-sm w-100" style="max-width: 500px;">
-            <form method="POST" action="{{ action_url }}" class="w-100">
+    <div class="etablissement-form-container">
+        <div class="etablissement-form-card">
+            <form method="POST" action="{{ action_url }}" class="etablissement-form">
                 {{ form.hidden_tag() }}
-
                 <!-- Champ de recherche pour l'autocomplete Google Maps -->
-                <div class="mb-3">
-                    <label for="search" class="form-label text-dark fw-bold">Recherche d'établissement</label>
-                    <input type="text" id="search" class="form-control" placeholder="Rechercher un établissement">
+                <div class="etablissement-form-group">
+                    <label for="search" class="etablissement-form-label">Recherche d'établissement</label>
+                    <input type="text" id="search" class="etablissement-form-input" placeholder="Rechercher un établissement">
                 </div>
-
                 <!-- Champs cachés pour les coordonnées et l'adresse (remplis par le script) -->
-                <div class="d-none">
+                <div class="etablissement-hidden-fields">
                     {{ form.nom(id="ajout-etab-nom") }}
                     {{ form.adresse(id="ajout-etab-adresse") }}
                     {{ form.latitude(id="ajout-etab-latitude") }}
@@ -31,55 +27,30 @@
                     {{ form.code_postal(id="ajout-etab-code_postal") }}
                     {{ form.ville(id="ajout-etab-ville") }}
                 </div>
-
-                <div class="mb-3">
-                    {{ form.type_etab.label(class="form-label text-dark fw-bold") }}
-                    {{ form.type_etab(class="form-control form-control-lg rounded-3") }}
+                <div class="etablissement-form-group">
+                    {{ form.type_etab.label(class="etablissement-form-label") }}
+                    {{ form.type_etab(class="etablissement-form-select") }}
                 </div>
-
                 {% if current_user.is_admin %}
-                    <div class="mb-3 d-flex gap-3">
-                        <div class="form-check">
-                            {{ form.label(class="form-check-input") }}
-                            {{ form.label.label(class="form-check-label text-dark") }}
+                    <div class="etablissement-checkbox-group">
+                        <div class="etablissement-form-check">
+                            {{ form.label(class="etablissement-form-check-input") }}
+                            {{ form.label.label(class="etablissement-form-check-label") }}
                         </div>
-                        <div class="form-check">
-                            {{ form.visite(class="form-check-input") }}
-                            {{ form.visite.label(class="form-check-label text-dark") }}
+                        <div class="etablissement-form-check">
+                            {{ form.visite(class="etablissement-form-check-input") }}
+                            {{ form.visite.label(class="etablissement-form-check-label") }}
                         </div>
                     </div>
                 {% endif %}
-
-                <button type="submit" class="btn btn-warning btn-lg text-white fw-bold w-100 py-2 rounded-3">
+                <button type="submit" class="etablissement-form-submit">
                     Enregistrer
                 </button>
             </form>
         </div>
-
         <!-- Conteneur pour la carte (caché par défaut, affiché après sélection d'un établissement) -->
-        <div id="map-container" class="mt-4 bg-white p-3 rounded-4 shadow-sm w-100" style="max-width: 500px; display: none;">
-            <div id="map" style="height: 300px; width: 100%;"></div>
+        <div id="map-container" class="etablissement-map-container">
+            <div id="map" class="etablissement-map"></div>
         </div>
     </div>
-
-    <style>
-        .bg-primary {
-            background-color: #4a90e2 !important;
-        }
-        .btn-warning {
-            background-color: #f5d76e;
-            border-color: #f5d76e;
-        }
-        .btn-warning:hover {
-            background-color: #f1c40f;
-            border-color: #f1c40f;
-        }
-        .form-control, .form-check-input {
-            border: 1px solid #ced4da;
-        }
-        .form-control:focus, .form-check-input:focus {
-            border-color: #86b7fe;
-            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-        }
-    </style>
 {% endblock %}
