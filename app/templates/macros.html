@@ -1,9 +1,19 @@
 <!-- MACROS D'AFFICHAGE -->
 {% macro afficher_image_ou_placeholder(item, classe='card-image') %}
-    {% if item.photos %}
-        <img src="{{ url_for('static', filename='uploads/' + item.photos[0].path) }}" alt="{{ item.nom }}" class="{{ classe }}">
+    {% if item is mapping %}
+        {# Si c'est un dictionnaire (JSON) #}
+        {% if item.photos and item.photos|length > 0 %}
+            <img src="{{ url_for('static', filename='uploads/' + item.photos[0].path) }}" alt="{{ item.nom }}" class="{{ classe }}">
+        {% else %}
+            <div class="{{ classe }} placeholder"><span>Pas de photo</span></div>
+        {% endif %}
     {% else %}
-        <div class="{{ classe }} placeholder"><span>Pas de photo</span></div>
+        {# Si c'est un objet SQLAlchemy #}
+        {% if item.photos %}
+            <img src="{{ url_for('static', filename='uploads/' + item.photos[0].path) }}" alt="{{ item.nom }}" class="{{ classe }}">
+        {% else %}
+            <div class="{{ classe }} placeholder"><span>Pas de photo</span></div>
+        {% endif %}
     {% endif %}
 {% endmacro %}
 
@@ -14,35 +24,67 @@
         'RESTAURANT': '#87CEEB',
         'CAFE': '#D2B48C'
     } %}
-    {% set couleur = couleurs.get(etablissement.type_etab.name, '#D3D3D3') %}
-
+    {% if etablissement is mapping %}
+        {# Si c'est un dictionnaire (JSON) #}
+        {% set type_etab = etablissement.type_etab %}
+    {% else %}
+        {# Si c'est un objet SQLAlchemy #}
+        {% set type_etab = etablissement.type_etab.value %}
+    {% endif %}
+    {% set couleur = couleurs.get(type_etab, '#D3D3D3') %}
     <div class="badge badge-type-etab" style="background-color: {{ couleur }};">
-        {{ etablissement.type_etab.value }}
+        {{ type_etab }}
     </div>
 {% endmacro %}
 
-
 {% macro afficher_badge_etablissement(etablissement) %}
-    {% if etablissement.label %}
-        <span class="badge badge-labellise">⭐ Labellisé</span>
+    {% if etablissement is mapping %}
+        {# Si c'est un dictionnaire (JSON) #}
+        {% if etablissement.label %}
+            <span class="badge badge-labellise">⭐ Labellisé</span>
+        {% endif %}
+    {% else %}
+        {# Si c'est un objet SQLAlchemy #}
+        {% if etablissement.label %}
+            <span class="badge badge-labellise">⭐ Labellisé</span>
+        {% endif %}
     {% endif %}
 {% endmacro %}
 
-
 {% macro afficher_badge_flan(flan) %}
-    {% if flan.prix is not none %}
-        <span class="badge">{{ "%.2f"|format(flan.prix) }} €</span>
+    {% if flan is mapping %}
+        {# Si c'est un dictionnaire (JSON) #}
+        {% if flan.prix is not none %}
+            <span class="badge">{{ "%.2f"|format(flan.prix) }} €</span>
+        {% else %}
+            <span class="badge">Prix non renseigné</span>
+        {% endif %}
     {% else %}
-        <span class="badge">Prix non renseigné</span>
+        {# Si c'est un objet SQLAlchemy #}
+        {% if flan.prix is not none %}
+            <span class="badge">{{ "%.2f"|format(flan.prix) }} €</span>
+        {% else %}
+            <span class="badge">Prix non renseigné</span>
+        {% endif %}
     {% endif %}
 {% endmacro %}
 
 {% macro afficher_badge_statut(evaluation, current_user) %}
     {% if current_user and current_user.is_authenticated and (current_user.is_admin or evaluation.user_id == current_user.user_id) %}
-        {% if evaluation.statut.value == 'VALIDE' %}
-            <span class="badge statut-valide">Valide</span>
-        {% elif evaluation.statut.value == 'EN_ATTENTE' %}
-            <span class="badge statut-en-attente">En attente</span>
+        {% if evaluation is mapping %}
+            {# Si c'est un dictionnaire (JSON) #}
+            {% if evaluation.statut == 'VALIDE' %}
+                <span class="badge statut-valide">Valide</span>
+            {% elif evaluation.statut == 'EN_ATTENTE' %}
+                <span class="badge statut-en-attente">En attente</span>
+            {% endif %}
+        {% else %}
+            {# Si c'est un objet SQLAlchemy #}
+            {% if evaluation.statut.value == 'VALIDE' %}
+                <span class="badge statut-valide">Valide</span>
+            {% elif evaluation.statut.value == 'EN_ATTENTE' %}
+                <span class="badge statut-en-attente">En attente</span>
+            {% endif %}
         {% endif %}
     {% endif %}
 {% endmacro %}
@@ -51,7 +93,7 @@
     {% set page_attendue = 'page_' + type_objet %}
     {% if current_user.is_authenticated %}
         {% if current_page == page_attendue %}
-            {% if current_user.id_user == objet.id_user and not objet.statut.value == 'VALIDE' %}
+            {% if current_user.id_user == objet[id_field] and not objet.statut.value == 'VALIDE' %}
                 <div class="action-buttons d-flex gap-1">
                     <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
                         <i class="bi bi-pencil"></i>
@@ -66,42 +108,84 @@
                     {% endif %}
                 </div>
             {% elif current_user.is_admin %}
-                {% if objet.statut.value == 'EN_ATTENTE' %}
-                    <div class="action-buttons d-flex gap-1">
-                        {% if validate_form %}
-                            <form method="POST" action="{{ url_for(validate_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
-                                {{ validate_form.hidden_tag() }}
-                                <button type="submit" class="btn btn-success square-btn" title="Valider">
-                                    <i class="bi bi-check"></i>
-                                </button>
-                            </form>
-                        {% endif %}
-                        <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        {% if delete_form %}
-                            <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
-                                {{ delete_form.hidden_tag() }}
-                                <button type="submit" class="btn btn-danger square-btn" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </form>
-                        {% endif %}
-                    </div>
+                {% if objet is mapping %}
+                    {# Si c'est un dictionnaire (JSON) #}
+                    {% if objet.statut == 'EN_ATTENTE' %}
+                        <div class="action-buttons d-flex gap-1">
+                            {% if validate_form %}
+                                <form method="POST" action="{{ url_for(validate_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
+                                    {{ validate_form.hidden_tag() }}
+                                    <button type="submit" class="btn btn-success square-btn" title="Valider">
+                                        <i class="bi bi-check"></i>
+                                    </button>
+                                </form>
+                            {% endif %}
+                            <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            {% if delete_form %}
+                                <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
+                                    {{ delete_form.hidden_tag() }}
+                                    <button type="submit" class="btn btn-danger square-btn" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="action-buttons d-flex gap-1">
+                            <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            {% if delete_form %}
+                                <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
+                                    {{ delete_form.hidden_tag() }}
+                                    <button type="submit" class="btn btn-danger square-btn" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    {% endif %}
                 {% else %}
-                    <div class="action-buttons d-flex gap-1">
-                        <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        {% if delete_form %}
-                            <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
-                                {{ delete_form.hidden_tag() }}
-                                <button type="submit" class="btn btn-danger square-btn" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </form>
-                        {% endif %}
-                    </div>
+                    {# Si c'est un objet SQLAlchemy #}
+                    {% if objet.statut.value == 'EN_ATTENTE' %}
+                        <div class="action-buttons d-flex gap-1">
+                            {% if validate_form %}
+                                <form method="POST" action="{{ url_for(validate_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
+                                    {{ validate_form.hidden_tag() }}
+                                    <button type="submit" class="btn btn-success square-btn" title="Valider">
+                                        <i class="bi bi-check"></i>
+                                    </button>
+                                </form>
+                            {% endif %}
+                            <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            {% if delete_form %}
+                                <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
+                                    {{ delete_form.hidden_tag() }}
+                                    <button type="submit" class="btn btn-danger square-btn" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        <div class="action-buttons d-flex gap-1">
+                            <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            {% if delete_form %}
+                                <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" style="display: inline-block;">
+                                    {{ delete_form.hidden_tag() }}
+                                    <button type="submit" class="btn btn-danger square-btn" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    {% endif %}
                 {% endif %}
             {% endif %}
         {% endif %}
@@ -118,61 +202,81 @@
         </div>
         <div class="card-content">
             <div class="card-header">
-                <h2 id="etablissement-{{ etablissement.id_etab }}-nom">{{ etablissement.nom | enlever_accents }}</h2>
+                <h2>{{ etablissement.nom | enlever_accents }}</h2>
             </div>
-            <div id="etablissement-{{ etablissement.id_etab }}-display">
-                <p class="adresse" id="etablissement-{{ etablissement.id_etab }}-adresse">{{ etablissement.adresse }}, {{ etablissement.ville }}</p>
+            <div>
+                <p class="adresse">{{ etablissement.adresse }}, {{ etablissement.ville }}</p>
+                {% if etablissement is mapping %}
+                    {# Si c'est un dictionnaire (JSON) #}
+                    {% if etablissement.flans_count > 0 %}
+                        <p class="flans-count">
+                            {{ etablissement.flans_count }} flan{{ 's' if etablissement.flans_count > 1 else '' }}
+                        </p>
+                    {% else %}
+                        <p>Aucun flan</p>
+                    {% endif %}
+                    <p class="description">
+                        Description : {{ etablissement.description|default('Pas de description', true) }}
+                    </p>
+                    <a href="{{ etablissement.url }}" class="btn btn-primary">Voir plus</a>
+                {% else %}
+                    {# Si c'est un objet SQLAlchemy #}
+                    {% if etablissement.flans %}
+                        <p class="flans-count">
+                            {{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}
+                        </p>
+                    {% else %}
+                        <p>Aucun flan</p>
+                    {% endif %}
+                    <p class="description">
+                        Description : {{ etablissement.description|default('Pas de description', true) }}
+                    </p>
+                    <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}" class="btn btn-primary">Voir plus</a>
+                {% endif %}
+                {{ afficher_boutons_actions(etablissement, current_user, 'id_etab',
+                'maps.modifier_etablissement', 'maps.supprimer_etablissement', 'maps.valider_etablissement', 'etablissement', current_page,
+                        delete_form, validate_form) }}
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro afficher_etablissement_infowindow(etablissement, details_url) %}
+    <div class="infowindow-content">
+        <div class="infowindow-badges">
+            {{ afficher_badge_etablissement(etablissement) }}
+            {{ afficher_badge_type_etab(etablissement) }}
+        </div>
+        <div class="infowindow-header">
+            <h3>{{ etablissement.nom | enlever_accents }}</h3>
+        </div>
+        <div class="infowindow-body">
+            <p class="adresse">{{ etablissement.adresse }}, {{ etablissement.ville }}</p>
+            {% if etablissement is mapping %}
+                {# Si c'est un dictionnaire (JSON) #}
+                {% if etablissement.flans_count > 0 %}
+                    <p class="flans-count">
+                        {{ etablissement.flans_count }} flan{{ 's' if etablissement.flans_count > 1 else '' }}
+                    </p>
+                {% endif %}
+            {% else %}
+                {# Si c'est un objet SQLAlchemy #}
                 {% if etablissement.flans %}
                     <p class="flans-count">
                         {{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}
                     </p>
                 {% endif %}
-                <p class="description" id="etablissement-{{ etablissement.id_etab }}-description">Description : {{ etablissement.description }}</p>
-                {{ afficher_boutons_actions(etablissement, current_user, 'id_etab',
-                'maps.modifier_etablissement', 'maps.supprimer_etablissement', 'maps.valider_etablissement', 'etablissement', current_page,
-                        delete_form, validate_form) }}
-            </div>
-            {{ afficher_formulaire_edition_etablissement(etablissement, form_edit, current_user) }}
-            <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}" class="btn btn-primary">Voir plus</a>
-        </div>
-    </div>
-    <script>
-        function cancelEdit(idEtab) {
-            document.getElementById('etablissement-' + idEtab + '-display').style.display = 'block';
-            document.getElementById('etablissement-' + idEtab + '-edit').style.display = 'none';
-        }
-        function editEtablissement(idEtab) {
-            document.getElementById('etablissement-' + idEtab + '-display').style.display = 'none';
-            document.getElementById('etablissement-' + idEtab + '-edit').style.display = 'block';
-        }
-    </script>
-{% endmacro %}
-
-{% macro afficher_etablissement_infowindow(etablissement, details_url) %}
-    <div class="infowindow-content">
-          <div class="infowindow-badges">
-                {{ afficher_badge_etablissement(etablissement) }}
-                {{ afficher_badge_type_etab(etablissement) }}
-            </div>
-        <div class="infowindow-header">
-            <h3>{{ etablissement.nom | enlever_accents }}</h3>
-          
-        </div>
-        <div class="infowindow-body">
-            <p class="adresse">{{ etablissement.adresse }}, {{ etablissement.ville }}</p>
-            {% if etablissement.flans %}
-                <p class="flans-count">
-                    {{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}
-                </p>
             {% endif %}
         </div>
         <div class="infowindow-footer">
-            <a href="{{ details_url }}" class="btn btn-primary btn-small">Voir plus</a>
+            {% if etablissement is mapping %}
+                <a href="{{ etablissement.url }}" class="btn btn-primary btn-small">Voir plus</a>
+            {% else %}
+                <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}" class="btn btn-primary btn-small">Voir plus</a>
+            {% endif %}
         </div>
-        
     </div>
 {% endmacro %}
-
 
 {% macro afficher_formulaire_edition_etablissement(etablissement, form_edit, current_user) %}
     {% if form_edit %}
@@ -205,7 +309,7 @@
             </div>
             <div class="form-group">
                 <label class="form-label">{{ form_edit.type_etab.label }}</label>
-                {{ form_edit.type_etab(class="form-control", value=etablissement.type_etab.name) }}
+                {{ form_edit.type_etab(class="form-control", value=etablissement.type_etab.name if etablissement is not mapping else etablissement.type_etab) }}
             </div>
             <div class="form-group">
                 <label class="form-label">{{ form_edit.description.label }}</label>
@@ -227,7 +331,7 @@
             <button type="button" class="btn btn-secondary" onclick="cancelEdit({{ etablissement.id_etab }})">Annuler</button>
         </form>
     </div>
-    {%  endif %}
+    {% endif %}
 {% endmacro %}
 
 <!-- FLAN -->
@@ -239,51 +343,32 @@
         </div>
         <div class="card-content">
             <div class="card-header">
-                <h2 id="flan-{{ flan.id_flan }}-nom">{{ flan.nom | enlever_accents }}</h2>
+                <h2>{{ flan.nom | enlever_accents }}</h2>
             </div>
-            <div id="flan-{{ flan.id_flan }}-display">
-                <p class="type">Saveur : {{ flan.type_saveur.value | default("inconnue") }}</p>
-                <p class="type">Pâte : {{ flan.type_pate.value | default("inconnue") }}</p>
-                <p class="type">Texture : {{ flan.type_texture.value | default("inconnue") }}</p>
-                <p class="type" id="flan-{{ flan.id_flan }}-description">Description : {{ flan.description | default("Flantastique") }}</p>
-                <p class="flan-price">Prix : {{ "%.2f"|format(flan.prix) }} €</p>
+            <div>
+                {% if flan is mapping %}
+                    {# Si c'est un dictionnaire (JSON) #}
+                    <p class="type">Saveur : {{ flan.type_saveur|default("inconnue") }}</p>
+                    <p class="type">Pâte : {{ flan.type_pate|default("inconnue") }}</p>
+                    <p class="type">Texture : {{ flan.type_texture|default("inconnue") }}</p>
+                    <p class="type">Description : {{ flan.description|default("Flantastique") }}</p>
+                    <p class="flan-price">Prix : {{ "%.2f"|format(flan.prix) }} €</p>
+                {% else %}
+                    {# Si c'est un objet SQLAlchemy #}
+                    <p class="type">Saveur : {{ flan.type_saveur.value|default("inconnue") }}</p>
+                    <p class="type">Pâte : {{ flan.type_pate.value|default("inconnue") }}</p>
+                    <p class="type">Texture : {{ flan.type_texture.value|default("inconnue") }}</p>
+                    <p class="type">Description : {{ flan.description|default("Flantastique") }}</p>
+                    <p class="flan-price">Prix : {{ "%.2f"|format(flan.prix) }} €</p>
+                {% endif %}
                 {{ afficher_boutons_actions(flan, current_user, 'id_flan',
                 'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan', 'flan', current_page,
                         delete_form, validate_form) }}
             </div>
-            {{ afficher_formulaire_edition_flan(flan, form) }}
+            <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) if flan is not mapping else flan.url }}" class="btn btn-primary">Voir plus</a>
         </div>
-        <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}" class="btn btn-primary">Voir plus</a>
     </div>
-    <script>
-        function editFlan(idFlan) {
-            const displayElement = document.getElementById('flan-' + idFlan + '-display');
-            const editElement = document.getElementById('flan-' + idFlan + '-edit');
-            const nomElement = document.getElementById('flan-' + idFlan + '-nom');
-            const descriptionElement = document.getElementById('flan-' + idFlan + '-description');
-            if (displayElement && editElement && nomElement && descriptionElement) {
-                document.getElementById('edit-flan-nom').value = nomElement.textContent;
-                document.getElementById('edit-flan-description').value = descriptionElement.textContent.replace('Description : ', '').trim();
-                displayElement.style.display = 'none';
-                editElement.style.display = 'block';
-            } else {
-                console.error('Elements not found');
-            }
-        }
-        function cancelEdit(idFlan) {
-            const displayElement = document.getElementById('flan-' + idFlan + '-display');
-            const editElement = document.getElementById('flan-' + idFlan + '-edit');
-            if (displayElement && editElement) {
-                displayElement.style.display = 'block';
-                editElement.style.display = 'none';
-            } else {
-                console.error('Elements not found');
-            }
-        }
-    </script>
 {% endmacro %}
-
-
 
 {% macro afficher_formulaire_edition_flan(flan, form) %}
     {% if form %}
@@ -292,27 +377,27 @@
             {{ form.hidden_tag() }}
             <div class="form-group">
                 <label class="form-label" for="edit-flan-nom">{{ form.nom.label }}</label>
-                {{ form.nom(class="form-control", id="edit-flan-nom") }}
+                {{ form.nom(class="form-control", id="edit-flan-nom", value=flan.nom) }}
             </div>
             <div class="form-group">
                 <label class="form-label" for="edit-flan-description">{{ form.description.label }}</label>
-                {{ form.description(class="form-control", id="edit-flan-description") }}
+                {{ form.description(class="form-control", id="edit-flan-description", value=flan.description) }}
             </div>
             <div class="form-group">
                 <label class="form-label" for="edit-flan-prix">{{ form.prix.label }}</label>
-                {{ form.prix(class="form-control", id="edit-flan-prix") }}
+                {{ form.prix(class="form-control", id="edit-flan-prix", value=flan.prix) }}
             </div>
             <div class="form-group">
                 <label class="form-label" for="edit-flan-type_pate">{{ form.type_pate.label }}</label>
-                {{ form.type_pate(class="form-control", id="edit-flan-type_pate") }}
+                {{ form.type_pate(class="form-control", id="edit-flan-type_pate", value=flan.type_pate.name if flan is not mapping else flan.type_pate) }}
             </div>
             <div class="form-group">
                 <label class="form-label" for="edit-flan-type_saveur">{{ form.type_saveur.label }}</label>
-                {{ form.type_saveur(class="form-control", id="edit-flan-type_saveur") }}
+                {{ form.type_saveur(class="form-control", id="edit-flan-type_saveur", value=flan.type_saveur.name if flan is not mapping else flan.type_saveur) }}
             </div>
             <div class="form-group">
                 <label class="form-label" for="edit-flan-type_texture">{{ form.type_texture.label }}</label>
-                {{ form.type_texture(class="form-control", id="edit-flan-type_texture") }}
+                {{ form.type_texture(class="form-control", id="edit-flan-type_texture", value=flan.type_texture.name if flan is not mapping else flan.type_texture) }}
             </div>
             <div class="form-group">
                 <button type="submit" class="btn btn-primary">Enregistrer</button>
@@ -323,19 +408,29 @@
     {% endif %}
 {% endmacro %}
 
-
 <!-- EVALUATION -->
 {% macro afficher_evaluation(evaluation, current_user, form, current_page, delete_form, validate_form) %}
     <div class="card">
         <div class="card-content">
             <div class="card-header">
-                <h2>{{ evaluation.flan.etablissement.nom | enlever_accents }}</h2>
-                <h3>{{ evaluation.flan.nom | enlever_accents }}</h3>
+                {% if evaluation is mapping %}
+                    {# Si c'est un dictionnaire (JSON) #}
+                    <h2>{{ evaluation.flan.etablissement.nom | enlever_accents }}</h2>
+                    <h3>{{ evaluation.flan.nom | enlever_accents }}</h3>
+                {% else %}
+                    {# Si c'est un objet SQLAlchemy #}
+                    <h2>{{ evaluation.flan.etablissement.nom | enlever_accents }}</h2>
+                    <h3>{{ evaluation.flan.nom | enlever_accents }}</h3>
+                {% endif %}
                 {{ afficher_badge_statut(evaluation, current_user) }}
             </div>
             <div class="evaluation-date-container">
                 <small class="evaluation-date">
-                    {{ evaluation.date_creation.strftime('%d/%m/%Y') }}
+                    {% if evaluation is mapping %}
+                        {{ evaluation.date_creation }}
+                    {% else %}
+                        {{ evaluation.date_creation.strftime('%d/%m/%Y') }}
+                    {% endif %}
                 </small>
             </div>
             {% if current_user.is_authenticated and (current_user.id_user == evaluation.id_user or current_user.is_admin) %}
@@ -350,22 +445,16 @@
             {% else %}
                 {{ afficher_criteres_evaluation(evaluation) }}
             {% endif %}
-            <a href="{{ url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval) }}" class="btn btn-primary">Voir plus</a>
+            {% if evaluation is mapping %}
+                {# Si c'est un dictionnaire (JSON) #}
+                <a href="{{ evaluation.url }}" class="btn btn-primary">Voir plus</a>
+            {% else %}
+                {# Si c'est un objet SQLAlchemy #}
+                <a href="{{ url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval) }}" class="btn btn-primary">Voir plus</a>
+            {% endif %}
         </div>
     </div>
-    <script>
-        function editEvaluation(idEval) {
-            document.getElementById('evaluation-' + idEval + '-display').style.display = 'none';
-            document.getElementById('evaluation-' + idEval + '-edit').style.display = 'block';
-        }
-        function cancelEdit(idEval) {
-            document.getElementById('evaluation-' + idEval + '-display').style.display = 'block';
-            document.getElementById('evaluation-' + idEval + '-edit').style.display = 'none';
-        }
-    </script>
 {% endmacro %}
-
-
 
 {% macro afficher_formulaire_edition_evaluation(evaluation, form) %}
     {% if form is not none %}
@@ -374,23 +463,23 @@
             {{ form.hidden_tag() }}
             <div class="form-group">
                 <label for="eval-detail-visuel" class="form-label">Visuel</label>
-                {{ form.visuel(class="form-control", id="eval-detail-visuel") }}
+                {{ form.visuel(class="form-control", id="eval-detail-visuel", value=evaluation.visuel) }}
             </div>
             <div class="form-group">
                 <label for="eval-detail-pate" class="form-label">Pâte</label>
-                {{ form.pate(class="form-control", id="eval-detail-pate") }}
+                {{ form.pate(class="form-control", id="eval-detail-pate", value=evaluation.pate) }}
             </div>
             <div class="form-group">
                 <label for="eval-detail-texture" class="form-label">Texture</label>
-                {{ form.texture(class="form-control", id="eval-detail-texture") }}
+                {{ form.texture(class="form-control", id="eval-detail-texture", value=evaluation.texture) }}
             </div>
             <div class="form-group">
                 <label for="eval-detail-gout" class="form-label">Goût</label>
-                {{ form.gout(class="form-control", id="eval-detail-gout") }}
+                {{ form.gout(class="form-control", id="eval-detail-gout", value=evaluation.gout) }}
             </div>
             <div class="form-group">
                 <label for="eval-detail-description" class="form-label">Description</label>
-                {{ form.description(class="form-control", id="eval-detail-description") }}
+                {{ form.description(class="form-control", id="eval-detail-description", value=evaluation.description) }}
             </div>
             <div class="form-group">
                 <button type="submit" class="btn btn-primary">Enregistrer</button>
@@ -405,45 +494,85 @@
     <div class="criteria">
         <div class="criterion">
             <span class="criterion-name">Visuel :</span>
-            <span class="criterion-value">{{ evaluation.visuel }}/5</span>
+            <span class="criterion-value">
+                {% if evaluation is mapping %}
+                    {{ evaluation.visuel }}/5
+                {% else %}
+                    {{ evaluation.visuel }}/5
+                {% endif %}
+            </span>
         </div>
         <div class="criterion">
             <span class="criterion-name">Pâte :</span>
-            <span class="criterion-value">{{ evaluation.pate }}/5</span>
+            <span class="criterion-value">
+                {% if evaluation is mapping %}
+                    {{ evaluation.pate }}/5
+                {% else %}
+                    {{ evaluation.pate }}/5
+                {% endif %}
+            </span>
         </div>
         <div class="criterion">
             <span class="criterion-name">Texture :</span>
-            <span class="criterion-value">{{ evaluation.texture }}/5</span>
+            <span class="criterion-value">
+                {% if evaluation is mapping %}
+                    {{ evaluation.texture }}/5
+                {% else %}
+                    {{ evaluation.texture }}/5
+                {% endif %}
+            </span>
         </div>
         <div class="criterion">
             <span class="criterion-name">Goût :</span>
-            <span class="criterion-value">{{ evaluation.gout }}/5</span>
+            <span class="criterion-value">
+                {% if evaluation is mapping %}
+                    {{ evaluation.gout }}/5
+                {% else %}
+                    {{ evaluation.gout }}/5
+                {% endif %}
+            </span>
         </div>
     </div>
-    {% if evaluation.gout is not none and evaluation.texture is not none and evaluation.visuel is not none and evaluation.pate is not none %}
-        {% set moyenne = (evaluation.gout + evaluation.texture + evaluation.visuel + evaluation.pate) / 4 %}
-        <div class="moyenne">
-            <span class="moyenne-value">{{ moyenne }}/5</span>
-        </div>
+    {% if evaluation is mapping %}
+        {# Si c'est un dictionnaire (JSON) #}
+        {% if evaluation.gout is not none and evaluation.texture is not none and evaluation.visuel is not none and evaluation.pate is not none %}
+            {% set moyenne = (evaluation.gout + evaluation.texture + evaluation.visuel + evaluation.pate) / 4 %}
+            <div class="moyenne">
+                <span class="moyenne-value">{{ "%.2f"|format(moyenne) }}/5</span>
+            </div>
+        {% else %}
+            <div class="moyenne">
+                <span class="moyenne-value">N/A</span>
+            </div>
+        {% endif %}
+        <p class="type">{{ evaluation.description }}</p>
     {% else %}
-        <div class="moyenne">
-            <span class="moyenne-value">N/A</span>
-        </div>
+        {# Si c'est un objet SQLAlchemy #}
+        {% if evaluation.gout is not none and evaluation.texture is not none and evaluation.visuel is not none and evaluation.pate is not none %}
+            {% set moyenne = (evaluation.gout + evaluation.texture + evaluation.visuel + evaluation.pate) / 4 %}
+            <div class="moyenne">
+                <span class="moyenne-value">{{ "%.2f"|format(moyenne) }}/5</span>
+            </div>
+        {% else %}
+            <div class="moyenne">
+                <span class="moyenne-value">N/A</span>
+            </div>
+        {% endif %}
+        <p class="type">{{ evaluation.description }}</p>
     {% endif %}
-    <p class="type">{{ evaluation.description }}</p>
 {% endmacro %}
 
 {% macro afficher_grille(objet_type, objets, current_user=None, form_edit=None, form_ajout=None, etablissement=None, flan=None, delete_form=None, validate_form=None) %}
     <div class="grille">
-    {% if not objets %}
-    <p>Vide, contribuez !</p>
-    {%  endif %}
-        {% for objet in objets %}
-            {{ afficher_objet(objet_type, objet, current_user, form_ajout, current_page, delete_form, validate_form) }}
-        {% endfor %}
+        {% if not objets %}
+            <p>Vide, contribuez !</p>
+        {% else %}
+            {% for objet in objets %}
+                {{ afficher_objet(objet_type, objet, current_user, form_edit, current_page, delete_form, validate_form) }}
+            {% endfor %}
+        {% endif %}
     </div>
 {% endmacro %}
-
 
 {% macro afficher_objet(objet_type, objet, current_user=None, form_edit=None, current_page='', delete_form=None, validate_form=None) %}
     {% if objet_type == 'etablissement' %}
@@ -455,19 +584,15 @@
     {% endif %}
 {% endmacro %}
 
-
-
-
-
 {% macro afficher_bouton_ajout(objet_type, current_user, etablissement=None, form_ajout=None, flan=None) %}
     {% if objet_type == 'etablissement' %}
         <div class="card-content">
-            <h3>Ajouter un etablissement</h3>
+            <h3>Ajouter un établissement</h3>
             {% if current_user.is_authenticated %}
                 {{ proposer_etablissement(form_ajout, url_for('maps.ajouter_etablissement'), current_user) }}
             {% else %}
                 <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn btn-primary">
-                    Ajouter un etablissement (connectez-vous)
+                    Ajouter un établissement (connectez-vous)
                 </a>
             {% endif %}
         </div>
@@ -484,12 +609,12 @@
         </div>
     {% elif objet_type == 'evaluation' and flan %}
         <div class="card-content">
-            <h3>Ajouter une evaluation</h3>
+            <h3>Ajouter une évaluation</h3>
             {% if current_user.is_authenticated %}
                 {{ proposer_evaluation(form_ajout, url_for('main.evaluer_flan', id_flan=flan.id_flan)) }}
             {% else %}
                 <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn btn-primary">
-                    Ajouter une evaluation (connectez-vous)
+                    Ajouter une évaluation (connectez-vous)
                 </a>
             {% endif %}
         </div>
@@ -535,26 +660,20 @@
         <div class="form-group">
             <label for="search" class="form-label">Recherche d'établissement</label>
             <input type="text" id="search" class="form-control" placeholder="Rechercher un établissement">
-
         </div>
         {{ afficher_champ_formulaire(form.description) }}
         {% if current_user.is_admin %}
-<!-- Utilise une div conteneur pour regrouper les cases -->
-<div class="form-check-container">
-    <div class="form-check-inline">
-        <input type="checkbox" id="{{ form.label.id }}" name="{{ form.label.name }}" class="form-check-input" {{ form.label() }}>
-        <label class="form-check-label" for="{{ form.label.id }}">{{ form.label.label }}</label>
-    </div>
-    <div class="form-check-inline">
-        <input type="checkbox" id="{{ form.visite.id }}" name="{{ form.visite.name }}" class="form-check-input" {{ form.visite() }}>
-        <label class="form-check-label" for="{{ form.visite.id }}">{{ form.visite.label }}</label>
-    </div>
-</div>
-
-
-
+            <div class="form-check-container">
+                <div class="form-check-inline">
+                    <input type="checkbox" id="{{ form.label.id }}" name="{{ form.label.name }}" class="form-check-input" {{ form.label() }}>
+                    <label class="form-check-label" for="{{ form.label.id }}">{{ form.label.label }}</label>
+                </div>
+                <div class="form-check-inline">
+                    <input type="checkbox" id="{{ form.visite.id }}" name="{{ form.visite.name }}" class="form-check-input" {{ form.visite() }}>
+                    <label class="form-check-label" for="{{ form.visite.id }}">{{ form.visite.label }}</label>
+                </div>
+            </div>
         {% endif %}
-        <!-- Champs cachés avec préfixe -->
         <input type="hidden" id="ajout-etab-nom" name="ajout-etab-nom" value="{{ form.nom.data }}">
         <input type="hidden" id="ajout-etab-adresse" name="ajout-etab-adresse" value="{{ form.adresse.data }}">
         <input type="hidden" id="ajout-etab-code_postal" name="ajout-etab-code_postal" value="{{ form.code_postal.data }}">
@@ -580,6 +699,7 @@
         </div>
     </form>
 {% endmacro %}
+
 {% macro modifier_etablissement(form, action_url) %}
     <form method="POST" action="{{ action_url }}" class="form-container">
         {{ form.hidden_tag() }}
@@ -591,37 +711,32 @@
         {{ afficher_champ_formulaire(form.latitude) }}
         {{ afficher_champ_formulaire(form.longitude) }}
         {{ afficher_champ_formulaire(form.type_etab) }}
-
         {% if current_user.is_admin %}
-            <!-- Labellisé (radios en ligne) -->
             <div class="form-group">
                 <label class="form-label">Labellisé</label>
                 <div class="form-check form-check-inline">
-                    <input type="radio" id="label-oui" name="label" value="Oui" class="form-check-input" {% if form.label.data == 'Oui' %}checked{% endif %}>
+                    <input type="radio" id="label-oui" name="label" value="Oui" class="form-check-input">
                     <label class="form-check-label" for="label-oui">Oui</label>
                 </div>
                 <div class="form-check form-check-inline">
-                    <input type="radio" id="label-non" name="label" value="Non" class="form-check-input" {% if form.label.data == 'Non' %}checked{% endif %}>
+                    <input type="radio" id="label-non" name="label" value="Non" class="form-check-input">
                     <label class="form-check-label" for="label-non">Non</label>
                 </div>
             </div>
-
-            <!-- Visité (radios en ligne) -->
             <div class="form-group">
                 <label class="form-label">Visité</label>
                 <div class="form-check form-check-inline">
-                    <input type="radio" id="visite-oui" name="visite" value="Oui" class="form-check-input" {% if form.visite.data == 'Oui' %}checked{% endif %}>
+                    <input type="radio" id="visite-oui" name="visite" value="Oui" class="form-check-input">
                     <label class="form-check-label" for="visite-oui">Oui</label>
                 </div>
                 <div class="form-check form-check-inline">
-                    <input type="radio" id="visite-non" name="visite" value="Non" class="form-check-input" {% if form.visite.data == 'Non' %}checked{% endif %}>
+                    <input type="radio" id="visite-non" name="visite" value="Non" class="form-check-input">
                     <label class="form-check-label" for="visite-non">Non</label>
                 </div>
             </div>
         {% endif %}
     </form>
 {% endmacro %}
-
 
 {% macro modifier_flan(form, action_url) %}
     <form method="POST" action="{{ action_url }}" class="form-container">

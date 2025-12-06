@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Fonction pour recharger les établissements selon les filtres
-async function loadEtablissements() {
+async function loadEtablissements(format = 'json') {
     try {
 
         const params = new URLSearchParams();
@@ -94,22 +94,36 @@ async function loadEtablissements() {
         if (activeFilters.type_saveur && activeFilters.type_saveur !== 'tous') params.append('type_saveur', activeFilters.type_saveur);
         if (activeFilters.prix && activeFilters.prix !== 'tous') params.append('prix', activeFilters.prix);
         const response = await fetch(`/api/etablissements?${params.toString()}`);
-        if (!response.ok) throw new Error("Erreur lors du chargement des établissements.");
-        return await response.json();
+
+        // Vérifie le Content-Type de la réponse
+        const contentType = response.headers.get('Content-Type');
+        if (format === 'html' && !contentType.includes('text/html')) {
+            throw new Error(`Type de contenu inattendu: ${contentType}. Attendu: text/html`);
+        }
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Erreur HTTP ${response.status}: ${errorText}`);
+        }
+
+        return format === 'html' ? await response.text() : await response.json();
     } catch (error) {
-        console.error("Erreur:", error);
-        return [];
+        console.error("Erreur dans loadEtablissements:", error);
+        return format === 'html'
+            ? `<div class="alert alert-danger">Erreur lors du chargement: ${error.message}</div>`
+            : [];
     } finally {
 
     }
 }
 
 async function updateMapAndMarkers() {
-    const newEtablissements = await loadEtablissements();
-    if (!newEtablissements || newEtablissements.length === 0) {
-        console.warn("Aucun établissement trouvé avec ces filtres.");
-        return;
-    }
+    try {
+        const newEtablissements = await loadEtablissements('json'); // Toujours JSON pour la carte
+        if (!newEtablissements || newEtablissements.length === 0) {
+            console.warn("Aucun établissement trouvé avec ces filtres.");
+            return;
+        }
 
     // Supprime les anciens marqueurs
     markers.forEach(marker => map.removeLayer(marker));
@@ -176,8 +190,25 @@ async function updateMapAndMarkers() {
         if (etablissements.length === 1) {
             map.setView([etablissements[0].latitude, etablissements[0].longitude], 14);
         } else {
-            map.fitBounds(bounds);
+            data.forEach(etab => {
+                html += `
+                    <div class="carte">
+                        <div class="card-content">
+                            <h2>${etab.nom}</h2>
+                            <p>${etab.adresse}, ${etab.ville}</p>
+                            <p>${etab.flans_count} flan${etab.flans_count > 1 ? 's' : ''}</p>
+                            <a href="${etab.url}" class="btn btn-primary">Voir plus</a>
+                        </div>
+                    </div>
+                `;
+            });
         }
+        html += '</div>';
+        document.getElementById('results-grid').innerHTML = html;
+    } catch (error) {
+        console.error("Erreur:", error);
+        document.getElementById('results-grid').innerHTML =
+            `<div class="alert alert-danger">Erreur: ${error.message}</div>`;
     }
 }
 
@@ -203,6 +234,7 @@ window.initAutocomplete = function() {
         document.getElementById('ajout-etab-adresse').value = place.formatted_address || '';
         document.getElementById('ajout-etab-latitude').value = place.geometry.location.lat();
         document.getElementById('ajout-etab-longitude').value = place.geometry.location.lng();
+
         fetch('/verifier_etablissement', {
             method: 'POST',
             headers: {
@@ -239,6 +271,7 @@ window.initAutocomplete = function() {
             errorMessage.textContent = `Erreur: ${error.message}`;
             document.querySelector('.form-container').prepend(errorMessage);
         });
+
         fetch('/extraire_infos_adresse', {
             method: 'POST',
             headers: {'Content-Type': 'application/json', 'X-CSRFToken': csrfToken},
@@ -273,6 +306,7 @@ window.initMap = function() {
     };
     legend.addTo(map);
     updateMapAndMarkers();
+    updateResultsGrid();
 };
 
 // Fonction pour initialiser l'autocomplétion et la carte

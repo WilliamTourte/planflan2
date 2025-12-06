@@ -1,120 +1,165 @@
-from flask import Blueprint, session, render_template, redirect, url_for, request, current_app, flash
+from flask import Blueprint, session, render_template, redirect, url_for, request, current_app, flash, render_template_string, make_response, jsonify
+
 from flask_login import login_required, current_user, AnonymousUserMixin
 from sqlalchemy.exc import IntegrityError
 from app.forms import EvalForm, NewFlanForm, RechercheForm, UpdateProfileForm, EtabForm, DeleteForm, ValidateForm
 from app.models import Etablissement, Flan, Evaluation, Utilisateur
 from app import db, bcrypt
+from app.outils import afficher_etablissements
 
 main_bp = Blueprint('main', __name__)
 
-
+## ROUTES PRINCIPALES
 @main_bp.route('/')
 def index():
-    from app.outils import afficher_etablissements
-    form_recherche=RechercheForm()
- 
-    resultats = Etablissement.query.all()
-    etablissements, etablissements_json = afficher_etablissements(resultats)
-    return render_template('index.html',
-                           etablissements=etablissements,
-                           etablissements_json=etablissements_json,
-                           google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
+    form_recherche = RechercheForm()
+    etablissements = Etablissement.query.all()
+    return render_template(
+        'index.html',
+        etablissements=etablissements,
+        etablissements_json=[etab.to_dict() for etab in etablissements],
+        google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
+        form_recherche=form_recherche
+    )
 
-                           form_recherche=form_recherche)
-
-def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
-    print("Form data received:", form.data)
-    visuel = float(str(form.visuel.data).replace(',', '.')) if form.visuel.data is not None else None
-    texture = float(str(form.texture.data).replace(',', '.')) if form.texture.data is not None else None
-    pate = float(str(form.pate.data).replace(',', '.')) if form.pate.data is not None else None
-    gout = float(str(form.gout.data).replace(',', '.')) if form.gout.data is not None else None
-    description = form.description.data if form.description.data is not None else ''
-
-    evaluation = Evaluation.query.filter_by(id_flan=id_flan, id_user=id_user).first()
-    if evaluation:
-        # Toujours mettre à jour tous les champs, même s'ils n'ont pas changé
-        evaluation.visuel = visuel
-        evaluation.texture = texture
-        evaluation.pate = pate
-        evaluation.gout = gout
-        evaluation.description = description
-        moyenne = (
-            float(evaluation.visuel or 0) +
-            float(evaluation.texture or 0) +
-            float(evaluation.pate or 0) +
-            float(evaluation.gout or 0)
-        ) / 4
-        evaluation.moyenne = moyenne
-    else:
-        moyenne = (
-            float(visuel or 0) +
-            float(texture or 0) +
-            float(pate or 0) +
-            float(gout or 0)
-        ) / 4
-        evaluation = Evaluation(
-            visuel=visuel,
-            texture=texture,
-            pate=pate,
-            gout=gout,
-            description=description,
-            id_flan=id_flan,
-            id_user=id_user,
-            moyenne=moyenne
-        )
-    if is_admin:
-        evaluation.statut = 'VALIDE'
-    db.session.add(evaluation)
-    db.session.commit()
-    return evaluation
-    
 @main_bp.route('/api/etablissements', methods=['GET'])
 def api_etablissements():
-    # Récupère TOUS les paramètres de filtre
-    nom = request.args.get('nom', '')
-    visite = request.args.get('visite', '')
-    labellise = request.args.get('labellise', '')
-    ville = request.args.get('ville', '')
-    type_flan = request.args.get('type_flan', '')
-    type_pate = request.args.get('type_pate', 'tous')
-    type_saveur = request.args.get('type_saveur', 'tous')
-    prix = request.args.get('prix', 'tous')
+    try:
+        # Récupère les paramètres de filtre
+        nom = request.args.get('nom', '')
+        visite = request.args.get('visite', '')
+        labellise = request.args.get('labellise', '')
+        ville = request.args.get('ville', '')
+        type_flan = request.args.get('type_flan', '')
+        type_pate = request.args.get('type_pate', 'tous')
+        type_saveur = request.args.get('type_saveur', 'tous')
+        prix = request.args.get('prix', 'tous')
+        format = request.args.get('format', 'json')  # 'html' ou 'json'
 
-    # Applique les filtres
-    query = Etablissement.query.join(Flan)
-    if nom:
-        query = query.filter(Etablissement.nom.ilike(f'%{nom}%'))
-    if visite == 'oui':
-        query = query.filter(Etablissement.visite == True)
-    elif visite == 'non':
-        query = query.filter(Etablissement.visite == False)
-    if labellise == 'oui':
-        query = query.filter(Etablissement.label == True)
-    elif labellise == 'non':
-        query = query.filter(Etablissement.label == False)
+        # Applique les filtres
+        query = Etablissement.query.join(Flan)
+        if nom:
+            query = query.filter(Etablissement.nom.ilike(f'%{nom}%'))
+        if visite == 'oui':
+            query = query.filter(Etablissement.visite == True)
+        elif visite == 'non':
+            query = query.filter(Etablissement.visite == False)
+        if labellise == 'oui':
+            query = query.filter(Etablissement.label == True)
+        elif labellise == 'non':
+            query = query.filter(Etablissement.label == False)
+        if ville:
+            query = query.filter(Etablissement.ville.ilike(f'%{ville}%'))
+        if type_flan:
+            query = query.filter(Flan.type == type_flan)
+        if type_pate != 'tous':
+            query = query.filter(Flan.type_pate == type_pate)
+        if type_saveur != 'tous':
+            query = query.filter(Flan.type_saveur == type_saveur)
+        if prix != 'tous':
+            if prix == '0':
+                query = query.filter(Flan.prix < 2.5)
+            elif prix == '2.5':
+                query = query.filter(Flan.prix >= 2.5, Flan.prix < 5)
+            elif prix == '5':
+                query = query.filter(Flan.prix >= 5)
+
+        # Récupère les résultats uniques
+        etablissements = []
+        seen = set()
+        for etab, flan in query.all():
+            if etab.id_etab not in seen:
+                seen.add(etab.id_etab)
+                etablissements.append(etab)
+
+        # Renvoie HTML ou JSON
+        if format == 'html':
+            html = render_template(
+                'macros/grille_etablissements.html',
+                etablissements=etablissements,
+                current_user=current_user
+            )
+            response = make_response(html)
+            response.headers['Content-Type'] = 'text/html; charset=utf-8'
+            return response
+        else:
+            return jsonify([etab.to_dict() for etab in etablissements])
+
+    except Exception as e:
+        # En cas d'erreur, renvoie toujours du JSON avec un message d'erreur
+        return jsonify({'error': str(e)}), 500
+
+@main_bp.route('/rechercher', methods=['GET', 'POST'])
+def rechercher():
+    form_recherche = RechercheForm(prefix='recherche')
+    resultats = Etablissement.query.all()
+    etablissements, etablissements_json = afficher_etablissements(resultats)
+    
+    if form_recherche.validate_on_submit():
+        ville = form_recherche.ville.data
+        type_flan = form_recherche.type.data
+        
+        query = Etablissement.query
+        if ville:
+            query = query.filter(Etablissement.ville.ilike(f'%{ville}%'))
+        if type_flan:
+            query = query.join(Flan).filter(Flan.type == type_flan)
+        
+        resultats = query.all()
+        etablissements, etablissements_json = afficher_etablissements(resultats)
+        
+        # Redirige vers liste_etablissements avec les résultats
+        return redirect(url_for('main.liste_etablissements', ville=ville, type=type_flan))
+    
+    return render_template(
+        'rechercher.html',
+        form_recherche=form_recherche,
+        etablissements=etablissements,
+        etablissements_json=etablissements_json
+    )
+
+
+@main_bp.route('/liste_etablissements', methods=['GET'])
+def liste_etablissements():
+    ville = request.args.get('ville', '')
+    type_flan = request.args.get('type', '')
+    
+    query = Etablissement.query
     if ville:
         query = query.filter(Etablissement.ville.ilike(f'%{ville}%'))
     if type_flan:
-        query = query.filter(Flan.type == type_flan)
-    if type_pate != 'tous':
-        query = query.filter(Flan.type_pate == type_pate)
-    if type_saveur != 'tous':
-        query = query.filter(Flan.type_saveur == type_saveur)
-    if prix != 'tous':
-        if prix == '0':
-            query = query.filter(Flan.prix < 2.5)
-        elif prix == '2.5':
-            query = query.filter(Flan.prix >= 2.5, Flan.prix < 5)
-        elif prix == '5':
-            query = query.filter(Flan.prix >= 5)
-
-    # Récupère les résultats
+        query = query.join(Flan).filter(Flan.type == type_flan)
+    
     resultats = query.all()
     etablissements, etablissements_json = afficher_etablissements(resultats)
-    return etablissements_json
+    
+    return render_template(
+        'liste_etablissements.html',
+        etablissements=etablissements,
+        etablissements_json=etablissements_json,
+        google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY']
+    )
 
 
+#Route pour générer le CONTENT d'une infowindow, utilisé dans maps_autocomplete.js
+@main_bp.route('/get_infowindow_content')
+def get_infowindow_content():
+    id_etab = request.args.get('id_etab', type=int)
+    etablissement = Etablissement.query.get(id_etab)
+    if not etablissement:
+        return "Détails non disponibles", 404
 
+    # Génère le contenu de l'infowindow
+    content = render_template_string("""
+        {% from 'macros.html' import afficher_etablissement_infowindow %}
+        {{ afficher_etablissement_infowindow(
+            etablissement,
+            url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab)
+        ) }}
+    """, etablissement=etablissement)
+    return content
+
+### DASHBOARD
 @main_bp.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
@@ -162,85 +207,8 @@ def dashboard():
                            pending_flans=pending_flans,
                            pending_etablissements=pending_etablissements)
 
-from flask import redirect, url_for, request
-from app.outils import afficher_etablissements
 
-@main_bp.route('/rechercher', methods=['GET', 'POST'])
-def rechercher():
-    form_recherche = RechercheForm(prefix='recherche')
-
-    # Récupère tous les établissements par défaut
-    resultats = Etablissement.query.all()
-    etablissements, etablissements_json = afficher_etablissements(resultats)
-
-    if form_recherche.validate_on_submit() or (request.method == 'GET' and any(request.args.get(k) for k in ['ville', 'type'])):
-        # Récupère les paramètres de recherche
-        ville = request.args.get('ville') or (form_recherche.ville.data if form_recherche.validate_on_submit() else None)
-        type_flan = request.args.get('type') or (form_recherche.type.data if form_recherche.validate_on_submit() else None)
-
-        # Applique les filtres
-        query = Etablissement.query
-        if ville:
-            query = query.filter(Etablissement.ville.ilike(f'%{ville}%'))
-        if type_flan:
-            query = query.join(Flan).filter(Flan.type == type_flan)
-
-        resultats = query.all()
-        etablissements, etablissements_json = afficher_etablissements(resultats)
-
-        # Redirige vers liste_etablissements avec les résultats
-        return redirect(url_for('main.liste_etablissements', **request.args))
-
-    return render_template(
-        'rechercher.html',
-        form_recherche=form_recherche,
-        etablissements=etablissements,
-        etablissements_json=etablissements_json  # Toujours défini
-    )
-
-@main_bp.route('/liste_etablissements', methods=['GET'])
-def liste_etablissements():
-    # Récupère les paramètres de recherche depuis l'URL
-    ville = request.args.get('ville', '')
-    type_flan = request.args.get('type', '')
-
-    # Applique les filtres (identique à la route /rechercher)
-    query = Etablissement.query
-    if ville:
-        query = query.filter(Etablissement.ville.ilike(f'%{ville}%'))
-    if type_flan:
-        query = query.join(Flan).filter(Flan.type == type_flan)
-
-    resultats = query.all()
-    etablissements, etablissements_json = afficher_etablissements(resultats)
-
-    return render_template(
-        'liste_etablissements.html',
-        etablissements=etablissements,
-        etablissements_json=etablissements_json,
-        google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY']
-    )
-
-from flask import render_template_string
-
-#Route pour générer le CONTENT d'une infowindow, utilisé dans maps_autocomplete.js
-@main_bp.route('/get_infowindow_content')
-def get_infowindow_content():
-    id_etab = request.args.get('id_etab', type=int)
-    etablissement = Etablissement.query.get(id_etab)
-    if not etablissement:
-        return "Détails non disponibles", 404
-
-    # Génère le contenu de l'infowindow
-    content = render_template_string("""
-        {% from 'macros.html' import afficher_etablissement_infowindow %}
-        {{ afficher_etablissement_infowindow(
-            etablissement,
-            url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab)
-        ) }}
-    """, etablissement=etablissement)
-    return content
-
+### Routes établissement, flan, évaluation
 
 @main_bp.route('/etablissement/<int:id_etab>', methods=['GET', 'POST'])
 def afficher_etablissement_unique(id_etab):
@@ -385,6 +353,7 @@ def supprimer_flan(id_flan):
         db.session.rollback()
         flash('Une erreur est survenue lors de la suppression du flan.', 'danger')
     return redirect(url_for('main.dashboard'))
+
 @main_bp.route('/flan/<int:id_flan>/evaluer', methods=['GET', 'POST'])
 @login_required
 def evaluer_flan(id_flan):
@@ -436,6 +405,54 @@ def afficher_evaluation_unique(id_eval):
                            delete_form=delete_form,  # <-- Passe delete_form au template
                             validate_form=validate_form,
                            current_page='page_evaluation')
+
+
+
+def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
+    print("Form data received:", form.data)
+    visuel = float(str(form.visuel.data).replace(',', '.')) if form.visuel.data is not None else None
+    texture = float(str(form.texture.data).replace(',', '.')) if form.texture.data is not None else None
+    pate = float(str(form.pate.data).replace(',', '.')) if form.pate.data is not None else None
+    gout = float(str(form.gout.data).replace(',', '.')) if form.gout.data is not None else None
+    description = form.description.data if form.description.data is not None else ''
+
+    evaluation = Evaluation.query.filter_by(id_flan=id_flan, id_user=id_user).first()
+    if evaluation:
+        # Toujours mettre à jour tous les champs, même s'ils n'ont pas changé
+        evaluation.visuel = visuel
+        evaluation.texture = texture
+        evaluation.pate = pate
+        evaluation.gout = gout
+        evaluation.description = description
+        moyenne = (
+            float(evaluation.visuel or 0) +
+            float(evaluation.texture or 0) +
+            float(evaluation.pate or 0) +
+            float(evaluation.gout or 0)
+        ) / 4
+        evaluation.moyenne = moyenne
+    else:
+        moyenne = (
+            float(visuel or 0) +
+            float(texture or 0) +
+            float(pate or 0) +
+            float(gout or 0)
+        ) / 4
+        evaluation = Evaluation(
+            visuel=visuel,
+            texture=texture,
+            pate=pate,
+            gout=gout,
+            description=description,
+            id_flan=id_flan,
+            id_user=id_user,
+            moyenne=moyenne
+        )
+    if is_admin:
+        evaluation.statut = 'VALIDE'
+    db.session.add(evaluation)
+    db.session.commit()
+    return evaluation
 
 @main_bp.route('/valider_evaluation/<int:id_eval>', methods=['POST'])
 @login_required

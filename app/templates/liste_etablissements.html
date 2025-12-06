@@ -2,6 +2,7 @@
 {% block scripts_head %}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<<<<<<< HEAD
 {% endblock %}
 {% block content %}
     <!-- Données passées à JavaScript -->
@@ -56,6 +57,7 @@
     </script>
 
 
+
     <div id="map">
         <div id="filter-bubbles">
             <div class="filter-group">
@@ -91,18 +93,76 @@
             </div>
         </div>
     </div>
-    <div class="container" style="margin-top: 20px;">
-        <h2>Résultats de la recherche</h2>
-        <div id="results-grid">
-            {% if etablissements %}
-                {{ afficher_grille('etablissement', etablissements, current_user) }}
-            {% else %}
-                <p>Aucun établissement trouvé.</p>
+    <div class="container">
+        <h2>Résultats de la recherche
+            {% if request.args.get('ville') or request.args.get('type') %}
+                pour
+                {% if request.args.get('ville') %}"{{ request.args.get('ville') }}"{% endif %}
+                {% if request.args.get('ville') and request.args.get('type') %} et {% endif %}
+                {% if request.args.get('type') %}"{{ request.args.get('type') }}"{% endif %}
             {% endif %}
+        </h2>
+        <div id="results-grid">
+            {# La grille sera chargée dynamiquement via AJAX #}
         </div>
     </div>
+<<<<<<< HEAD
 {% endblock %}
 
 {% block scripts %}
+=======
+    <script>
+        // URL de base pour les liens (générée côté serveur)
+        window.baseUrl = "{{ url_for('main.afficher_etablissement_unique', id_etab=999999) }}".split('/999999')[0];
+        // Données initiales pour les filtres
+        window.filterSettings = {
+            activeFilters: {
+                type_pate: 'tous',
+                type_saveur: 'tous',
+                prix: 'tous',
+                ville: "{{ request.args.get('ville', '') }}",
+                type: "{{ request.args.get('type', '') }}"
+            }
+        };
+        window.filterLabels = {
+            type_pate: {
+                tous: 'Pâte',
+                FEUILLETEE: 'Feuilletée',
+                BRISEE: 'Brisée',
+                SUCREE: 'Sucrée',
+                SABLEE: 'Sablée',
+                MIXTE: 'Mixte'
+            },
+            type_saveur: {
+                tous: 'Saveur',
+                VANILLE: 'Vanille',
+                NOIX: 'Noix',
+                FRUITS: 'Fruits',
+                INSOLITE: 'Insolite',
+                NATURE: 'Nature'
+            },
+            prix: {
+                tous: 'Prix',
+                '0': 'Moins de 2€50',
+                '2.5': '2€50 - 5€',
+                '5': 'Plus de 5€'
+            }
+        };
+    </script>
+    <script>
+        // Charge la grille initialement via AJAX
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch(`/api/etablissements?format=html&ville=${encodeURIComponent("{{ request.args.get('ville', '') }}")}&type=${encodeURIComponent("{{ request.args.get('type', '') }}")}`)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('results-grid').innerHTML = html;
+                })
+                .catch(error => {
+                    console.error("Erreur lors du chargement initial de la grille:", error);
+                    document.getElementById('results-grid').innerHTML = '<p class="text-danger">Erreur lors du chargement des résultats.</p>';
+                });
+        });
+    </script>
+>>>>>>> d75d395 (Travail sur JSON. Distinction HTML/JSON à améliorer)
     <script src="{{ url_for('static', filename='js/maps_autocomplete.js') }}"></script>
 {% endblock %}
