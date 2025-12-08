@@ -21,6 +21,73 @@ def index():
         google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
         form_recherche=form_recherche
     )
+    
+@main_bp.route('/rechercher', methods=['GET', 'POST'])
+def rechercher():
+    form_recherche = RechercheForm()
+    resultats = Etablissement.query.all()
+    etablissements, etablissements_json = afficher_etablissements(resultats)
+
+    if form_recherche.validate_on_submit():
+        # Récupération des données du formulaire
+        nom = form_recherche.nom.data
+        ville = form_recherche.ville.data
+        type_saveur = form_recherche.type_saveur.data
+        type_pate = form_recherche.type_pate.data
+        type_texture = form_recherche.type_texture.data
+        prix = form_recherche.prix.data
+        visite = form_recherche.visite.data
+        labellise = form_recherche.labellise.data
+
+        # Construction de la requête de base
+        query = Etablissement.query.join(Flan)
+
+        # Application des filtres
+        if nom:
+            query = query.filter(Etablissement.nom.ilike(f'%{nom}%'))
+        if ville:
+            query = query.filter(Etablissement.ville.ilike(f'%{ville}%'))
+        if type_saveur and type_saveur != 'tous':
+            query = query.filter(Flan.type_saveur == type_saveur)
+        if type_pate and type_pate != 'tous':
+            query = query.filter(Flan.type_pate == type_pate)
+        if type_texture and type_texture != 'tous':
+            query = query.filter(Flan.type_texture == type_texture)
+        if prix and prix != 'tous':
+            if prix == '0':
+                query = query.filter(Flan.prix < 2.5)
+            elif prix == '2.5':
+                query = query.filter(Flan.prix >= 2.5, Flan.prix < 5)
+            elif prix == '5':
+                query = query.filter(Flan.prix >= 5)
+        if visite and visite != 'tous':
+            query = query.filter(Etablissement.visite == (visite == 'oui'))
+        if labellise and labellise != 'tous':
+            query = query.filter(Etablissement.label == (labellise == 'oui'))
+
+        # Exécution de la requête et récupération des résultats
+        resultats = query.all()
+        etablissements, etablissements_json = afficher_etablissements(resultats)
+
+        # Redirection vers liste_etablissements avec les paramètres de recherche
+        return redirect(url_for('main.liste_etablissements',
+                              nom=nom,
+                              ville=ville,
+                              type_saveur=type_saveur,
+                              type_pate=type_pate,
+                              type_texture=type_texture,
+                              prix=prix,
+                              visite=visite,
+                              labellise=labellise))
+
+    return render_template(
+        'rechercher.html',
+        form_recherche=form_recherche,
+        etablissements=etablissements,
+        etablissements_json=etablissements_json
+    )
+
+
 @main_bp.route('/api/etablissements', methods=['GET', 'POST'])
 def api_etablissements():
     try:
@@ -96,34 +163,6 @@ def api_etablissements():
     except Exception as e:
         # En cas d'erreur, renvoie toujours du JSON avec un message d'erreur
         return jsonify({'error': str(e)}), 500
-
-@main_bp.route('/rechercher', methods=['GET', 'POST'])
-def rechercher():
-    form_recherche = RechercheForm(prefix='recherche')
-    resultats = Etablissement.query.all()
-    etablissements, etablissements_json = afficher_etablissements(resultats)
-
-    if form_recherche.validate_on_submit():
-        ville = form_recherche.ville.data
-        type_saveur = form_recherche.type_saveur.data
-
-        query = Etablissement.query
-        if ville:
-            query = query.filter(Etablissement.ville.ilike(f'%{ville}%'))
-        if type_saveur and type_saveur != 'tous':
-            query = query.join(Flan).filter(Flan.type_saveur == type_saveur)
-
-        resultats = query.all()
-        etablissements, etablissements_json = afficher_etablissements(resultats)
-
-        return redirect(url_for('main.liste_etablissements', ville=ville, type_saveur=type_saveur))
-
-    return render_template(
-        'rechercher.html',
-        form_recherche=form_recherche,
-        etablissements=etablissements,
-        etablissements_json=etablissements_json
-    )
 
 @main_bp.route('/liste_etablissements', methods=['GET', 'POST'])
 def liste_etablissements():
