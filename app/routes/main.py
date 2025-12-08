@@ -21,20 +21,31 @@ def index():
         google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
         form_recherche=form_recherche
     )
-
-@main_bp.route('/api/etablissements', methods=['GET'])
+@main_bp.route('/api/etablissements', methods=['GET', 'POST'])
 def api_etablissements():
     try:
         # Récupère les paramètres de filtre
-        nom = request.args.get('nom', '')
-        visite = request.args.get('visite', '')
-        labellise = request.args.get('labellise', '')
-        ville = request.args.get('ville', '')
-        type_flan = request.args.get('type_flan', '')
-        type_pate = request.args.get('type_pate', 'tous')
-        type_saveur = request.args.get('type_saveur', 'tous')
-        prix = request.args.get('prix', 'tous')
-        format = request.args.get('format', 'json')  # 'html' ou 'json'
+        if request.method == 'POST':
+            data = request.get_json()  # Récupère les données JSON envoyées avec la requête POST
+            nom = data.get('nom', '')
+            visite = data.get('visite', '')
+            labellise = data.get('labellise', '')
+            ville = data.get('ville', '')
+            type_flan = data.get('type_flan', '')
+            type_pate = data.get('type_pate', 'tous')
+            type_saveur = data.get('type_saveur', 'tous')
+            prix = data.get('prix', 'tous')
+            format = data.get('format', 'json')  # 'html' ou 'json'
+        else:
+            nom = request.args.get('nom', '')
+            visite = request.args.get('visite', '')
+            labellise = request.args.get('labellise', '')
+            ville = request.args.get('ville', '')
+            type_flan = request.args.get('type_flan', '')
+            type_pate = request.args.get('type_pate', 'tous')
+            type_saveur = request.args.get('type_saveur', 'tous')
+            prix = request.args.get('prix', 'tous')
+            format = request.args.get('format', 'json')  # 'html' ou 'json'
 
         # Applique les filtres
         query = Etablissement.query.join(Flan)
@@ -50,8 +61,6 @@ def api_etablissements():
             query = query.filter(Etablissement.label == False)
         if ville:
             query = query.filter(Etablissement.ville.ilike(f'%{ville}%'))
-        if type_flan:
-            query = query.filter(Flan.type == type_flan)
         if type_pate != 'tous':
             query = query.filter(Flan.type_pate == type_pate)
         if type_saveur != 'tous':
@@ -84,7 +93,6 @@ def api_etablissements():
             return response
         else:
             return jsonify([etab.to_dict() for etab in etablissements])
-
     except Exception as e:
         # En cas d'erreur, renvoie toujours du JSON avec un message d'erreur
         return jsonify({'error': str(e)}), 500
@@ -94,23 +102,22 @@ def rechercher():
     form_recherche = RechercheForm(prefix='recherche')
     resultats = Etablissement.query.all()
     etablissements, etablissements_json = afficher_etablissements(resultats)
-    
+
     if form_recherche.validate_on_submit():
         ville = form_recherche.ville.data
-        type_flan = form_recherche.type.data
-        
+        type_saveur = form_recherche.type_saveur.data
+
         query = Etablissement.query
         if ville:
             query = query.filter(Etablissement.ville.ilike(f'%{ville}%'))
-        if type_flan:
-            query = query.join(Flan).filter(Flan.type == type_flan)
-        
+        if type_saveur and type_saveur != 'tous':
+            query = query.join(Flan).filter(Flan.type_saveur == type_saveur)
+
         resultats = query.all()
         etablissements, etablissements_json = afficher_etablissements(resultats)
-        
-        # Redirige vers liste_etablissements avec les résultats
-        return redirect(url_for('main.liste_etablissements', ville=ville, type=type_flan))
-    
+
+        return redirect(url_for('main.liste_etablissements', ville=ville, type_saveur=type_saveur))
+
     return render_template(
         'rechercher.html',
         form_recherche=form_recherche,
@@ -120,15 +127,17 @@ def rechercher():
 
 @main_bp.route('/liste_etablissements', methods=['GET', 'POST'])
 def liste_etablissements():
-    if request.method == 'POST':
-        ville = request.form.get('ville', '')
-        type_flan = request.form.get('type', '')
+    form_recherche = RechercheForm()
+
+    if request.method == 'POST' and form_recherche.validate_on_submit():
+        ville = form_recherche.ville.data
+        type_saveur = form_recherche.type_saveur.data
 
         query = Etablissement.query
         if ville:
             query = query.filter(Etablissement.ville.ilike(f'%{ville}%'))
-        if type_flan:
-            query = query.join(Flan).filter(Flan.type == type_flan)
+        if type_saveur and type_saveur != 'tous':
+            query = query.join(Flan).filter(Flan.type_saveur == type_saveur)
 
         resultats = query.all()
         etablissements, etablissements_json = afficher_etablissements(resultats)
@@ -137,28 +146,44 @@ def liste_etablissements():
             'liste_etablissements.html',
             etablissements=etablissements,
             etablissements_json=etablissements_json,
-            google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY']
+            google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
+            form_recherche=form_recherche
         )
     else:
         # Gérer le cas où la méthode est GET
-        ville = request.args.get('ville', '')
-        type_flan = request.args.get('type', '')
+        form_recherche = RechercheForm(request.args)
+        if form_recherche.validate():
+            ville = form_recherche.ville.data
+            type_saveur = form_recherche.type_saveur.data
 
-        query = Etablissement.query
-        if ville:
-            query = query.filter(Etablissement.ville.ilike(f'%{ville}%'))
-        if type_flan:
-            query = query.join(Flan).filter(Flan.type == type_flan)
+            query = Etablissement.query
+            if ville:
+                query = query.filter(Etablissement.ville.ilike(f'%{ville}%'))
+            if type_saveur and type_saveur != 'tous':
+                query = query.join(Flan).filter(Flan.type_saveur == type_saveur)
 
-        resultats = query.all()
-        etablissements, etablissements_json = afficher_etablissements(resultats)
+            resultats = query.all()
+            etablissements, etablissements_json = afficher_etablissements(resultats)
 
-        return render_template(
-            'liste_etablissements.html',
-            etablissements=etablissements,
-            etablissements_json=etablissements_json,
-            google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY']
-        )
+            return render_template(
+                'liste_etablissements.html',
+                etablissements=etablissements,
+                etablissements_json=etablissements_json,
+                google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
+                form_recherche=form_recherche
+            )
+        else:
+            # Si le formulaire n'est pas valide, afficher tous les établissements
+            resultats = Etablissement.query.all()
+            etablissements, etablissements_json = afficher_etablissements(resultats)
+
+            return render_template(
+                'liste_etablissements.html',
+                etablissements=etablissements,
+                etablissements_json=etablissements_json,
+                google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
+                form_recherche=form_recherche
+            )
 
 #Route pour générer le CONTENT d'une infowindow, utilisé dans maps_autocomplete.js
 @main_bp.route('/get_infowindow_content')
