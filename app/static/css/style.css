@@ -1,9 +1,14 @@
-/* ===== VARIABLES GLOBALES ===== */
+/* =============================================
+   1. VARIABLES GLOBALES & RESET
+   ============================================= */
 :root {
+    /* Polices */
     --font-primary: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     --font-bubblegum: 'Bubblegum', cursive;
+
+    /* Couleurs */
     --color-primary: #799dcb;
-    --color-secondary: #fee10d;
+    --color-secondary: #ffcf40;
     --color-success: #4CAF50;
     --color-success-dark: #45a049;
     --color-danger: #e74c3c;
@@ -18,12 +23,11 @@
     --color-white: #fff;
     --color-shadow: rgba(0, 0, 0, 0.1);
     --color-shadow-hover: rgba(0, 0, 0, 0.15);
+
+    /* Espacements & Bordures */
     --border-radius: 4px;
     --border-radius-btn: 25px;
     --border-radius-card: 10px;
-    --transition: all 0.3s ease;
-    --box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    --box-shadow-hover: 0 5px 10px rgba(0, 0, 0, 0.15);
     --max-width: 1200px;
     --padding-sm: 5px;
     --padding-md: 10px;
@@ -31,15 +35,22 @@
     --margin-sm: 4px;
     --margin-md: 10px;
     --margin-lg: 20px;
-    --font-size-sm: 0.9rem;
-    --font-size-md: 1rem;
-    --font-size-lg: 1.3rem;
     --gap-sm: 8px;
     --gap-md: 15px;
     --gap-lg: 25px;
+
+    /* Tailles de texte */
+    --font-size-sm: 0.9rem;
+    --font-size-md: 1rem;
+    --font-size-lg: 1.3rem;
+
+    /* Effets & Transitions */
+    --transition: all 0.3s ease;
+    --box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    --box-shadow-hover: 0 5px 10px rgba(0, 0, 0, 0.15);
 }
 
-/* ===== RESET & BASE ===== */
+/* Reset & Base */
 * {
     margin: 0;
     padding: 0;
@@ -55,7 +66,9 @@ body {
     color: var(--color-text);
 }
 
-/* ===== POLICES ===== */
+/* =============================================
+   2. POLICES
+   ============================================= */
 @font-face {
     font-family: 'Bubblegum';
     src: url('/static/fonts/Bubblegum.ttf') format('truetype');
@@ -67,7 +80,9 @@ h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-bubblegum) !important;
 }
 
-/* ===== LAYOUT ===== */
+/* =============================================
+   3. LAYOUT & CONTAINERS
+   ============================================= */
 .container {
     width: 90%;
     max-width: var(--max-width);
@@ -118,7 +133,10 @@ footer {
     padding: var(--padding-md) 0;
 }
 
-/* ===== BOUTONS ===== */
+/* =============================================
+   4. BOUTONS
+   ============================================= */
+/* Base */
 .btn,
 button,
 input[type="button"],
@@ -148,6 +166,7 @@ input[type="reset"],
     text-overflow: ellipsis;
 }
 
+/* États */
 .btn:hover,
 button:hover,
 input[type="button"]:hover,
@@ -168,7 +187,7 @@ input[type="submit"]:active,
     box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* Tailles de boutons */
+/* Tailles */
 .btn-small,
 .btn-edit,
 .btn-validate,
@@ -179,7 +198,7 @@ input[type="submit"]:active,
     font-size: var(--font-size-sm);
 }
 
-/* Couleurs de boutons */
+/* Couleurs */
 .btn-primary,
 button.primary,
 input.primary {
@@ -251,7 +270,7 @@ input.back:hover {
     background-color: var(--color-back-dark);
 }
 
-/* Groupes de boutons */
+/* Groupes */
 .btn-group {
     display: flex;
     justify-content: center;
@@ -286,7 +305,9 @@ input.back:hover {
     transform: scale(1.1);
 }
 
-/* ===== BARRE DE RECHERCHE ===== */
+/* =============================================
+   5. BARRE DE RECHERCHE
+   ============================================= */
 .search-bar {
     background-color: var(--color-secondary);
     padding: 0.4rem 0;
@@ -350,7 +371,9 @@ input.back:hover {
     top: 1px;
 }
 
-/* ===== CARTES ===== */
+/* =============================================
+   6. CARTES
+   ============================================= */
 .carte {
     text-decoration: none;
     color: inherit;
@@ -459,7 +482,9 @@ input.back:hover {
     transform: translateX(5px);
 }
 
-/* ===== BADGES ===== */
+/* =============================================
+   7. BADGES
+   ============================================= */
 .badge {
     position: absolute;
     display: inline-block;
@@ -499,7 +524,9 @@ input.back:hover {
     right: var(--margin-sm);
 }
 
-/* ===== GRILLE ===== */
+/* =============================================
+   8. GRILLE
+   ============================================= */
 .grille {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -507,7 +534,9 @@ input.back:hover {
     margin-top: var(--margin-lg);
 }
 
-/* ===== FORMULAIRES ===== */
+/* =============================================
+   9. FORMULAIRES
+   ============================================= */
 .form-container {
     background: var(--color-white);
     padding: var(--padding-lg);
@@ -575,7 +604,9 @@ input.back:hover {
     margin-top: var(--margin-sm);
 }
 
-/* ===== ÉVALUATIONS ===== */
+/* =============================================
+   10. ÉVALUATIONS
+   ============================================= */
 .criteria {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -623,7 +654,9 @@ input.back:hover {
     margin-bottom: var(--margin-sm);
 }
 
-/* ===== ALERTES ===== */
+/* =============================================
+   11. ALERTES
+   ============================================= */
 .alert {
     padding: var(--padding-md);
     margin: var(--margin-md) 0;
@@ -640,7 +673,9 @@ input.back:hover {
     color: var(--color-white);
 }
 
-/* ===== NO RESULTS ===== */
+/* =============================================
+   12. NO RESULTS
+   ============================================= */
 .no-results {
     grid-column: 1 / -1;
     text-align: center;
@@ -655,7 +690,9 @@ input.back:hover {
     color: var(--color-text-light);
 }
 
-/* ===== INFOWINDOWS & EMOJIS ===== */
+/* =============================================
+   13. INFOWINDOWS & EMOJIS
+   ============================================= */
 .leaflet-popup-content-wrapper {
     max-width: 300px !important;
     max-height: 400px !important;
@@ -674,7 +711,7 @@ input.back:hover {
     top: 5px !important;
     right: 5px !important;
 }
-/* Structure de l'infowindow */
+
 .infowindow-content {
     position: relative;
     min-width: 200px;
@@ -686,12 +723,12 @@ input.back:hover {
 .infowindow-header {
     margin-bottom: 10px;
     position: relative;
-    min-height: 30px; /* Espace réservé pour les badges */
+    min-height: 30px;
 }
 
 .infowindow-header h3 {
-    margin: 15px 0 10px 0; /* Marge supérieure de 15px pour laisser de la place aux badges */
-    padding-top: 10px; /* Espace supplémentaire si nécessaire */
+    margin: 15px 0 10px 0;
+    padding-top: 10px;
     font-size: 1.2rem;
     line-height: 1.3;
     text-align: center;
@@ -703,18 +740,17 @@ input.back:hover {
     width: 100%;
     display: flex;
     justify-content: space-between;
-    pointer-events: none; /* Permet de cliquer "à travers" les badges */
+    pointer-events: none;
 }
 
 .infowindow-badges .badge {
-    font-size: 0.7rem; /* Taille de police plus petite */
-    padding: 3px 8px; /* Padding réduit */
-    max-width: 80px; /* Largeur maximale */
-    white-space: nowrap; /* Évite le retour à la ligne */
-    overflow: hidden; /* Cache le contenu qui dépasse */
-    text-overflow: ellipsis; /* Ajoute "..." si le texte est trop long */
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    max-width: 80px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-
 
 .infowindow-body {
     margin-bottom: 15px;
@@ -729,7 +765,7 @@ input.back:hover {
 .infowindow-footer {
     display: flex;
     justify-content: center;
-    margin-bottom: 25px; /* Espace pour la croix de fermeture */
+    margin-bottom: 25px;
 }
 
 .infowindow-footer .btn {
@@ -760,7 +796,6 @@ input.back:hover {
     color: var(--color-danger);
 }
 
-
 .emoji-marker {
     font-size: 24px;
     text-align: center;
@@ -773,7 +808,9 @@ input.back:hover {
     transform: translateY(-12px);
 }
 
-/* ===== MAP ===== */
+/* =============================================
+   14. MAP
+   ============================================= */
 #map {
     height: 80vh;
     width: 100%;
@@ -786,39 +823,132 @@ input.back:hover {
     padding: 0;
 }
 
-/* ===== RESPONSIVE ===== */
+/* =============================================
+   15. FORMULAIRE ÉTABLISSEMENT (spécifique)
+   ============================================= */
+.etablissement-form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.etablissement-form-card {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.etablissement-form-group {
+    margin-bottom: 15px;
+}
+
+.etablissement-form-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.etablissement-form-input,
+.etablissement-form-select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.etablissement-form-submit {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.etablissement-form-submit:hover {
+    background-color: #45a049;
+}
+
+.etablissement-hidden-fields {
+    display: none;
+}
+
+.etablissement-map-container {
+    display: none;
+    height: 500px;
+    width: 100%;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+}
+
+.etablissement-map {
+    height: 100%;
+    width: 100%;
+    border-radius: 8px;
+}
+
+.etablissement-checkbox-group {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 15px;
+}
+
+.etablissement-form-check {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.alert {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* =============================================
+   16. RESPONSIVE
+   ============================================= */
 @media (max-width: 768px) {
     .grille {
         grid-template-columns: 1fr;
     }
-
     .carte {
         border-radius: var(--border-radius);
     }
-
     .card-content {
         padding: var(--padding-md);
     }
-
     header h1 {
         font-size: 1.5rem;
     }
-
     .search-bar .form-control {
         width: 180px;
     }
-
     .btn-search-icon {
         width: 32px;
         height: 32px;
         font-size: var(--font-size-sm);
     }
-
     .leaflet-popup-content-wrapper {
         max-width: 90vw !important;
         max-height: 70vh !important;
     }
-
     #map {
         height: 60vh;
     }
@@ -828,30 +958,24 @@ input.back:hover {
     .container {
         padding: 0 var(--padding-sm);
     }
-
     .search-bar .container {
         flex-wrap: wrap;
         gap: 0.3rem;
     }
-
     .search-bar .form-control {
         width: 160px;
     }
-
     .btn-search-icon {
         width: 28px;
         height: 28px;
         font-size: var(--font-size-sm);
     }
-
     .form-container {
         padding: var(--padding-md);
     }
-
     .form-group {
         margin-bottom: var(--margin-md);
     }
-
     .form-control {
         padding: var(--padding-sm);
     }

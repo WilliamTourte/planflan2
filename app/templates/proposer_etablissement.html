@@ -8,91 +8,10 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
             integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
             crossorigin=""></script>
-    <style>
-        .etablissement-form-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .etablissement-form-card {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .etablissement-form-group {
-            margin-bottom: 15px;
-        }
-        .etablissement-form-label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        .etablissement-form-input, .etablissement-form-select {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        .etablissement-form-submit {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .etablissement-form-submit:hover {
-            background-color: #45a049;
-        }
-        .etablissement-hidden-fields {
-            display: none;
-        }
-        .etablissement-map-container {
-            display: none;
-            height: 500px;
-            width: 100%;
-            background-color: #f5f5f5;
-            border-radius: 8px;
-        }
-        .etablissement-map {
-            height: 100%;
-            width: 100%;
-            border-radius: 8px;
-        }
-        .etablissement-checkbox-group {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 15px;
-        }
-        .etablissement-form-check {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        .alert {
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 4px;
-        }
-        .alert-warning {
-            background-color: #fff3cd;
-            color: #856404;
-            border: 1px solid #ffeeba;
-        }
-        .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-    </style>
+
     <script>
         let autocomplete;
         let map;
-
         // Fonction pour initialiser l'autocomplétion
         window.initAutocomplete = function() {
             const input = document.getElementById('search');
@@ -104,7 +23,6 @@
                 types: ['establishment'],
                 componentRestrictions: {country: 'fr'}
             });
-
             // Écouter la sélection d'un lieu
             autocomplete.addListener('place_changed', function() {
                 const place = autocomplete.getPlace();
@@ -112,13 +30,11 @@
                     console.error("Aucune information de géolocalisation disponible pour ce lieu.");
                     return;
                 }
-
                 // Remplir les champs cachés
                 document.getElementById('ajout-etab-nom').value = place.name || '';
                 document.getElementById('ajout-etab-adresse').value = place.formatted_address || '';
                 document.getElementById('ajout-etab-latitude').value = place.geometry.location.lat();
                 document.getElementById('ajout-etab-longitude').value = place.geometry.location.lng();
-
                 // Vérifier si le lieu est déjà dans la liste
                 fetch('/verifier_etablissement', {
                     method: 'POST',
@@ -156,7 +72,6 @@
                     errorMessage.textContent = `Erreur: ${error.message}`;
                     document.querySelector('.etablissement-form-container').prepend(errorMessage);
                 });
-
                 // Extraire le code postal et la ville
                 fetch('/extraire_infos_adresse', {
                     method: 'POST',
@@ -177,22 +92,18 @@
                 .catch(error => console.error('Erreur:', error));
             });
         };
-
         // Fonction pour initialiser la carte Leaflet
         function initMap(lat, lng, title) {
             const mapContainer = document.getElementById('map-container');
             mapContainer.style.display = 'block';
-
             const map = L.map('map').setView([lat, lng], 15);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);
-
             L.marker([lat, lng]).addTo(map)
                 .bindPopup(title)
                 .openPopup();
         }
-
         // Chargement de l'API Google Maps
         document.addEventListener('DOMContentLoaded', function() {
             const script = document.createElement('script');
@@ -205,15 +116,17 @@
 {% endblock %}
 
 {% block content %}
-    <div class="etablissement-form-container">
-        <div class="etablissement-form-card">
+    <div class="container">
+        <div class="form-container etablissement-form-container">
             <form method="POST" action="{{ action_url }}" class="etablissement-form">
                 {{ form.hidden_tag() }}
+
                 <!-- Champ de recherche pour l'autocomplete Google Maps -->
-                <div class="etablissement-form-group">
-                    <label for="search" class="etablissement-form-label">Recherche d'établissement</label>
-                    <input type="text" id="search" class="etablissement-form-input" placeholder="Rechercher un établissement">
+                <div class="form-group">
+                    <label for="search" class="form-check-label">Recherche d'établissement</label>
+                    <input type="text" id="search" class="form-control" placeholder="Rechercher un établissement">
                 </div>
+
                 <!-- Champs cachés pour les coordonnées et l'adresse -->
                 <div class="etablissement-hidden-fields">
                     {{ form.nom(id="ajout-etab-nom") }}
@@ -223,27 +136,34 @@
                     {{ form.code_postal(id="ajout-etab-code_postal") }}
                     {{ form.ville(id="ajout-etab-ville") }}
                 </div>
-                <div class="etablissement-form-group">
-                    {{ form.type_etab.label(class="etablissement-form-label") }}
-                    {{ form.type_etab(class="etablissement-form-select") }}
+
+                <!-- Type d'établissement -->
+                <div class="form-group">
+                    {{ form.type_etab.label(class="form-check-label") }}
+                    {{ form.type_etab(class="form-select") }}
                 </div>
+
                 {% if current_user.is_admin %}
-                    <div class="etablissement-checkbox-group">
-                        <div class="etablissement-form-check">
-                            {{ form.label(class="etablissement-form-check-input") }}
-                            {{ form.label.label(class="etablissement-form-check-label") }}
+                    <div class="form-group etablissement-checkbox-group">
+                        <div class="form-check-inline">
+                            {{ form.label(class="form-check-input") }}
+                            {{ form.label.label(class="form-check-label") }}
                         </div>
-                        <div class="etablissement-form-check">
-                            {{ form.visite(class="etablissement-form-check-input") }}
-                            {{ form.visite.label(class="etablissement-form-check-label") }}
+                        <div class="form-check-inline">
+                            {{ form.visite(class="form-check-input") }}
+                            {{ form.visite.label(class="form-check-label") }}
                         </div>
                     </div>
                 {% endif %}
-                <button type="submit" class="etablissement-form-submit">
-                    Enregistrer
-                </button>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-success">
+                        Enregistrer
+                    </button>
+                </div>
             </form>
         </div>
+
         <!-- Conteneur pour la carte -->
         <div id="map-container" class="etablissement-map-container">
             <div id="map" class="etablissement-map"></div>
