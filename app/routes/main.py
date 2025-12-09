@@ -22,14 +22,21 @@ def index():
         form_recherche=form_recherche
     )
     
-@main_bp.route('/rechercher', methods=['GET', 'POST'])
-def rechercher():
+@main_bp.route('/liste_etablissements', methods=['GET', 'POST'])
+def liste_etablissements():
     form_recherche = RechercheForm()
-    resultats = Etablissement.query.all()
-    etablissements, etablissements_json = afficher_etablissements(resultats)
 
-    if form_recherche.validate_on_submit():
-        # Récupération des données du formulaire
+    # Récupération des données (GET ou POST)
+    if request.method == 'POST' and form_recherche.validate_on_submit():
+        # Utiliser les données du formulaire
+        pass  # Voir ci-dessous
+    else:
+        # Utiliser les paramètres GET (pour les liens/redirections)
+        form_recherche = RechercheForm(request.args)
+
+    # Validation du formulaire (GET ou POST)
+    if form_recherche.validate():
+        # Récupération des données
         nom = form_recherche.nom.data
         ville = form_recherche.ville.data
         type_saveur = form_recherche.type_saveur.data
@@ -65,27 +72,28 @@ def rechercher():
         if labellise and labellise != 'tous':
             query = query.filter(Etablissement.label == (labellise == 'oui'))
 
-        # Exécution de la requête et récupération des résultats
+        # Exécution de la requête
         resultats = query.all()
         etablissements, etablissements_json = afficher_etablissements(resultats)
 
-        # Redirection vers liste_etablissements avec les paramètres de recherche
-        return redirect(url_for('main.liste_etablissements',
-                              nom=nom,
-                              ville=ville,
-                              type_saveur=type_saveur,
-                              type_pate=type_pate,
-                              type_texture=type_texture,
-                              prix=prix,
-                              visite=visite,
-                              labellise=labellise))
-
-    return render_template(
-        'rechercher.html',
-        form_recherche=form_recherche,
-        etablissements=etablissements,
-        etablissements_json=etablissements_json
-    )
+        return render_template(
+            'liste_etablissements.html',
+            etablissements=etablissements,
+            etablissements_json=etablissements_json,
+            google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
+            form_recherche=form_recherche
+        )
+    else:
+        # Si le formulaire n'est pas valide, afficher tous les établissements
+        resultats = Etablissement.query.all()
+        etablissements, etablissements_json = afficher_etablissements(resultats)
+        return render_template(
+            'liste_etablissements.html',
+            etablissements=etablissements,
+            etablissements_json=etablissements_json,
+            google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
+            form_recherche=form_recherche
+        )
 
 
 @main_bp.route('/api/etablissements', methods=['GET', 'POST'])
@@ -164,65 +172,6 @@ def api_etablissements():
         # En cas d'erreur, renvoie toujours du JSON avec un message d'erreur
         return jsonify({'error': str(e)}), 500
 
-@main_bp.route('/liste_etablissements', methods=['GET', 'POST'])
-def liste_etablissements():
-    form_recherche = RechercheForm()
-
-    if request.method == 'POST' and form_recherche.validate_on_submit():
-        ville = form_recherche.ville.data
-        type_saveur = form_recherche.type_saveur.data
-
-        query = Etablissement.query
-        if ville:
-            query = query.filter(Etablissement.ville.ilike(f'%{ville}%'))
-        if type_saveur and type_saveur != 'tous':
-            query = query.join(Flan).filter(Flan.type_saveur == type_saveur)
-
-        resultats = query.all()
-        etablissements, etablissements_json = afficher_etablissements(resultats)
-
-        return render_template(
-            'liste_etablissements.html',
-            etablissements=etablissements,
-            etablissements_json=etablissements_json,
-            google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
-            form_recherche=form_recherche
-        )
-    else:
-        # Gérer le cas où la méthode est GET
-        form_recherche = RechercheForm(request.args)
-        if form_recherche.validate():
-            ville = form_recherche.ville.data
-            type_saveur = form_recherche.type_saveur.data
-
-            query = Etablissement.query
-            if ville:
-                query = query.filter(Etablissement.ville.ilike(f'%{ville}%'))
-            if type_saveur and type_saveur != 'tous':
-                query = query.join(Flan).filter(Flan.type_saveur == type_saveur)
-
-            resultats = query.all()
-            etablissements, etablissements_json = afficher_etablissements(resultats)
-
-            return render_template(
-                'liste_etablissements.html',
-                etablissements=etablissements,
-                etablissements_json=etablissements_json,
-                google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
-                form_recherche=form_recherche
-            )
-        else:
-            # Si le formulaire n'est pas valide, afficher tous les établissements
-            resultats = Etablissement.query.all()
-            etablissements, etablissements_json = afficher_etablissements(resultats)
-
-            return render_template(
-                'liste_etablissements.html',
-                etablissements=etablissements,
-                etablissements_json=etablissements_json,
-                google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
-                form_recherche=form_recherche
-            )
 
 #Route pour générer le CONTENT d'une infowindow, utilisé dans maps_autocomplete.js
 @main_bp.route('/get_infowindow_content')
@@ -241,6 +190,16 @@ def get_infowindow_content():
         ) }}
     """, etablissement=etablissement)
     return content
+
+### PAGE RECHERCHE
+@main_bp.route('/rechercher', methods=['GET'])
+def rechercher():
+    form_recherche=RechercheForm()
+    return render_template(
+        'rechercher.html',
+        form_recherche=form_recherche
+    )
+    
 
 ### DASHBOARD
 @main_bp.route('/dashboard', methods=['GET', 'POST'])
