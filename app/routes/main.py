@@ -21,79 +21,66 @@ def index():
         google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
         form_recherche=form_recherche
     )
-    
+
 @main_bp.route('/liste_etablissements', methods=['GET', 'POST'])
 def liste_etablissements():
-    form_recherche = RechercheForm()
-
-    # Récupération des données (GET ou POST)
-    if request.method == 'POST' and form_recherche.validate_on_submit():
-        # Utiliser les données du formulaire
-        pass  # Voir ci-dessous
+    # 1. Initialisation du formulaire
+    if request.method == 'POST':
+        form_recherche = RechercheForm()
     else:
-        # Utiliser les paramètres GET (pour les liens/redirections)
         form_recherche = RechercheForm(request.args)
 
-    # Validation du formulaire (GET ou POST)
-    if form_recherche.validate():
-        # Récupération des données
-        nom = form_recherche.nom.data
-        ville = form_recherche.ville.data
-        type_saveur = form_recherche.type_saveur.data
-        type_pate = form_recherche.type_pate.data
-        type_texture = form_recherche.type_texture.data
-        prix = form_recherche.prix.data
-        visite = form_recherche.visite.data
-        labellise = form_recherche.labellise.data
-
-        # Construction de la requête de base
-        query = Etablissement.query.join(Flan)
-
-        # Application des filtres
-        if nom:
-            query = query.filter(Etablissement.nom.ilike(f'%{nom}%'))
-        if ville:
-            query = query.filter(Etablissement.ville.ilike(f'%{ville}%'))
-        if type_saveur and type_saveur != 'tous':
-            query = query.filter(Flan.type_saveur == type_saveur)
-        if type_pate and type_pate != 'tous':
-            query = query.filter(Flan.type_pate == type_pate)
-        if type_texture and type_texture != 'tous':
-            query = query.filter(Flan.type_texture == type_texture)
-        if prix and prix != 'tous':
-            if prix == '0':
-                query = query.filter(Flan.prix < 2.5)
-            elif prix == '2.5':
-                query = query.filter(Flan.prix >= 2.5, Flan.prix < 5)
-            elif prix == '5':
-                query = query.filter(Flan.prix >= 5)
-        if visite and visite != 'tous':
-            query = query.filter(Etablissement.visite == (visite == 'oui'))
-        if labellise and labellise != 'tous':
-            query = query.filter(Etablissement.label == (labellise == 'oui'))
-
-        # Exécution de la requête
-        resultats = query.all()
-        etablissements, etablissements_json = afficher_etablissements(resultats)
-
-        return render_template(
-            'liste_etablissements.html',
-            etablissements=etablissements,
-            etablissements_json=etablissements_json,
-            google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
-            form_recherche=form_recherche
+    # 2. Recherche simple (toujours appliquée si présente)
+    recherche_simple = request.args.get('recherche_simple', None)
+    if recherche_simple:
+        # Recherche simple : pas besoin de jointure avec Flan
+        query = Etablissement.query.filter(
+            (Etablissement.nom.ilike(f'%{recherche_simple}%')) |
+            (Etablissement.ville.ilike(f'%{recherche_simple}%'))
         )
     else:
-        # Si le formulaire n'est pas valide, afficher tous les établissements
-        resultats = Etablissement.query.all()
-        etablissements, etablissements_json = afficher_etablissements(resultats)
-        return render_template(
-            'liste_etablissements.html',
-            etablissements=etablissements,
-            etablissements_json=etablissements_json,
-            google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
-            form_recherche=form_recherche
-        )
+        # Sinon, on part d'une requête de base
+        query = Etablissement.query
+
+    # 3. Filtres avancés (uniquement si le formulaire est valide)
+    if form_recherche.validate():
+        # On a besoin de la jointure avec Flan pour les filtres sur les flans
+        query = query.join(Flan)
+
+        # Application des filtres
+        if form_recherche.nom.data:
+            query = query.filter(Etablissement.nom.ilike(f'%{form_recherche.nom.data}%'))
+        if form_recherche.ville.data:
+            query = query.filter(Etablissement.ville.ilike(f'%{form_recherche.ville.data}%'))
+        if form_recherche.type_saveur.data and form_recherche.type_saveur.data != 'tous':
+            query = query.filter(Flan.type_saveur == form_recherche.type_saveur.data)
+        if form_recherche.type_pate.data and form_recherche.type_pate.data != 'tous':
+            query = query.filter(Flan.type_pate == form_recherche.type_pate.data)
+        if form_recherche.type_texture.data and form_recherche.type_texture.data != 'tous':
+            query = query.filter(Flan.type_texture == form_recherche.type_texture.data)
+        if form_recherche.prix.data and form_recherche.prix.data != 'tous':
+            if form_recherche.prix.data == '0':
+                query = query.filter(Flan.prix < 2.5)
+            elif form_recherche.prix.data == '2.5':
+                query = query.filter(Flan.prix >= 2.5, Flan.prix < 5)
+            elif form_recherche.prix.data == '5':
+                query = query.filter(Flan.prix >= 5)
+        if form_recherche.visite.data and form_recherche.visite.data != 'tous':
+            query = query.filter(Etablissement.visite == (form_recherche.visite.data == 'oui'))
+        if form_recherche.labellise.data and form_recherche.labellise.data != 'tous':
+            query = query.filter(Etablissement.label == (form_recherche.labellise.data == 'oui'))
+
+    # 4. Exécution de la requête
+    resultats = query.distinct().all()  # distinct() pour éviter les doublons
+    etablissements, etablissements_json = afficher_etablissements(resultats)
+
+    return render_template(
+        'liste_etablissements.html',
+        etablissements=etablissements,
+        etablissements_json=etablissements_json,
+        google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
+        form_recherche=form_recherche
+    )
 
 
 @main_bp.route('/api/etablissements', methods=['GET', 'POST'])
