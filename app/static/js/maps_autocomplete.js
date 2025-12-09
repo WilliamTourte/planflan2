@@ -1,8 +1,7 @@
 let autocomplete;
 let map;
-let markers = [];
+let markers = {};
 let infowindowContents = {};
-let infowindow;
 
 function closeInfoWindow() {
     // Leaflet gère la fermeture des popups automatiquement
@@ -99,6 +98,7 @@ window.initMap = function() {
         }
         return;
     }
+
     // Initialisation de la carte Leaflet
     map = L.map('map').setView([46.2276, 2.2137], 6);
     // Ajout de la couche OpenStreetMap
@@ -115,11 +115,10 @@ window.initMap = function() {
         return L.divIcon({
             html: `<div class="emoji-marker ${className}">${emoji}</div>`,
             className: 'emoji-icon',
-            iconSize: [30, 30], // Taille de l'icône
-            iconAnchor: [15, 15] // Point d'ancrage (centre de l'emoji)
+            iconSize: [30, 30],
+            iconAnchor: [15, 15]
         });
     };
-
     const labelIcon = createEmojiIcon('🏆', 'label-icon');
     const visiteIcon = createEmojiIcon('✅', 'visited-icon');
     const nonvisiteIcon = createEmojiIcon('❌', 'unvisited-icon');
@@ -136,10 +135,25 @@ window.initMap = function() {
         }
         const marker = L.marker([etablissement.latitude, etablissement.longitude], {
             icon: icon,
-            title: etablissement.nom
+            title: etablissement.nom,
+            id_etab: etablissement.id_etab // On stocke l'ID de l'établissement dans le marqueur
         })
         .addTo(map)
-        .bindPopup(infowindowContents[etablissement.id_etab]);
+        .on('click', function(e) {
+            // Charger le contenu de l'infowindow à la demande
+            if (!this.getPopup()) {
+                this.bindPopup("Chargement en cours...").openPopup();
+                fetch(`/get_infowindow_content?id_etab=${etablissement.id_etab}`)
+                    .then(response => response.text())
+                    .then(content => {
+                        this.setPopupContent(content);
+                    })
+                    .catch(error => {
+                        console.error(`Erreur lors du chargement de l'infowindow pour ${etablissement.nom}:`, error);
+                        this.setPopupContent("Détails non disponibles");
+                    });
+            }
+        });
         bounds.extend(marker.getLatLng());
     });
 
@@ -149,7 +163,6 @@ window.initMap = function() {
         } else {
             map.fitBounds(bounds);
         }
-    }
 
     // Légende
     const legend = L.control({ position: 'bottomright' });
@@ -164,12 +177,13 @@ window.initMap = function() {
     };
     legend.addTo(map);
 };
+}
 
 // Chargement de l'API Google Maps (uniquement pour l'autocomplete)
 document.addEventListener('DOMContentLoaded', function() {
     const googleMapsApiKey = document.getElementById('google-maps-api-key').getAttribute('data-api-key');
     const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}&libraries=places&callback=initAll&v=weekly&loading=async`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}&libraries=places&callback=initAll&v=weekly`;
     script.async = true;
     script.defer = true;
     document.head.appendChild(script);
