@@ -24,6 +24,8 @@ def index():
 
 @main_bp.route('/liste_etablissements', methods=['GET', 'POST'])
 def liste_etablissements():
+    form_ajout = EtabForm(prefix='ajout-etab')  # Toujours initialiser le formulaire
+    form_edit = EtabForm(prefix='edit-etab')
     # 1. Initialisation du formulaire
     if request.method == 'POST':
         form_recherche = RechercheForm()
@@ -79,7 +81,9 @@ def liste_etablissements():
         etablissements=etablissements,
         etablissements_json=etablissements_json,
         google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
-        form_recherche=form_recherche
+        form_recherche=form_recherche,
+        form_ajout=form_ajout,  # Toujours passer form_ajout
+        form_edit=form_edit
     )
 
 
