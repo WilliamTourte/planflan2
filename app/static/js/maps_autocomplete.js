@@ -6,6 +6,7 @@ let etablissements = [];
 let baseUrl = window.location.origin;
 // Variables pour les filtres
 let activeFilters = {
+    type_pate: false,
     visited: false,
     unvisited: false,
     label: false
@@ -27,10 +28,31 @@ function closeInfoWindow() {
 
 // Fonction pour mettre à jour l'affichage des marqueurs en fonction des filtres
 function updateMarkersBasedOnFilters() {
+    console.log("Mise à jour des marqueurs en fonction des filtres. Filtre actif :", activeFilters);
     markers.forEach(marker => {
         const etablissement = marker.options.etablissement;
         let showMarker = true;
+        console.log("Établissement :", etablissement.nom, "Flans :", etablissement.flans);
 
+        // Vérifier si l'établissement a au moins un flan correspondant au filtre de type de pâte
+        if (activeFilters.type_pate) {
+            console.log(`Filtre type_pate actif : ${activeFilters.type_pate}`);
+            if (!etablissement.flans || etablissement.flans.length === 0) {
+                console.log(`Établissement ${etablissement.nom} n'a pas de flans.`);
+                showMarker = false;
+            } else {
+                const hasMatchingPate = etablissement.flans.some(flan => {
+                    console.log(`Vérification du flan : ${flan.nom}, type_pate : ${flan.type_pate}`);
+                    return flan.type_pate === activeFilters.type_pate;
+                });
+                console.log(`Établissement ${etablissement.nom} a un flan correspondant : ${hasMatchingPate}`);
+                if (!hasMatchingPate) {
+                    showMarker = false;
+                }
+            }
+        }
+
+        // Vérifier les autres filtres
         if (activeFilters.visited && !etablissement.visite) {
             showMarker = false;
         }
@@ -41,6 +63,7 @@ function updateMarkersBasedOnFilters() {
             showMarker = false;
         }
 
+        console.log(`Établissement ${etablissement.nom} sera ${showMarker ? 'affiché' : 'masqué'}`);
         if (showMarker) {
             map.addLayer(marker);
         } else {
@@ -138,6 +161,14 @@ function loadEtablissements() {
         }
         const etablissementsData = JSON.parse(etablissementsDataElement.getAttribute('data-etablissements'));
         console.log("Données des établissements chargées:", etablissementsData);
+        etablissementsData.forEach(etab => {
+            console.log(`Établissement: ${etab.nom}, Flans:`, etab.flans);
+            if (etab.flans && etab.flans.length > 0) {
+                etab.flans.forEach(flan => {
+                    console.log(`Flan: ${flan.nom}, type_pate: ${flan.type_pate}`);
+                });
+            }
+        });
         return etablissementsData;
     } catch (error) {
         console.error("Erreur lors du chargement des établissements:", error);
@@ -186,7 +217,6 @@ function updateMapAndMarkers() {
     if (etablissements.length > 0) {
         map.fitBounds(bounds);
     }
-
     // Appliquer les filtres initiaux
     updateMarkersBasedOnFilters();
 }
@@ -194,25 +224,72 @@ function updateMapAndMarkers() {
 // Fonction pour gérer les clics sur les boutons de filtre
 function setupFilterButtons() {
     document.getElementById('filter-all').addEventListener('click', function() {
-        activeFilters = { visited: false, unvisited: false, label: false };
+        activeFilters = { type_pate: false, visited: false, unvisited: false, label: false };
+        console.log("Filtre réinitialisé :", activeFilters);
+        updateMarkersBasedOnFilters();
+    });
+    document.getElementById('filter-type_pate_FEUILLETEE').addEventListener('click', function() {
+        activeFilters.type_pate = activeFilters.type_pate === 'Feuilletée' ? false : 'Feuilletée';
+        console.log(`Filtre type_pate défini à : ${activeFilters.type_pate}`);
+        activeFilters.visited = false;
+        activeFilters.unvisited = false;
+        activeFilters.label = false;
+        updateMarkersBasedOnFilters();
+    });
+    document.getElementById('filter-type_pate_BRISEE').addEventListener('click', function() {
+        activeFilters.type_pate = activeFilters.type_pate === 'Brisée' ? false : 'Brisée';
+        console.log(`Filtre type_pate défini à : ${activeFilters.type_pate}`);
+        activeFilters.visited = false;
+        activeFilters.unvisited = false;
+        activeFilters.label = false;
+        updateMarkersBasedOnFilters();
+    });
+    document.getElementById('filter-type_pate_SUCREE').addEventListener('click', function() {
+        activeFilters.type_pate = activeFilters.type_pate === 'Sucrée' ? false : 'Sucrée';
+        console.log(`Filtre type_pate défini à : ${activeFilters.type_pate}`);
+        activeFilters.visited = false;
+        activeFilters.unvisited = false;
+        activeFilters.label = false;
+        updateMarkersBasedOnFilters();
+    });
+    document.getElementById('filter-type_pate_SABLEE').addEventListener('click', function() {
+        activeFilters.type_pate = activeFilters.type_pate === 'Sablée' ? false : 'Sablée';
+        console.log(`Filtre type_pate défini à : ${activeFilters.type_pate}`);
+        activeFilters.visited = false;
+        activeFilters.unvisited = false;
+        activeFilters.label = false;
+        updateMarkersBasedOnFilters();
+    });
+    document.getElementById('filter-type_pate_MIXTE').addEventListener('click', function() {
+        activeFilters.type_pate = activeFilters.type_pate === 'Mixte' ? false : 'Mixte';
+        console.log(`Filtre type_pate défini à : ${activeFilters.type_pate}`);
+        activeFilters.visited = false;
+        activeFilters.unvisited = false;
+        activeFilters.label = false;
         updateMarkersBasedOnFilters();
     });
     document.getElementById('filter-visited').addEventListener('click', function() {
         activeFilters.visited = !activeFilters.visited;
+        activeFilters.type_pate = false;
         activeFilters.unvisited = false;
         activeFilters.label = false;
+        console.log("Filtre visited défini à :", activeFilters.visited);
         updateMarkersBasedOnFilters();
     });
     document.getElementById('filter-unvisited').addEventListener('click', function() {
         activeFilters.unvisited = !activeFilters.unvisited;
+        activeFilters.type_pate = false;
         activeFilters.visited = false;
         activeFilters.label = false;
+        console.log("Filtre unvisited défini à :", activeFilters.unvisited);
         updateMarkersBasedOnFilters();
     });
     document.getElementById('filter-label').addEventListener('click', function() {
         activeFilters.label = !activeFilters.label;
+        activeFilters.type_pate = false;
         activeFilters.visited = false;
         activeFilters.unvisited = false;
+        console.log("Filtre label défini à :", activeFilters.label);
         updateMarkersBasedOnFilters();
     });
 }

@@ -98,7 +98,7 @@ class Etablissement(db.Model):
     photos = db.relationship('Photo', back_populates='etablissement', foreign_keys='Photo.id_etab')
     utilisateur = db.relationship('Utilisateur', back_populates='etablissements')
 
-    def to_dict(self, include_flans=False, include_photos=False):
+    def to_dict(self, include_flans=True, include_photos=False):
         data = {
             'id_etab': self.id_etab,
             'type_etab': self.type_etab.value if self.type_etab else None,
@@ -148,7 +148,7 @@ class Flan(db.Model):
     etablissement = db.relationship('Etablissement', back_populates='flans')
     utilisateur = db.relationship('Utilisateur', back_populates='flans')
 
-    def to_dict(self, include_etablissement=False, include_evaluations=False, include_photos=False):
+    def to_dict(self, include_etablissement=True, include_evaluations=True, include_photos=False):
             data = {
                 'id_flan': self.id_flan,
                 'id_etab': self.id_etab,

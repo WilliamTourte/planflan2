@@ -31,7 +31,6 @@ def liste_etablissements():
         form_recherche = RechercheForm()
     else:
         form_recherche = RechercheForm(request.args)
-
     # 2. Recherche simple (toujours appliquée si présente)
     recherche_simple = request.args.get('recherche_simple', None)
     if recherche_simple:
@@ -43,12 +42,10 @@ def liste_etablissements():
     else:
         # Sinon, on part d'une requête de base
         query = Etablissement.query
-
     # 3. Filtres avancés (uniquement si le formulaire est valide)
     if form_recherche.validate():
         # On a besoin de la jointure avec Flan pour les filtres sur les flans
         query = query.join(Flan)
-
         # Application des filtres
         if form_recherche.nom.data:
             query = query.filter(Etablissement.nom.ilike(f'%{form_recherche.nom.data}%'))
@@ -71,11 +68,9 @@ def liste_etablissements():
             query = query.filter(Etablissement.visite == (form_recherche.visite.data == 'oui'))
         if form_recherche.labellise.data and form_recherche.labellise.data != 'tous':
             query = query.filter(Etablissement.label == (form_recherche.labellise.data == 'oui'))
-
     # 4. Exécution de la requête
     resultats = query.distinct().all()  # distinct() pour éviter les doublons
     etablissements, etablissements_json = afficher_etablissements(resultats)
-
     return render_template(
         'liste_etablissements.html',
         etablissements=etablissements,
@@ -112,7 +107,6 @@ def api_etablissements():
             type_saveur = request.args.get('type_saveur', 'tous')
             prix = request.args.get('prix', 'tous')
             format = request.args.get('format', 'json')  # 'html' ou 'json'
-
         # Applique les filtres
         query = Etablissement.query.join(Flan)
         if nom:
@@ -138,7 +132,6 @@ def api_etablissements():
                 query = query.filter(Flan.prix >= 2.5, Flan.prix < 5)
             elif prix == '5':
                 query = query.filter(Flan.prix >= 5)
-
         # Récupère les résultats uniques
         etablissements = []
         seen = set()
@@ -146,7 +139,6 @@ def api_etablissements():
             if etab.id_etab not in seen:
                 seen.add(etab.id_etab)
                 etablissements.append(etab)
-
         # Renvoie HTML ou JSON
         if format == 'html':
             html = render_template(
@@ -158,6 +150,7 @@ def api_etablissements():
             response.headers['Content-Type'] = 'text/html; charset=utf-8'
             return response
         else:
+            # Utilisez la méthode to_dict pour inclure les flans
             return jsonify([etab.to_dict() for etab in etablissements])
     except Exception as e:
         # En cas d'erreur, renvoie toujours du JSON avec un message d'erreur
