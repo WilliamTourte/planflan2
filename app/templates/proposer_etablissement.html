@@ -100,54 +100,60 @@
         });
     };
 
-    window.initMap = function(lat, lng, title) {
-        const mapElement = document.getElementById("map");
-        if (!mapElement) {
-            console.error("Élément #map introuvable !");
-            const mapContainer = document.getElementById("map-container");
-            if (mapContainer) mapContainer.innerHTML = "<p style='color: red;'>Erreur : Impossible de charger la carte.</p>";
-            return;
-        }
-        const mapContainer = document.getElementById('map-container');
-        mapContainer.style.display = 'block';
-        let center = [46.2276, 2.2137];
-        let zoom = 6;
-        if (lat && lng) {
-            center = [lat, lng];
-            zoom = 15;
-        }
-        map = L.map('map').setView(center, zoom);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
+   window.initMap = function(lat, lng, title) {
+    const mapElement = document.getElementById("map");
+    if (!mapElement) {
+        console.error("Élément #map introuvable !");
+        const mapContainer = document.getElementById("map-container");
+        if (mapContainer) mapContainer.innerHTML = "<p style='color: red;'>Erreur : Impossible de charger la carte.</p>";
+        return;
+    }
+    const mapContainer = document.getElementById('map-container');
+    mapContainer.style.display = 'block';
 
-        // Si on a un établissement sélectionné via l'autocomplete
-        if (lat && lng && title) {
-            const marker = L.marker([lat, lng]).addTo(map);
-            if (etablissementId) {
-                marker.bindPopup("Chargement en cours...").openPopup();
-                fetch(`/get_infowindow_content?id_etab=${etablissementId}`)
-                    .then(response => response.text())
-                    .then(content => {
-                        marker.setPopupContent(content);
-                    })
-                    .catch(error => {
-                        console.error('Erreur lors du chargement de l\'infowindow:', error);
-                        let popupContent = `<b>${title}</b>`;
-                        if (etablissementUrl) {
-                            popupContent += `<br><a href="${etablissementUrl}" target="_blank">Voir la page de l'établissement</a>`;
-                        }
-                        marker.setPopupContent(popupContent);
-                    });
-            } else {
-                let popupContent = `<b>${title}</b>`;
-                if (etablissementUrl) {
-                    popupContent += `<br><a href="${etablissementUrl}" target="_blank">Voir la page de l'établissement</a>`;
-                }
-                marker.bindPopup(popupContent).openPopup();
+    // Si une carte existe déjà, la détruire avant d'en créer une nouvelle
+    if (map) {
+        map.remove();
+    }
+
+    let center = [46.2276, 2.2137];
+    let zoom = 6;
+    if (lat && lng) {
+        center = [lat, lng];
+        zoom = 15;
+    }
+    map = L.map('map').setView(center, zoom);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Si on a un établissement sélectionné via l'autocomplete
+    if (lat && lng && title) {
+        const marker = L.marker([lat, lng]).addTo(map);
+        if (etablissementId) {
+            marker.bindPopup("Chargement en cours...").openPopup();
+            fetch(`/get_infowindow_content?id_etab=${etablissementId}`)
+                .then(response => response.text())
+                .then(content => {
+                    marker.setPopupContent(content);
+                })
+                .catch(error => {
+                    console.error('Erreur lors du chargement de l\'infowindow:', error);
+                    let popupContent = `<b>${title}</b>`;
+                    if (etablissementUrl) {
+                        popupContent += `<br><a href="${etablissementUrl}" target="_blank">Voir la page de l'établissement</a>`;
+                    }
+                    marker.setPopupContent(popupContent);
+                });
+        } else {
+            let popupContent = `<b>${title}</b>`;
+            if (etablissementUrl) {
+                popupContent += `<br><a href="${etablissementUrl}" target="_blank">Voir la page de l'établissement</a>`;
             }
+            marker.bindPopup(popupContent).openPopup();
         }
-    };
+    }
+};
 
     document.addEventListener('DOMContentLoaded', function() {
         const script = document.createElement('script');
