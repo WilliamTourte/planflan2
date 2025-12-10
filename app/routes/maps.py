@@ -109,18 +109,18 @@ def ajouter_etablissement():
             db.session.commit()
 
             # Récupère l'ID de l'établissement nouvellement créé
-            id_etab = nouvel_etablissement.id_etab  # ou nouvel_etablissement.id selon ton modèle
+            id_etab = nouvel_etablissement.id_etab
 
             flash("Établissement ajouté avec succès !", "success")
             # Redirige vers la page de l'établissement
             return redirect(url_for('main.afficher_etablissement_unique', id_etab=id_etab))
-    # ...
 
         else:
             print("\n9. ERREURS DE VALIDATION:")
             for field_name, errors in form_ajout.errors.items():
                 print(f"   {field_name}: {errors}")
-    # Pour une requête GET
+
+    # Pour une requête GET (ne devrait pas servir)
     resultats = Etablissement.query.all()
     etablissements, etablissements_json = afficher_etablissements(resultats)
     return render_template(
