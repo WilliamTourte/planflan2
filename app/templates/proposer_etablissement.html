@@ -8,71 +8,69 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
             integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
             crossorigin=""></script>
+<script>
+    let autocomplete;
+    let map;
+    let etablissementUrl = null;
+    let etablissementId = null;
 
-    <script>
-        let autocomplete;
-        let map;
-        // Fonction pour initialiser l'autocomplétion
-        window.initAutocomplete = function() {
-            const input = document.getElementById('search');
-            if (!input) {
-                console.error("Élément #search introuvable !");
+    window.initAutocomplete = function() {
+        const input = document.getElementById('search');
+        if (!input) {
+            console.error("Élément #search introuvable !");
+            return;
+        }
+        autocomplete = new google.maps.places.Autocomplete(input, {
+            types: ['establishment'],
+            componentRestrictions: {country: 'fr'}
+        });
+        autocomplete.addListener('place_changed', function() {
+            const place = autocomplete.getPlace();
+            if (!place.geometry) {
+                console.error("Aucune information de géolocalisation disponible pour ce lieu.");
                 return;
             }
-            autocomplete = new google.maps.places.Autocomplete(input, {
-                types: ['establishment'],
-                componentRestrictions: {country: 'fr'}
-            });
-            // Écouter la sélection d'un lieu
-            autocomplete.addListener('place_changed', function() {
-                const place = autocomplete.getPlace();
-                if (!place.geometry) {
-                    console.error("Aucune information de géolocalisation disponible pour ce lieu.");
+            document.getElementById('ajout-etab-nom').value = place.name || '';
+            document.getElementById('ajout-etab-adresse').value = place.formatted_address || '';
+            document.getElementById('ajout-etab-latitude').value = place.geometry.location.lat();
+            document.getElementById('ajout-etab-longitude').value = place.geometry.location.lng();
+
+            // Vérifier si le lieu est déjà dans la liste
+            fetch('/verifier_etablissement', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({ nom: place.name }),
+            })
+            .then(async response => {
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Erreur serveur: ${errorText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    console.error("Erreur:", data.error);
                     return;
                 }
-                // Remplir les champs cachés
-                document.getElementById('ajout-etab-nom').value = place.name || '';
-                document.getElementById('ajout-etab-adresse').value = place.formatted_address || '';
-                document.getElementById('ajout-etab-latitude').value = place.geometry.location.lat();
-                document.getElementById('ajout-etab-longitude').value = place.geometry.location.lng();
-                // Vérifier si le lieu est déjà dans la liste
-                fetch('/verifier_etablissement', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').content
-                    },
-                    body: JSON.stringify({ nom: place.name }),
-                })
-                .then(async response => {
-                    if (!response.ok) {
-                        const errorText = await response.text();
-                        throw new Error(`Erreur serveur: ${errorText}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.error) {
-                        console.error("Erreur:", data.error);
-                        return;
-                    }
-                    if (data.exists) {
-                        const previousMessages = document.querySelectorAll('.alert-warning');
-                        previousMessages.forEach(msg => msg.remove());
-                        const message = document.createElement('div');
-                        message.className = 'alert alert-warning';
-                        message.innerHTML = `Cet établissement est déjà dans la liste. <a href="${data.url}">Voir la page</a>`;
-                        document.querySelector('.etablissement-form-container').prepend(message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Erreur:', error);
-                    const errorMessage = document.createElement('div');
-                    errorMessage.className = 'alert alert-danger';
-                    errorMessage.textContent = `Erreur: ${error.message}`;
-                    document.querySelector('.etablissement-form-container').prepend(errorMessage);
-                });
-                // Extraire le code postal et la ville
+                if (data.exists) {
+                    etablissementUrl = data.url;
+                    etablissementId = data.id_etab;
+                    console.log("Établissement existant, ID:", etablissementId);
+                    const previousMessages = document.querySelectorAll('.alert-warning');
+                    previousMessages.forEach(msg => msg.remove());
+                    const message = document.createElement('div');
+                    message.className = 'alert alert-warning';
+                    message.innerHTML = `Déjà présent : <a href="${data.url}">Voir la page</a>`;
+                    document.querySelector('.etablissement-form-container').prepend(message);
+                } else {
+                    etablissementUrl = null;
+                    etablissementId = null;
+                }
+                // Appeler initMap ici, après avoir défini etablissementId
                 fetch('/extraire_infos_adresse', {
                     method: 'POST',
                     headers: {
@@ -86,47 +84,90 @@
                     document.getElementById('ajout-etab-code_postal').value = data.code_postal || '';
                     document.getElementById('ajout-etab-ville').value = data.ville || '';
                     document.getElementById('ajout-etab-adresse').value = data.adresse_nettoyee || '';
-                    // Afficher la carte Leaflet
                     initMap(place.geometry.location.lat(), place.geometry.location.lng(), place.name);
                 })
                 .catch(error => console.error('Erreur:', error));
+            })
+            .catch(error => {
+                console.error('Erreur:', error);
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'alert alert-danger';
+                errorMessage.textContent = `Erreur: ${error.message}`;
+                document.querySelector('.etablissement-form-container').prepend(errorMessage);
+                etablissementUrl = null;
+                etablissementId = null;
             });
-        };
-        // Fonction pour initialiser la carte Leaflet
-        function initMap(lat, lng, title) {
-            const mapContainer = document.getElementById('map-container');
-            mapContainer.style.display = 'block';
-            const map = L.map('map').setView([lat, lng], 15);
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
-            L.marker([lat, lng]).addTo(map)
-                .bindPopup(title)
-                .openPopup();
-        }
-        // Chargement de l'API Google Maps
-        document.addEventListener('DOMContentLoaded', function() {
-            const script = document.createElement('script');
-            script.src = `https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places&callback=initAutocomplete&v=weekly&loading=async`;
-            script.async = true;
-            script.defer = true;
-            document.head.appendChild(script);
         });
-    </script>
-{% endblock %}
+    };
 
+    window.initMap = function(lat, lng, title) {
+        const mapElement = document.getElementById("map");
+        if (!mapElement) {
+            console.error("Élément #map introuvable !");
+            const mapContainer = document.getElementById("map-container");
+            if (mapContainer) mapContainer.innerHTML = "<p style='color: red;'>Erreur : Impossible de charger la carte.</p>";
+            return;
+        }
+        const mapContainer = document.getElementById('map-container');
+        mapContainer.style.display = 'block';
+        let center = [46.2276, 2.2137];
+        let zoom = 6;
+        if (lat && lng) {
+            center = [lat, lng];
+            zoom = 15;
+        }
+        map = L.map('map').setView(center, zoom);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Si on a un établissement sélectionné via l'autocomplete
+        if (lat && lng && title) {
+            const marker = L.marker([lat, lng]).addTo(map);
+            if (etablissementId) {
+                marker.bindPopup("Chargement en cours...").openPopup();
+                fetch(`/get_infowindow_content?id_etab=${etablissementId}`)
+                    .then(response => response.text())
+                    .then(content => {
+                        marker.setPopupContent(content);
+                    })
+                    .catch(error => {
+                        console.error('Erreur lors du chargement de l\'infowindow:', error);
+                        let popupContent = `<b>${title}</b>`;
+                        if (etablissementUrl) {
+                            popupContent += `<br><a href="${etablissementUrl}" target="_blank">Voir la page de l'établissement</a>`;
+                        }
+                        marker.setPopupContent(popupContent);
+                    });
+            } else {
+                let popupContent = `<b>${title}</b>`;
+                if (etablissementUrl) {
+                    popupContent += `<br><a href="${etablissementUrl}" target="_blank">Voir la page de l'établissement</a>`;
+                }
+                marker.bindPopup(popupContent).openPopup();
+            }
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places&callback=initAutocomplete&v=weekly&loading=async`;
+        script.async = true;
+        script.defer = true;
+        document.head.appendChild(script);
+    });
+</script>
+{% endblock %}
 {% block content %}
     <div class="container">
         <div class="form-container etablissement-form-container">
             <form method="POST" action="{{ action_url }}" class="etablissement-form">
                 {{ form.hidden_tag() }}
-
                 <!-- Champ de recherche pour l'autocomplete Google Maps -->
                 <div class="form-group">
                     <label for="search" class="form-check-label">Recherche d'établissement</label>
                     <input type="text" id="search" class="form-control" placeholder="Rechercher un établissement">
                 </div>
-
                 <!-- Champs cachés pour les coordonnées et l'adresse -->
                 <div class="etablissement-hidden-fields">
                     {{ form.nom(id="ajout-etab-nom") }}
@@ -136,13 +177,11 @@
                     {{ form.code_postal(id="ajout-etab-code_postal") }}
                     {{ form.ville(id="ajout-etab-ville") }}
                 </div>
-
                 <!-- Type d'établissement -->
                 <div class="form-group">
                     {{ form.type_etab.label(class="form-check-label") }}
                     {{ form.type_etab(class="form-select") }}
                 </div>
-
                 {% if current_user.is_admin %}
                     <div class="form-group etablissement-checkbox-group">
                         <div class="form-check-inline">
@@ -155,7 +194,6 @@
                         </div>
                     </div>
                 {% endif %}
-
                 <div class="btn-group">
                     <button type="submit" class="btn btn-success">
                         Enregistrer
@@ -163,7 +201,6 @@
                 </div>
             </form>
         </div>
-
         <!-- Conteneur pour la carte -->
         <div id="map-container" class="etablissement-map-container">
             <div id="map" class="etablissement-map"></div>

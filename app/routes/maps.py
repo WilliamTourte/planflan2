@@ -74,7 +74,8 @@ def verifier_etablissement():
             current_app.logger.info(f"Établissement trouvé : {etablissement.nom}")
             return jsonify({
                 'exists': True,
-                'url': url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab, _external=True)
+                'url': url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab, _external=True),
+                'id_etab':etablissement.id_etab
             })
         else:
             current_app.logger.info("Aucun établissement trouvé avec ce nom.")
