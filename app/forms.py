@@ -41,11 +41,12 @@ class EtabForm(FlaskForm):
     adresse = HiddenField('Adresse', validators=[DataRequired(), Length(min=3, max=50)])
     code_postal = HiddenField('Code Postal', validators=[DataRequired(), Length(min=5, max=5)])
     ville = HiddenField('Ville', validators=[DataRequired(), Length(min=3, max=50)])
-    description = StringField('Description', validators=[Length(min=3, max=255)])
+    description = StringField('Description')
     label = BooleanField('Labellisé')
     visite = BooleanField('Visité')
     latitude = HiddenField('Latitude')
     longitude = HiddenField('Longitude')
+    id_user = HiddenField('id_user', default=1)
     submit = SubmitField('Proposer un établissement')
 
 # Formulaire proposer/modifier un flan

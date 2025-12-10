@@ -50,12 +50,13 @@ def extraire_infos_adresse():
 
 @maps_bp.route('/proposer_etablissement', methods=['GET', 'POST'])
 def proposer_etablissement():
-    form = EtabForm(prefix='ajout-etab')
-    return render_template('proposer_etablissement.html',
-                           form=form,
-                           google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
-
-
+    form = EtabForm(prefix='ajout-etab')  # Ajoute le préfixe ici
+    return render_template(
+        'proposer_etablissement.html',
+        action_url=url_for('maps.ajouter_etablissement'),
+        form=form,
+        google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY']
+    )
 
 @maps_bp.route('/verifier_etablissement', methods=['POST'])
 def verifier_etablissement():
@@ -100,9 +101,10 @@ def ajouter_etablissement():
                 longitude=form_ajout.longitude.data,
                 type_etab=form_ajout.type_etab.data,
                 description=form_ajout.description.data,
-                id_user=current_user.id_user,
+                id_user=1, ##### TEMPORAIRE #####
                 label=form_ajout.label.data,  # Directement un booléen
-                visite=form_ajout.visite.data  # Directement un booléen
+                visite=form_ajout.visite.data,  # Directement un booléen
+                
             )
             db.session.add(nouvel_etablissement)
             db.session.commit()

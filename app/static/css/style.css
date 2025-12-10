@@ -3,14 +3,14 @@
    ============================================= */
 :root {
     /* Polices */
-    --font-primary: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --font-primary: 'Verdana';
     --font-bubblegum: 'Bubblegum', cursive;
 
     /* Couleurs */
     --color-primary: #799dcb;
     --color-secondary: #ffcf40;
     --color-success: #ffcf40;
-    --color-success-dark: #45a049;
+    --color-success-dark: #ffcf40;
     --color-danger: #e74c3c;
     --color-danger-dark: #c0392b;
     --color-info: #3498db;

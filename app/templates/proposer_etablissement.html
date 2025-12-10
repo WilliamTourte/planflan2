@@ -21,9 +21,11 @@
             return;
         }
         autocomplete = new google.maps.places.Autocomplete(input, {
-            types: ['establishment'],
-            componentRestrictions: {country: 'fr'}
+        types: ['bakery', 'cafe', 'restaurant'],
+        componentRestrictions: { country: 'fr' }
         });
+
+        
         autocomplete.addListener('place_changed', function() {
             const place = autocomplete.getPlace();
             if (!place.geometry) {
@@ -213,3 +215,4 @@
         </div>
     </div>
 {% endblock %}
+
