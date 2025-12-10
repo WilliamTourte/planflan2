@@ -980,3 +980,85 @@ input.back:hover {
         padding: var(--padding-sm);
     }
 }
+/* FILTRES SUR LA MAP */
+#filter-controls {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    background: transparent !important;
+    padding: 0;
+    width: 100%; /* Prend toute la largeur de la carte */
+    max-width: 500px; /* Limite la largeur pour éviter que le conteneur soit trop large */
+    border:none !important;
+}
+
+/* Conteneur des boutons principaux */
+.main-filters {
+    display: flex;
+    gap: 8px;
+    background: transparent;
+    justify-content: flex-end; /* Aligne les boutons à droite */
+    margin-left: auto; /* Décale le groupe de boutons à droite */
+    width: fit-content; /* Largeur adaptée au contenu */
+}
+
+/* Boutons principaux plus petits et compacts */
+.main-filters button {
+    padding: 2px 6px; /* Réduit l'espace interne */
+    font-size: 0.9rem; /* Texte plus petit */
+    width: auto; /* Largeur adaptée au contenu */
+    min-width: 0; /* Annule les largeurs minimales par défaut */
+    height: auto; /* Hauteur adaptée au contenu */
+    line-height: 1; /* Alignement vertical du texte */
+    white-space: nowrap; /* Empêche le retour à la ligne */
+    background:#ffcf40
+}
+
+
+
+/* Sous-filtres */
+.sub-filters {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: transparent;
+    padding: 4px 8px;
+    margin-top: 6px;
+    z-index: 1001;
+    min-width: 160px;
+}
+
+.sub-filters.show {
+    display: block;
+}
+
+/* Style pour les groupes de filtres */
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    background: transparent !important;
+    border: none !important;
+    padding: 0;
+}
+
+.filter-group label,
+.filter-group button {
+    margin-left: auto;
+    display: block;
+    width: fit-content;
+}
+
+.filter-group button {
+    padding: 2px 6px; /* Réduit l'espace interne */
+    font-size: 0.9rem; /* Texte plus petit */
+    width: auto; /* Largeur adaptée au contenu */
+    min-width: 0; /* Annule les largeurs minimales par défaut */
+    height: auto; /* Hauteur adaptée au contenu */
+    line-height: 1; /* Alignement vertical du texte */
+    white-space: nowrap; /* Empêche le retour à la ligne */
+    background:#ffcf40
+}

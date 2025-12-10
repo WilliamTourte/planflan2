@@ -4,6 +4,7 @@ let map;
 let markers = [];
 let etablissements = [];
 let baseUrl = window.location.origin;
+
 // Variables pour les filtres
 let activeFilters = {
     type_pate: false,
@@ -28,24 +29,16 @@ function closeInfoWindow() {
 
 // Fonction pour mettre à jour l'affichage des marqueurs en fonction des filtres
 function updateMarkersBasedOnFilters() {
-    console.log("Mise à jour des marqueurs en fonction des filtres. Filtre actif :", activeFilters);
     markers.forEach(marker => {
         const etablissement = marker.options.etablissement;
         let showMarker = true;
-        console.log("Établissement :", etablissement.nom, "Flans :", etablissement.flans);
 
         // Vérifier si l'établissement a au moins un flan correspondant au filtre de type de pâte
         if (activeFilters.type_pate) {
-            console.log(`Filtre type_pate actif : ${activeFilters.type_pate}`);
             if (!etablissement.flans || etablissement.flans.length === 0) {
-                console.log(`Établissement ${etablissement.nom} n'a pas de flans.`);
                 showMarker = false;
             } else {
-                const hasMatchingPate = etablissement.flans.some(flan => {
-                    console.log(`Vérification du flan : ${flan.nom}, type_pate : ${flan.type_pate}`);
-                    return flan.type_pate === activeFilters.type_pate;
-                });
-                console.log(`Établissement ${etablissement.nom} a un flan correspondant : ${hasMatchingPate}`);
+                const hasMatchingPate = etablissement.flans.some(flan => flan.type_pate === activeFilters.type_pate);
                 if (!hasMatchingPate) {
                     showMarker = false;
                 }
@@ -63,7 +56,6 @@ function updateMarkersBasedOnFilters() {
             showMarker = false;
         }
 
-        console.log(`Établissement ${etablissement.nom} sera ${showMarker ? 'affiché' : 'masqué'}`);
         if (showMarker) {
             map.addLayer(marker);
         } else {
@@ -203,7 +195,7 @@ function updateMapAndMarkers() {
                 <div class="infowindow-content">
                     <h4>${etablissement.nom}</h4>
                     <p>${etablissement.adresse}, ${etablissement.ville}</p>
-                    <a href="${baseUrl}/etablissements/${etablissement.id_etab}" class="btn btn-sm btn-primary">Voir plus</a>
+                    <a href="${baseUrl}/etablissement/${etablissement.id_etab}" class="btn btn-sm btn-success">Voir plus</a>
                 </div>
             `);
             marker.options.etablissement = etablissement; // Ajouter les données de l'établissement au marqueur
@@ -225,73 +217,135 @@ function updateMapAndMarkers() {
 function setupFilterButtons() {
     document.getElementById('filter-all').addEventListener('click', function() {
         activeFilters = { type_pate: false, visited: false, unvisited: false, label: false };
-        console.log("Filtre réinitialisé :", activeFilters);
         updateMarkersBasedOnFilters();
+        document.getElementById('sub-filters').classList.remove('show');
     });
-    document.getElementById('filter-type_pate_FEUILLETEE').addEventListener('click', function() {
-        activeFilters.type_pate = activeFilters.type_pate === 'Feuilletée' ? false : 'Feuilletée';
-        console.log(`Filtre type_pate défini à : ${activeFilters.type_pate}`);
-        activeFilters.visited = false;
-        activeFilters.unvisited = false;
-        activeFilters.label = false;
-        updateMarkersBasedOnFilters();
+
+    // Bouton pour afficher/masquer les options de pâte
+    document.getElementById('filter-pate-btn').addEventListener('click', function() {
+        const subFilters = document.getElementById('sub-filters');
+        // Si les sous-filtres sont déjà visibles et proviennent de ce bouton, on les masque
+        if (subFilters.classList.contains('show') &&
+            subFilters.querySelector('.filter-group label')?.textContent === 'Pâte') {
+            subFilters.classList.remove('show');
+        } else {
+            subFilters.innerHTML = `
+                <div class="filter-group">
+                   
+                    <button id="filter-type_pate_FEUILLETEE" class="btn btn-secondary">Feuilletée</button>
+                    <button id="filter-type_pate_BRISEE" class="btn btn-secondary">Brisée</button>
+                    <button id="filter-type_pate_SUCREE" class="btn btn-secondary">Sucrée</button>
+                    <button id="filter-type_pate_SABLEE" class="btn btn-secondary">Sablée</button>
+                    <button id="filter-type_pate_MIXTE" class="btn btn-secondary">Mixte</button>
+                </div>
+            `;
+            subFilters.classList.add('show');
+            setupPateButtons();
+        }
     });
-    document.getElementById('filter-type_pate_BRISEE').addEventListener('click', function() {
-        activeFilters.type_pate = activeFilters.type_pate === 'Brisée' ? false : 'Brisée';
-        console.log(`Filtre type_pate défini à : ${activeFilters.type_pate}`);
-        activeFilters.visited = false;
-        activeFilters.unvisited = false;
-        activeFilters.label = false;
-        updateMarkersBasedOnFilters();
+
+    // Bouton pour afficher/masquer les options de statut
+    document.getElementById('filter-statut-btn').addEventListener('click', function() {
+        const subFilters = document.getElementById('sub-filters');
+        // Si les sous-filtres sont déjà visibles et proviennent de ce bouton, on les masque
+        if (subFilters.classList.contains('show') &&
+            subFilters.querySelector('.filter-group label')?.textContent === 'Statut') {
+            subFilters.classList.remove('show');
+        } else {
+            subFilters.innerHTML = `
+                <div class="filter-group">
+                    <button id="filter-visited" class="btn btn-success">Visités</button>
+                    <button id="filter-unvisited" class="btn btn-danger">Non visités</button>
+                    <button id="filter-label" class="btn btn-warning">Avec label</button>
+                </div>
+            `;
+            subFilters.classList.add('show');
+            setupStatutButtons();
+        }
     });
-    document.getElementById('filter-type_pate_SUCREE').addEventListener('click', function() {
-        activeFilters.type_pate = activeFilters.type_pate === 'Sucrée' ? false : 'Sucrée';
-        console.log(`Filtre type_pate défini à : ${activeFilters.type_pate}`);
-        activeFilters.visited = false;
-        activeFilters.unvisited = false;
-        activeFilters.label = false;
-        updateMarkersBasedOnFilters();
-    });
-    document.getElementById('filter-type_pate_SABLEE').addEventListener('click', function() {
-        activeFilters.type_pate = activeFilters.type_pate === 'Sablée' ? false : 'Sablée';
-        console.log(`Filtre type_pate défini à : ${activeFilters.type_pate}`);
-        activeFilters.visited = false;
-        activeFilters.unvisited = false;
-        activeFilters.label = false;
-        updateMarkersBasedOnFilters();
-    });
-    document.getElementById('filter-type_pate_MIXTE').addEventListener('click', function() {
-        activeFilters.type_pate = activeFilters.type_pate === 'Mixte' ? false : 'Mixte';
-        console.log(`Filtre type_pate défini à : ${activeFilters.type_pate}`);
-        activeFilters.visited = false;
-        activeFilters.unvisited = false;
-        activeFilters.label = false;
-        updateMarkersBasedOnFilters();
-    });
-    document.getElementById('filter-visited').addEventListener('click', function() {
-        activeFilters.visited = !activeFilters.visited;
-        activeFilters.type_pate = false;
-        activeFilters.unvisited = false;
-        activeFilters.label = false;
-        console.log("Filtre visited défini à :", activeFilters.visited);
-        updateMarkersBasedOnFilters();
-    });
-    document.getElementById('filter-unvisited').addEventListener('click', function() {
-        activeFilters.unvisited = !activeFilters.unvisited;
-        activeFilters.type_pate = false;
-        activeFilters.visited = false;
-        activeFilters.label = false;
-        console.log("Filtre unvisited défini à :", activeFilters.unvisited);
-        updateMarkersBasedOnFilters();
-    });
-    document.getElementById('filter-label').addEventListener('click', function() {
-        activeFilters.label = !activeFilters.label;
-        activeFilters.type_pate = false;
-        activeFilters.visited = false;
-        activeFilters.unvisited = false;
-        console.log("Filtre label défini à :", activeFilters.label);
-        updateMarkersBasedOnFilters();
-    });
+
+    // Fonction pour configurer les boutons de pâte
+    function setupPateButtons() {
+        document.getElementById('filter-type_pate_FEUILLETEE').addEventListener('click', function() {
+            activeFilters.type_pate = activeFilters.type_pate === 'Feuilletée' ? false : 'Feuilletée';
+            activeFilters.visited = false;
+            activeFilters.unvisited = false;
+            activeFilters.label = false;
+            updateMarkersBasedOnFilters();
+        });
+
+        document.getElementById('filter-type_pate_BRISEE').addEventListener('click', function() {
+            activeFilters.type_pate = activeFilters.type_pate === 'Brisée' ? false : 'Brisée';
+            activeFilters.visited = false;
+            activeFilters.unvisited = false;
+            activeFilters.label = false;
+            updateMarkersBasedOnFilters();
+        });
+
+        document.getElementById('filter-type_pate_SUCREE').addEventListener('click', function() {
+            activeFilters.type_pate = activeFilters.type_pate === 'Sucrée' ? false : 'Sucrée';
+            activeFilters.visited = false;
+            activeFilters.unvisited = false;
+            activeFilters.label = false;
+            updateMarkersBasedOnFilters();
+        });
+
+        document.getElementById('filter-type_pate_SABLEE').addEventListener('click', function() {
+            activeFilters.type_pate = activeFilters.type_pate === 'Sablée' ? false : 'Sablée';
+            activeFilters.visited = false;
+            activeFilters.unvisited = false;
+            activeFilters.label = false;
+            updateMarkersBasedOnFilters();
+        });
+
+        document.getElementById('filter-type_pate_MIXTE').addEventListener('click', function() {
+            activeFilters.type_pate = activeFilters.type_pate === 'Mixte' ? false : 'Mixte';
+            activeFilters.visited = false;
+            activeFilters.unvisited = false;
+            activeFilters.label = false;
+            updateMarkersBasedOnFilters();
+        });
+    }
+
+    // Fonction pour configurer les boutons de statut
+    function setupStatutButtons() {
+        document.getElementById('filter-visited').addEventListener('click', function() {
+            activeFilters.visited = !activeFilters.visited;
+            activeFilters.type_pate = false;
+            activeFilters.unvisited = false;
+            activeFilters.label = false;
+            updateMarkersBasedOnFilters();
+        });
+
+        document.getElementById('filter-unvisited').addEventListener('click', function() {
+            activeFilters.unvisited = !activeFilters.unvisited;
+            activeFilters.type_pate = false;
+            activeFilters.visited = false;
+            activeFilters.label = false;
+            updateMarkersBasedOnFilters();
+        });
+
+        document.getElementById('filter-label').addEventListener('click', function() {
+            activeFilters.label = !activeFilters.label;
+            activeFilters.type_pate = false;
+            activeFilters.visited = false;
+            activeFilters.unvisited = false;
+            updateMarkersBasedOnFilters();
+        });
+    }
+document.addEventListener('click', function(event) {
+    const subFilters = document.getElementById('sub-filters');
+    const filterPateBtn = document.getElementById('filter-pate-btn');
+    const filterStatutBtn = document.getElementById('filter-statut-btn');
+
+    // Si le clic n'est pas sur un bouton de filtre ou dans les sous-filtres, on masque les sous-filtres
+    if (!filterPateBtn.contains(event.target) &&
+        !filterStatutBtn.contains(event.target) &&
+        !subFilters.contains(event.target)) {
+        subFilters.classList.remove('show');
+    }
+});
+
 }
 
 // Initialisation globale
