@@ -101,15 +101,21 @@ def ajouter_etablissement():
                 longitude=form_ajout.longitude.data,
                 type_etab=form_ajout.type_etab.data,
                 description=form_ajout.description.data,
-                id_user=1, ##### TEMPORAIRE #####
-                label=form_ajout.label.data,  # Directement un booléen
-                visite=form_ajout.visite.data,  # Directement un booléen
-                
+                id_user=1,  # TEMPORAIRE
+                label=form_ajout.label.data,
+                visite=form_ajout.visite.data,
             )
             db.session.add(nouvel_etablissement)
             db.session.commit()
+
+            # Récupère l'ID de l'établissement nouvellement créé
+            id_etab = nouvel_etablissement.id_etab  # ou nouvel_etablissement.id selon ton modèle
+
             flash("Établissement ajouté avec succès !", "success")
-            return redirect(url_for('main.index'))
+            # Redirige vers la page de l'établissement
+            return redirect(url_for('main.afficher_etablissement_unique', id_etab=id_etab))
+    # ...
+
         else:
             print("\n9. ERREURS DE VALIDATION:")
             for field_name, errors in form_ajout.errors.items():
