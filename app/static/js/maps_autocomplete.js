@@ -4,6 +4,12 @@ let map;
 let markers = [];
 let etablissements = [];
 let baseUrl = window.location.origin;
+// Variables pour les filtres
+let activeFilters = {
+    visited: false,
+    unvisited: false,
+    label: false
+};
 
 // Fonction pour créer des icônes personnalisées
 const createEmojiIcon = (emoji, className) => {
@@ -17,6 +23,30 @@ const createEmojiIcon = (emoji, className) => {
 
 function closeInfoWindow() {
     // Leaflet gère la fermeture des popups automatiquement
+}
+
+// Fonction pour mettre à jour l'affichage des marqueurs en fonction des filtres
+function updateMarkersBasedOnFilters() {
+    markers.forEach(marker => {
+        const etablissement = marker.options.etablissement;
+        let showMarker = true;
+
+        if (activeFilters.visited && !etablissement.visite) {
+            showMarker = false;
+        }
+        if (activeFilters.unvisited && etablissement.visite) {
+            showMarker = false;
+        }
+        if (activeFilters.label && !etablissement.label) {
+            showMarker = false;
+        }
+
+        if (showMarker) {
+            map.addLayer(marker);
+        } else {
+            map.removeLayer(marker);
+        }
+    });
 }
 
 // Initialisation de la carte Leaflet
@@ -45,7 +75,6 @@ window.initAutocomplete = function() {
         types: ['establishment'],
         componentRestrictions: {country: 'fr'}
     });
-
     // Écouter les changements dans l'Autocomplete
     autocomplete.addListener('place_changed', function() {
         const place = autocomplete.getPlace();
@@ -53,18 +82,15 @@ window.initAutocomplete = function() {
             console.error("Aucune géométrie trouvée pour ce lieu.");
             return;
         }
-
         // Remplir les champs CACHÉS avec le préfixe "ajout-etab-"
         const nomElement = document.getElementById('ajout-etab-nom');
         const adresseElement = document.getElementById('ajout-etab-adresse');
         const latitudeElement = document.getElementById('ajout-etab-latitude');
         const longitudeElement = document.getElementById('ajout-etab-longitude');
-
         if (nomElement) nomElement.value = place.name || '';
         if (adresseElement) adresseElement.value = place.formatted_address || '';
         if (latitudeElement) latitudeElement.value = place.geometry.location.lat();
         if (longitudeElement) longitudeElement.value = place.geometry.location.lng();
-
         // Vérifier si le lieu est déjà dans la liste
         fetch('/verifier_etablissement', {
             method: 'POST',
@@ -126,19 +152,16 @@ function updateMapAndMarkers() {
         console.warn("Aucun établissement trouvé.");
         return;
     }
-
     // Efface les anciens marqueurs
     markers.forEach(marker => map.removeLayer(marker));
     markers = [];
     const bounds = L.latLngBounds();
-
     etablissements.forEach(etablissement => {
         console.log(`Établissement: ${etablissement.nom}, Lat: ${etablissement.latitude}, Lng: ${etablissement.longitude}`);
         let icon = createEmojiIcon('🏠', 'default-icon');
         if (etablissement.label) icon = createEmojiIcon('🏆', 'label-icon');
         else if (etablissement.visite) icon = createEmojiIcon('✅', 'visited-icon');
         else icon = createEmojiIcon('❌', 'unvisited-icon');
-
         if (etablissement.latitude && etablissement.longitude) {
             const marker = L.marker(
                 [etablissement.latitude, etablissement.longitude],
@@ -152,17 +175,46 @@ function updateMapAndMarkers() {
                     <a href="${baseUrl}/etablissements/${etablissement.id_etab}" class="btn btn-sm btn-primary">Voir plus</a>
                 </div>
             `);
+            marker.options.etablissement = etablissement; // Ajouter les données de l'établissement au marqueur
             markers.push(marker);
             bounds.extend(marker.getLatLng());
         } else {
             console.warn(`Établissement sans coordonnées valides: ${etablissement.nom}`);
         }
     });
-
     // Ajuste la vue
     if (etablissements.length > 0) {
         map.fitBounds(bounds);
     }
+
+    // Appliquer les filtres initiaux
+    updateMarkersBasedOnFilters();
+}
+
+// Fonction pour gérer les clics sur les boutons de filtre
+function setupFilterButtons() {
+    document.getElementById('filter-all').addEventListener('click', function() {
+        activeFilters = { visited: false, unvisited: false, label: false };
+        updateMarkersBasedOnFilters();
+    });
+    document.getElementById('filter-visited').addEventListener('click', function() {
+        activeFilters.visited = !activeFilters.visited;
+        activeFilters.unvisited = false;
+        activeFilters.label = false;
+        updateMarkersBasedOnFilters();
+    });
+    document.getElementById('filter-unvisited').addEventListener('click', function() {
+        activeFilters.unvisited = !activeFilters.unvisited;
+        activeFilters.visited = false;
+        activeFilters.label = false;
+        updateMarkersBasedOnFilters();
+    });
+    document.getElementById('filter-label').addEventListener('click', function() {
+        activeFilters.label = !activeFilters.label;
+        activeFilters.visited = false;
+        activeFilters.unvisited = false;
+        updateMarkersBasedOnFilters();
+    });
 }
 
 // Initialisation globale
@@ -171,6 +223,7 @@ function initAll() {
     initMap();
     updateMapAndMarkers();
     initAutocomplete();
+    setupFilterButtons(); // Initialiser les boutons de filtre
 }
 
 // Initialisation au chargement de la page
