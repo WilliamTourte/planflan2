@@ -25,6 +25,17 @@ def create_app():
     bcrypt.init_app(app)
     csrf.init_app(app)
 
+    from sqlalchemy import text
+
+    with app.app_context():
+        try:
+            db.session.execute(text("SELECT 1"))
+            print("✅ Connexion réussie avec l'URL :", app.config['SQLALCHEMY_DATABASE_URI'])
+        except Exception as e:
+            print(f"❌ Erreur de connexion : {e}")
+            print(f"URL utilisée : {app.config['SQLALCHEMY_DATABASE_URI']}")
+
+
     @login_manager.user_loader
     def load_user(user_id):
         from .models import Utilisateur
