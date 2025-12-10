@@ -34,7 +34,13 @@
     <script src="{{ url_for('static', filename='js/maps_autocomplete.js') }}" defer></script>
 {% endblock %}
 {% block content %}
-<div id="map-container" class="map-container">
+<div id="map-container" class="map-container d-flex justify-content-center">
     <div id="map"></div>
+    <div class="position-absolute bottom-0 start-50 translate-middle-x p-3">
+        <a href="{{ url_for('maps.proposer_etablissement') }}" class="btn btn-success btn-lg" role="button">
+            Proposer une adresse
+        </a>
+    </div>
 </div>
+
 {% endblock %}
