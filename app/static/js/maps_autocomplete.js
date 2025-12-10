@@ -1,18 +1,40 @@
+// Variables globales
 let autocomplete;
 let map;
-let markers = {};
-let infowindowContents = {};
+let markers = [];
+let etablissements = [];
+let baseUrl = window.location.origin;
+
+// Fonction pour créer des icônes personnalisées
+const createEmojiIcon = (emoji, className) => {
+    return L.divIcon({
+        html: `<div class="emoji-marker ${className}">${emoji}</div>`,
+        className: 'emoji-icon',
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
+    });
+};
 
 function closeInfoWindow() {
     // Leaflet gère la fermeture des popups automatiquement
 }
 
-// Fonction pour initialiser l'autocomplétion et la carte
-window.initAll = function() {
-    initAutocomplete();
-    initMap();
-};
+// Initialisation de la carte Leaflet
+function initMap() {
+    console.log("Initialisation de la carte...");
+    const mapElement = document.getElementById("map");
+    if (!mapElement) {
+        console.error("Élément #map introuvable !");
+        return;
+    }
+    map = L.map('map').setView([46.2276, 2.2137], 6);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+    console.log("Carte initialisée avec succès.");
+}
 
+// Initialisation de l'autocomplétion Google Maps
 window.initAutocomplete = function() {
     const input = document.getElementById('search');
     if (!input) {
@@ -23,15 +45,26 @@ window.initAutocomplete = function() {
         types: ['establishment'],
         componentRestrictions: {country: 'fr'}
     });
+
     // Écouter les changements dans l'Autocomplete
     autocomplete.addListener('place_changed', function() {
         const place = autocomplete.getPlace();
-        if (!place.geometry) return;
+        if (!place.geometry) {
+            console.error("Aucune géométrie trouvée pour ce lieu.");
+            return;
+        }
+
         // Remplir les champs CACHÉS avec le préfixe "ajout-etab-"
-        document.getElementById('ajout-etab-nom').value = place.name || '';
-        document.getElementById('ajout-etab-adresse').value = place.formatted_address || '';
-        document.getElementById('ajout-etab-latitude').value = place.geometry.location.lat();
-        document.getElementById('ajout-etab-longitude').value = place.geometry.location.lng();
+        const nomElement = document.getElementById('ajout-etab-nom');
+        const adresseElement = document.getElementById('ajout-etab-adresse');
+        const latitudeElement = document.getElementById('ajout-etab-latitude');
+        const longitudeElement = document.getElementById('ajout-etab-longitude');
+
+        if (nomElement) nomElement.value = place.name || '';
+        if (adresseElement) adresseElement.value = place.formatted_address || '';
+        if (latitudeElement) latitudeElement.value = place.geometry.location.lat();
+        if (longitudeElement) longitudeElement.value = place.geometry.location.lng();
+
         // Vérifier si le lieu est déjà dans la liste
         fetch('/verifier_etablissement', {
             method: 'POST',
@@ -59,129 +92,95 @@ window.initAutocomplete = function() {
                 const message = document.createElement('div');
                 message.className = 'alert alert-warning';
                 message.innerHTML = `Cet établissement est déjà dans la liste. <a href="${data.url}">Voir la page</a>`;
-                document.querySelector('.form-container').prepend(message);
+                const formContainer = document.querySelector('.form-container');
+                if (formContainer) formContainer.prepend(message);
             }
         })
         .catch(error => {
             console.error('Erreur:', error);
-            const errorMessage = document.createElement('div');
-            errorMessage.className = 'alert alert-danger';
-            errorMessage.textContent = `Erreur: ${error.message}`;
-            document.querySelector('.form-container').prepend(errorMessage);
         });
-        // Envoyer l'adresse à une route AJAX pour extraire le code postal et la ville
-        fetch('/extraire_infos_adresse', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json',
-            'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').content    },
-            body: JSON.stringify({ adresse: place.formatted_address }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('ajout-etab-code_postal').value = data.code_postal || '';
-            document.getElementById('ajout-etab-ville').value = data.ville || '';
-            document.getElementById('ajout-etab-adresse').value = data.adresse_nettoyee || '';
-        })
-        .catch(error => console.error('Erreur:', error));
     });
 };
 
-window.initMap = function() {
-    const mapElement = document.getElementById("map");
-    if (!mapElement) {
-        console.error("Élément #map introuvable !");
-        const mapContainer = document.getElementById("map-container");
-        if (mapContainer) {
-            mapContainer.innerHTML = "<p style='color: red;'>Erreur : Impossible de charger la carte.</p>";
-        } else {
-            console.error("Élément #map-container introuvable !");
+// Chargement des établissements depuis les données intégrées
+function loadEtablissements() {
+    try {
+        const etablissementsDataElement = document.getElementById('etablissements-data');
+        if (!etablissementsDataElement) {
+            console.error("Élément #etablissements-data introuvable !");
+            return [];
         }
+        const etablissementsData = JSON.parse(etablissementsDataElement.getAttribute('data-etablissements'));
+        console.log("Données des établissements chargées:", etablissementsData);
+        return etablissementsData;
+    } catch (error) {
+        console.error("Erreur lors du chargement des établissements:", error);
+        return [];
+    }
+}
+
+// Mise à jour de la carte et des marqueurs
+function updateMapAndMarkers() {
+    etablissements = loadEtablissements();
+    if (!etablissements || etablissements.length === 0) {
+        console.warn("Aucun établissement trouvé.");
         return;
     }
 
-    // Initialisation de la carte Leaflet
-    map = L.map('map').setView([46.2276, 2.2137], 6);
-    // Ajout de la couche OpenStreetMap
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-
-    const etablissements = JSON.parse(document.getElementById('etablissements-data').getAttribute('data-etablissements'));
-    const isAdmin = JSON.parse(document.getElementById('is-admin').getAttribute('data-is-admin'));
+    // Efface les anciens marqueurs
+    markers.forEach(marker => map.removeLayer(marker));
+    markers = [];
     const bounds = L.latLngBounds();
 
-    // Définition des icônes personnalisées avec emojis
-    const createEmojiIcon = (emoji, className) => {
-        return L.divIcon({
-            html: `<div class="emoji-marker ${className}">${emoji}</div>`,
-            className: 'emoji-icon',
-            iconSize: [30, 30],
-            iconAnchor: [15, 15]
-        });
-    };
-    const labelIcon = createEmojiIcon('🏆', 'label-icon');
-    const visiteIcon = createEmojiIcon('✅', 'visited-icon');
-    const nonvisiteIcon = createEmojiIcon('❌', 'unvisited-icon');
-
-    // Ajout des marqueurs avec les emojis
     etablissements.forEach(etablissement => {
-        let icon;
-        if (etablissement.label) {
-            icon = labelIcon;
-        } else if (etablissement.visite) {
-            icon = visiteIcon;
+        console.log(`Établissement: ${etablissement.nom}, Lat: ${etablissement.latitude}, Lng: ${etablissement.longitude}`);
+        let icon = createEmojiIcon('🏠', 'default-icon');
+        if (etablissement.label) icon = createEmojiIcon('🏆', 'label-icon');
+        else if (etablissement.visite) icon = createEmojiIcon('✅', 'visited-icon');
+        else icon = createEmojiIcon('❌', 'unvisited-icon');
+
+        if (etablissement.latitude && etablissement.longitude) {
+            const marker = L.marker(
+                [etablissement.latitude, etablissement.longitude],
+                { icon: icon, title: etablissement.nom }
+            )
+            .addTo(map)
+            .bindPopup(`
+                <div class="infowindow-content">
+                    <h4>${etablissement.nom}</h4>
+                    <p>${etablissement.adresse}, ${etablissement.ville}</p>
+                    <a href="${baseUrl}/etablissements/${etablissement.id_etab}" class="btn btn-sm btn-primary">Voir plus</a>
+                </div>
+            `);
+            markers.push(marker);
+            bounds.extend(marker.getLatLng());
         } else {
-            icon = nonvisiteIcon;
+            console.warn(`Établissement sans coordonnées valides: ${etablissement.nom}`);
         }
-        const marker = L.marker([etablissement.latitude, etablissement.longitude], {
-            icon: icon,
-            title: etablissement.nom,
-            id_etab: etablissement.id_etab // On stocke l'ID de l'établissement dans le marqueur
-        })
-        .addTo(map)
-        .on('click', function(e) {
-            // Charger le contenu de l'infowindow à la demande
-            if (!this.getPopup()) {
-                this.bindPopup("Chargement en cours...").openPopup();
-                fetch(`/get_infowindow_content?id_etab=${etablissement.id_etab}`)
-                    .then(response => response.text())
-                    .then(content => {
-                        this.setPopupContent(content);
-                    })
-                    .catch(error => {
-                        console.error(`Erreur lors du chargement de l'infowindow pour ${etablissement.nom}:`, error);
-                        this.setPopupContent("Détails non disponibles");
-                    });
-            }
-        });
-        bounds.extend(marker.getLatLng());
     });
 
+    // Ajuste la vue
     if (etablissements.length > 0) {
-        if (etablissements.length === 1) {
-            map.setView([etablissements[0].latitude, etablissements[0].longitude], 14);
-        } else {
-            map.fitBounds(bounds);
-        }
-
-    // Légende
-    const legend = L.control({ position: 'bottomright' });
-    legend.onAdd = function() {
-        const div = L.DomUtil.create('div', 'info legend');
-        div.style.backgroundColor = 'white';
-        div.style.padding = '10px';
-        div.style.margin = '10px';
-        div.style.border = '1px solid #ccc';
-        div.innerHTML = `🏆 Labellisé ✅ Visité ❌ Non visité`;
-        return div;
-    };
-    legend.addTo(map);
-};
+        map.fitBounds(bounds);
+    }
 }
 
-// Chargement de l'API Google Maps (uniquement pour l'autocomplete)
+// Initialisation globale
+function initAll() {
+    console.log("Initialisation de l'application...");
+    initMap();
+    updateMapAndMarkers();
+    initAutocomplete();
+}
+
+// Initialisation au chargement de la page
 document.addEventListener('DOMContentLoaded', function() {
-    const googleMapsApiKey = document.getElementById('google-maps-api-key').getAttribute('data-api-key');
+    console.log("DOM chargé.");
+    const googleMapsApiKey = document.getElementById('google-maps-api-key')?.getAttribute('data-api-key');
+    if (!googleMapsApiKey) {
+        console.error("Clé API Google Maps introuvable !");
+        return;
+    }
     const script = document.createElement('script');
     script.src = `https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}&libraries=places&callback=initAll&v=weekly`;
     script.async = true;
