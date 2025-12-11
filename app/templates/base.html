@@ -15,22 +15,30 @@
     {% block scripts_head %}
     {% endblock %}
 </head>
-<body>
-    <header>
-        <div class="container d-flex justify-content-between align-items-center py-2">
-            <!-- Bouton maison à gauche -->
+<body><header class="header-yellow">
+    <nav>
+        <div class="d-flex justify-content-between align-items-center py-2 flex-nowrap w-100">
+            <!-- Bouton maison (rond, bleu) -->
             <a class="btn btn-icon" href="{{ url_for('main.index') }}">
                 <i class="bi bi-house-door"></i>
             </a>
-
-            <!-- Bouton connexion/déconnexion à droite -->
-            <div>
+            <!-- Barre de recherche (fond blanc) + bouton recherche (rond, bleu) -->
+            <div class="d-flex align-items-center">
+                <form action="{{ url_for('main.liste_etablissements') }}" method="GET" class="d-flex align-items-center">
+                    <input type="text" name="recherche_simple" placeholder="Rechercher..." class="form-control">
+                    <button type="submit" class="btn-search-icon">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </form>
+            </div>
+            <!-- Boutons connexion/déconnexion (ronds, bleus) -->
+            <div class="d-flex align-items-center">
                 {% if current_user.is_authenticated %}
-                     <a class="btn btn-icon" href="{{ url_for('main.dashboard') }}">
+                    <a class="btn btn-icon" href="{{ url_for('main.dashboard') }}">
                         <i class="bi bi-person-square"></i>
                     </a>
                     <a class="btn btn-icon" href="{{ url_for('auth.logout') }}">
-                        <i class="bi bi-person-slash"></i>
+                        <i class="bi bi-box-arrow-right"></i>
                     </a>
                 {% else %}
                     <a class="btn btn-icon" href="{{ url_for('auth.login') }}">
@@ -39,25 +47,9 @@
                 {% endif %}
             </div>
         </div>
-        <!-- Barre de recherche centrale -->
-        <nav class="search-bar">
-            <div class="container d-flex justify-content-center align-items-center flex-nowrap">
-                <form action="{{ url_for('main.liste_etablissements') }}" method="GET" class="d-flex align-items-center">
-                    <input type="text" name="recherche_simple" placeholder="Rechercher un établissement, une ville..." class="form-control me-2">
-                    <button type="submit" class="btn btn-primary btn-search-icon">
-                        <i class="bi bi-search"></i>
-                    </button>
-                </form>
-                <form action="{{ url_for('main.rechercher') }}" method="GET" class="d-flex align-items-center ms-2">
-                    <button type="submit" class="btn btn-primary btn-search-icon">
-                        <i class="bi bi-gear"></i>
-                    </button>
-                </form>
-            </div>
-        </nav>
+    </nav>
+</header>
 
-        </nav>
-    </header>
     <main class="container">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}

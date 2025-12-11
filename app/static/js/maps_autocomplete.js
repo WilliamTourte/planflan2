@@ -254,9 +254,9 @@ function setupFilterButtons() {
         } else {
             subFilters.innerHTML = `
                 <div class="filter-group">
-                    <button id="filter-visited" class="btn btn-success">Visités</button>
-                    <button id="filter-unvisited" class="btn btn-danger">Non visités</button>
-                    <button id="filter-label" class="btn btn-warning">Avec label</button>
+                    <button id="filter-visited" class="btn btn-success">Visité</button>
+                    <button id="filter-unvisited" class="btn btn-danger">Non visité</button>
+                    <button id="filter-label" class="btn btn-warning">Labellisé</button>
                 </div>
             `;
             subFilters.classList.add('show');
