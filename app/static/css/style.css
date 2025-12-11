@@ -84,7 +84,7 @@ h1, h2, h3, h4, h5, h6 {
    3. LAYOUT & CONTAINERS
    ============================================= */
 .container {
-    width: 95%;
+    width: 90%;
     max-width: var(--max-width);
     margin: 0 auto;
     padding: 0 var(--padding-md);
