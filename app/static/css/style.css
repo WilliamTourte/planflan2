@@ -85,11 +85,9 @@ main {
     margin-top: var(--margin-lg);
 }
 header {
-    background-color: var(--color-secondary); /* Fond jaune pour la barre */
+    background-color: var(--color-secondary);
     color: var(--color-white);
     width: 100%;
-}
-header {
     padding: 0.5rem 0;
     position: sticky;
     top: 0;
@@ -140,8 +138,8 @@ input[type="reset"],
     transition: var(--transition);
     box-shadow: var(--box-shadow);
     text-align: center;
-    min-width: 100px;
-    height: 40px;
+    min-width: 36px;
+    height: 36px;
     margin: var(--margin-sm);
     line-height: 1;
     white-space: nowrap;
@@ -179,7 +177,7 @@ input[type="submit"]:active,
 .btn-primary,
 button.primary,
 input.primary {
-    background-color: var(--color-info); /* Bleu pour les boutons */
+    background-color: var(--color-info);
     color: var(--color-white);
 }
 .btn-primary:hover,
@@ -236,7 +234,27 @@ input.back {
 button.back:hover,
 input.back:hover {
     background-color: var(--color-back-dark);
+
 }
+
+.btn-icon {
+   
+    width: 36px !important;
+    height: 36px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    background-color: var(--color-success) !important;
+    color: white !important;
+}
+
+.btn-icon i {
+    font-size: 1rem !important;
+    margin: 0 !important;
+}
+
+
 /* Groupes */
 .btn-group {
     display: flex;
@@ -253,19 +271,8 @@ input.back:hover {
 .action-buttons .btn {
     margin: 0;
 }
-/* Boutons icônes */
-.btn-icon {
-    background: transparent;
-    border: none;
-    color: var(--color-white);
-    font-size: 1rem;
-    padding: 0.15rem;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-.btn-icon:hover {
-    color: var(--color-secondary);
-    transform: scale(1.1);
+
+
 }
 /* =============================================
    5. BARRE DE RECHERCHE
@@ -307,24 +314,31 @@ input.back:hover {
     margin: 0;
     line-height: 1.2;
 }
-.btn-search-icon {
-    width: 36px;
-    height: 36px;
-    padding: 0;
-    margin: 0;
-    border-radius: var(--border-radius);
-    background-color: var(--color-primary);
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: var(--font-size-md);
+/* Bouton recherche - CORRIGÉ */
+header .btn-search-icon.custom-btn {
+    width: 36px !important;
+    height: 36px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 50% !important;
+    background-color: var(--color-info) !important;
+    color: white !important;
+    border: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: var(--font-size-md) !important;
     flex-shrink: 0;
+    transition: var(--transition);
 }
-.btn-search-icon i {
-    margin: 0;
-    position: relative;
-    top: 1px;
+header .btn-search-icon.custom-btn:hover {
+    background-color: var(--color-info-dark) !important;
+    transform: scale(1.05);
+}
+header .btn-search-icon.custom-btn i {
+    margin: 0 !important;
+    position: relative !important;
+    top: 0 !important;
 }
 /* =============================================
    6. CARTES
@@ -803,7 +817,7 @@ input.back:hover {
     border: 1px solid #f5c6cb;
 }
 /* =============================================
-   16. RESPONSIVE
+   16. RESPONSIVE - CORRIGÉ
    ============================================= */
 @media (max-width: 768px) {
     .grille {
@@ -821,11 +835,13 @@ input.back:hover {
     .search-bar .form-control {
         width: 180px;
     }
-    .btn-search-icon {
+    header .btn-search-icon.custom-btn {
         width: 32px;
         height: 32px;
         font-size: var(--font-size-sm);
+        padding: 0 !important;
     }
+
     .leaflet-popup-content-wrapper {
         max-width: 90vw !important;
         max-height: 70vh !important;
@@ -839,10 +855,6 @@ input.back:hover {
     .form-control-sm {
         width: 120px;
     }
-    .btn-icon {
-        font-size: 0.875rem;
-        padding: 0.2rem;
-    }
 }
 @media (max-width: 480px) {
     .container {
@@ -855,11 +867,13 @@ input.back:hover {
     .search-bar .form-control {
         width: 160px;
     }
-    .btn-search-icon {
+    header .btn-search-icon.custom-btn {
         width: 28px;
         height: 28px;
         font-size: var(--font-size-sm);
+        padding: 0 !important;
     }
+
     .form-container {
         padding: var(--padding-md);
     }
@@ -872,10 +886,6 @@ input.back:hover {
     .form-control-sm {
         width: 100px;
     }
-    .btn-icon {
-        font-size: 0.75rem;
-        padding: 0.15rem;
-    }
 }
 /* FILTRES SUR LA MAP */
 #filter-controls {
@@ -886,29 +896,29 @@ input.back:hover {
     z-index: 1000;
     background: transparent !important;
     padding: 0;
-    width: 100%; /* Prend toute la largeur de la carte */
-    max-width: 500px; /* Limite la largeur pour éviter que le conteneur soit trop large */
-    border:none !important;
+    width: 100%;
+    max-width: 500px;
+    border: none !important;
 }
 /* Conteneur des boutons principaux */
 .main-filters {
     display: flex;
     gap: 8px;
     background: transparent;
-    justify-content: flex-end; /* Aligne les boutons à droite */
-    margin-left: auto; /* Décale le groupe de boutons à droite */
-    width: fit-content; /* Largeur adaptée au contenu */
+    justify-content: flex-end;
+    margin-left: auto;
+    width: fit-content;
 }
 /* Boutons principaux plus petits et compacts */
 .main-filters button {
-    padding: 2px 6px; /* Réduit l'espace interne */
-    font-size: 0.9rem; /* Texte plus petit */
-    width: auto; /* Largeur adaptée au contenu */
-    min-width: 0; /* Annule les largeurs minimales par défaut */
-    height: auto; /* Hauteur adaptée au contenu */
-    line-height: 1; /* Alignement vertical du texte */
-    white-space: nowrap; /* Empêche le retour à la ligne */
-    background:#ffcf40
+    padding: 2px 6px;
+    font-size: 0.9rem;
+    width: auto;
+    min-width: 0;
+    height: auto;
+    line-height: 1;
+    white-space: nowrap;
+    background: #ffcf40;
 }
 /* Sous-filtres */
 .sub-filters {
@@ -941,14 +951,14 @@ input.back:hover {
     width: fit-content;
 }
 .filter-group button {
-    padding: 2px 6px; /* Réduit l'espace interne */
-    font-size: 0.9rem; /* Texte plus petit */
-    width: auto; /* Largeur adaptée au contenu */
-    min-width: 0; /* Annule les largeurs minimales par défaut */
-    height: auto; /* Hauteur adaptée au contenu */
-    line-height: 1; /* Alignement vertical du texte */
-    white-space: nowrap; /* Empêche le retour à la ligne */
-    background:#ffcf40
+    padding: 2px 6px;
+    font-size: 0.9rem;
+    width: auto;
+    min-width: 0;
+    height: auto;
+    line-height: 1;
+    white-space: nowrap;
+    background: #ffcf40;
 }
 /* Supprime tout style par défaut de la navbar */
 .header-yellow nav {
@@ -958,14 +968,12 @@ input.back:hover {
     box-shadow: none !important;
     border: none !important;
 }
-
 /* Fond jaune pour toute la navbar */
 .header-yellow {
     background-color: var(--color-secondary) !important;
     width: 100%;
     padding: 0.5rem 0;
 }
-
 /* Conteneur interne */
 .header-yellow > nav > div {
     width: 100%;
@@ -974,53 +982,36 @@ input.back:hover {
     margin: 0 auto;
     background-color: transparent !important;
 }
+/* Boutons dans le header - CORRIGÉ */
+.header-yellow .btn,
 
-/* Champ de recherche : fond blanc, bordure arrondie */
+
+
+/* Icônes */
+.header-yellow .btn i,
+
+    font-size: 1.1rem;
+    margin: 0 !important;
+    position: relative;
+    top: 0 !important;
+}
+/* Champ de recherche */
 .header-yellow .form-control {
     background-color: white;
     border: 1px solid #ddd;
     border-radius: 25px;
-    padding: 0.3rem var(--padding-md);
+    padding: 0.3rem 1rem;
     height: 36px;
     width: 220px;
-    margin-right: 0.5rem;
+    margin-right: 8px;
 }
-
-/* Boutons ronds et bleus */
-.header-yellow .btn,
-.header-yellow .btn-icon,
-.header-yellow .btn-search-icon {
-    background-color: var(--color-info) !important;
-    color: white !important;
-    border: none;
-    border-radius: 50% !important;
-    width: 36px !important;
-    height: 36px !important;
-    padding: 0;
-    margin: 0 0.3rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-}
-
 /* Effet de survol */
-.header-yellow .btn:hover,
-.header-yellow .btn-icon:hover,
-.header-yellow .btn-search-icon:hover {
+.header-yellow .btn:hover
+{
     background-color: var(--color-info-dark) !important;
     transform: scale(1.05);
 }
-
-/* Icônes centrées et blanches */
-.header-yellow .btn i,
-.header-yellow .btn-icon i,
-.header-yellow .btn-search-icon i {
-    color: white !important;
-    margin: 0;
-}
-
-/* Ajustement responsive */
+/* Ajustement responsive pour header */
 @media (max-width: 768px) {
     .header-yellow > nav > div {
         padding: 0 var(--padding-sm);
@@ -1028,4 +1019,6 @@ input.back:hover {
     .header-yellow .form-control {
         width: 180px;
     }
+
+
 }
