@@ -18,11 +18,23 @@ csrf = CSRFProtect()
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
     bcrypt.init_app(app)
     csrf.init_app(app)
+
+    from sqlalchemy import text
+
+    with app.app_context():
+        try:
+            db.session.execute(text("SELECT 1"))
+            print("✅ Connexion réussie avec l'URL :", app.config['SQLALCHEMY_DATABASE_URI'])
+        except Exception as e:
+            print(f"❌ Erreur de connexion : {e}")
+            print(f"URL utilisée : {app.config['SQLALCHEMY_DATABASE_URI']}")
+
 
     @login_manager.user_loader
     def load_user(user_id):
@@ -36,6 +48,7 @@ def create_app():
     from .routes.auth import auth_bp
     from .routes.main import main_bp
     from .routes.maps import maps_bp
+
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(maps_bp)

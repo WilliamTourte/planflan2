@@ -9,21 +9,9 @@ def enlever_accents(text): # Enlève les accents parce que la police ne les gèr
 
 
 def afficher_etablissements(resultats):
-    etablissements = resultats
-
-    etablissements_json = [{
-        'id_etab': etab.id_etab,
-        'nom': enlever_accents(etab.nom), # On enlève les accents car la police Bubblegum ne les gère pas
-        'adresse': etab.adresse,
-        'ville': etab.ville,
-        'code_postal': etab.code_postal,
-        'latitude': float(etab.latitude),
-        'longitude': float(etab.longitude),
-        'url': url_for('main.afficher_etablissement_unique', id_etab=etab.id_etab),
-        'visite' : bool(etab.visite),
-        'type_etab': str(etab.type_etab.value),
-        'label' : bool(etab.label),
-        'flans_count': len(etab.flans)  # Ajouter le nombre de flans
-    } for etab in etablissements]
-
-    return(etablissements, etablissements_json)
+    etablissements = []
+    etablissements_json = []
+    for etab in resultats:
+        etablissements.append(etab)
+        etablissements_json.append(etab.to_dict(include_flans=True))
+    return etablissements, etablissements_json

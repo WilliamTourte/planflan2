@@ -50,12 +50,13 @@ def extraire_infos_adresse():
 
 @maps_bp.route('/proposer_etablissement', methods=['GET', 'POST'])
 def proposer_etablissement():
-    form = EtabForm(prefix='ajout-etab')
-    return render_template('proposer_etablissement.html',
-                           form=form,
-                           google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'])
-
-
+    form = EtabForm(prefix='ajout-etab')  # Ajoute le préfixe ici
+    return render_template(
+        'proposer_etablissement.html',
+        action_url=url_for('maps.ajouter_etablissement'),
+        form=form,
+        google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY']
+    )
 
 @maps_bp.route('/verifier_etablissement', methods=['POST'])
 def verifier_etablissement():
@@ -74,7 +75,8 @@ def verifier_etablissement():
             current_app.logger.info(f"Établissement trouvé : {etablissement.nom}")
             return jsonify({
                 'exists': True,
-                'url': url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab, _external=True)
+                'url': url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab, _external=True),
+                'id_etab':etablissement.id_etab
             })
         else:
             current_app.logger.info("Aucun établissement trouvé avec ce nom.")
@@ -99,19 +101,26 @@ def ajouter_etablissement():
                 longitude=form_ajout.longitude.data,
                 type_etab=form_ajout.type_etab.data,
                 description=form_ajout.description.data,
-                id_user=current_user.id_user,
-                label=form_ajout.label.data,  # Directement un booléen
-                visite=form_ajout.visite.data  # Directement un booléen
+                id_user=1,  # TEMPORAIRE
+                label=form_ajout.label.data,
+                visite=form_ajout.visite.data,
             )
             db.session.add(nouvel_etablissement)
             db.session.commit()
+
+            # Récupère l'ID de l'établissement nouvellement créé
+            id_etab = nouvel_etablissement.id_etab
+
             flash("Établissement ajouté avec succès !", "success")
-            return redirect(url_for('main.index'))
+            # Redirige vers la page de l'établissement
+            return redirect(url_for('main.afficher_etablissement_unique', id_etab=id_etab))
+
         else:
             print("\n9. ERREURS DE VALIDATION:")
             for field_name, errors in form_ajout.errors.items():
                 print(f"   {field_name}: {errors}")
-    # Pour une requête GET
+
+    # Pour une requête GET (ne devrait pas servir)
     resultats = Etablissement.query.all()
     etablissements, etablissements_json = afficher_etablissements(resultats)
     return render_template(

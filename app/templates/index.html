@@ -1,34 +1,41 @@
 {% extends "base.html" %}
 {% block content %}
-    <div class="container-fluid bg-primary d-flex flex-column align-items-center justify-content-center vh-100 p-4">
-        <h1 class="text-white display-1 fw-bold mb-5" style="font-family: 'Comic Sans MS', cursive, sans-serif; text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);">
+    <div class="container d-flex flex-column align-items-center justify-content-center" style="min-height: 100vh; padding: var(--padding-lg);">
+        <h1 class="text-white" style="font-family: var(--font-bubblegum); font-size: 3.5rem; margin-bottom: var(--margin-lg); text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);">
             PLANFLAN
         </h1>
 
-<div class="d-flex flex-column align-items-center w-100" style="max-width: 400px;">
-    <form action="{{ url_for('main.liste_etablissements') }}" method="GET" class="w-100">
-        <!-- Champ "ville" généré par Flask-WTF -->
-        {{ form_recherche.hidden_tag() }}
-        <div class="mb-3 w-100">
+        <div class="d-flex flex-column align-items-center w-100 form-container" style="max-width: 400px;">
+            <form action="{{ url_for('main.liste_etablissements') }}" method="POST" class="w-100">
+                {{ form_recherche.hidden_tag() }}
 
-            {{ form_recherche.ville(class="form-control py-2 rounded-3 border-0 mb-3", style="background-color: rgba(255, 255, 255, 0.9);", placeholder="Lyon") }}
-        </div>
-        <!-- Champ "type_saveur" -->
-        <div class="mb-3 w-100">
-            {{ form_recherche.type_saveur.label(class="form-label") }}
-            {{ form_recherche.type_saveur(class="form-select py-2 rounded-3 border-0 mb-3", style="background-color: rgba(255, 255, 255, 0.9);", placeholder="Flan pâtissier") }}
-        </div>
-        <!-- Bouton de soumission -->
-         <div class="text-center">
-        <button type="submit" class="btn btn-warning btn-lg text-white fw-bold w-auto py-2 mb-3 rounded-3">
-            {{ form_recherche.submit.label }}
-        </button>
-        </div>
-    </form>
-</div>
-<a href="{{ url_for('maps.proposer_etablissement') }}" class="btn btn-warning btn-lg text-white fw-bold w-auto py-2 mb-3 rounded-3" role="button">
-    Proposer une adresse
-</a>
-</div>
+                <div class="form-group w-100">
+                    {{ form_recherche.ville(
+                        class="form-control py-2",
+                        style="background-color: rgba(255, 255, 255, 0.9); border-radius: var(--border-radius-btn);",
+                        placeholder="Lyon"
+                    ) }}
+                </div>
 
+                <div class="form-group w-100">
+                    {{ form_recherche.type_saveur.label(class="form-check-label") }}
+                    {{ form_recherche.type_saveur(
+                        class="form-select py-2",
+                        style="background-color: rgba(255, 255, 255, 0.9); border-radius: var(--border-radius-btn);",
+                        placeholder="Flan pâtissier"
+                    ) }}
+                </div>
+
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-success btn-lg">
+                        {{ form_recherche.submit.label }}
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <a href="{{ url_for('maps.proposer_etablissement') }}" class="btn btn-success btn-lg" role="button">
+            Proposer une adresse
+        </a>
+    </div>
 {% endblock %}

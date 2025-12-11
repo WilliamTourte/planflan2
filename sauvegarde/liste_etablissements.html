@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% from 'macros.html' import afficher_etablissement_infowindow %}
+{% block scripts_head %}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+    <!-- Variables globales pour les données dynamiques -->
+    <script>
+    // Variables pour les données dynamiques
+    document.addEventListener('DOMContentLoaded', function() {
+        const etablissementsData = {{ etablissements_json|tojson|safe }};
+        const etablissementsDataElement = document.createElement('div');
+        etablissementsDataElement.id = 'etablissements-data';
+        etablissementsDataElement.setAttribute('data-etablissements', JSON.stringify(etablissementsData));
+        document.body.appendChild(etablissementsDataElement);
+
+        const isAdminElement = document.createElement('div');
+        isAdminElement.id = 'is-admin';
+        isAdminElement.setAttribute('data-is-admin', {{ current_user.is_admin|tojson|safe if current_user.is_authenticated else 'false' }});
+        document.body.appendChild(isAdminElement);
+
+        const googleMapsApiKeyElement = document.createElement('div');
+        googleMapsApiKeyElement.id = 'google-maps-api-key';
+        googleMapsApiKeyElement.setAttribute('data-api-key', '{{ google_maps_api_key }}');
+        document.body.appendChild(googleMapsApiKeyElement);
+    });
+    </script>
+    <!-- Inclure le fichier JavaScript externe -->
+    <script src="{{ url_for('static', filename='js/maps_autocomplete.js') }}" defer></script>
+{% endblock %}
+
+
+{% block content %}
+<div id="map-container" class="map-container d-flex justify-content-center">
+    <div id="map"></div>
+    <div class="position-absolute bottom-0 start-50 translate-middle-x p-3">
+        <a href="{{ url_for('maps.proposer_etablissement') }}" class="btn btn-success btn-lg" role="button">
+            Proposer une adresse
+        </a>
+    </div>
+</div>
+
+{% endblock %}

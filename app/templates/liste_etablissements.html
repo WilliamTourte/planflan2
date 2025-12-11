@@ -1,8 +1,71 @@
 {% extends "base.html" %}
 {% block scripts_head %}
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<<<<<<< HEAD
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+            integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+            crossorigin=""></script>
+
+    <!-- Variables globales pour les données dynamiques -->
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const etablissementsData = {{ etablissements_json|tojson|safe }};
+        const etablissementsDataElement = document.createElement('div');
+        etablissementsDataElement.id = 'etablissements-data';
+        etablissementsDataElement.setAttribute('data-etablissements', JSON.stringify(etablissementsData));
+        document.body.appendChild(etablissementsDataElement);
+        const isAdminElement = document.createElement('div');
+        isAdminElement.id = 'is-admin';
+        isAdminElement.setAttribute('data-is-admin', {{ current_user.is_admin|tojson|safe if current_user.is_authenticated else 'false' }});
+        document.body.appendChild(isAdminElement);
+        const googleMapsApiKeyElement = document.createElement('div');
+        googleMapsApiKeyElement.id = 'google-maps-api-key';
+        googleMapsApiKeyElement.setAttribute('data-api-key', '{{ google_maps_api_key }}');
+        document.body.appendChild(googleMapsApiKeyElement);
+    });
+    </script>
+    <!-- Inclure le fichier JavaScript externe -->
+    <script src="{{ url_for('static', filename='js/maps_autocomplete.js') }}" defer></script>
+    <style>
+        .map-container {
+            position: relative;
+            height: 100vh;
+            width: 100%;
+        }
+        #filter-controls {
+            z-index: 1000;
+            background: white;
+            padding: 10px;
+            border: 1px solid black;
+        }
+    </style>
+{% endblock %}
+{% block content %}
+<div id="map-container" class="d-flex flex-column align-items-center" style="position: relative; height: 80vh; width: 100%;">
+    <!-- Carte -->
+    <div id="map" style="width: 100%; height: 100%;"></div>
+
+    <!-- Filtres (positionnés en absolu sur la carte) -->
+    <div id="filter-controls" style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 1000;">
+        <div class="main-filters">
+            <button id="filter-all" class="btn btn-primary">Tous</button>
+            <button id="filter-pate-btn" class="btn btn-secondary">Pâte</button>
+            <button id="filter-statut-btn" class="btn btn-secondary">Statut</button>
+        </div>
+        <div id="sub-filters" class="sub-filters"></div>
+    </div>
+
+    <!-- Bouton "Proposer une adresse" (sous la carte) -->
+    <div class="mt-3 mb-3" style="z-index: 1;">
+        <a href="{{ url_for('maps.proposer_etablissement') }}" class="btn btn-success btn-lg" role="button">
+            Proposer une adresse
+        </a>
+    </div>
+</div>
+
 {% endblock %}
 {% block content %}
     <!-- Données passées à JavaScript -->
@@ -106,63 +169,9 @@
             {# La grille sera chargée dynamiquement via AJAX #}
         </div>
     </div>
-<<<<<<< HEAD
 {% endblock %}
 
 {% block scripts %}
-=======
-    <script>
-        // URL de base pour les liens (générée côté serveur)
-        window.baseUrl = "{{ url_for('main.afficher_etablissement_unique', id_etab=999999) }}".split('/999999')[0];
-        // Données initiales pour les filtres
-        window.filterSettings = {
-            activeFilters: {
-                type_pate: 'tous',
-                type_saveur: 'tous',
-                prix: 'tous',
-                ville: "{{ request.args.get('ville', '') }}",
-                type: "{{ request.args.get('type', '') }}"
-            }
-        };
-        window.filterLabels = {
-            type_pate: {
-                tous: 'Pâte',
-                FEUILLETEE: 'Feuilletée',
-                BRISEE: 'Brisée',
-                SUCREE: 'Sucrée',
-                SABLEE: 'Sablée',
-                MIXTE: 'Mixte'
-            },
-            type_saveur: {
-                tous: 'Saveur',
-                VANILLE: 'Vanille',
-                NOIX: 'Noix',
-                FRUITS: 'Fruits',
-                INSOLITE: 'Insolite',
-                NATURE: 'Nature'
-            },
-            prix: {
-                tous: 'Prix',
-                '0': 'Moins de 2€50',
-                '2.5': '2€50 - 5€',
-                '5': 'Plus de 5€'
-            }
-        };
-    </script>
-    <script>
-        // Charge la grille initialement via AJAX
-        document.addEventListener('DOMContentLoaded', function() {
-            fetch(`/api/etablissements?format=html&ville=${encodeURIComponent("{{ request.args.get('ville', '') }}")}&type=${encodeURIComponent("{{ request.args.get('type', '') }}")}`)
-                .then(response => response.text())
-                .then(html => {
-                    document.getElementById('results-grid').innerHTML = html;
-                })
-                .catch(error => {
-                    console.error("Erreur lors du chargement initial de la grille:", error);
-                    document.getElementById('results-grid').innerHTML = '<p class="text-danger">Erreur lors du chargement des résultats.</p>';
-                });
-        });
-    </script>
->>>>>>> d75d395 (Travail sur JSON. Distinction HTML/JSON à améliorer)
     <script src="{{ url_for('static', filename='js/maps_autocomplete.js') }}"></script>
+
 {% endblock %}

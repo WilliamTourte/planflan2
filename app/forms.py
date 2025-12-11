@@ -46,6 +46,7 @@ class EtabForm(FlaskForm):
     visite = BooleanField('Visité')
     latitude = HiddenField('Latitude')
     longitude = HiddenField('Longitude')
+    id_user = HiddenField('id_user', default=1)
     submit = SubmitField('Proposer un établissement')
 
 # Formulaire proposer/modifier un flan

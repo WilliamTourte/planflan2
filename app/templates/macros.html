@@ -269,11 +269,7 @@
             {% endif %}
         </div>
         <div class="infowindow-footer">
-            {% if etablissement is mapping %}
-                <a href="{{ etablissement.url }}" class="btn btn-primary btn-small">Voir plus</a>
-            {% else %}
-                <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}" class="btn btn-primary btn-small">Voir plus</a>
-            {% endif %}
+            <a href="{{ details_url }}" class="btn btn-success btn-small">Voir plus</a>
         </div>
     </div>
 {% endmacro %}
