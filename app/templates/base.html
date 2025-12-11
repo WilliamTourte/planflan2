@@ -1,24 +1,24 @@
 {% from "macros.html" import afficher_grille %}
 {% from "macros.html" import afficher_objet %}
+{% from "macros.html" import afficher_etablissement_infowindow %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{% block title %}PlanFlan{% endblock %}</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Lien vers les icones -->
+    <!-- Lien vers les icônes -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!-- Lien vers le fichier CSS personnalisé -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    {% block scripts_head %}
-    {% endblock %}
+    {% block scripts_head %}{% endblock %}
 </head>
 <body>
     <header>
         <div class="container d-flex justify-content-between align-items-center py-2">
-            <!-- Bouton maison à gauche -->
             <a class="btn btn-icon" href="{{ url_for('main.index') }}">
                 <i class="bi bi-house-door"></i>
             </a>
@@ -26,7 +26,7 @@
             <!-- Bouton connexion/déconnexion à droite -->
             <div>
                 {% if current_user.is_authenticated %}
-                     <a class="btn btn-icon" href="{{ url_for('main.dashboard') }}">
+                    <a class="btn btn-icon" href="{{ url_for('main.dashboard') }}">
                         <i class="bi bi-person-square"></i>
                     </a>
                     <a class="btn btn-icon" href="{{ url_for('auth.logout') }}">
@@ -73,29 +73,30 @@
     </footer>
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    {% block scripts %}{% endblock %}
+    <!-- Script global pour l'effet de scroll -->
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        let lastScroll = 0;
-        const header = document.querySelector('header');
-        const searchBar = document.querySelector('.search-bar');
-        window.addEventListener('scroll', function() {
-            const currentScroll = window.scrollY;
-            if (currentScroll <= 0) {
-                header.classList.remove('hide');
-                searchBar.classList.remove('hide');
-                return;
-            }
-            if (currentScroll > lastScroll && currentScroll > 50) {
-                header.classList.add('hide');
-                searchBar.classList.add('hide');
-            } else if (currentScroll < lastScroll) {
-                header.classList.remove('hide');
-                searchBar.classList.remove('hide');
-            }
-            lastScroll = currentScroll;
+        document.addEventListener('DOMContentLoaded', function() {
+            let lastScroll = 0;
+            const header = document.querySelector('header');
+            const searchBar = document.querySelector('.search-bar');
+            window.addEventListener('scroll', function() {
+                const currentScroll = window.scrollY;
+                if (currentScroll <= 0) {
+                    header.classList.remove('hide');
+                    if (searchBar) searchBar.classList.remove('hide');
+                    return;
+                }
+                if (currentScroll > lastScroll && currentScroll > 50) {
+                    header.classList.add('hide');
+                    if (searchBar) searchBar.classList.add('hide');
+                } else if (currentScroll < lastScroll) {
+                    header.classList.remove('hide');
+                    if (searchBar) searchBar.classList.remove('hide');
+                }
+                lastScroll = currentScroll;
+            });
         });
-    });
     </script>
+    {% block scripts %}{% endblock %}
 </body>
 </html>

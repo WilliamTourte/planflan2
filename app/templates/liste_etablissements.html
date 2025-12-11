@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% from 'macros.html' import afficher_etablissement_infowindow %}
 {% block scripts_head %}
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- Leaflet CSS & JS -->
@@ -66,5 +65,113 @@
         </a>
     </div>
 </div>
+
+{% endblock %}
+{% block content %}
+    <!-- Données passées à JavaScript -->
+    <script>
+        window.etablissementsInitiaux = {{ etablissements_json|tojson|safe }};
+        window.isAdmin = {{ current_user.is_admin|lower }};
+        window.googleMapsApiKey = "{{ google_maps_api_key }}";
+        window.csrfToken = "{{ csrf_token() }}";
+        window.filterSettings = {
+            nom: "{{ request.args.get('nom', '') }}",
+            visite: "{{ request.args.get('visite', '') }}",
+            labellise: "{{ request.args.get('labellise', '') }}",
+            activeFilters: {
+                type_pate: 'tous',
+                type_saveur: 'tous',
+                prix: 'tous'
+            }
+        };
+        window.filterLabels = {
+            type_pate: {
+                tous: 'Pâte',
+                FEUILLETEE: 'Feuilletée',
+                BRISEE: 'Brisée',
+                SUCREE: 'Sucrée',
+                SABLEE: 'Sablée',
+                MIXTE: 'Mixte'
+            },
+            type_saveur: {
+                tous: 'Saveur',
+                VANILLE: 'Vanille',
+                NOIX: 'Noix',
+                FRUITS: 'Fruits',
+                INSOLITE: 'Insolite',
+                NATURE: 'Nature'
+            },
+            prix: {
+                tous: 'Prix',
+                '0': 'Moins de 2€50',
+                '2.5': '2€50 - 5€',
+                '5': 'Plus de 5€'
+            }
+        };
+        window.infowindowContents = {
+        {% for etablissement in etablissements %}
+            "{{ etablissement.id_etab }}": {{ afficher_etablissement_infowindow(
+                etablissement,
+                url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab)
+            ) | tojson | safe }}{% if not loop.last %},{% endif %}
+        {% endfor %}
+    };
+    console.log("Contenu de infowindowContents après génération :", window.infowindowContents);
+    </script>
+
+
+
+    <div id="map">
+        <div id="filter-bubbles">
+            <div class="filter-group">
+                <button class="filter-main-btn" data-filter="type_pate" id="type_pate-btn">Pâte</button>
+                <div class="filter-options" data-filter="type_pate">
+                    <button class="filter-option active" data-filter="type_pate" data-value="tous">Tous</button>
+                    <button class="filter-option" data-filter="type_pate" data-value="FEUILLETEE">Feuilletée</button>
+                    <button class="filter-option" data-filter="type_pate" data-value="BRISEE">Brisée</button>
+                    <button class="filter-option" data-filter="type_pate" data-value="SUCREE">Sucrée</button>
+                    <button class="filter-option" data-filter="type_pate" data-value="SABLEE">Sablée</button>
+                    <button class="filter-option" data-filter="type_pate" data-value="MIXTE">Mixte</button>
+                </div>
+            </div>
+            <div class="filter-group">
+                <button class="filter-main-btn" data-filter="type_saveur" id="type_saveur-btn">Saveur</button>
+                <div class="filter-options" data-filter="type_saveur">
+                    <button class="filter-option active" data-filter="type_saveur" data-value="tous">Tous</button>
+                    <button class="filter-option" data-filter="type_saveur" data-value="VANILLE">Vanille</button>
+                    <button class="filter-option" data-filter="type_saveur" data-value="NOIX">Noix</button>
+                    <button class="filter-option" data-filter="type_saveur" data-value="FRUITS">Fruits</button>
+                    <button class="filter-option" data-filter="type_saveur" data-value="INSOLITE">Insolite</button>
+                    <button class="filter-option" data-filter="type_saveur" data-value="NATURE">Nature</button>
+                </div>
+            </div>
+            <div class="filter-group">
+                <button class="filter-main-btn" data-filter="prix" id="prix-btn">Prix</button>
+                <div class="filter-options" data-filter="prix">
+                    <button class="filter-option active" data-filter="prix" data-value="tous">Tous</button>
+                    <button class="filter-option" data-filter="prix" data-value="0">Moins de 2€50</button>
+                    <button class="filter-option" data-filter="prix" data-value="2.5">2€50 - 5€</button>
+                    <button class="filter-option" data-filter="prix" data-value="5">Plus de 5€</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <h2>Résultats de la recherche
+            {% if request.args.get('ville') or request.args.get('type') %}
+                pour
+                {% if request.args.get('ville') %}"{{ request.args.get('ville') }}"{% endif %}
+                {% if request.args.get('ville') and request.args.get('type') %} et {% endif %}
+                {% if request.args.get('type') %}"{{ request.args.get('type') }}"{% endif %}
+            {% endif %}
+        </h2>
+        <div id="results-grid">
+            {# La grille sera chargée dynamiquement via AJAX #}
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/maps_autocomplete.js') }}"></script>
 
 {% endblock %}
