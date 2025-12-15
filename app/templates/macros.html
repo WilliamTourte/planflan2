@@ -53,7 +53,7 @@
         {% if current_page == page_attendue %}
             {% if current_user.id_user == objet.id_user and not objet.statut.value == 'VALIDE' %}
                 <div class="action-buttons d-flex gap-1">
-                    <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
+                    <button type="button" class="btn btn-success btn-sm square-btn" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
                         <i class="bi bi-pencil"></i>
                     </button>
                     {% if delete_form %}
@@ -76,7 +76,7 @@
                                 </button>
                             </form>
                         {% endif %}
-                        <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
+                        <button type="button" class="btn btn-success btn-sm square-btn" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
                             <i class="bi bi-pencil"></i>
                         </button>
                         {% if delete_form %}
@@ -90,7 +90,7 @@
                     </div>
                 {% else %}
                     <div class="action-buttons d-flex gap-1">
-                        <button type="button" class="btn btn-primary btn-sm square-btn" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
+                        <button type="button" class="btn btn-success btn-sm square-btn" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
                             <i class="bi bi-pencil"></i>
                         </button>
                         {% if delete_form %}
@@ -133,7 +133,7 @@
                         delete_form, validate_form) }}
             </div>
             {{ afficher_formulaire_edition_etablissement(etablissement, form_edit, current_user) }}
-            <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}" class="btn btn-primary">Voir plus</a>
+            <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}" class="btn btn-success">Voir plus</a>
         </div>
     </div>
     <script>
@@ -223,7 +223,7 @@
                     <input type="radio" name="edit-visite" value="Non" {% if not etablissement.visite %}checked{% endif %}> Non
                 </div>
             {% endif %}
-            <button type="submit" class="btn btn-primary">Valider</button>
+            <button type="submit" class="btn btn-success">Valider</button>
             <button type="button" class="btn btn-secondary" onclick="cancelEdit({{ etablissement.id_etab }})">Annuler</button>
         </form>
     </div>
@@ -253,7 +253,7 @@
             </div>
             {{ afficher_formulaire_edition_flan(flan, form) }}
         </div>
-        <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}" class="btn btn-primary">Voir plus</a>
+        <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}" class="btn btn-success">Voir plus</a>
     </div>
     <script>
         function editFlan(idFlan) {
@@ -315,7 +315,7 @@
                 {{ form.type_texture(class="form-control", id="edit-flan-type_texture") }}
             </div>
             <div class="form-group">
-                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                <button type="submit" class="btn btn-success">Enregistrer</button>
                 <button type="button" class="btn btn-secondary" onclick="cancelEdit({{ flan.id_flan }})">Annuler</button>
             </div>
         </form>
@@ -350,7 +350,7 @@
             {% else %}
                 {{ afficher_criteres_evaluation(evaluation) }}
             {% endif %}
-            <a href="{{ url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval) }}" class="btn btn-primary">Voir plus</a>
+            <a href="{{ url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval) }}" class="btn btn-success">Voir plus</a>
         </div>
     </div>
     <script>
@@ -393,7 +393,7 @@
                 {{ form.description(class="form-control", id="eval-detail-description") }}
             </div>
             <div class="form-group">
-                <button type="submit" class="btn btn-primary">Enregistrer</button>
+                <button type="submit" class="btn btn-success">Enregistrer</button>
                 <button type="button" class="btn btn-secondary" onclick="cancelEdit({{ evaluation.id_eval }})">Annuler</button>
             </div>
         </form>
@@ -468,7 +468,7 @@
             {% if current_user.is_authenticated %}
                 {{ proposer_etablissement(form_ajout, url_for('maps.ajouter_etablissement'), current_user) }}
             {% else %}
-                <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn btn-primary">
+                <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn btn-success">
                     Ajouter un etablissement (connectez-vous)
                 </a>
             {% endif %}
@@ -479,7 +479,7 @@
             {% if current_user.is_authenticated %}
                 {{ proposer_flan(form_ajout, url_for('main.proposer_flan', id_etab=etablissement.id_etab)) }}
             {% else %}
-                <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn btn-primary">
+                <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn btn-success">
                     Ajouter un flan (connectez-vous)
                 </a>
             {% endif %}
@@ -490,7 +490,7 @@
             {% if current_user.is_authenticated %}
                 {{ proposer_evaluation(form_ajout, url_for('main.evaluer_flan', id_flan=flan.id_flan)) }}
             {% else %}
-                <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn btn-primary">
+                <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn btn-success">
                     Ajouter une evaluation (connectez-vous)
                 </a>
             {% endif %}
