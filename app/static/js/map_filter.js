@@ -153,43 +153,54 @@ function updateMapAndMarkers() {
         console.warn("Aucun établissement trouvé.");
         return;
     }
+
     // Efface les anciens marqueurs
     markers.forEach(marker => map.removeLayer(marker));
     markers = [];
     const bounds = L.latLngBounds();
+
     etablissements.forEach(etablissement => {
-        
-        let icon = createEmojiIcon('🏠', 'default-icon');
-        if (etablissement.label) icon = createEmojiIcon('❤️', 'label-icon');
-        else if (etablissement.visite) icon = createEmojiIcon('✅', 'visited-icon');
-        else icon = createEmojiIcon('👋', 'unvisited-icon');
-        if (etablissement.latitude && etablissement.longitude) {
-            const marker = L.marker(
-                [etablissement.latitude, etablissement.longitude],
-                { icon: icon, title: etablissement.nom }
-            )
-            .addTo(map)
-            .bindPopup(`
-                <div class="infowindow-content">
-                    <h4>${etablissement.nom}</h4>
-                    <p>${etablissement.adresse}, ${etablissement.ville}</p>
-                    <a href="${baseUrl}/etablissement/${etablissement.id_etab}" class="btn btn-sm btn-success">Voir plus</a>
-                </div>
-            `);
-            marker.options.etablissement = etablissement; // Ajouter les données de l'établissement au marqueur
-            markers.push(marker);
-            bounds.extend(marker.getLatLng());
-        } else {
-            console.warn(`Établissement sans coordonnées valides: ${etablissement.nom}`);
-        }
-    });
+    let icon = createEmojiIcon('🏠', 'default-icon');
+    if (etablissement.label) icon = createEmojiIcon('❤️', 'label-icon');
+    else if (etablissement.visite) icon = createEmojiIcon('✅', 'visited-icon');
+    else icon = createEmojiIcon('👋', 'unvisited-icon');
+
+    if (etablissement.latitude && etablissement.longitude) {
+        const marker = L.marker(
+            [etablissement.latitude, etablissement.longitude],
+            { icon: icon, title: etablissement.nom }
+        ).addTo(map);
+
+        // Chargement asynchrone de l'infowindow (sans ouverture automatique)
+        marker.bindPopup("Chargement en cours...");
+        fetch(`/get_infowindow_content?id_etab=${etablissement.id_etab}`)
+            .then(response => response.text())
+            .then(content => {
+                marker.setPopupContent(content);
+            })
+            .catch(error => {
+                console.error('Erreur lors du chargement de l\'infowindow:', error);
+                let popupContent = `<div class="infowindow-content"><h4>${etablissement.nom}</h4>`;
+                popupContent += `<p>${etablissement.adresse}, ${etablissement.ville}</p>`;
+                popupContent += `<a href="${baseUrl}/etablissement/${etablissement.id_etab}" class="btn btn-sm btn-success">Voir plus</a></div>`;
+                marker.setPopupContent(popupContent);
+            });
+
+        marker.options.etablissement = etablissement;
+        markers.push(marker);
+        bounds.extend(marker.getLatLng());
+    }
+});
+
     // Ajuste la vue
     if (etablissements.length > 0) {
         map.fitBounds(bounds);
     }
+
     // Appliquer les filtres initiaux
     updateMarkersBasedOnFilters();
 }
+
 
 // Fonction pour gérer les clics sur les boutons de filtre
 function setupFilterButtons() {
