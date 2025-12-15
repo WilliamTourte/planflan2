@@ -314,32 +314,8 @@ input.back:hover {
     margin: 0;
     line-height: 1.2;
 }
-/* Bouton recherche - CORRIGÉ */
-header .btn-search-icon.custom-btn {
-    width: 36px !important;
-    height: 36px !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    border-radius: 50% !important;
-    background-color: var(--color-info) !important;
-    color: white !important;
-    border: none !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    font-size: var(--font-size-md) !important;
-    flex-shrink: 0;
-    transition: var(--transition);
-}
-header .btn-search-icon.custom-btn:hover {
-    background-color: var(--color-info-dark) !important;
-    transform: scale(1.05);
-}
-header .btn-search-icon.custom-btn i {
-    margin: 0 !important;
-    position: relative !important;
-    top: 0 !important;
-}
+
+
 /* =============================================
    6. CARTES
    ============================================= */
@@ -835,12 +811,7 @@ header .btn-search-icon.custom-btn i {
     .search-bar .form-control {
         width: 180px;
     }
-    header .btn-search-icon.custom-btn {
-        width: 32px;
-        height: 32px;
-        font-size: var(--font-size-sm);
-        padding: 0 !important;
-    }
+
 
     .leaflet-popup-content-wrapper {
         max-width: 90vw !important;
@@ -867,12 +838,7 @@ header .btn-search-icon.custom-btn i {
     .search-bar .form-control {
         width: 160px;
     }
-    header .btn-search-icon.custom-btn {
-        width: 28px;
-        height: 28px;
-        font-size: var(--font-size-sm);
-        padding: 0 !important;
-    }
+
 
     .form-container {
         padding: var(--padding-md);
