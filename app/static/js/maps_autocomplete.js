@@ -182,9 +182,9 @@ function updateMapAndMarkers() {
     etablissements.forEach(etablissement => {
         console.log(`Établissement: ${etablissement.nom}, Lat: ${etablissement.latitude}, Lng: ${etablissement.longitude}`);
         let icon = createEmojiIcon('🏠', 'default-icon');
-        if (etablissement.label) icon = createEmojiIcon('🏆', 'label-icon');
+        if (etablissement.label) icon = createEmojiIcon('❤️', 'label-icon');
         else if (etablissement.visite) icon = createEmojiIcon('✅', 'visited-icon');
-        else icon = createEmojiIcon('❌', 'unvisited-icon');
+        else icon = createEmojiIcon('👋', 'unvisited-icon');
         if (etablissement.latitude && etablissement.longitude) {
             const marker = L.marker(
                 [etablissement.latitude, etablissement.longitude],
