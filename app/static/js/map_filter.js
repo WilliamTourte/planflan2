@@ -76,6 +76,47 @@ function updateActiveButtonStates() {
     if (activeFilters.label) document.getElementById('filter-label').classList.add('active');
 }
 
+/**
+ * Crée un marqueur avec un popup asynchrone pour un établissement donné.
+ * @param {L.Map} map - La carte Leaflet.
+ * @param {Object} etablissement - L'établissement à afficher.
+ * @param {boolean} openPopup - Si true, ouvre le popup automatiquement.
+ * @param {string} baseUrl - URL de base pour les liens.
+ * @returns {L.Marker} Le marqueur créé.
+ */
+
+function createEtablissementMarker(map, etablissement, openPopup = false, baseUrl = window.location.origin) {
+    let icon = createEmojiIcon('🏠', 'default-icon');
+    if (etablissement.label) icon = createEmojiIcon('❤️', 'label-icon');
+    else if (etablissement.visite) icon = createEmojiIcon('✅', 'visited-icon');
+    else icon = createEmojiIcon('👋', 'unvisited-icon');
+
+    const marker = L.marker(
+        [etablissement.latitude, etablissement.longitude],
+        { icon: icon, title: etablissement.nom }
+    ).addTo(map);
+
+    // Chargement asynchrone de l'infowindow
+    marker.bindPopup("Chargement en cours...");
+    fetch(`/get_infowindow_content?id_etab=${etablissement.id_etab}`)
+        .then(response => response.text())
+        .then(content => {
+            marker.setPopupContent(content);
+            if (openPopup) marker.openPopup();
+        })
+        .catch(error => {
+            console.error('Erreur lors du chargement de l\'infowindow:', error);
+            let popupContent = `<div class="infowindow-content"><h4>${etablissement.nom}</h4>`;
+            popupContent += `<p>${etablissement.adresse}, ${etablissement.ville}</p>`;
+            popupContent += `<a href="${baseUrl}/etablissement/${etablissement.id_etab}" class="btn btn-sm btn-success">Voir plus</a></div>`;
+            marker.setPopupContent(popupContent);
+            if (openPopup) marker.openPopup();
+        });
+
+    marker.options.etablissement = etablissement;
+    return marker;
+}
+
 
 // Fonction pour mettre à jour l'affichage des marqueurs en fonction des filtres
 function updateMarkersBasedOnFilters() {
@@ -145,7 +186,6 @@ function loadEtablissements() {
         return [];
     }
 }
-
 // Mise à jour de la carte et des marqueurs
 function updateMapAndMarkers() {
     etablissements = loadEtablissements();
@@ -160,37 +200,24 @@ function updateMapAndMarkers() {
     const bounds = L.latLngBounds();
 
     etablissements.forEach(etablissement => {
-    let icon = createEmojiIcon('🏠', 'default-icon');
-    if (etablissement.label) icon = createEmojiIcon('❤️', 'label-icon');
-    else if (etablissement.visite) icon = createEmojiIcon('✅', 'visited-icon');
-    else icon = createEmojiIcon('👋', 'unvisited-icon');
+        if (etablissement.latitude && etablissement.longitude) {
+            const marker = createEtablissementMarker(map, etablissement, false, baseUrl);
+            markers.push(marker);
+            bounds.extend(marker.getLatLng());
+        } else {
+            console.warn(`Établissement sans coordonnées valides: ${etablissement.nom}`);
+        }
+    });
 
-    if (etablissement.latitude && etablissement.longitude) {
-        const marker = L.marker(
-            [etablissement.latitude, etablissement.longitude],
-            { icon: icon, title: etablissement.nom }
-        ).addTo(map);
-
-        // Chargement asynchrone de l'infowindow (sans ouverture automatique)
-        marker.bindPopup("Chargement en cours...");
-        fetch(`/get_infowindow_content?id_etab=${etablissement.id_etab}`)
-            .then(response => response.text())
-            .then(content => {
-                marker.setPopupContent(content);
-            })
-            .catch(error => {
-                console.error('Erreur lors du chargement de l\'infowindow:', error);
-                let popupContent = `<div class="infowindow-content"><h4>${etablissement.nom}</h4>`;
-                popupContent += `<p>${etablissement.adresse}, ${etablissement.ville}</p>`;
-                popupContent += `<a href="${baseUrl}/etablissement/${etablissement.id_etab}" class="btn btn-sm btn-success">Voir plus</a></div>`;
-                marker.setPopupContent(popupContent);
-            });
-
-        marker.options.etablissement = etablissement;
-        markers.push(marker);
-        bounds.extend(marker.getLatLng());
+    // Ajuste la vue de la carte pour inclure tous les marqueurs
+    if (markers.length > 0) {
+        map.fitBounds(bounds);
     }
-});
+
+    // Appliquer les filtres initiaux
+    updateMarkersBasedOnFilters();
+}
+
 
     // Ajuste la vue
     if (etablissements.length > 0) {
@@ -199,7 +226,7 @@ function updateMapAndMarkers() {
 
     // Appliquer les filtres initiaux
     updateMarkersBasedOnFilters();
-}
+
 
 
 // Fonction pour gérer les clics sur les boutons de filtre
