@@ -157,7 +157,25 @@ def api_etablissements():
         return jsonify({'error': str(e)}), 500
 
 
-#Route pour générer le CONTENT d'une infowindow, utilisé dans maps_autocomplete.js
+def afficher_badge_etablissement(etablissement):
+    if hasattr(etablissement, 'label') and etablissement.label:
+        return '<span class="badge badge-labellise">❤️ Labellisé</span>'
+    return ''
+
+def afficher_badge_type_etab(etablissement):
+    couleurs = {
+        'BOULANGERIE': '#F5DEB3',
+        'PATISSERIE': '#FFB6C1',
+        'RESTAURANT': '#87CEEB',
+        'CAFE': '#D2B48C'
+    }
+    type_etab = getattr(etablissement, 'type_etab', None)
+    if type_etab:
+        couleur = couleurs.get(type_etab.name, '#D3D3D3')
+        return f'<div class="badge badge-type-etab" style="background-color: {couleur};">{type_etab.value}</div>'
+    return ''
+
+
 @main_bp.route('/get_infowindow_content')
 def get_infowindow_content():
     id_etab = request.args.get('id_etab', type=int)
@@ -165,15 +183,28 @@ def get_infowindow_content():
     if not etablissement:
         return "Détails non disponibles", 404
 
-    # Génère le contenu de l'infowindow
-    content = render_template_string("""
-        {% from 'macros.html' import afficher_etablissement_infowindow %}
-        {{ afficher_etablissement_infowindow(
-            etablissement,
-            url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab)
-        ) }}
-    """, etablissement=etablissement)
+    details_url = url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab)
+    content = f"""
+    <div class="infowindow-content">
+        <div class="infowindow-badges">
+            {afficher_badge_etablissement(etablissement)}
+            {afficher_badge_type_etab(etablissement)}
+        </div>
+        <div class="infowindow-header">
+            <h3>{etablissement.nom}</h3>
+        </div>
+        <div class="infowindow-body">
+            <p class="adresse">{etablissement.adresse}, {etablissement.ville}</p>
+            {'<p class="flans-count">' + str(len(etablissement.flans)) + ' flan' + ('s' if len(etablissement.flans) > 1 else '') + '</p>' if etablissement.flans else ''}
+        </div>
+        <div class="infowindow-footer">
+            <a href="{details_url}" class="btn btn-success">Voir plus</a>
+        </div>
+    </div>
+    """
     return content
+
+
 
 ### PAGE RECHERCHE
 @main_bp.route('/rechercher', methods=['GET'])

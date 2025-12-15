@@ -24,7 +24,7 @@
 
 {% macro afficher_badge_etablissement(etablissement) %}
     {% if etablissement.label %}
-        <span class="badge badge-labellise">⭐ Labellisé</span>
+        <span class="badge badge-labellise">❤️ Labellisé</span>
     {% endif %}
 {% endmacro %}
 
@@ -133,7 +133,7 @@
                         delete_form, validate_form) }}
             </div>
             {{ afficher_formulaire_edition_etablissement(etablissement, form_edit, current_user) }}
-            <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}" class="btn btn-success">Voir plus</a>
+            <!--<a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}" class="btn btn-success">Voir plus</a>-->
         </div>
     </div>
     <script>
@@ -148,30 +148,7 @@
     </script>
 {% endmacro %}
 
-{% macro afficher_etablissement_infowindow(etablissement, details_url) %}
-    <div class="infowindow-content">
-          <div class="infowindow-badges">
-                {{ afficher_badge_etablissement(etablissement) }}
-                {{ afficher_badge_type_etab(etablissement) }}
-            </div>
-        <div class="infowindow-header">
-            <h3>{{ etablissement.nom | enlever_accents }}</h3>
 
-        </div>
-        <div class="infowindow-body">
-            <p class="adresse">{{ etablissement.adresse }}, {{ etablissement.ville }}</p>
-            {% if etablissement.flans %}
-                <p class="flans-count">
-                    {{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}
-                </p>
-            {% endif %}
-        </div>
-        <div class="infowindow-footer">
-            <a href="{{ details_url }}" class="btn btn-success btn-small">Voir plus</a>
-        </div>
-
-    </div>
-{% endmacro %}
 
 
 {% macro afficher_formulaire_edition_etablissement(etablissement, form_edit, current_user) %}

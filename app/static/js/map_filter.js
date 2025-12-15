@@ -1,5 +1,5 @@
 // Variables globales
-let autocomplete;
+
 let map;
 let markers = [];
 let etablissements = [];
@@ -129,69 +129,6 @@ function initMap() {
     console.log("Carte initialisée avec succès.");
 }
 
-// Initialisation de l'autocomplétion Google Maps
-window.initAutocomplete = function() {
-    const input = document.getElementById('search');
-    if (!input) {
-        console.error("Élément #search introuvable !");
-        return;
-    }
-    autocomplete = new google.maps.places.Autocomplete(input, {
-        types: ['establishment'],
-        componentRestrictions: {country: 'fr'}
-    });
-    // Écouter les changements dans l'Autocomplete
-    autocomplete.addListener('place_changed', function() {
-        const place = autocomplete.getPlace();
-        if (!place.geometry) {
-            console.error("Aucune géométrie trouvée pour ce lieu.");
-            return;
-        }
-        // Remplir les champs CACHÉS avec le préfixe "ajout-etab-"
-        const nomElement = document.getElementById('ajout-etab-nom');
-        const adresseElement = document.getElementById('ajout-etab-adresse');
-        const latitudeElement = document.getElementById('ajout-etab-latitude');
-        const longitudeElement = document.getElementById('ajout-etab-longitude');
-        if (nomElement) nomElement.value = place.name || '';
-        if (adresseElement) adresseElement.value = place.formatted_address || '';
-        if (latitudeElement) latitudeElement.value = place.geometry.location.lat();
-        if (longitudeElement) longitudeElement.value = place.geometry.location.lng();
-        // Vérifier si le lieu est déjà dans la liste
-        fetch('/verifier_etablissement', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').content
-            },
-            body: JSON.stringify({ nom: place.name }),
-        })
-        .then(async response => {
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Erreur serveur: ${errorText}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.error) {
-                console.error("Erreur:", data.error);
-                return;
-            }
-            if (data.exists) {
-                const previousMessages = document.querySelectorAll('.alert-warning');
-                previousMessages.forEach(msg => msg.remove());
-                const message = document.createElement('div');
-                message.className = 'alert alert-warning';
-                message.innerHTML = `Cet établissement est déjà dans la liste. <a href="${data.url}">Voir la page</a>`;
-                const formContainer = document.querySelector('.form-container');
-                if (formContainer) formContainer.prepend(message);
-            }
-        })
-        .catch(error => {
-            console.error('Erreur:', error);
-        });
-    });
-};
 
 // Chargement des établissements depuis les données intégrées
 function loadEtablissements() {
@@ -202,15 +139,6 @@ function loadEtablissements() {
             return [];
         }
         const etablissementsData = JSON.parse(etablissementsDataElement.getAttribute('data-etablissements'));
-        console.log("Données des établissements chargées:", etablissementsData);
-        etablissementsData.forEach(etab => {
-            console.log(`Établissement: ${etab.nom}, Flans:`, etab.flans);
-            if (etab.flans && etab.flans.length > 0) {
-                etab.flans.forEach(flan => {
-                    console.log(`Flan: ${flan.nom}, type_pate: ${flan.type_pate}`);
-                });
-            }
-        });
         return etablissementsData;
     } catch (error) {
         console.error("Erreur lors du chargement des établissements:", error);
@@ -230,7 +158,7 @@ function updateMapAndMarkers() {
     markers = [];
     const bounds = L.latLngBounds();
     etablissements.forEach(etablissement => {
-        console.log(`Établissement: ${etablissement.nom}, Lat: ${etablissement.latitude}, Lng: ${etablissement.longitude}`);
+        
         let icon = createEmojiIcon('🏠', 'default-icon');
         if (etablissement.label) icon = createEmojiIcon('❤️', 'label-icon');
         else if (etablissement.visite) icon = createEmojiIcon('✅', 'visited-icon');
@@ -396,7 +324,6 @@ function initAll() {
     initDataElements(); // Initialiser les éléments de données
     initMap();
     updateMapAndMarkers();
-    initAutocomplete();
     setupFilterButtons(); // Initialiser les boutons de filtre
 }
 

@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from 'macros.html' import afficher_etablissement_infowindow %}
+
 {% block scripts_head %}
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- Leaflet CSS & JS -->
@@ -31,7 +31,7 @@
     });
     </script>
     <!-- Inclure le fichier JavaScript externe -->
-    <script src="{{ url_for('static', filename='js/maps_autocomplete.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/map_filter.js') }}" defer></script>
 {% endblock %}
 
 
