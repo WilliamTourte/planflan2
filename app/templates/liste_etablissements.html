@@ -12,16 +12,19 @@
 
     <!-- Variables globales pour les données dynamiques -->
     <script>
+    // Initialiser les données dynamiques avant de charger le script principal
     document.addEventListener('DOMContentLoaded', function() {
         const etablissementsData = {{ etablissements_json|tojson|safe }};
         const etablissementsDataElement = document.createElement('div');
         etablissementsDataElement.id = 'etablissements-data';
         etablissementsDataElement.setAttribute('data-etablissements', JSON.stringify(etablissementsData));
         document.body.appendChild(etablissementsDataElement);
+        
         const isAdminElement = document.createElement('div');
         isAdminElement.id = 'is-admin';
         isAdminElement.setAttribute('data-is-admin', {{ current_user.is_admin|tojson|safe if current_user.is_authenticated else 'false' }});
         document.body.appendChild(isAdminElement);
+        
         const googleMapsApiKeyElement = document.createElement('div');
         googleMapsApiKeyElement.id = 'google-maps-api-key';
         googleMapsApiKeyElement.setAttribute('data-api-key', '{{ google_maps_api_key }}');
@@ -31,17 +34,7 @@
     <!-- Inclure le fichier JavaScript externe -->
     <script src="{{ url_for('static', filename='js/maps_autocomplete.js') }}" defer></script>
     <style>
-        .map-container {
-            position: relative;
-            height: 100vh;
-            width: 100%;
-        }
-        #filter-controls {
-            z-index: 1000;
-            background: white;
-            padding: 10px;
-            border: 1px solid black;
-        }
+
     </style>
 {% endblock %}
 {% block content %}
@@ -53,8 +46,8 @@
     <div id="filter-controls" style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%); z-index: 1000;">
         <div class="main-filters">
             <button id="filter-all" class="btn btn-success">Tous</button>
-            <button id="filter-pate-btn" class="btn btn-secondary">Pâte</button>
-            <button id="filter-statut-btn" class="btn btn-secondary">Statut</button>
+            <button id="filter-pate-btn" class="btn btn-success">Pâte</button>
+            <button id="filter-statut-btn" class="btn btn-success">Statut</button>
         </div>
         <div id="sub-filters" class="sub-filters"></div>
     </div>

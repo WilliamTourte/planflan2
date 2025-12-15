@@ -892,7 +892,7 @@ header .btn-search-icon.custom-btn i {
     position: absolute;
     top: 10px;
     left: 50%;
-    transform: translateX(-50%);
+   
     z-index: 1000;
     background: transparent !important;
     padding: 0;
@@ -916,7 +916,7 @@ header .btn-search-icon.custom-btn i {
     width: auto;
     min-width: 0;
     height: auto;
-    line-height: 1;
+    line-height: 2;
     white-space: nowrap;
     background: #ffcf40;
 }
@@ -931,6 +931,7 @@ header .btn-search-icon.custom-btn i {
     margin-top: 6px;
     z-index: 1001;
     min-width: 160px;
+    color:white;
 }
 .sub-filters.show {
     display: block;
@@ -956,10 +957,21 @@ header .btn-search-icon.custom-btn i {
     width: auto;
     min-width: 0;
     height: auto;
-    line-height: 1;
+    line-height: 2;
     white-space: nowrap;
     background: #ffcf40;
 }
+        /* Styles pour les boutons de filtre */
+        .filter-btn {
+            margin: 2px;
+        }
+.filter-btn.active {
+    background-color: #007bff !important;
+    color: white !important;
+    border-color: #007bff !important;
+}
+
+
 /* Supprime tout style par défaut de la navbar */
 .header-yellow nav {
     background-color: transparent !important;
