@@ -1,0 +1,69 @@
+## Penser à changers les informations indiquées avec les chevrons (les TODO vous indiquerons où)
+services:
+  planflan-service-db:
+    # Sous-dossier contenant le Dockerfile 
+    # build: ./db
+    # Nom de l'image créée à partir du Dockerfile
+    image: mysql:lts
+    # Le nom du conteneur instancié
+    container_name: planflan-container-db
+    restart: always
+    env_file: .env
+    # Montage du volume permettant de paser les scripts de création dans le conteneur
+    # volumes:
+      # - ${MYSQL_DUMP_DIR}:/docker-entrypoint-initdb.d
+    environment:
+      # Configuration du mot de passe de l'utilisateur "root"
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    healthcheck:
+      # test: ["CMD", "mysqladmin" ,"ping", "-h", "127.0.0.1", "--silent"]
+      test: ["CMD-SHELL", "mysql -u${MYSQL_USER} -p${MYSQL_PASSWORD} -e 'SELECT 1;' || exit 1"]
+      timeout: 30s
+      retries: 20
+      interval: 5s
+
+  planflan-backend:
+    image: planflan.backend:rc1
+    container_name: planflan-container-backend
+    build : 
+      context : ./
+    env_file: .env
+    environment:
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_HOST=planflan-container-db
+    restart: always
+    # Redirection de port à utiliser pour test en local
+    # ATTENTION : ne pas garder en production
+    # ports:
+    #   - "5000:5000"
+    depends_on:
+      planflan-service-db:
+        condition: service_healthy
+
+  # Le service suivant correspond au "reverse proxy"
+  # -> le serveur HTTP de type "nginx" comme un reverse proxy
+  nginx:
+    image: docker.io/nginx:alpine
+    restart: always
+    cap_add:
+      - NET_BIND_SERVICE
+    # Dans le cas d'utilisation de conteneurs rootless (notamment avec podman)
+    # penser à faire la redirection suivant : 8443:443
+    ports:
+      - "8080:80"
+      - "443:443" # exposition du port 443 (sécurisé)
+    volumes:
+      # ajout du fichier de configuration du nginx pour en faire un "reverse proxy"
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      # ajout du chemin vers les certificats
+      - ./nginx:/etc/nginx/conf.d/ 
+    depends_on:
+      - planflan-backend
+
