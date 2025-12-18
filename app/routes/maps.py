@@ -24,9 +24,6 @@ def extraire_ville(adresse):
 def nettoyer_adresse(adresse):
     return adresse.split(',')[0].strip()
 
-@maps_bp.route('/geolocalisation', methods=['GET'])
-def geolocalisation():
-    return render_template('geoloc.html')
 
 
 @maps_bp.route('/geoloc', methods=['POST'])

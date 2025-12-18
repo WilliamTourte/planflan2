@@ -32,6 +32,33 @@ def calculer_distance(lat1, lon1, lat2, lon2):
     c = 2 * atan2(sqrt(a), sqrt(1 - a))
     return R * c
 
+def filtrer_etablissements(query, **kwargs):
+    """Applique les filtres communs à une requête Etablissement."""
+    if kwargs.get('nom'):
+        query = query.filter(Etablissement.nom.ilike(f'%{kwargs["nom"]}%'))
+    if kwargs.get('ville'):
+        query = query.filter(Etablissement.ville.ilike(f'%{kwargs["ville"]}%'))
+    if kwargs.get('visite') == 'oui':
+        query = query.filter(Etablissement.visite == True)
+    elif kwargs.get('visite') == 'non':
+        query = query.filter(Etablissement.visite == False)
+    if kwargs.get('labellise') == 'oui':
+        query = query.filter(Etablissement.label == True)
+    elif kwargs.get('labellise') == 'non':
+        query = query.filter(Etablissement.label == False)
+    if kwargs.get('type_pate') and kwargs['type_pate'] != 'tous':
+        query = query.filter(Flan.type_pate == kwargs['type_pate'])
+    if kwargs.get('type_saveur') and kwargs['type_saveur'] != 'tous':
+        query = query.filter(Flan.type_saveur == kwargs['type_saveur'])
+    if kwargs.get('prix') and kwargs['prix'] != 'tous':
+        if kwargs['prix'] == '0':
+            query = query.filter(Flan.prix < 2.5)
+        elif kwargs['prix'] == '2.5':
+            query = query.filter(Flan.prix >= 2.5, Flan.prix < 5)
+        elif kwargs['prix'] == '5':
+            query = query.filter(Flan.prix >= 5)
+    return query
+
 @main_bp.route('/liste_etablissements', methods=['GET', 'POST'])
 def liste_etablissements():
     form_ajout = EtabForm(prefix='ajout-etab')
