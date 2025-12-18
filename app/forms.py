@@ -1,7 +1,7 @@
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, RadioField, HiddenField, \
-    DecimalField
+    DecimalField, FloatField
 from wtforms.validators import DataRequired, Length, Email, ValidationError, EqualTo, NumberRange, Optional
 from app import bcrypt
 from app.models import TypeEtab, TypePate, TypeSaveur, TypeTexture, Utilisateur
@@ -72,6 +72,9 @@ class EvalForm(FlaskForm):
 
 # Formulaire de recherche
 class RechercheForm(FlaskForm):
+    latitude = HiddenField()  # Champ caché pour la latitude
+    longitude = HiddenField()  # Champ caché pour la longitude
+    rayon = FloatField('Rayon (km)', default=5.0)  # Optionnel : laisser l'utilisateur choisir le rayon
     nom = StringField('Nom', validators=[Optional(), Length(min=3, max=50)])
     ville = StringField('Ville', validators=[Optional(), Length(min=3, max=50)])
     type_saveur = SelectField('Saveur', choices=[('tous', 'Tous')] + [(choice.name, choice.value) for choice in TypeSaveur], default='tous')

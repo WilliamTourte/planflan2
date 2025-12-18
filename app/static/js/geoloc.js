@@ -31,23 +31,24 @@ function showError(error) {
 
 
 function sendToServer(latitude, longitude) {
-    const data = { latitude, longitude };
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-    fetch('/geoloc', {
+    // Envoie les coordonnées au serveur pour obtenir les établissements proches
+    fetch('/etablissements_proches', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRFToken': csrfToken,
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ latitude, longitude }),
     })
-    .then(response => {
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        return response.json();
+    .then(response => response.json())
+    .then(data => {
+        console.log('Établissements proches :', data.etablissements);
+        afficherEtablissementsProches(data.etablissements);  // Fonction à implémenter
     })
-    .then(data => console.log('Success:', data))
     .catch(error => console.error('Error:', error));
 }
+
 
 

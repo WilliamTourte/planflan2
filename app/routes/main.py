@@ -21,32 +21,40 @@ def index():
         google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
         form_recherche=form_recherche
     )
+from math import radians, sin, cos, sqrt, atan2
+
+def calculer_distance(lat1, lon1, lat2, lon2):
+    R = 6371.0
+    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    return R * c
 
 @main_bp.route('/liste_etablissements', methods=['GET', 'POST'])
 def liste_etablissements():
-    form_ajout = EtabForm(prefix='ajout-etab')  # Toujours initialiser le formulaire
+    form_ajout = EtabForm(prefix='ajout-etab')
     form_edit = EtabForm(prefix='edit-etab')
-    # 1. Initialisation du formulaire
+
     if request.method == 'POST':
         form_recherche = RechercheForm()
     else:
         form_recherche = RechercheForm(request.args)
-    # 2. Recherche simple (toujours appliquée si présente)
+
+    # 1. Recherche simple
     recherche_simple = request.args.get('recherche_simple', None)
     if recherche_simple:
-        # Recherche simple : pas besoin de jointure avec Flan
         query = Etablissement.query.filter(
             (Etablissement.nom.ilike(f'%{recherche_simple}%')) |
             (Etablissement.ville.ilike(f'%{recherche_simple}%'))
         )
     else:
-        # Sinon, on part d'une requête de base
         query = Etablissement.query
-    # 3. Filtres avancés (uniquement si le formulaire est valide)
+
+    # 2. Filtres avancés
     if form_recherche.validate():
-        # On a besoin de la jointure avec Flan pour les filtres sur les flans
         query = query.join(Flan)
-        # Application des filtres
         if form_recherche.nom.data:
             query = query.filter(Etablissement.nom.ilike(f'%{form_recherche.nom.data}%'))
         if form_recherche.ville.data:
@@ -68,17 +76,36 @@ def liste_etablissements():
             query = query.filter(Etablissement.visite == (form_recherche.visite.data == 'oui'))
         if form_recherche.labellise.data and form_recherche.labellise.data != 'tous':
             query = query.filter(Etablissement.label == (form_recherche.labellise.data == 'oui'))
-    # 4. Exécution de la requête
-    resultats = query.distinct().all()  # distinct() pour éviter les doublons
-    etablissements, etablissements_json = afficher_etablissements(resultats)
+
+    # 3. Filtre par proximité (si latitude/longitude fournies)
+    user_lat = form_recherche.latitude.data
+    user_lon = form_recherche.longitude.data
+    if user_lat and user_lon:
+        rayon = form_recherche.rayon.data or 5.0  # Rayon par défaut : 5 km
+        # Récupère tous les établissements pour calculer la distance
+        etablissements = query.distinct().all()
+        # Filtre les établissements proches
+        etablissements = [
+            etab for etab in etablissements
+            if etab.latitude and etab.longitude and
+            calculer_distance(user_lat, user_lon, etab.latitude, etab.longitude) <= rayon
+        ]
+    else:
+        # Sinon, exécute la requête normale
+        etablissements = query.distinct().all()
+
+    # 4. Préparation pour le template
+    etablissements, etablissements_json = afficher_etablissements(etablissements)
     return render_template(
         'liste_etablissements.html',
         etablissements=etablissements,
         etablissements_json=etablissements_json,
         google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
         form_recherche=form_recherche,
-        form_ajout=form_ajout,  # Toujours passer form_ajout
-        form_edit=form_edit
+        form_ajout=form_ajout,
+        form_edit=form_edit,
+        user_lat=user_lat,  # Passe la latitude pour la carte
+        user_lon=user_lon,  # Passe la longitude pour la carte
     )
 
 
@@ -92,7 +119,7 @@ def api_etablissements():
             visite = data.get('visite', '')
             labellise = data.get('labellise', '')
             ville = data.get('ville', '')
-            type_flan = data.get('type_flan', '')
+
             type_pate = data.get('type_pate', 'tous')
             type_saveur = data.get('type_saveur', 'tous')
             prix = data.get('prix', 'tous')
@@ -102,7 +129,7 @@ def api_etablissements():
             visite = request.args.get('visite', '')
             labellise = request.args.get('labellise', '')
             ville = request.args.get('ville', '')
-            type_flan = request.args.get('type_flan', '')
+
             type_pate = request.args.get('type_pate', 'tous')
             type_saveur = request.args.get('type_saveur', 'tous')
             prix = request.args.get('prix', 'tous')

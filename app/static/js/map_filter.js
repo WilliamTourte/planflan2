@@ -1,43 +1,53 @@
 // Variables globales
-
 let map;
 let markers = [];
 let etablissements = [];
+let userMarker = null;
+let userCircle = null;
 let baseUrl = window.location.origin;
+let userLocation = null;
+let proximityRadius = 5;
 
 // Variables pour les filtres
 let activeFilters = {
     type_pate: false,
     visited: false,
     unvisited: false,
-    label: false
+    label: false,
+    proximity: false
 };
 
 // Fonction pour initialiser les données dynamiques
 function initDataElements() {
-    // Vérifier si les éléments de données existent déjà
     if (!document.getElementById('etablissements-data')) {
-        // Créer l'élément pour les données des établissements
         const etablissementsDataElement = document.createElement('div');
         etablissementsDataElement.id = 'etablissements-data';
         etablissementsDataElement.setAttribute('data-etablissements', '[]');
         document.body.appendChild(etablissementsDataElement);
     }
-    
+
     if (!document.getElementById('is-admin')) {
-        // Créer l'élément pour l'état admin
         const isAdminElement = document.createElement('div');
         isAdminElement.id = 'is-admin';
         isAdminElement.setAttribute('data-is-admin', 'false');
         document.body.appendChild(isAdminElement);
     }
-    
+
     if (!document.getElementById('google-maps-api-key')) {
-        // Créer l'élément pour la clé API Google Maps
         const googleMapsApiKeyElement = document.createElement('div');
         googleMapsApiKeyElement.id = 'google-maps-api-key';
         googleMapsApiKeyElement.setAttribute('data-api-key', '');
         document.body.appendChild(googleMapsApiKeyElement);
+    }
+
+    // Récupérer la position utilisateur si disponible
+    const userLocationElement = document.getElementById('user-location');
+    if (userLocationElement) {
+        userLocation = {
+            lat: parseFloat(userLocationElement.getAttribute('data-lat')),
+            lon: parseFloat(userLocationElement.getAttribute('data-lon'))
+        };
+        activeFilters.proximity = true;
     }
 }
 
@@ -51,52 +61,36 @@ const createEmojiIcon = (emoji, className) => {
     });
 };
 
-function closeInfoWindow() {
-    // Leaflet gère la fermeture des popups automatiquement
+// Fonction pour calculer la distance entre deux points (en km)
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Rayon de la Terre en km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
 }
 
-function updateActiveButtonStates() {
-    // Désactiver tous les boutons de pâte
-    document.querySelectorAll('[id^="filter-type_pate_"]').forEach(button => {
-        button.classList.remove('active');
-    });
-    // Activer le bouton de pâte correspondant si un filtre est actif
-    if (activeFilters.type_pate) {
-        const pateButton = document.getElementById(`filter-type_pate_${activeFilters.type_pate.toUpperCase()}`);
-        if (pateButton) pateButton.classList.add('active');
-    }
-
-    // Désactiver tous les boutons de statut
-    document.querySelectorAll('[id^="filter-"]:not([id^="filter-type_pate_"]):not([id="filter-all"]):not([id="filter-pate-btn"]):not([id="filter-statut-btn"])').forEach(button => {
-        button.classList.remove('active');
-    });
-    // Activer les boutons de statut correspondants
-    if (activeFilters.visited) document.getElementById('filter-visited').classList.add('active');
-    if (activeFilters.unvisited) document.getElementById('filter-unvisited').classList.add('active');
-    if (activeFilters.label) document.getElementById('filter-label').classList.add('active');
-}
-
-/**
- * Crée un marqueur avec un popup asynchrone pour un établissement donné.
- * @param {L.Map} map - La carte Leaflet.
- * @param {Object} etablissement - L'établissement à afficher.
- * @param {boolean} openPopup - Si true, ouvre le popup automatiquement.
- * @param {string} baseUrl - URL de base pour les liens.
- * @returns {L.Marker} Le marqueur créé.
- */
-
+// Fonction pour créer un marqueur avec un popup asynchrone pour un établissement donné
 function createEtablissementMarker(map, etablissement, openPopup = false, baseUrl = window.location.origin) {
     let icon = createEmojiIcon('🏠', 'default-icon');
-    if (etablissement.label) icon = createEmojiIcon('❤️', 'label-icon');
-    else if (etablissement.visite) icon = createEmojiIcon('✅', 'visited-icon');
-    else icon = createEmojiIcon('👋', 'unvisited-icon');
+    if (etablissement.label) {
+        icon = createEmojiIcon('❤️', 'label-icon');
+    } else if (etablissement.visite) {
+        icon = createEmojiIcon('✅', 'visited-icon');
+    } else {
+        icon = createEmojiIcon('👋', 'unvisited-icon');
+    }
 
     const marker = L.marker(
         [etablissement.latitude, etablissement.longitude],
         { icon: icon, title: etablissement.nom }
     ).addTo(map);
 
-    // Chargement asynchrone de l'infowindow
+    // Chargement asynchrone du contenu du popup
     marker.bindPopup("Chargement en cours...");
     fetch(`/get_infowindow_content?id_etab=${etablissement.id_etab}`)
         .then(response => response.text())
@@ -105,7 +99,7 @@ function createEtablissementMarker(map, etablissement, openPopup = false, baseUr
             if (openPopup) marker.openPopup();
         })
         .catch(error => {
-            console.error('Erreur lors du chargement de l\'infowindow:', error);
+            console.error('Erreur lors du chargement du popup:', error);
             let popupContent = `<div class="infowindow-content"><h4>${etablissement.nom}</h4>`;
             popupContent += `<p>${etablissement.adresse}, ${etablissement.ville}</p>`;
             popupContent += `<a href="${baseUrl}/etablissement/${etablissement.id_etab}" class="btn btn-sm btn-success">Voir plus</a></div>`;
@@ -117,35 +111,37 @@ function createEtablissementMarker(map, etablissement, openPopup = false, baseUr
     return marker;
 }
 
-
 // Fonction pour mettre à jour l'affichage des marqueurs en fonction des filtres
 function updateMarkersBasedOnFilters() {
     markers.forEach(marker => {
         const etablissement = marker.options.etablissement;
         let showMarker = true;
 
-        // Vérifier si l'établissement a au moins un flan correspondant au filtre de type de pâte
-        if (activeFilters.type_pate) {
+        // Filtre de proximité
+        if (activeFilters.proximity && userLocation) {
+            const distance = calculateDistance(
+                userLocation.lat, userLocation.lon,
+                etablissement.latitude, etablissement.longitude
+            );
+            if (distance > proximityRadius) {
+                showMarker = false;
+            }
+        }
+
+        // Filtre par type de pâte
+        if (activeFilters.type_pate && showMarker) {
             if (!etablissement.flans || etablissement.flans.length === 0) {
                 showMarker = false;
             } else {
                 const hasMatchingPate = etablissement.flans.some(flan => flan.type_pate === activeFilters.type_pate);
-                if (!hasMatchingPate) {
-                    showMarker = false;
-                }
+                if (!hasMatchingPate) showMarker = false;
             }
         }
 
-        // Vérifier les autres filtres
-        if (activeFilters.visited && !etablissement.visite) {
-            showMarker = false;
-        }
-        if (activeFilters.unvisited && etablissement.visite) {
-            showMarker = false;
-        }
-        if (activeFilters.label && !etablissement.label) {
-            showMarker = false;
-        }
+        // Autres filtres
+        if (activeFilters.visited && !etablissement.visite && showMarker) showMarker = false;
+        if (activeFilters.unvisited && etablissement.visite && showMarker) showMarker = false;
+        if (activeFilters.label && !etablissement.label && showMarker) showMarker = false;
 
         if (showMarker) {
             map.addLayer(marker);
@@ -155,23 +151,61 @@ function updateMarkersBasedOnFilters() {
     });
 }
 
+// Fonction pour créer un marqueur utilisateur
+function createUserMarker() {
+    if (userMarker) map.removeLayer(userMarker);
+    if (userCircle) map.removeLayer(userCircle);
+
+    if (userLocation) {
+        userMarker = L.marker([userLocation.lat, userLocation.lon], {
+            icon: L.divIcon({
+                html: '📍',
+                className: 'user-marker',
+                iconSize: [30, 30],
+                iconAnchor: [15, 15]
+            })
+        }).addTo(map);
+
+        userCircle = L.circle([userLocation.lat, userLocation.lon], {
+            color: 'blue',
+            fillColor: '#30f',
+            fillOpacity: 0.2,
+            radius: proximityRadius * 1000 // Convertir km en mètres
+        }).addTo(map);
+
+        // Centrer la carte sur l'utilisateur
+        map.setView([userLocation.lat, userLocation.lon], 13);
+    }
+}
+
 // Initialisation de la carte Leaflet
 function initMap() {
-    console.log("Initialisation de la carte...");
     const mapElement = document.getElementById("map");
     if (!mapElement) {
         console.error("Élément #map introuvable !");
         return;
     }
-    map = L.map('map').setView([46.2276, 2.2137], 6);
+
+    // Position par défaut (centre de la France)
+    let center = [46.2276, 2.2137];
+    let zoom = 6;
+
+    // Si on a une position utilisateur, centrer dessus
+    if (userLocation) {
+        center = [userLocation.lat, userLocation.lon];
+        zoom = 13;
+    }
+
+    map = L.map('map').setView(center, zoom);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
-    console.log("Carte initialisée avec succès.");
+
+    // Ajouter le marqueur utilisateur si position disponible
+    createUserMarker();
 }
 
-
-// Chargement des établissements depuis les données intégrées
+// Chargement des établissements
 function loadEtablissements() {
     try {
         const etablissementsDataElement = document.getElementById('etablissements-data');
@@ -179,13 +213,13 @@ function loadEtablissements() {
             console.error("Élément #etablissements-data introuvable !");
             return [];
         }
-        const etablissementsData = JSON.parse(etablissementsDataElement.getAttribute('data-etablissements'));
-        return etablissementsData;
+        return JSON.parse(etablissementsDataElement.getAttribute('data-etablissements'));
     } catch (error) {
         console.error("Erreur lors du chargement des établissements:", error);
         return [];
     }
 }
+
 // Mise à jour de la carte et des marqueurs
 function updateMapAndMarkers() {
     etablissements = loadEtablissements();
@@ -204,13 +238,11 @@ function updateMapAndMarkers() {
             const marker = createEtablissementMarker(map, etablissement, false, baseUrl);
             markers.push(marker);
             bounds.extend(marker.getLatLng());
-        } else {
-            console.warn(`Établissement sans coordonnées valides: ${etablissement.nom}`);
         }
     });
 
-    // Ajuste la vue de la carte pour inclure tous les marqueurs
-    if (markers.length > 0) {
+    // Ajuste la vue de la carte pour inclure tous les marqueurs (si pas de position utilisateur)
+    if (markers.length > 0 && !userLocation) {
         map.fitBounds(bounds);
     }
 
@@ -218,31 +250,67 @@ function updateMapAndMarkers() {
     updateMarkersBasedOnFilters();
 }
 
+// Fonction pour gérer la géolocalisation
+function setupGeolocation() {
+    document.getElementById('geolocate-me').addEventListener('click', function() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    userLocation = {
+                        lat: position.coords.latitude,
+                        lon: position.coords.longitude
+                    };
+                    activeFilters.proximity = true;
+                    createUserMarker();
+                    updateMarkersBasedOnFilters();
 
-    // Ajuste la vue
-    if (etablissements.length > 0) {
-        map.fitBounds(bounds);
+                    // Mettre à jour l'URL pour inclure la position (optionnel)
+                    const url = new URL(window.location);
+                    url.searchParams.set('latitude', userLocation.lat);
+                    url.searchParams.set('longitude', userLocation.lon);
+                    window.history.pushState({}, '', url);
+                },
+                error => {
+                    alert("Erreur de géolocalisation: " + error.message);
+                }
+            );
+        } else {
+            alert("La géolocalisation n'est pas supportée par ce navigateur.");
+        }
+    });
+
+    // Gestion du rayon de proximité
+    document.getElementById('proximity-radius').addEventListener('change', function() {
+        proximityRadius = parseInt(this.value);
+        if (userCircle) {
+            userCircle.setRadius(proximityRadius * 1000);
+        }
+        updateMarkersBasedOnFilters();
+    });
+}
+
+// Fonction pour mettre à jour l'état des boutons actifs
+function updateActiveButtonStates() {
+    // Désactiver tous les boutons de pâte
+    document.querySelectorAll('[id^="filter-type_pate_"]').forEach(button => {
+        button.classList.remove('active');
+    });
+    // Activer le bouton de pâte correspondant si un filtre est actif
+    if (activeFilters.type_pate) {
+        const pateButton = document.getElementById(`filter-type_pate_${activeFilters.type_pate.toUpperCase()}`);
+        if (pateButton) pateButton.classList.add('active');
     }
 
-    // Appliquer les filtres initiaux
-    updateMarkersBasedOnFilters();
-
-
-
-// Fonction pour gérer les clics sur les boutons de filtre
-function setupFilterButtons() {
-    // Ajouter la classe filter-btn à tous les boutons de filtre
-    const filterButtons = document.querySelectorAll('#filter-controls button');
-    filterButtons.forEach(button => {
-        button.classList.add('filter-btn');
+    // Désactiver tous les boutons de statut
+    document.querySelectorAll('[id^="filter-"]:not([id^="filter-type_pate_"]):not([id="filter-all"]):not([id="filter-pate-btn"]):not([id="filter-statut-btn"]):not([id="geolocate-me"])').forEach(button => {
+        button.classList.remove('active');
     });
-    
-    document.getElementById('filter-all').addEventListener('click', function() {
-        activeFilters = { type_pate: false, visited: false, unvisited: false, label: false };
-        updateMarkersBasedOnFilters();
-        document.getElementById('sub-filters').classList.remove('show');
-        updateActiveButtonStates();
-    });
+    // Activer les boutons de statut correspondants
+    if (activeFilters.visited) document.getElementById('filter-visited').classList.add('active');
+    if (activeFilters.unvisited) document.getElementById('filter-unvisited').classList.add('active');
+    if (activeFilters.label) document.getElementById('filter-label').classList.add('active');
+}
+
 // Fonction utilitaire pour basculer l'état actif d'un bouton
 function toggleActiveButton(button, isActive) {
     if (isActive) {
@@ -303,79 +371,81 @@ function setupStatutButtons() {
     });
 }
 
-// Bouton pour afficher/masquer les options de pâte
-document.getElementById('filter-pate-btn').addEventListener('click', function() {
-    const subFilters = document.getElementById('sub-filters');
-    if (subFilters.classList.contains('show') && subFilters.querySelector('.filter-group')) {
-        subFilters.classList.remove('show');
-    } else {
-        subFilters.innerHTML = `
-            <div class="filter-group">
-                <button id="filter-type_pate_FEUILLETEE" class="btn btn-success">Feuilletée</button>
-                <button id="filter-type_pate_BRISEE" class="btn btn-success">Brisée</button>
-                <button id="filter-type_pate_SUCREE" class="btn btn-success">Sucrée</button>
-                <button id="filter-type_pate_SABLEE" class="btn btn-success">Sablée</button>
-                <button id="filter-type_pate_MIXTE" class="btn btn-success">Mixte</button>
-            </div>
-        `;
-        subFilters.classList.add('show');
-        setupPateButtons();
-    }
-});
+// Fonction pour configurer les boutons de filtre
+function setupFilterButtons() {
+    // Ajouter la classe filter-btn à tous les boutons de filtre
+    const filterButtons = document.querySelectorAll('#filter-controls button');
+    filterButtons.forEach(button => {
+        button.classList.add('filter-btn');
+    });
 
-// Bouton pour afficher/masquer les options de statut
-document.getElementById('filter-statut-btn').addEventListener('click', function() {
-    const subFilters = document.getElementById('sub-filters');
-    if (subFilters.classList.contains('show') && subFilters.querySelector('.filter-group')) {
-        subFilters.classList.remove('show');
-    } else {
-        subFilters.innerHTML = `
-            <div class="filter-group">
-                <button id="filter-visited" class="btn btn-success">Visité</button>
-                <button id="filter-unvisited" class="btn btn-success">Non visité</button>
-                <button id="filter-label" class="btn btn-success">Labellisé</button>
-            </div>
-        `;
-        subFilters.classList.add('show');
-        setupStatutButtons();
-    }
-});
+    document.getElementById('filter-all').addEventListener('click', function() {
+        activeFilters = { type_pate: false, visited: false, unvisited: false, label: false, proximity: false };
+        updateMarkersBasedOnFilters();
+        document.getElementById('sub-filters').classList.remove('show');
+        updateActiveButtonStates();
+    });
 
-document.addEventListener('click', function(event) {
-    const subFilters = document.getElementById('sub-filters');
-    const filterPateBtn = document.getElementById('filter-pate-btn');
-    const filterStatutBtn = document.getElementById('filter-statut-btn');
+    // Bouton pour afficher/masquer les options de pâte
+    document.getElementById('filter-pate-btn').addEventListener('click', function() {
+        const subFilters = document.getElementById('sub-filters');
+        if (subFilters.classList.contains('show') && subFilters.querySelector('.filter-group')) {
+            subFilters.classList.remove('show');
+        } else {
+            subFilters.innerHTML = `
+                <div class="filter-group">
+                    <button id="filter-type_pate_FEUILLETEE" class="btn btn-success">Feuilletée</button>
+                    <button id="filter-type_pate_BRISEE" class="btn btn-success">Brisée</button>
+                    <button id="filter-type_pate_SUCREE" class="btn btn-success">Sucrée</button>
+                    <button id="filter-type_pate_SABLEE" class="btn btn-success">Sablée</button>
+                    <button id="filter-type_pate_MIXTE" class="btn btn-success">Mixte</button>
+                </div>
+            `;
+            subFilters.classList.add('show');
+            setupPateButtons();
+        }
+    });
 
-    // Si le clic n'est pas sur un bouton de filtre ou dans les sous-filtres, on masque les sous-filtres
-    if (!filterPateBtn.contains(event.target) &&
-        !filterStatutBtn.contains(event.target) &&
-        !subFilters.contains(event.target)) {
-        subFilters.classList.remove('show');
-    }
-});
+    // Bouton pour afficher/masquer les options de statut
+    document.getElementById('filter-statut-btn').addEventListener('click', function() {
+        const subFilters = document.getElementById('sub-filters');
+        if (subFilters.classList.contains('show') && subFilters.querySelector('.filter-group')) {
+            subFilters.classList.remove('show');
+        } else {
+            subFilters.innerHTML = `
+                <div class="filter-group">
+                    <button id="filter-visited" class="btn btn-success">Visité</button>
+                    <button id="filter-unvisited" class="btn btn-success">Non visité</button>
+                    <button id="filter-label" class="btn btn-success">Labellisé</button>
+                </div>
+            `;
+            subFilters.classList.add('show');
+            setupStatutButtons();
+        }
+    });
 
+    document.addEventListener('click', function(event) {
+        const subFilters = document.getElementById('sub-filters');
+        const filterPateBtn = document.getElementById('filter-pate-btn');
+        const filterStatutBtn = document.getElementById('filter-statut-btn');
+
+        // Si le clic n'est pas sur un bouton de filtre ou dans les sous-filtres, on masque les sous-filtres
+        if (!filterPateBtn.contains(event.target) &&
+            !filterStatutBtn.contains(event.target) &&
+            !subFilters.contains(event.target)) {
+            subFilters.classList.remove('show');
+        }
+    });
 }
 
 // Initialisation globale
 function initAll() {
-    console.log("Initialisation de l'application...");
-    initDataElements(); // Initialiser les éléments de données
+    initDataElements();
     initMap();
     updateMapAndMarkers();
-    setupFilterButtons(); // Initialiser les boutons de filtre
+    setupFilterButtons();
+    setupGeolocation();
 }
 
 // Initialisation au chargement de la page
-document.addEventListener('DOMContentLoaded', function() {
-    console.log("DOM chargé.");
-    const googleMapsApiKey = document.getElementById('google-maps-api-key')?.getAttribute('data-api-key');
-    if (!googleMapsApiKey) {
-        console.error("Clé API Google Maps introuvable !");
-        return;
-    }
-    const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}&libraries=places&callback=initAll&v=weekly`;
-    script.async = true;
-    script.defer = true;
-    document.head.appendChild(script);
-});
+document.addEventListener('DOMContentLoaded', initAll);

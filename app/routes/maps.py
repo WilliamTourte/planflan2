@@ -1,16 +1,9 @@
 import traceback
-
-from flask import Flask, render_template, request, jsonify
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
-from flask_bcrypt import Bcrypt
 from werkzeug.datastructures import MultiDict
-
-
 from app.outils import enlever_accents, afficher_etablissements
 import re
-from flask import Flask, request, jsonify, Blueprint
-from flask import Blueprint, session, render_template, redirect, url_for, request, current_app, flash
+
+from flask import Blueprint, render_template, redirect, url_for, request, current_app, flash, jsonify
 from flask_login import login_required, current_user
 
 from app.forms import  EtabForm
@@ -36,17 +29,15 @@ def geolocalisation():
     return render_template('geoloc.html')
 
 
-
-
 @maps_bp.route('/geoloc', methods=['POST'])
 def geoloc():
-    print("Route /geoloc appelée")  # Message de log pour confirmer que la route est appelée
+
     try:
         data = request.get_json()
-        print(f"Données reçues : {data}")
+
         if not data:
-            print("No data received")
-            return jsonify({'error': 'No data received'}), 400
+            print("Données GPS non reçues")
+            return jsonify({'error': 'Données GPS non reçues'}), 400
         latitude = data.get('latitude')
         longitude = data.get('longitude')
         print(f"Latitude: {latitude}, Longitude: {longitude}")
@@ -54,6 +45,38 @@ def geoloc():
     except Exception as e:
         print(f"Erreur: {e}")
         return jsonify({"status": "error", "message": str(e)}), 400
+
+@maps_bp.route('/etablissements_proches', methods=['POST'])
+def etablissements_proches():
+    try:
+        data = request.get_json()
+        user_lat = data['latitude']
+        user_lon = data['longitude']
+        rayon_km = 5  # Rayon en kilomètres
+
+        # Récupère tous les établissements depuis la base
+        etablissements = Etablissement.query.all()
+
+        # Filtre les établissements dans le rayon de 5 km
+        etablissements_proches = []
+        for etab in etablissements:
+            distance = calculer_distance(user_lat, user_lon, etab.latitude, etab.longitude)
+            if distance <= rayon_km:
+                etablissements_proches.append({
+                    'id_etab': etab.id_etab,
+                    'nom': etab.nom,
+                    'adresse': etab.adresse,
+                    'latitude': etab.latitude,
+                    'longitude': etab.longitude,
+                    'distance': round(distance, 2)  # Arrondi à 2 décimales
+                })
+
+        return jsonify({'etablissements': etablissements_proches})
+
+    except Exception as e:
+        current_app.logger.error(f"Erreur : {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
 
 @maps_bp.route('/extraire_infos_adresse', methods=['POST'])
 def extraire_infos_adresse():

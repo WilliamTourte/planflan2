@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block scripts_head %}
 <meta name="csrf-token" content="{{ csrf_token() }}">
+    <script src="{{ url_for('static', filename='js/geoloc.js') }}" defer></script>
 {% endblock %}
 {% block content %}
 <div class="container d-flex flex-column align-items-center justify-content-center" style="min-height: 100vh; padding: var(--padding-lg);">
