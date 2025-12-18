@@ -27,9 +27,9 @@
     --border-radius-btn: 25px;
     --border-radius-card: 10px;
     --max-width: 1200px;
-    --padding-sm: 5px;
-    --padding-md: 10px;
-    --padding-lg: 20px;
+    --padding-sm: 1px;
+    --padding-md: 5px;
+    --padding-lg: 10px;
     --margin-sm: 4px;
     --margin-md: 10px;
     --margin-lg: 20px;
@@ -75,7 +75,7 @@ h1, h2, h3, h4, h5, h6 {
    3. LAYOUT & CONTAINERS
    ============================================= */
 .container {
-    width: 95%;
+    width: 100%;
     max-width: var(--max-width);
     margin: 0 auto;
     padding: 0 var(--padding-md);
@@ -88,7 +88,7 @@ header {
     background-color: var(--color-secondary);
     color: var(--color-white);
     width: 100%;
-    padding: 0.5rem 0;
+    padding: 0rem 0;
     position: sticky;
     top: 0;
     z-index: 100;
@@ -103,7 +103,7 @@ header .top-bar {
     align-items: center;
     width: 100%;
     padding: 0 var(--padding-lg);
-    margin-bottom: 0.3rem;
+    margin-bottom: 0rem;
 }
 header h1 {
     text-align: center;
@@ -174,17 +174,7 @@ input[type="submit"]:active,
     height: 30px;
 }
 /* Couleurs */
-.btn-primary,
-button.primary,
-input.primary {
-    background-color: var(--color-info);
-    color: var(--color-white);
-}
-.btn-primary:hover,
-button.primary:hover,
-input.primary:hover {
-    background-color: var(--color-info-dark);
-}
+
 .btn-success,
 button.success,
 input.success,
@@ -234,17 +224,14 @@ input.back {
 button.back:hover,
 input.back:hover {
     background-color: var(--color-back-dark);
-
 }
 
 .btn-icon {
-   
     width: 36px !important;
     height: 36px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-
     background-color: var(--color-success) !important;
     color: white !important;
 }
@@ -253,7 +240,6 @@ input.back:hover {
     font-size: 1rem !important;
     margin: 0 !important;
 }
-
 
 /* Groupes */
 .btn-group {
@@ -271,51 +257,12 @@ input.back:hover {
 .action-buttons .btn {
     margin: 0;
 }
-
-
-}
 /* =============================================
    5. BARRE DE RECHERCHE
    ============================================= */
-.search-bar {
-    background-color: var(--color-secondary);
-    padding: 0.4rem 0;
-    margin-bottom: 0;
-    transition: transform 0.3s ease, opacity 0.3s ease;
-    width: 100%;
+#search-input {
+    width: 200px !important; /* ou toute autre largeur souhaitée */
 }
-.search-bar.hide {
-    transform: translateY(-100%);
-    opacity: 0;
-}
-.search-bar .container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-wrap: nowrap;
-    gap: 0.5rem;
-    padding: 0;
-    max-width: 100%;
-}
-.search-bar form {
-    display: flex;
-    align-items: center;
-    margin: 0;
-    padding: 0;
-}
-.search-bar .form-control {
-    border-radius: var(--border-radius-btn);
-    border: none;
-    padding: 0.3rem var(--padding-md);
-    font-size: var(--font-size-md);
-    box-shadow: none;
-    height: 34px;
-    width: 220px;
-    margin: 0;
-    line-height: 1.2;
-}
-
-
 /* =============================================
    6. CARTES
    ============================================= */
@@ -578,6 +525,11 @@ input.back:hover {
     background-color: var(--color-danger);
     color: var(--color-white);
 }
+.alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
 /* =============================================
    12. NO RESULTS
    ============================================= */
@@ -777,21 +729,6 @@ input.back:hover {
     align-items: center;
     gap: 5px;
 }
-.alert {
-    padding: 10px;
-    margin-bottom: 15px;
-    border-radius: 4px;
-}
-.alert-warning {
-    background-color: #fff3cd;
-    color: #856404;
-    border: 1px solid #ffeeba;
-}
-.alert-danger {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
 /* =============================================
    16. RESPONSIVE - CORRIGÉ
    ============================================= */
@@ -808,11 +745,6 @@ input.back:hover {
     header h1 {
         font-size: 1.5rem;
     }
-    .search-bar .form-control {
-        width: 180px;
-    }
-
-
     .leaflet-popup-content-wrapper {
         max-width: 90vw !important;
         max-height: 70vh !important;
@@ -831,26 +763,17 @@ input.back:hover {
     .container {
         padding: 0 var(--padding-sm);
     }
-    .search-bar .container {
-        flex-wrap: nowrap;
-        gap: 0.3rem;
+    .form-control {
+        padding: var(--padding-sm);
     }
-    .search-bar .form-control {
-        width: 160px;
+    .form-control-sm {
+        width: 120px;
     }
-
-
     .form-container {
         padding: var(--padding-md);
     }
     .form-group {
         margin-bottom: var(--margin-md);
-    }
-    .form-control {
-        padding: var(--padding-sm);
-    }
-    .form-control-sm {
-        width: 100px;
     }
 }
 /* FILTRES SUR LA MAP */
@@ -858,7 +781,6 @@ input.back:hover {
     position: absolute;
     top: 10px;
     left: 50%;
-   
     z-index: 1000;
     background: transparent !important;
     padding: 0;
@@ -927,17 +849,15 @@ input.back:hover {
     white-space: nowrap;
     background: #ffcf40;
 }
-        /* Styles pour les boutons de filtre */
-        .filter-btn {
-            margin: 2px;
-        }
+/* Styles pour les boutons de filtre */
+.filter-btn {
+    margin: 2px;
+}
 .filter-btn.active {
     background-color: #007bff !important;
     color: white !important;
     border-color: #007bff !important;
 }
-
-
 /* Supprime tout style par défaut de la navbar */
 .header-yellow nav {
     background-color: transparent !important;
@@ -950,7 +870,7 @@ input.back:hover {
 .header-yellow {
     background-color: var(--color-secondary) !important;
     width: 100%;
-    padding: 0.5rem 0;
+    padding: 0rem 0;
 }
 /* Conteneur interne */
 .header-yellow > nav > div {
@@ -962,12 +882,7 @@ input.back:hover {
 }
 /* Boutons dans le header - CORRIGÉ */
 .header-yellow .btn,
-
-
-
-/* Icônes */
-.header-yellow .btn i,
-
+.header-yellow .btn i {
     font-size: 1.1rem;
     margin: 0 !important;
     position: relative;
@@ -980,12 +895,11 @@ input.back:hover {
     border-radius: 25px;
     padding: 0.3rem 1rem;
     height: 36px;
-    width: 220px;
+    width: 120px;
     margin-right: 8px;
 }
 /* Effet de survol */
-.header-yellow .btn:hover
-{
+.header-yellow .btn:hover {
     background-color: var(--color-info-dark) !important;
     transform: scale(1.05);
 }
@@ -995,8 +909,6 @@ input.back:hover {
         padding: 0 var(--padding-sm);
     }
     .header-yellow .form-control {
-        width: 180px;
+        width: 120px;
     }
-
-
 }

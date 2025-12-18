@@ -6,7 +6,7 @@
         </h1>
 
         <div class="d-flex flex-column align-items-center w-100 form-container" style="max-width: 400px;">
-            <form action="{{ url_for('main.liste_etablissements') }}" method="POST" class="w-100">
+            <form action="{{ url_for('main.liste_etablissements') }}" method="POST" class="form-container">
                 {{ form_recherche.hidden_tag() }}
 
                 <div class="form-group w-100">
@@ -26,11 +26,11 @@
                     ) }}
                 </div>
 
-                <div class="btn-group">
-                    <button type="submit" class="btn btn-success btn-lg">
+
+                    <button type="submit" class="btn btn-success">
                         {{ form_recherche.submit.label }}
                     </button>
-                </div>
+
             </form>
         </div>
 
