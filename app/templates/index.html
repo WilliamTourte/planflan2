@@ -5,7 +5,7 @@
         PLANFLAN
     </h1>
 
-<form action="{{ url_for('main.liste_etablissements') }}" method="POST" class="form-container form-container-center">
+<form action="{{ url_for('main.liste_etablissements') }}" method="POST" class="form-container">
     {{ form_recherche.hidden_tag() }}
     <div class="form-group">
         {{ form_recherche.ville(

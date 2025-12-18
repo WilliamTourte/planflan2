@@ -67,7 +67,7 @@
                     const message = document.createElement('div');
                     message.className = 'alert alert-warning';
                     message.innerHTML = `Déjà présent : <a href="${data.url}">Voir la page</a>`;
-                    document.querySelector('.etablissement-form-container').prepend(message);
+                    document.querySelector('.form-container').prepend(message);
                 } else {
                     etablissementUrl = null;
                     etablissementId = null;
@@ -168,9 +168,9 @@
 
 {% endblock %}
 {% block content %}
-    <div class="container">
-        <div class="form-container etablissement-form-container">
-            <form method="POST" action="{{ action_url }}" class="etablissement-form">
+
+<div class="form-container">
+            <form method="POST" action="{{ action_url }}" class="form-container">
                 {{ form.hidden_tag() }}
                 <!-- Champ de recherche pour l'autocomplete Google Maps -->
                 <div class="form-group">
@@ -209,11 +209,11 @@
                     </button>
                 </div>
             </form>
-        </div>
+</div>
         <!-- Conteneur pour la carte -->
         <div id="map-container" class="etablissement-map-container">
             <div id="map" class="etablissement-map"></div>
         </div>
-    </div>
+
 {% endblock %}
 
