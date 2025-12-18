@@ -9,7 +9,7 @@ from werkzeug.datastructures import MultiDict
 
 from app.outils import enlever_accents, afficher_etablissements
 import re
-
+from flask import Flask, request, jsonify, Blueprint
 from flask import Blueprint, session, render_template, redirect, url_for, request, current_app, flash
 from flask_login import login_required, current_user
 
@@ -31,14 +31,29 @@ def extraire_ville(adresse):
 def nettoyer_adresse(adresse):
     return adresse.split(',')[0].strip()
 
-@maps_bp.route('/gps', methods=['POST'])
-def gps():
-    data = request.get_json()
-    latitude = data.get('latitude')
-    longitude = data.get('longitude')
-    # Ici, vous pouvez traiter les données comme vous le souhaitez, par exemple, les sauvegarder dans une base de données
-    print(f"Latitude: {latitude}, Longitude: {longitude}")
-    return jsonify({"status": "success", "latitude": latitude, "longitude": longitude})
+@maps_bp.route('/geolocalisation', methods=['GET'])
+def geolocalisation():
+    return render_template('geoloc.html')
+
+
+
+
+@maps_bp.route('/geoloc', methods=['POST'])
+def geoloc():
+    print("Route /geoloc appelée")  # Message de log pour confirmer que la route est appelée
+    try:
+        data = request.get_json()
+        print(f"Données reçues : {data}")
+        if not data:
+            print("No data received")
+            return jsonify({'error': 'No data received'}), 400
+        latitude = data.get('latitude')
+        longitude = data.get('longitude')
+        print(f"Latitude: {latitude}, Longitude: {longitude}")
+        return jsonify({"status": "success", "latitude": latitude, "longitude": longitude})
+    except Exception as e:
+        print(f"Erreur: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 400
 
 @maps_bp.route('/extraire_infos_adresse', methods=['POST'])
 def extraire_infos_adresse():

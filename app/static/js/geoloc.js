@@ -29,26 +29,25 @@ function showError(error) {
     }
 }
 
-function sendToServer(latitude, longitude) {
-    // Créer un objet avec les coordonnées GPS
-    const data = {
-        latitude: latitude,
-        longitude: longitude
-    };
 
-    // Envoyer les données au serveur via AJAX
-    fetch('/gps', {
+function sendToServer(latitude, longitude) {
+    const data = { latitude, longitude };
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+    fetch('/geoloc', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'X-CSRFToken': csrfToken,
         },
         body: JSON.stringify(data),
     })
-    .then(response => response.json())
-    .then(data => {
-        console.log('Success:', data);
+    .then(response => {
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        return response.json();
     })
-    .catch((error) => {
-        console.error('Error:', error);
-    });
+    .then(data => console.log('Success:', data))
+    .catch(error => console.error('Error:', error));
 }
+
+
