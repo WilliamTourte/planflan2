@@ -23,7 +23,7 @@
     --color-shadow: rgba(0, 0, 0, 0.1);
     --color-shadow-hover: rgba(0, 0, 0, 0.15);
     /* Espacements & Bordures */
-    --border-radius: 4px;
+    --border-radius: 10px;
     --border-radius-btn: 25px;
     --border-radius-card: 10px;
     --max-width: 1200px;
@@ -414,7 +414,14 @@ input.back:hover {
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
     margin-top: var(--margin-lg);
+    align-content: center;
 }
+/* le bouton de recherche est centré dans le formulaire*/
+.form-container button {
+    display: block;
+    margin: 0 auto;
+}
+
 .form-group {
     margin-bottom: var(--margin-sm);
 }
