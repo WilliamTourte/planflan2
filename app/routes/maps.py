@@ -1,19 +1,21 @@
+import traceback
+
 from flask import Flask, render_template, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
 from werkzeug.datastructures import MultiDict
 
-from app.config import Config
+
 from app.outils import enlever_accents, afficher_etablissements
 import re
 
 from flask import Blueprint, session, render_template, redirect, url_for, request, current_app, flash
 from flask_login import login_required, current_user
-from sqlalchemy.exc import IntegrityError
-from app.forms import EvalForm, NewFlanForm, RechercheForm, UpdateProfileForm, EtabForm
-from app.models import Etablissement, Flan, Evaluation, Utilisateur, TypeEtab
-from app import db, bcrypt
+
+from app.forms import  EtabForm
+from app.models import Etablissement, TypeEtab
+from app import db
 
 maps_bp = Blueprint('maps', __name__)
 
@@ -28,6 +30,15 @@ def extraire_ville(adresse):
 
 def nettoyer_adresse(adresse):
     return adresse.split(',')[0].strip()
+
+@maps_bp.route('/gps', methods=['POST'])
+def gps():
+    data = request.get_json()
+    latitude = data.get('latitude')
+    longitude = data.get('longitude')
+    # Ici, vous pouvez traiter les données comme vous le souhaitez, par exemple, les sauvegarder dans une base de données
+    print(f"Latitude: {latitude}, Longitude: {longitude}")
+    return jsonify({"status": "success", "latitude": latitude, "longitude": longitude})
 
 @maps_bp.route('/extraire_infos_adresse', methods=['POST'])
 def extraire_infos_adresse():
