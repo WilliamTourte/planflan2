@@ -9,9 +9,7 @@
 <body>
 <!-- Inclure le fichier JavaScript externe -->
 <script src="{{ url_for('static', filename='js/geoloc.js') }}" defer></script>
-<script>
-    const csrfToken = "{{ csrf_token() }}";
-</script>
+
 
     <h1>Géolocalisation</h1>
     <button onclick="getLocation()">Obtenir ma position</button>
