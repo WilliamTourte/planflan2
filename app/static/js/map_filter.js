@@ -102,7 +102,7 @@ function createEtablissementMarker(map, etablissement, openPopup = false, baseUr
             console.error('Erreur lors du chargement du popup:', error);
             let popupContent = `<div class="infowindow-content"><h4>${etablissement.nom}</h4>`;
             popupContent += `<p>${etablissement.adresse}, ${etablissement.ville}</p>`;
-            popupContent += `<a href="${baseUrl}/etablissement/${etablissement.id_etab}" class="btn btn-sm btn-success">Voir plus</a></div>`;
+            popupContent += `<a href="${baseUrl}/etablissement/${etablissement.id_etab}" class="btn btn-success">Voir plus</a></div>`;
             marker.setPopupContent(popupContent);
             if (openPopup) marker.openPopup();
         });

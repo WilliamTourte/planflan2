@@ -1,5 +1,5 @@
 <!-- MACROS D'AFFICHAGE -->
-{% macro afficher_image_ou_placeholder(item, classe='card-image') %}
+{% macro afficher_image_ou_placeholder(item, classe='carte-image') %}
     {% if item.photos %}
         <img src="{{ url_for('static', filename='uploads/' + item.photos[0].path) }}" alt="{{ item.nom }}" class="{{ classe }}">
     {% else %}
@@ -111,13 +111,13 @@
 <!-- ETABLISSEMENT -->
 {% macro afficher_etablissement(etablissement, current_user, form_edit, current_page, delete_form, validate_form) %}
     <div class="carte">
-        <div class="card-image-container">
+        <div class="carte-image-container">
             {{ afficher_image_ou_placeholder(etablissement) }}
             {{ afficher_badge_type_etab(etablissement) }}
             {{ afficher_badge_etablissement(etablissement) }}
         </div>
-        <div class="card-content">
-            <div class="card-header">
+        <div class="carte-content">
+            <div class="carte-header">
                 <h2 id="etablissement-{{ etablissement.id_etab }}-nom">{{ etablissement.nom | enlever_accents }}</h2>
             </div>
             <div id="etablissement-{{ etablissement.id_etab }}-display">
@@ -210,12 +210,12 @@
 <!-- FLAN -->
 {% macro afficher_flan(flan, current_user, form, current_page, delete_form, validate_form) %}
     <div class="carte">
-        <div class="card-image-container">
+        <div class="carte-image-container">
             {{ afficher_image_ou_placeholder(flan) }}
             {{ afficher_badge_flan(flan) }}
         </div>
-        <div class="card-content">
-            <div class="card-header">
+        <div class="carte-content">
+            <div class="carte-header">
                 <h2 id="flan-{{ flan.id_flan }}-nom">{{ flan.nom | enlever_accents }}</h2>
             </div>
             <div id="flan-{{ flan.id_flan }}-display">
@@ -303,9 +303,9 @@
 
 <!-- EVALUATION -->
 {% macro afficher_evaluation(evaluation, current_user, form, current_page, delete_form, validate_form) %}
-    <div class="card">
-        <div class="card-content">
-            <div class="card-header">
+    <div class="carte">
+        <div class="carte-content">
+            <div class="carte-header">
                 <h2>{{ evaluation.flan.etablissement.nom | enlever_accents }}</h2>
                 <h3>{{ evaluation.flan.nom | enlever_accents }}</h3>
                 {{ afficher_badge_statut(evaluation, current_user) }}
@@ -440,7 +440,7 @@
 
 {% macro afficher_bouton_ajout(objet_type, current_user, etablissement=None, form_ajout=None, flan=None) %}
     {% if objet_type == 'etablissement' %}
-        <div class="card-content">
+        <div class="carte-content">
             <h3>Ajouter un etablissement</h3>
             {% if current_user.is_authenticated %}
                 {{ proposer_etablissement(form_ajout, url_for('maps.ajouter_etablissement'), current_user) }}
@@ -451,7 +451,7 @@
             {% endif %}
         </div>
     {% elif objet_type == 'flan' and etablissement %}
-        <div class="card-content">
+        <div class="carte-content">
             <h3>Ajouter un flan</h3>
             {% if current_user.is_authenticated %}
                 {{ proposer_flan(form_ajout, url_for('main.proposer_flan', id_etab=etablissement.id_etab)) }}
@@ -462,7 +462,7 @@
             {% endif %}
         </div>
     {% elif objet_type == 'evaluation' and flan %}
-        <div class="card-content">
+        <div class="carte-content">
             <h3>Ajouter une evaluation</h3>
             {% if current_user.is_authenticated %}
                 {{ proposer_evaluation(form_ajout, url_for('main.evaluer_flan', id_flan=flan.id_flan)) }}
