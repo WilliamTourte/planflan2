@@ -3,7 +3,7 @@ let map;
 let markers = [];
 let etablissements = [];
 let userMarker = null;
-let userCircle = null;
+
 let baseUrl = window.location.origin;
 let userLocation = null;
 let proximityRadius = 5;
@@ -154,7 +154,7 @@ function updateMarkersBasedOnFilters() {
 // Fonction pour créer un marqueur utilisateur
 function createUserMarker() {
     if (userMarker) map.removeLayer(userMarker);
-    if (userCircle) map.removeLayer(userCircle);
+   
 
     if (userLocation) {
         userMarker = L.marker([userLocation.lat, userLocation.lon], {
@@ -164,13 +164,6 @@ function createUserMarker() {
                 iconSize: [30, 30],
                 iconAnchor: [15, 15]
             })
-        }).addTo(map);
-
-        userCircle = L.circle([userLocation.lat, userLocation.lon], {
-            color: '#ffcf40',
-            fillColor: '#ffcf40',
-            fillOpacity: 0.1,
-            radius: proximityRadius * 1000 // Convertir km en mètres
         }).addTo(map);
 
         // Centrer la carte sur l'utilisateur
@@ -300,9 +293,7 @@ function setupGeolocation() {
     // Gestion du rayon de proximité (inchangé)
     document.getElementById('proximity-radius').addEventListener('change', function() {
         proximityRadius = parseInt(this.value);
-        if (userCircle) {
-            userCircle.setRadius(proximityRadius * 1000);
-        }
+ 
         updateMarkersBasedOnFilters();
     });
 }
