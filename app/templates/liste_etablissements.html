@@ -54,9 +54,10 @@ document.addEventListener('DOMContentLoaded', function() {
         <button id="filter-all" class="btn btn-success">Tous</button>
         <button id="filter-pate-btn" class="btn btn-success">Pâte</button>
         <button id="filter-statut-btn" class="btn btn-success">Statut</button>
-        <button id="geolocate-me" class="btn btn-success">
-            <i class="bi bi-geo-alt-fill"></i>
-        </button>
+        <button type="submit" class="btn btn-icon btn-geolocate" id='geolocate-me'>
+    <i class="bi bi-geo-alt"></i>
+</button>
+
         <div id="proximity-filter" style="display: flex; align-items: center; gap: 5px;">
             <input type="number" id="proximity-radius" value="5" min="1" max="50" step="1" style="width: 50px; text-align: center; border-radius: 5px; border: 1px solid #ccc; padding: 5px;">
             <span>km</span>
