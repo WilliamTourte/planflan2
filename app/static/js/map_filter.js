@@ -167,9 +167,9 @@ function createUserMarker() {
         }).addTo(map);
 
         userCircle = L.circle([userLocation.lat, userLocation.lon], {
-            color: 'blue',
-            fillColor: '#30f',
-            fillOpacity: 0.2,
+            color: '#ffcf40',
+            fillColor: '#ffcf40',
+            fillOpacity: 0.1,
             radius: proximityRadius * 1000 // Convertir km en mètres
         }).addTo(map);
 
@@ -253,33 +253,51 @@ function updateMapAndMarkers() {
 // Fonction pour gérer la géolocalisation
 function setupGeolocation() {
     document.getElementById('geolocate-me').addEventListener('click', function() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                position => {
-                    userLocation = {
-                        lat: position.coords.latitude,
-                        lon: position.coords.longitude
-                    };
-                    activeFilters.proximity = true;
-                    createUserMarker();
-                    updateMarkersBasedOnFilters();
+        geoloc.getUserLocation(
+            // Callback en cas de succès
+            (coords) => {
+                userLocation = { lat: coords.latitude, lon: coords.longitude };
+                activeFilters.proximity = true;
+                createUserMarker();
+                updateMarkersBasedOnFilters();
 
-                    // Mettre à jour l'URL pour inclure la position (optionnel)
-                    const url = new URL(window.location);
-                    url.searchParams.set('latitude', userLocation.lat);
-                    url.searchParams.set('longitude', userLocation.lon);
-                    window.history.pushState({}, '', url);
-                },
-                error => {
-                    alert("Erreur de géolocalisation: " + error.message);
+                // Mettre à jour l'URL
+                const url = new URL(window.location);
+                url.searchParams.set('latitude', userLocation.lat);
+                url.searchParams.set('longitude', userLocation.lon);
+                window.history.pushState({}, '', url);
+
+                // Optionnel : Envoyer au serveur si nécessaire
+                geoloc.sendToServer(userLocation.lat, userLocation.lon, (data) => {
+                    console.log('Établissements proches :', data.etablissements);
+                    // Mettre à jour les données des établissements si besoin
+                    const etablissementsDataElement = document.getElementById('etablissements-data');
+                    etablissementsDataElement.setAttribute('data-etablissements', JSON.stringify(data.etablissements));
+                    updateMapAndMarkers();
+                });
+            },
+            // Callback en cas d'erreur
+            (error) => {
+                let message = "Erreur de géolocalisation: ";
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        message += "L'utilisateur a refusé la demande de géolocalisation.";
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        message += "Les informations de position sont indisponibles.";
+                        break;
+                    case error.TIMEOUT:
+                        message += "La demande de position a expiré.";
+                        break;
+                    default:
+                        message += error.message;
                 }
-            );
-        } else {
-            alert("La géolocalisation n'est pas supportée par ce navigateur.");
-        }
+                alert(message);
+            }
+        );
     });
 
-    // Gestion du rayon de proximité
+    // Gestion du rayon de proximité (inchangé)
     document.getElementById('proximity-radius').addEventListener('change', function() {
         proximityRadius = parseInt(this.value);
         if (userCircle) {
@@ -288,6 +306,7 @@ function setupGeolocation() {
         updateMarkersBasedOnFilters();
     });
 }
+
 
 // Fonction pour mettre à jour l'état des boutons actifs
 function updateActiveButtonStates() {
