@@ -259,16 +259,45 @@
             <div class="carte-header">
                 <h2 id="flan-{{ flan.id_flan }}-nom">{{ flan.nom | enlever_accents }}</h2>
             </div>
-            <div id="flan-{{ flan.id_flan }}-display">
-                <p class="type">Saveur : {{ flan.type_saveur.value | default("inconnue") }}</p>
-                <p class="type">Pâte : {{ flan.type_pate.value | default("inconnue") }}</p>
-                <p class="type">Texture : {{ flan.type_texture.value | default("inconnue") }}</p>
-                <p class="type" id="flan-{{ flan.id_flan }}-description">Description : {{ flan.description | default("Flantastique") }}</p>
-                <p class="flan-price">Prix : {{ "%.2f"|format(flan.prix) }} €</p>
-                {{ afficher_boutons_actions(flan, current_user, 'id_flan',
-                'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan', 'flan', current_page,
+            <div id="flan-{{ flan.id_flan }}-display" class="carte-flan">
+                <div class="flan-header">
+                    <div class="flan-price-tag">{{ "%.2f"|format(flan.prix) }} €</div>
+                </div>
+                <div class="flan-details">
+                    <div class="flan-attribute">
+                        <span class="attribute-icon">🥧</span>
+                        <span class="attribute-label">Saveur :</span>
+                        <span class="attribute-value">{{ flan.type_saveur.value | default("Inconnue") }}</span>
+                    </div>
+                    <div class="flan-attribute">
+                        <span class="attribute-icon">🍴</span>
+                        <span class="attribute-label">Pâte :</span>
+                        <span class="attribute-value">{{ flan.type_pate.value | default("Inconnue") }}</span>
+                    </div>
+                    <div class="flan-attribute">
+                        <span class="attribute-icon">👅</span>
+                        <span class="attribute-label">Texture :</span>
+                        <span class="attribute-value">{{ flan.type_texture.value | default("Inconnue") }}</span>
+                    </div>
+                    <div class="flan-description">
+                        <span class="attribute-icon">📝</span>
+                        <span class="attribute-label">Description :</span>
+                        <span class="attribute-value" id="flan-{{ flan.id_flan }}-description">
+                            {{ flan.description | default("Un flan à découvrir absolument !") }}
+                        </span>
+                    </div>
+                </div>
+                <div class="flan-actions">
+                    {{ afficher_boutons_actions(flan, current_user, 'id_flan',
+                        'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan', 'flan', current_page,
                         delete_form, validate_form) }}
+                </div>
             </div>
+        </div>
+    </div>
+
+
+
             {{ afficher_formulaire_edition_flan(flan, form) }}
         </div>
         <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}" class="btn btn-success">Voir plus</a>

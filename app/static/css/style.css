@@ -329,6 +329,128 @@ input.back:hover {
 }
 
 /* =============================================
+   CARTE FLAN (NOUVEAU DESIGN)
+   ============================================= */
+.carte-flan {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: var(--padding-md);
+    margin-bottom: var(--margin-md);
+    transition: var(--transition);
+    border-left: 4px solid var(--color-secondary);
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-sm);
+}
+
+.carte-flan:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--box-shadow-hover);
+}
+
+.flan-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--margin-sm);
+    padding-bottom: var(--margin-sm);
+    border-bottom: 1px solid #eee;
+}
+
+.flan-title {
+    margin: 0;
+    font-size: var(--font-size-lg);
+    color: var(--color-text);
+    font-family: var(--font-bubblegum);
+}
+
+.flan-price-tag {
+    background: var(--color-secondary);
+    color: var(--color-white);
+    padding: var(--padding-sm) var(--padding-md);
+    border-radius: var(--border-radius-btn);
+    font-weight: bold;
+    font-size: var(--font-size-sm);
+}
+
+.flan-details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-sm);
+}
+
+.flan-attribute {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-sm);
+    font-size: var(--font-size-sm);
+}
+
+.attribute-icon {
+    font-size: 1.1em;
+    width: 20px;
+    text-align: center;
+}
+
+.attribute-label {
+    font-weight: bold;
+    color: var(--color-text-light);
+    min-width: 70px;
+}
+
+.attribute-value {
+    color: var(--color-text);
+}
+
+.flan-description {
+    display: flex;
+    gap: var(--gap-sm);
+    font-size: var(--font-size-sm);
+    line-height: 1.4;
+}
+
+.flan-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--gap-sm);
+    margin-top: auto;
+    padding-top: var(--margin-sm);
+    border-top: 1px solid #eee;
+}
+
+/* Boutons dans la carte flan */
+.flan-actions .btn {
+    padding: var(--padding-sm) var(--padding-md);
+    font-size: var(--font-size-sm);
+    min-width: auto;
+    height: auto;
+    line-height: 1;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+    .flan-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--gap-sm);
+    }
+
+    .flan-price-tag {
+        align-self: flex-end;
+    }
+
+    .flan-actions {
+        justify-content: stretch;
+    }
+
+    .flan-actions .btn {
+        flex: 1;
+        text-align: center;
+    }
+}
+
+/* =============================================
    7. BADGES
    ============================================= */
 .badge {
@@ -589,7 +711,7 @@ input.back:hover {
 }
 
 .infowindow-header {
-    margin-bottom: 10px;
+    
     position: relative;
     min-height: 30px;
 }
@@ -632,7 +754,7 @@ input.back:hover {
 .infowindow-footer {
     display: flex;
     justify-content: center;
-    margin-bottom: 25px;
+  
 }
 
 .infowindow-footer .btn {
