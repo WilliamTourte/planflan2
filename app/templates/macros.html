@@ -251,63 +251,61 @@
 <!-- FLAN -->
 {% macro afficher_flan(flan, current_user, form, current_page, delete_form, validate_form) %}
     <div class="carte">
-        <div class="carte-image-container">
-            {{ afficher_image_ou_placeholder(flan) }}
-            {{ afficher_badge_flan(flan) }}
-        </div>
-        <div class="carte-content">
-            <div class="carte-header">
-                <h2 id="flan-{{ flan.id_flan }}-nom">{{ flan.nom | enlever_accents }}</h2>
+        <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}" class="carte-link">
+            <div class="carte-image-container">
+                {{ afficher_image_ou_placeholder(flan) }}
+                {{ afficher_badge_flan(flan) }}
             </div>
-            <div id="flan-{{ flan.id_flan }}-display" class="carte-flan">
-                <div class="flan-header">
-                    <div class="flan-price-tag">{{ "%.2f"|format(flan.prix) }} €</div>
+            <div class="carte-content">
+                <div class="carte-header">
+                    <h2 id="flan-{{ flan.id_flan }}-nom">{{ flan.nom | enlever_accents }}</h2>
                 </div>
-                <div class="flan-details">
-                    <div class="flan-attribute">
-                        <span class="attribute-icon">🥧</span>
-                        <span class="attribute-label">Saveur :</span>
-                        <span class="attribute-value">{{ flan.type_saveur.value | default("Inconnue") }}</span>
+                <div id="flan-{{ flan.id_flan }}-display" class="carte-flan">
+                    <div class="flan-details">
+                        <div class="flan-attribute">
+                            <span class="attribute-icon">🥧</span>
+                            <span class="attribute-label">Saveur :</span>
+                            <span class="attribute-value">{{ flan.type_saveur.value | default("Inconnue") }}</span>
+                        </div>
+                        <div class="flan-attribute">
+                            <span class="attribute-icon">🍴</span>
+                            <span class="attribute-label">Pâte :</span>
+                            <span class="attribute-value">{{ flan.type_pate.value | default("Inconnue") }}</span>
+                        </div>
+                        <div class="flan-attribute">
+                            <span class="attribute-icon">👅</span>
+                            <span class="attribute-label">Texture :</span>
+                            <span class="attribute-value">{{ flan.type_texture.value | default("Inconnue") }}</span>
+                        </div>
+                        <!-- Ajoutez un ID pour la description -->
+                        <div class="flan-description">
+                            <span class="attribute-icon">📝</span>
+                            <span class="attribute-label">Description :</span>
+                            <span class="attribute-value" id="flan-{{ flan.id_flan }}-description">
+                                {{ flan.description | default("Un flan à découvrir absolument !") }}
+                            </span>
+                        </div>
+                        <div class="flan-price-tag">{{ "%.2f"|format(flan.prix) }} €</div>
                     </div>
-                    <div class="flan-attribute">
-                        <span class="attribute-icon">🍴</span>
-                        <span class="attribute-label">Pâte :</span>
-                        <span class="attribute-value">{{ flan.type_pate.value | default("Inconnue") }}</span>
-                    </div>
-                    <div class="flan-attribute">
-                        <span class="attribute-icon">👅</span>
-                        <span class="attribute-label">Texture :</span>
-                        <span class="attribute-value">{{ flan.type_texture.value | default("Inconnue") }}</span>
-                    </div>
-                    <div class="flan-description">
-                        <span class="attribute-icon">📝</span>
-                        <span class="attribute-label">Description :</span>
-                        <span class="attribute-value" id="flan-{{ flan.id_flan }}-description">
-                            {{ flan.description | default("Un flan à découvrir absolument !") }}
-                        </span>
-                    </div>
-                </div>
-                <div class="flan-actions">
-                    {{ afficher_boutons_actions(flan, current_user, 'id_flan',
-                        'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan', 'flan', current_page,
-                        delete_form, validate_form) }}
                 </div>
             </div>
+        </a>
+        <div class="flan-actions">
+            {{ afficher_boutons_actions(flan, current_user, 'id_flan',
+                'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan', 'flan', current_page,
+                delete_form, validate_form) }}
         </div>
     </div>
+    <!-- Assurez-vous que le formulaire d'édition a bien les IDs attendus -->
+    {{ afficher_formulaire_edition_flan(flan, form) }}
 
-
-
-            {{ afficher_formulaire_edition_flan(flan, form) }}
-        </div>
-        <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}" class="btn btn-success">Voir plus</a>
-    </div>
     <script>
         function editFlan(idFlan) {
             const displayElement = document.getElementById('flan-' + idFlan + '-display');
             const editElement = document.getElementById('flan-' + idFlan + '-edit');
             const nomElement = document.getElementById('flan-' + idFlan + '-nom');
             const descriptionElement = document.getElementById('flan-' + idFlan + '-description');
+
             if (displayElement && editElement && nomElement && descriptionElement) {
                 document.getElementById('edit-flan-nom').value = nomElement.textContent;
                 document.getElementById('edit-flan-description').value = descriptionElement.textContent.replace('Description : ', '').trim();
@@ -317,9 +315,11 @@
                 console.error('Elements not found');
             }
         }
+
         function cancelEdit(idFlan) {
             const displayElement = document.getElementById('flan-' + idFlan + '-display');
             const editElement = document.getElementById('flan-' + idFlan + '-edit');
+
             if (displayElement && editElement) {
                 displayElement.style.display = 'block';
                 editElement.style.display = 'none';

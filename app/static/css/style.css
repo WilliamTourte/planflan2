@@ -418,6 +418,47 @@ input.back:hover {
     padding-top: var(--margin-sm);
     border-top: 1px solid #eee;
 }
+.carte {
+    position: relative;
+    border-radius: var(--border-radius-carte);
+    overflow: hidden;
+    box-shadow: var(--box-shadow);
+    transition: var(--transition);
+    background: var(--color-white);
+    display: flex;
+    flex-direction: column;
+}
+
+.carte-link {
+    text-decoration: none;
+    color: inherit;
+    flex-grow: 1;
+    display: block;
+}
+
+.carte-content {
+    padding: var(--padding-lg);
+}
+
+.flan-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--gap-sm);
+    padding: var(--padding-md);
+    background: var(--color-white);
+    border-top: 1px solid #eee;
+}
+
+/* Empêcher le lien de capturer les clics sur les boutons */
+.flan-actions a {
+    pointer-events: auto;
+}
+
+/* Assurer que les boutons sont cliquables */
+.flan-actions .btn {
+    pointer-events: auto;
+}
+
 
 /* Boutons dans la carte flan */
 .flan-actions .btn {
