@@ -1,39 +1,20 @@
-function getLocation() {
+// geoloc.js
+
+// Fonction principale pour obtenir la position
+function getUserLocation(callbackSuccess, callbackError) {
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition, showError);
+        navigator.geolocation.getCurrentPosition(
+            position => callbackSuccess(position.coords),
+            error => callbackError(error)
+        );
     } else {
-        alert("La géolocalisation n'est pas supportée par ce navigateur.");
+        callbackError({ code: 0, message: "La géolocalisation n'est pas supportée par ce navigateur." });
     }
 }
 
-function showPosition(position) {
-    const latitude = position.coords.latitude;
-    const longitude = position.coords.longitude;
-    sendToServer(latitude, longitude);
-}
-
-function showError(error) {
-    switch(error.code) {
-        case error.PERMISSION_DENIED:
-            alert("L'utilisateur a refusé la demande de géolocalisation.");
-            break;
-        case error.POSITION_UNAVAILABLE:
-            alert("Les informations de position sont indisponibles.");
-            break;
-        case error.TIMEOUT:
-            alert("La demande de position a expiré.");
-            break;
-        case error.UNKNOWN_ERROR:
-            alert("Une erreur inconnue est survenue.");
-            break;
-    }
-}
-
-
-function sendToServer(latitude, longitude) {
+// Fonction pour envoyer la position au serveur (optionnel)
+function sendToServer(latitude, longitude, callback) {
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-
-    // Envoie les coordonnées au serveur pour obtenir les établissements proches
     fetch('/etablissements_proches', {
         method: 'POST',
         headers: {
@@ -43,12 +24,12 @@ function sendToServer(latitude, longitude) {
         body: JSON.stringify({ latitude, longitude }),
     })
     .then(response => response.json())
-    .then(data => {
-        console.log('Établissements proches :', data.etablissements);
-        afficherEtablissementsProches(data.etablissements);  // Fonction à implémenter
-    })
+    .then(data => callback(data))
     .catch(error => console.error('Error:', error));
 }
 
-
-
+// Export des fonctions pour les utiliser dans d'autres fichiers
+window.geoloc = {
+    getUserLocation,
+    sendToServer
+};

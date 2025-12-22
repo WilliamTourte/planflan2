@@ -12,6 +12,8 @@
         <h3>Flans</h3>
         {{ afficher_grille('flan', etablissement.flans, current_user, None, form_flan, etablissement) }}
     </div>
+    {{ afficher_bouton_ajout('flan', current_user, etablissement, form_flan) }}
+
     <!-- Bouton retour -->
     <div>
         <a href="{{ url_for('main.index') }}" class="btn btn-back btn-with-icon">
