@@ -501,7 +501,7 @@ input.back:hover {
    13. INFOWINDOWS & EMOJIS
    ============================================= */
 .leaflet-popup-content-wrapper {
-    max-width: 300px !important;
+    max-width: 400px !important;
     max-height: 400px !important;
     overflow-y: auto !important;
     font-size: var(--font-size-md) !important;
@@ -519,7 +519,7 @@ input.back:hover {
 .infowindow-content {
     position: relative;
     min-width: 200px;
-    max-width: 300px;
+    max-width: auto;
     padding: 10px;
     margin: 0;
 }
@@ -698,7 +698,7 @@ input.back:hover {
         font-size: 1.5rem;
     }
     .leaflet-popup-content-wrapper {
-        max-width: 90vw !important;
+        max-width: 100vw !important;
         max-height: 70vh !important;
     }
     #map {
@@ -863,4 +863,29 @@ input.back:hover {
     .header-yellow .form-control {
         width: 120px;
     }
+}
+
+.infowindow-content {
+    font-family: Arial, sans-serif;
+    max-width: 300px;
+}
+
+.infowindow-header h3 {
+    margin: 0 0 10px 0;
+    font-size: 1.2em;
+}
+
+.flan-item {
+    margin: 5px 0;
+    padding: 5px;
+    border-bottom: 1px solid #eee;
+}
+
+.flan-item:last-child {
+    border-bottom: none;
+}
+
+.no-flans {
+    font-style: italic;
+    color: #666;
 }

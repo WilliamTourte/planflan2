@@ -55,6 +55,40 @@
     {% endif %}
 {% endmacro %}
 
+
+{% macro afficher_infowindow(etablissement, details_url) %}
+    <div class="infowindow-content">
+        <div class="infowindow-badges">
+            {{ afficher_badge_etablissement(etablissement) }}
+            {{ afficher_badge_type_etab(etablissement) }}
+        </div>
+        <div class="infowindow-header">
+            <h3>{{ etablissement.nom | enlever_accents }}</h3>
+        </div>
+        <div class="infowindow-body">
+            <p class="adresse">
+                {{ etablissement.adresse }}, {{ etablissement.ville }}
+            </p>
+
+            <div class="flans-list">
+                {% if etablissement.flans %}
+                    {% for flan in etablissement.flans %}
+                        <div class="flan-item">
+                            <p><strong>{{ afficher_objet('flan', flan) }}</strong></p>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="no-flans">Aucun flan proposé.</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="infowindow-footer">
+            <a href="{{ details_url }}" class="btn btn-success">Voir plus</a>
+        </div>
+    </div>
+{% endmacro %}
+
+
 {% macro afficher_boutons_actions(objet, current_user, id_field, modify_route, delete_route, validate_route, type_objet, current_page, delete_form, validate_form) %}
     {% set page_attendue = 'page_' + type_objet %}
     {% if current_user.is_authenticated %}
@@ -417,6 +451,8 @@
     {% endif %}
     <p class="type">{{ evaluation.description }}</p>
 {% endmacro %}
+
+
 
 {% macro afficher_grille(objet_type, objets, current_user=None, form_edit=None, form_ajout=None, etablissement=None, flan=None, delete_form=None, validate_form=None) %}
     <div class="grille">
