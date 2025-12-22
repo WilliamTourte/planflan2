@@ -8,16 +8,13 @@
     </div>
 
     <!-- Grille des évaluations avec bouton d'ajout -->
-    <div class="evaluations-section">
+    <div class="carte-content">
         <h3>Evaluations</h3>
          {{ afficher_grille('evaluation', flan.evaluations, current_user, None, form_eval, None, flan) }}
-
-
-
     </div>
 
     <!-- Boutons d'action -->
-    <div class="flan-actions">
+    <div class="carte-content">
         <!-- Bouton retour -->
         <div>
             <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=flan.etablissement.id_etab) }}" class="btn btn-back btn-with-icon">

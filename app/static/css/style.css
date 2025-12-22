@@ -338,7 +338,7 @@ input.back:hover {
     padding: var(--padding-md);
     margin-bottom: var(--margin-md);
     transition: var(--transition);
-    border-left: 4px solid var(--color-secondary);
+  
     display: flex;
     flex-direction: column;
     gap: var(--gap-sm);
@@ -373,41 +373,29 @@ input.back:hover {
     font-weight: bold;
     font-size: var(--font-size-sm);
 }
-
 .flan-details {
     display: flex;
     flex-direction: column;
-    gap: var(--gap-sm);
+    gap: 8px; /* Espacement entre les lignes */
 }
 
-.flan-attribute {
+.flan-attribute, .flan-description {
     display: flex;
-    align-items: center;
-    gap: var(--gap-sm);
-    font-size: var(--font-size-sm);
+    align-items: center; /* Alignement vertical */
+    gap: 10px; /* Espacement entre les éléments */
 }
 
-.attribute-icon {
-    font-size: 1.1em;
-    width: 20px;
-    text-align: center;
-}
+
 
 .attribute-label {
+    width: 90px; /* Largeur fixe pour le label */
     font-weight: bold;
     color: var(--color-text-light);
-    min-width: 70px;
 }
 
 .attribute-value {
+    flex: 1; /* Prend le reste de l'espace */
     color: var(--color-text);
-}
-
-.flan-description {
-    display: flex;
-    gap: var(--gap-sm);
-    font-size: var(--font-size-sm);
-    line-height: 1.4;
 }
 
 .flan-actions {
@@ -825,6 +813,21 @@ input.back:hover {
     background: #f0f0f0;
     color: var(--color-danger);
 }
+
+.infowindow-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    padding: 10px;
+    margin: -10px; /* Pour compenser le padding et éviter un espacement indésirable */
+}
+
+.infowindow-link:hover {
+    background-color: rgba(0, 0, 0, 0.05); /* Leger survol pour indiquer que c'est cliquable */
+    border-radius: 5px;
+}
+
+
 
 /* Style des marqueurs emoji */
 .emoji-marker {

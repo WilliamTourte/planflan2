@@ -55,37 +55,38 @@
     {% endif %}
 {% endmacro %}
 
-
 {% macro afficher_infowindow(etablissement, details_url) %}
     <div class="infowindow-content">
-        <div class="infowindow-badges">
-            {{ afficher_badge_etablissement(etablissement) }}
-            {{ afficher_badge_type_etab(etablissement) }}
-        </div>
-        <div class="infowindow-header">
-            <h3>{{ etablissement.nom | enlever_accents }}</h3>
-        </div>
-        <div class="infowindow-body">
-            <p class="adresse">
-                {{ etablissement.adresse }}, {{ etablissement.ville }}
-            </p>
-            <div class="flans-list">
-                {% if etablissement.flans %}
-                    {% for flan in etablissement.flans %}
-                        <div class="flan-item">
-                            <p><strong>{{ afficher_objet('flan', flan) }}</strong></p>
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <p class="no-flans">Aucun flan proposé.</p>
-                {% endif %}
+        <!-- Lien cliquable pour la partie supérieure -->
+        <a href="{{ details_url }}" class="infowindow-link">
+            <div class="infowindow-badges">
+                {{ afficher_badge_etablissement(etablissement) }}
+                {{ afficher_badge_type_etab(etablissement) }}
             </div>
-        </div>
-        <div class="infowindow-footer">
-            <a href="{{ details_url }}" class="btn btn-success">Voir plus</a>
+            <div class="infowindow-header">
+                <h3>{{ etablissement.nom | enlever_accents }}</h3>
+            </div>
+            <div class="infowindow-body">
+                <p class="adresse">
+                    {{ etablissement.adresse }}, {{ etablissement.ville }}
+                </p>
+            </div>
+        </a>
+        <!-- Partie non cliquable avec la liste des flans -->
+        <div class="flans-list">
+            {% if etablissement.flans %}
+                {% for flan in etablissement.flans %}
+                    <div class="flan-item">
+                        {{ afficher_objet('flan', flan) }}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p class="no-flans">Aucun flan proposé.</p>
+            {% endif %}
         </div>
     </div>
 {% endmacro %}
+
 
 
 {% macro afficher_boutons_actions(objet, current_user, id_field, modify_route, delete_route, validate_route, type_objet, current_page, delete_form, validate_form) %}
@@ -261,30 +262,29 @@
                     <h2 id="flan-{{ flan.id_flan }}-nom">{{ flan.nom | enlever_accents }}</h2>
                 </div>
                 <div id="flan-{{ flan.id_flan }}-display" class="carte-flan">
-                    <div class="flan-details">
-                        <div class="flan-attribute">
-                            <span class="attribute-icon">🥧</span>
-                            <span class="attribute-label">Saveur :</span>
-                            <span class="attribute-value">{{ flan.type_saveur.value | default("Inconnue") }}</span>
-                        </div>
-                        <div class="flan-attribute">
-                            <span class="attribute-icon">🍴</span>
-                            <span class="attribute-label">Pâte :</span>
-                            <span class="attribute-value">{{ flan.type_pate.value | default("Inconnue") }}</span>
-                        </div>
-                        <div class="flan-attribute">
-                            <span class="attribute-icon">👅</span>
-                            <span class="attribute-label">Texture :</span>
-                            <span class="attribute-value">{{ flan.type_texture.value | default("Inconnue") }}</span>
-                        </div>
-                        <!-- Ajoutez un ID pour la description -->
-                        <div class="flan-description">
-                            <span class="attribute-icon">📝</span>
-                            <span class="attribute-label">Description :</span>
-                            <span class="attribute-value" id="flan-{{ flan.id_flan }}-description">
-                                {{ flan.description | default("Un flan à découvrir absolument !") }}
-                            </span>
-                        </div>
+                <div class="flan-details">
+                    <div class="flan-attribute">
+        
+                        <span class="attribute-label">Saveur</span>
+                        <span class="attribute-value">{{ flan.type_saveur.value | default("Inconnue") }}</span>
+                    </div>
+                    <div class="flan-attribute">
+    
+                        <span class="attribute-label">Pâte</span>
+                        <span class="attribute-value">{{ flan.type_pate.value | default("Inconnue") }}</span>
+                    </div>
+                    <div class="flan-attribute">
+ 
+                        <span class="attribute-label">Texture</span>
+                        <span class="attribute-value">{{ flan.type_texture.value | default("Inconnue") }}</span>
+                    </div>
+                    <div class="flan-description">
+                        <span class="attribute-value" id="flan-{{ flan.id_flan }}-description">
+                            {{ flan.description | default("Un flan à découvrir absolument !") }}
+                        </span>
+                    </div>
+                </div>
+
                         <div class="flan-price-tag">{{ "%.2f"|format(flan.prix) }} €</div>
                     </div>
                 </div>
@@ -513,7 +513,7 @@
 {% macro afficher_bouton_ajout(objet_type, current_user, etablissement=None, form_ajout=None, flan=None) %}
     {% if objet_type == 'etablissement' %}
         <div class="carte-content">
-            <h3>Ajouter un etablissement</h3>
+
             {% if current_user.is_authenticated %}
                 {{ proposer_etablissement(form_ajout, url_for('maps.ajouter_etablissement'), current_user) }}
             {% else %}
@@ -524,7 +524,7 @@
         </div>
     {% elif objet_type == 'flan' and etablissement %}
         <div class="carte-content">
-            <h3>Ajouter un flan</h3>
+
             {% if current_user.is_authenticated %}
                 {{ proposer_flan(form_ajout, url_for('main.proposer_flan', id_etab=etablissement.id_etab)) }}
             {% else %}
@@ -535,7 +535,7 @@
         </div>
     {% elif objet_type == 'evaluation' and flan %}
         <div class="carte-content">
-            <h3>Ajouter une evaluation</h3>
+
             {% if current_user.is_authenticated %}
                 {{ proposer_evaluation(form_ajout, url_for('main.evaluer_flan', id_flan=flan.id_flan)) }}
             {% else %}
