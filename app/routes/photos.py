@@ -4,9 +4,7 @@ from werkzeug.utils import secure_filename
 
 photos_bp = Blueprint('photos', __name__)
 
-@photos_bp.route('/upload_photo')
-def upload_photo():
-    return render_template('upload.html')
+
 
 @photos_bp.route('/upload', methods=['POST'])
 def upload_file():
