@@ -3,9 +3,17 @@
     {% if item.photos %}
         <img src="{{ url_for('static', filename='uploads/' + item.photos[0].path) }}" alt="{{ item.nom }}" class="{{ classe }}">
     {% else %}
-        <div class="{{ classe }} placeholder"><span>Pas de photo</span></div>
+        {% if item.__class__.__name__ == 'Flan' %}
+            <img src="{{ url_for('static', filename='uploads/flan-vanille.webp') }}" alt="Flan par défaut" class="{{ classe }}">
+        {% elif item.__class__.__name__ == 'Etablissement' %}
+            <img src="{{ url_for('static', filename='uploads/defaut_etab.jpg') }}" alt="Etablissement par défaut" class="{{ classe }}">
+        {% else %}
+            <div class="{{ classe }} placeholder"><span>Pas de photo</span></div>
+        {% endif %}
     {% endif %}
 {% endmacro %}
+
+
 
 {% macro afficher_badge_type_etab(etablissement) %}
     {% set couleurs = {
