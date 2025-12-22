@@ -10,3 +10,4 @@ class Config:
     REMEMBER_COOKIE_SECURE = True
     PERMANENT_SESSION_LIFETIME = 3600
     GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_API_KEY')
+    UPLOAD_FOLDER = 'app/static/uploads'
