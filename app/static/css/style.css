@@ -816,7 +816,7 @@ input.back:hover {
 
 .infowindow-link {
     text-decoration: none;
-    color: inherit;
+    color: black;
     display: block;
     padding: 10px;
     margin: -10px; /* Pour compenser le padding et éviter un espacement indésirable */

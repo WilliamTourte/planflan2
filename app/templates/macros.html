@@ -58,19 +58,19 @@
 {% macro afficher_infowindow(etablissement, details_url) %}
     <div class="infowindow-content">
         <!-- Lien cliquable pour la partie supérieure -->
-        <a href="{{ details_url }}" class="infowindow-link">
+        <a href="{{ details_url }}" class="carte">
             <div class="infowindow-badges">
                 {{ afficher_badge_etablissement(etablissement) }}
                 {{ afficher_badge_type_etab(etablissement) }}
             </div>
-            <div class="infowindow-header">
+
                 <h3>{{ etablissement.nom | enlever_accents }}</h3>
-            </div>
-            <div class="infowindow-body">
+
+            
                 <p class="adresse">
                     {{ etablissement.adresse }}, {{ etablissement.ville }}
                 </p>
-            </div>
+        
         </a>
         <!-- Partie non cliquable avec la liste des flans -->
         <div class="flans-list">
