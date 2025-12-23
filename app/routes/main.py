@@ -233,6 +233,7 @@ def afficher_badge_type_etab(etablissement):
     return ''
 
 
+
 @main_bp.route('/get_infowindow_content')
 def get_infowindow_content():
     id_etab = request.args.get('id_etab', type=int)
@@ -241,25 +242,9 @@ def get_infowindow_content():
         return "Détails non disponibles", 404
 
     details_url = url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab)
-    content = f"""
-    <div class="infowindow-content">
-        <div class="infowindow-badges">
-            {afficher_badge_etablissement(etablissement)}
-            {afficher_badge_type_etab(etablissement)}
-        </div>
-        <div class="infowindow-header">
-            <h3>{etablissement.nom}</h3>
-        </div>
-        <div class="infowindow-body">
-            <p class="adresse">{etablissement.adresse}, {etablissement.ville}</p>
-            {'<p class="flans-count">' + str(len(etablissement.flans)) + ' flan' + ('s' if len(etablissement.flans) > 1 else '') + '</p>' if etablissement.flans else ''}
-        </div>
-        <div class="infowindow-footer">
-            <a href="{details_url}" class="btn btn-success">Voir plus</a>
-        </div>
-    </div>
-    """
-    return content
+    return render_template('infowindow_template.html',
+                           etablissement=etablissement,
+                           details_url=details_url)
 
 
 

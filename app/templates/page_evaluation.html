@@ -2,18 +2,16 @@
 {% from "macros.html" import afficher_objet %}
 
 {% block content %}
-  <div class="container">
-      <h1>Evaluation</h1>
-      {% set current_page = 'page_evaluation' %}
-      {{ afficher_objet('evaluation', evaluation, current_user, form, current_page) }}
+{% set current_page = 'page_evaluation' %}
 
-          <!-- Bouton retour -->
-        <div>
-            <a href="{{ url_for('main.afficher_flan_unique', id_flan=evaluation.flan.id_flan) }}" class="btn btn-back btn-with-icon">
-                <i class="fas fa-arrow-left"></i>
-                Retour à {{ evaluation.flan.nom }} de {{ evaluation.flan.etablissement.nom }}
-            </a>
-        </div>
-  </div>
+{{ afficher_objet('evaluation', evaluation, current_user, form, current_page) }}
+
+<!-- Bouton retour -->
+
+<div class="action-buttons">
+    <a href="{{ url_for('main.afficher_flan_unique', id_flan=evaluation.flan.id_flan) }}" class="btn btn-danger btn-sm">
+        <i class="bi bi-arrow-return-left"></i>
+    </a>
+</div>
 {% endblock %}
 

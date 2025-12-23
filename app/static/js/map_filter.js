@@ -75,7 +75,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 }
 
 // Fonction pour créer un marqueur avec un popup asynchrone pour un établissement donné
-function createEtablissementMarker(map, etablissement, openPopup = false, baseUrl = window.location.origin) {
+function createEtablissementMarker(map, etablissement, baseUrl = window.location.origin) {
     let icon = createEmojiIcon('🏠', 'default-icon');
     if (etablissement.label) {
         icon = createEmojiIcon('❤️', 'label-icon');
@@ -90,26 +90,32 @@ function createEtablissementMarker(map, etablissement, openPopup = false, baseUr
         { icon: icon, title: etablissement.nom }
     ).addTo(map);
 
-    // Chargement asynchrone du contenu du popup
-    marker.bindPopup("Chargement en cours...");
-    fetch(`/get_infowindow_content?id_etab=${etablissement.id_etab}`)
-        .then(response => response.text())
-        .then(content => {
-            marker.setPopupContent(content);
-            if (openPopup) marker.openPopup();
-        })
-        .catch(error => {
-            console.error('Erreur lors du chargement du popup:', error);
-            let popupContent = `<div class="infowindow-content"><h4>${etablissement.nom}</h4>`;
-            popupContent += `<p>${etablissement.adresse}, ${etablissement.ville}</p>`;
-            popupContent += `<a href="${baseUrl}/etablissement/${etablissement.id_etab}" class="btn btn-success">Voir plus</a></div>`;
-            marker.setPopupContent(popupContent);
-            if (openPopup) marker.openPopup();
-        });
+    // Ne pas charger le popup immédiatement, mais seulement au clic
+    marker.on('click', function() {
+        if (!marker.getPopup()) {
+            marker.bindPopup("Chargement en cours...");
+            marker.openPopup();
+            fetch(`/get_infowindow_content?id_etab=${etablissement.id_etab}`)
+                .then(response => response.text())
+                .then(content => {
+                    marker.setPopupContent(content);
+                })
+                .catch(error => {
+                    console.error('Erreur lors du chargement du popup:', error);
+                    let popupContent = `<div class="infowindow-content"><h4>${etablissement.nom}</h4>`;
+                    popupContent += `<p>${etablissement.adresse}, ${etablissement.ville}</p>`;
+                    popupContent += `<a href="${baseUrl}/etablissement/${etablissement.id_etab}" class="btn btn-success">Voir plus</a></div>`;
+                    marker.setPopupContent(popupContent);
+                });
+        } else {
+            marker.openPopup();
+        }
+    });
 
     marker.options.etablissement = etablissement;
     return marker;
 }
+
 
 // Fonction pour mettre à jour l'affichage des marqueurs en fonction des filtres
 function updateMarkersBasedOnFilters() {
