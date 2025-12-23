@@ -300,6 +300,7 @@ input.back:hover {
     background: var(--color-white);
     display: block;
     height: 100%;
+    width: 100%;
 }
 
 .carte-image-container {
@@ -338,10 +339,10 @@ input.back:hover {
     padding: var(--padding-md);
     margin-bottom: var(--margin-md);
     transition: var(--transition);
-  
     display: flex;
     flex-direction: column;
     gap: var(--gap-sm);
+    width: 100%;
 }
 
 .carte-flan:hover {
@@ -373,28 +374,27 @@ input.back:hover {
     font-weight: bold;
     font-size: var(--font-size-sm);
 }
+
 .flan-details {
     display: flex;
     flex-direction: column;
-    gap: 8px; /* Espacement entre les lignes */
+    gap: 8px;
 }
 
 .flan-attribute, .flan-description {
     display: flex;
-    align-items: center; /* Alignement vertical */
-    gap: 10px; /* Espacement entre les éléments */
+    align-items: center;
+    gap: 10px;
 }
 
-
-
 .attribute-label {
-    width: 90px; /* Largeur fixe pour le label */
+    width: 90px;
     font-weight: bold;
     color: var(--color-text-light);
 }
 
 .attribute-value {
-    flex: 1; /* Prend le reste de l'espace */
+    flex: 1;
     color: var(--color-text);
 }
 
@@ -406,26 +406,12 @@ input.back:hover {
     padding-top: var(--margin-sm);
     border-top: 1px solid #eee;
 }
-.carte {
-    position: relative;
-    border-radius: var(--border-radius-carte);
-    overflow: hidden;
-    box-shadow: var(--box-shadow);
-    transition: var(--transition);
-    background: var(--color-white);
-    display: flex;
-    flex-direction: column;
-}
 
 .carte-link {
     text-decoration: none;
     color: inherit;
     flex-grow: 1;
     display: block;
-}
-
-.carte-content {
-    padding: var(--padding-lg);
 }
 
 .flan-actions {
@@ -437,19 +423,12 @@ input.back:hover {
     border-top: 1px solid #eee;
 }
 
-/* Empêcher le lien de capturer les clics sur les boutons */
 .flan-actions a {
     pointer-events: auto;
 }
 
-/* Assurer que les boutons sont cliquables */
 .flan-actions .btn {
     pointer-events: auto;
-}
-
-
-/* Boutons dans la carte flan */
-.flan-actions .btn {
     padding: var(--padding-sm) var(--padding-md);
     font-size: var(--font-size-sm);
     min-width: auto;
@@ -702,37 +681,32 @@ input.back:hover {
 /* =============================================
    13. INFOWINDOWS & EMOJIS
    ============================================= */
-/* Conteneur principal du popup Leaflet */
 .leaflet-popup {
     max-width: var(--infowindow-max-width) !important;
 }
 
-/* Conteneur du contenu du popup */
 .leaflet-popup-content-wrapper {
     width: var(--infowindow-width) !important;
     max-width: var(--infowindow-max-width) !important;
     max-height: 300px !important;
     overflow-y: auto !important;
     font-size: var(--font-size-md) !important;
-    margin-top: 80px !important; /* A ajuster selon la hauteur des filtres */
+    margin-top: 80px !important;
     margin-bottom: 20px !important;
 }
 
-/* Contenu du popup */
 .leaflet-popup-content {
     width: var(--infowindow-width) !important;
     margin: 0 !important;
     padding: var(--padding-md) !important;
 }
 
-/* Bouton de fermeture du popup */
 .leaflet-popup-close-button {
     font-size: 18px !important;
     top: 5px !important;
     right: 5px !important;
 }
 
-/* Contenu personnalisé de l'infowindow */
 .infowindow-content {
     font-family: Arial, sans-serif;
     min-width: 300px;
@@ -742,7 +716,6 @@ input.back:hover {
 }
 
 .infowindow-header {
-    
     position: relative;
     min-height: 30px;
 }
@@ -785,7 +758,6 @@ input.back:hover {
 .infowindow-footer {
     display: flex;
     justify-content: center;
-  
 }
 
 .infowindow-footer .btn {
@@ -821,17 +793,14 @@ input.back:hover {
     color: black;
     display: block;
     padding: 10px;
-    margin: -10px; /* Pour compenser le padding et éviter un espacement indésirable */
+    margin: -10px;
 }
 
 .infowindow-link:hover {
-    background-color: rgba(0, 0, 0, 0.05); /* Leger survol pour indiquer que c'est cliquable */
+    background-color: rgba(0, 0, 0, 0.05);
     border-radius: 5px;
 }
 
-
-
-/* Style des marqueurs emoji */
 .emoji-marker {
     font-size: 24px;
     text-align: center;
@@ -851,7 +820,7 @@ input.back:hover {
     height: 80vh;
     width: 100%;
     background-color: #f5f5f5;
-     transform: translateZ(0);
+    transform: translateZ(0);
     will-change: transform;
 }
 
@@ -1102,11 +1071,8 @@ input.back:hover {
         max-width: 100vw !important;
         max-height: 70vh !important;
         width: 90vw !important;
-        
-        margin-top: 80px !important; /* A ajuster selon la hauteur des filtres */
+        margin-top: 80px !important;
         margin-bottom: 20px !important;
-
-
     }
 
     #map {

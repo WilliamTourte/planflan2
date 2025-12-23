@@ -54,6 +54,7 @@
         {% endif %}
     {% endif %}
 {% endmacro %}
+
 {% macro afficher_infowindow(etablissement, details_url) %}
     <div class="infowindow-content">
         <!-- Lien cliquable pour la partie supérieure -->
@@ -248,7 +249,6 @@
     </div>
     {%  endif %}
 {% endmacro %}
-
 <!-- FLAN -->
 {% macro afficher_flan(flan, current_user, form, current_page, delete_form, validate_form) %}
     <div class="carte">
@@ -261,41 +261,35 @@
                 <div class="carte-header">
                     <h2 id="flan-{{ flan.id_flan }}-nom">{{ flan.nom | enlever_accents }}</h2>
                 </div>
-                <div id="flan-{{ flan.id_flan }}-display" class="carte-flan">
-                <div class="flan-details">
-                    <div class="flan-attribute">
-        
-                        <span class="attribute-label">Saveur</span>
-                        <span class="attribute-value">{{ flan.type_saveur.value | default("Inconnue") }}</span>
-                    </div>
-                    <div class="flan-attribute">
-    
-                        <span class="attribute-label">Pâte</span>
-                        <span class="attribute-value">{{ flan.type_pate.value | default("Inconnue") }}</span>
-                    </div>
-                    <div class="flan-attribute">
- 
-                        <span class="attribute-label">Texture</span>
-                        <span class="attribute-value">{{ flan.type_texture.value | default("Inconnue") }}</span>
-                    </div>
-                    <div class="flan-description">
-                        <span class="attribute-value" id="flan-{{ flan.id_flan }}-description">
-                            {{ flan.description | default("Un flan à découvrir absolument !") }}
-                        </span>
-                    </div>
-                </div>
-
-                        <div class="flan-price-tag">{{ "%.2f"|format(flan.prix) }} €</div>
-                    </div>
+                <div id="flan-{{ flan.id_flan }}-display">
+                    <div class="flan-details">
+                        <div class="flan-attribute">
+                            <span class="attribute-label">Saveur</span>
+                            <span class="attribute-value">{{ flan.type_saveur.value | default("Inconnue") }}</span>
+                        </div>
+                        <div class="flan-attribute">
+                            <span class="attribute-label">Pâte</span>
+                            <span class="attribute-value">{{ flan.type_pate.value | default("Inconnue") }}</span>
+                        </div>
+                        <div class="flan-attribute">
+                            <span class="attribute-label">Texture</span>
+                            <span class="attribute-value">{{ flan.type_texture.value | default("Inconnue") }}</span>
+                        </div>
+                        <div class="flan-description">
+                            <span class="attribute-value" id="flan-{{ flan.id_flan }}-description">
+                                {{ flan.description | default("Un flan à découvrir absolument !") }}
+                            </span>
+                        </div>
+                    <div class="flan-price-tag">{{ "%.2f"|format(flan.prix) }} €</div>
                 </div>
             </div>
         </a>
-       
-            {{ afficher_boutons_actions(flan, current_user, 'id_flan',
-                'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan', 'flan', current_page,
-                delete_form, validate_form) }}
-  
+        {{ afficher_boutons_actions(flan, current_user, 'id_flan',
+            'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan', 'flan', current_page,
+            delete_form, validate_form) }}
     </div>
+
+
     <!-- Assurez-vous que le formulaire d'édition a bien les IDs attendus -->
     {{ afficher_formulaire_edition_flan(flan, form) }}
 
@@ -481,18 +475,22 @@
 {% endmacro %}
 
 
-
-{% macro afficher_grille(objet_type, objets, current_user=None, form_edit=None, form_ajout=None, etablissement=None, flan=None, delete_form=None, validate_form=None) %}
+{% macro afficher_grille(objet_type, objets, current_user=None, form_edit=None, form_ajout=None, etablissement=None, flan=None, delete_form=None, validate_form=None, current_page='') %}
     <div class="grille">
     {% if not objets %}
     <p>Vide, contribuez !</p>
-    {%  endif %}
+    {% endif %}
         {% for objet in objets %}
-            {{ afficher_objet(objet_type, objet, current_user, form_ajout, current_page, delete_form, validate_form) }}
+            {{ afficher_objet(objet_type, objet, current_user, form_edit, current_page, delete_form, validate_form) }}
         {% endfor %}
+        <!-- Placer le bouton d'ajout à l'intérieur de la grille -->
+        <div class="carte">
+            {{ afficher_bouton_ajout(objet_type, current_user, etablissement, form_ajout, flan) }}
+        </div>
     </div>
-    {{ afficher_bouton_ajout(objet_type, current_user, objet, form_ajout, flan) }}
 {% endmacro %}
+
+
 
 
 

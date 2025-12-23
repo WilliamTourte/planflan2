@@ -10,9 +10,9 @@
     <!-- Grille des flans avec bouton d'ajout -->
     <div class="flans-section">
         <h3>Flans</h3>
-        {{ afficher_grille('flan', etablissement.flans, current_user, None, form_flan, etablissement) }}
+        {{ afficher_grille('flan', etablissement.flans, current_user, None, form_flan, etablissement, None, delete_form, validate_form) }}
     </div>
-    {{ afficher_bouton_ajout('flan', current_user, etablissement, form_flan) }}
+
 
     <!-- Bouton retour -->
     <div>
