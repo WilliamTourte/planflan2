@@ -66,10 +66,9 @@
       </div>
 
 <!-- Section Mes Évaluations -->
-<div class="evaluations-section form-container" style="margin-top: 20px;">
+
     <h2 class="evaluations-title">Mes evaluations</h2>
     {{ afficher_grille('evaluation', current_user.evaluations, current_user) }}
-</div>
 
 <!-- Sections Admin -->
 {% if current_user.is_admin %}
@@ -81,10 +80,10 @@
         <h2 class="evaluations-title">Flans en attente de validation</h2>
         {{ afficher_grille('flan', pending_flans, current_user) }}
     </div>
-    <div class="evaluations-section form-container" style="margin-top: 20px;">
+ 
         <h2 class="evaluations-title">Etablissements en attente de validation</h2>
         {{ afficher_grille('etablissement', pending_etablissements, current_user, form_ajout=form_ajout) }}
-    </div>
+
 {% endif %}
 
 
