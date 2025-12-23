@@ -1,27 +1,19 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container">
-    <!-- Détails du flan -->
-    <div class="etablissement-header">
-        {% set current_page = 'page_flan' %}
-        {{ afficher_objet('flan', flan, current_user, form_flan, current_page) }}
-    </div>
 
-    <!-- Grille des évaluations avec bouton d'ajout -->
-    <div class="carte-content">
-        <h3>Evaluations</h3>
-         {{ afficher_grille('evaluation', flan.evaluations, current_user, None, form_eval, None, flan) }}
-    </div>
+<!-- Détails du flan -->
+{% set current_page = 'page_flan' %}
+{{ afficher_objet('flan', flan, current_user, form_flan, current_page) }}
 
-    <!-- Boutons d'action -->
-    <div class="carte-content">
-        <!-- Bouton retour -->
-        <div>
-            <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=flan.etablissement.id_etab) }}" class="btn btn-back btn-with-icon">
-                <i class="fas fa-arrow-left"></i>
-                Retour à {{ flan.etablissement.nom }}
-            </a>
-        </div>
-    </div>
+<!-- Grille des évaluations avec bouton d'ajout -->
+<h3>Evaluations</h3>
+ {{ afficher_grille('evaluation', flan.evaluations, current_user, None, form_eval, None, flan) }}
+
+<!-- Bouton retour -->
+<div>
+    <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=flan.etablissement.id_etab) }}" class="btn btn-back btn-with-icon">
+        <i class="fas fa-arrow-left"></i>
+        Retour à {{ flan.etablissement.nom }}
+    </a>
 </div>
 {% endblock %}
