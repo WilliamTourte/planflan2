@@ -105,28 +105,71 @@ header {
     transition: transform 0.3s ease;
 }
 
-header.hide {
-    transform: translateY(-100%);
+/* =============================================
+   17. HEADER
+   ============================================= */
+.header-yellow nav {
+    background-color: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
 }
 
-header .top-bar {
+.header-yellow {
+    background-color: var(--color-secondary) !important;
+    width: 100%;
+    padding: 0rem 0;
+}
+
+.header-yellow > nav > div {
+    width: 100%;
+    max-width: 100%;
+    padding: 0 var(--padding-md);
+    margin: 0 auto;
+    background-color: transparent !important;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
-    padding: 0 var(--padding-lg);
-    margin-bottom: 0rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    flex-wrap: nowrap;
 }
 
-header h1 {
-    text-align: center;
-    margin: 0;
-    font-size: 2rem;
+.header-yellow form {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
 }
 
-footer {
-    text-align: center;
-    padding: var(--padding-md) 0;
+.header-yellow .user-buttons {
+    display: flex;
+    align-items: center;
+}
+
+.header-yellow .btn,
+.header-yellow .btn i {
+    font-size: 1.1rem;
+    margin: 0 !important;
+    position: relative;
+    top: 0 !important;
+}
+
+.header-yellow .form-control {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    padding: 0.3rem 1rem;
+    height: 36px;
+    width: 120px;
+    margin-right: 8px;
+}
+
+.header-yellow .btn:hover {
+    background-color: var(--color-info-dark) !important;
+    transform: scale(1.05);
 }
 
 /* =============================================
@@ -137,8 +180,7 @@ button,
 input[type="button"],
 input[type="submit"],
 input[type="reset"],
-.a-btn,
-.action-btn {
+{
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -182,7 +224,7 @@ input[type="submit"]:active,
 }
 
 .btn-sm {
-    color:white
+    color: white;
     padding: 0.15rem 0.15rem;
     font-size: 0.75rem;
     margin: 0 0.15rem;
@@ -220,21 +262,6 @@ input.danger:hover,
     background-color: var(--color-danger-dark);
 }
 
-.btn-info,
-button.info,
-input.info,
-.btn-edit {
-    background-color: var(--color-info);
-    color: var(--color-white);
-}
-
-.btn-info:hover,
-button.info:hover,
-input.info:hover,
-.btn-edit:hover {
-    background-color: var(--color-info-dark);
-}
-
 .btn-back,
 button.back,
 input.back {
@@ -256,25 +283,11 @@ input.back:hover {
     justify-content: center !important;
     background-color: var(--color-success) !important;
     color: white !important;
+    border-radius: 50% !important;
 }
 
-
-.btn-group {
-    display: flex;
-    justify-content: center;
-    gap: var(--gap-sm);
-    flex-wrap: wrap;
-    margin: var(--margin-md) 0;
-}
-
-.action-buttons {
-    display: flex;
-    gap: var(--gap-sm);
-    justify-content: flex-end;
-}
-
-.action-buttons .btn {
-    margin: 0;
+.inline-form {
+    display: inline-block;
 }
 
 /* =============================================
@@ -298,6 +311,8 @@ input.back:hover {
     display: block;
     height: 100%;
     width: 100%;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 .carte-image-container {
@@ -327,42 +342,8 @@ input.back:hover {
 }
 
 /* =============================================
-   CARTE FLAN (NOUVEAU DESIGN)
+   CARTE FLAN
    ============================================= */
-.carte-flan {
-    background: white;
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-    padding: var(--padding-md);
-    margin-bottom: var(--margin-md);
-    transition: var(--transition);
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap-sm);
-    width: 100%;
-}
-
-.carte-flan:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--box-shadow-hover);
-}
-
-.flan-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--margin-sm);
-    padding-bottom: var(--margin-sm);
-    border-bottom: 1px solid #eee;
-}
-
-.flan-title {
-    margin: 0;
-    font-size: var(--font-size-lg);
-    color: var(--color-text);
-    font-family: var(--font-bubblegum);
-}
-
 .flan-price-tag {
     background: var(--color-secondary);
     color: var(--color-white);
@@ -906,6 +887,7 @@ input.back:hover {
     align-items: center;
     gap: 5px;
 }
+
 /* =============================================
    16. FILTRES SUR LA MAP
    ============================================= */
@@ -1011,73 +993,6 @@ input.back:hover {
     background-color: #007bff !important;
     color: white !important;
     border-color: #007bff !important;
-}
-
-/* =============================================
-   17. HEADER
-   ============================================= */
-.header-yellow nav {
-    background-color: transparent !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    box-shadow: none !important;
-    border: none !important;
-}
-
-.header-yellow {
-    background-color: var(--color-secondary) !important;
-    width: 100%;
-    padding: 0rem 0;
-}
-
-.header-yellow > nav > div {
-    width: 100%;
-    max-width: 100%;
-    padding: 0 var(--padding-md);
-    margin: 0 auto;
-    background-color: transparent !important;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-    flex-wrap: nowrap;
-}
-
-.header-yellow form {
-    display: flex;
-    align-items: center;
-    flex-grow: 1;
-    margin-left: 0.5rem;
-    margin-right: 0.5rem;
-}
-
-.header-yellow .user-buttons {
-    display: flex;
-    align-items: center;
-}
-
-.header-yellow .btn,
-.header-yellow .btn i {
-    font-size: 1.1rem;
-    margin: 0 !important;
-    position: relative;
-    top: 0 !important;
-}
-
-.header-yellow .form-control {
-    background-color: white;
-    border: 1px solid #ddd;
-    border-radius: 25px;
-    padding: 0.3rem 1rem;
-    height: 36px;
-    width: 120px;
-    margin-right: 8px;
-}
-
-.header-yellow .btn:hover {
-    background-color: var(--color-info-dark) !important;
-    transform: scale(1.05);
 }
 
 /* =============================================
