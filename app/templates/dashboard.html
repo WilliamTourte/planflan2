@@ -4,16 +4,20 @@
       <h1>Tableau de bord</h1>
 
       <!-- Section Infos Utilisateur -->
-      <div id="user-info" class="form-container etablissement-header">
-          <p><strong>Pseudo:</strong> {{ current_user.pseudo }}</p>
-          <p><strong>Email:</strong> {{ current_user.email }}</p>
-          <div style="text-align: right; margin-top: 15px;">
-              <button id="edit-profile-btn" class="btn btn-success">Modifier le profil</button>
-              <form method="POST" action="{{ url_for('auth.supprimer_compte') }}" style="display: inline-block; margin-left: 10px;">
-                  <button type="submit" class="btn btn-danger">Supprimer le compte</button>
-              </form>
-          </div>
-      </div>
+<div id="user-info" class="form-container etablissementissement-header">
+    <p><strong>Pseudo:</strong> {{ current_user.pseudo }}</p>
+    <p><strong>Email:</strong> {{ current_user.email }}</p>
+    <div class="action-buttons">
+        <button id="edit-profile-btn" class="btn btn-success">
+            <i class="bi bi-pencil"></i>
+        </button>
+        <form method="POST" action="{{ url_for('auth.supprimer_compte') }}">
+            <button type="submit" class="btn btn-danger">
+                <i class="bi bi-trash-fill"></i>
+            </button>
+        </form>
+    </div>
+</div>
 
       <!-- Formulaire d'édition du profil (masqué par défaut) -->
       <div id="edit-profile-form" class="form-container" style="display: none; margin-top: 20px;">

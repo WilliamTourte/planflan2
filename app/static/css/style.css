@@ -290,12 +290,16 @@ input.back:hover {
     display: inline-block;
 }
 
-
 .action-buttons {
-    position: relative;
-    float:right
-
-
+    display: flex;
+    gap: 0; /* Supprime tout espace entre les éléments */
+    justify-content: flex-end;
+    margin-top: 15px;
+}
+.action-buttons form {
+    margin: 0;
+    padding: 0;
+    display: contents; /* Permet au form de ne pas créer de boîte supplémentaire */
 }
 /* =============================================
    5. BARRE DE RECHERCHE

@@ -366,6 +366,7 @@
 <!-- EVALUATION -->
 {% macro afficher_evaluation(evaluation, current_user, form, current_page, delete_form, validate_form) %}
     <div class="carte">
+        <a href="{{ url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval) }}" class="carte-link">
         <div class="carte-content">
             <div class="carte-header">
                 <h2>{{ evaluation.flan.etablissement.nom | enlever_accents }}</h2>
@@ -389,9 +390,11 @@
             {% else %}
                 {{ afficher_criteres_evaluation(evaluation) }}
             {% endif %}
-            <a href="{{ url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval) }}" class="btn btn-success">Voir plus</a>
+            
         </div>
+        </a>
     </div>
+
     <script>
         function editEvaluation(idEval) {
             document.getElementById('evaluation-' + idEval + '-display').style.display = 'none';
@@ -573,7 +576,7 @@
         {{ afficher_champ_formulaire(form.type_saveur) }}
         {{ afficher_champ_formulaire(form.type_texture) }}
         <div class="form-group">
-            {{ form.submit(class="btn btn-proposer") }}
+            {{ form.submit(class="btn btn-success") }}
         </div>
     </form>
 {% endmacro %}
@@ -612,7 +615,7 @@
         <input type="hidden" id="ajout-etab-latitude" name="ajout-etab-latitude" value="{{ form.latitude.data }}">
         <input type="hidden" id="ajout-etab-longitude" name="ajout-etab-longitude" value="{{ form.longitude.data }}">
         <div class="form-group">
-            {{ form.submit(class="btn btn-proposer") }}
+            {{ form.submit(class="btn btn-success") }}
         </div>
     </form>
 {% endmacro %}
@@ -626,7 +629,7 @@
         {{ afficher_champ_formulaire(form.gout) }}
         {{ afficher_champ_formulaire(form.description) }}
         <div class="form-group">
-            {{ form.submit(class="btn btn-proposer") }}
+            {{ form.submit(class="btn btn-success") }}
         </div>
     </form>
 {% endmacro %}
@@ -683,7 +686,7 @@
         {{ afficher_champ_formulaire(form.type_saveur) }}
         {{ afficher_champ_formulaire(form.type_texture) }}
         <div class="form-group">
-            {{ form.submit(class="btn btn-proposer") }}
+            {{ form.submit(class="btn btn-success") }}
         </div>
     </form>
 {% endmacro %}
