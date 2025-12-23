@@ -290,6 +290,13 @@ input.back:hover {
     display: inline-block;
 }
 
+
+.action-buttons {
+    position: relative;
+    float:right
+
+
+}
 /* =============================================
    5. BARRE DE RECHERCHE
    ============================================= */
@@ -351,6 +358,7 @@ input.back:hover {
     border-radius: var(--border-radius-btn);
     font-weight: bold;
     font-size: var(--font-size-sm);
+    width: 70px;
 }
 
 .flan-details {
@@ -661,12 +669,13 @@ input.back:hover {
    ============================================= */
 .leaflet-popup {
     max-width: var(--infowindow-max-width) !important;
+    max-height: 600px
 }
 
 .leaflet-popup-content-wrapper {
     width: var(--infowindow-width) !important;
     max-width: var(--infowindow-max-width) !important;
-    max-height: 300px !important;
+    max-height: 600px !important;
     overflow-y: auto !important;
     font-size: var(--font-size-md) !important;
     margin-top: 80px !important;

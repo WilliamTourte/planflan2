@@ -92,7 +92,7 @@
     {% if current_user.is_authenticated %}
         {% if current_page == page_attendue %}
             {% if current_user.id_user == objet.id_user and not objet.statut.value == 'VALIDE' %}
-                <div class="action-buttons d-flex gap-1">
+                <div class="action-buttons">
                     <button type="button" class="btn btn-success btn-sm" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
                         <i class="bi bi-pencil"></i>
                     </button>
@@ -247,6 +247,8 @@
     </div>
     {%  endif %}
 {% endmacro %}
+
+
 <!-- FLAN -->
 {% macro afficher_flan(flan, current_user, form, current_page, delete_form, validate_form) %}
     <div class="carte">
@@ -278,16 +280,17 @@
                                 {{ flan.description | default("Un flan à découvrir absolument !") }}
                             </span>
                         </div>
-                    <div class="flan-price-tag">{{ "%.2f"|format(flan.prix) }} €</div>
+                        <div class="flan-price-tag">{{ "%.2f"|format(flan.prix) }} €</div>
+                    </div>
                 </div>
-            </div>
-        </a>
-        {{ afficher_boutons_actions(flan, current_user, 'id_flan',
-            'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan', 'flan', current_page,
-            delete_form, validate_form) }}
+            </a>
+            {{ afficher_boutons_actions(flan, current_user, 'id_flan',
+                'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan', 'flan', current_page,
+                delete_form, validate_form) }}
+            <!-- Formulaire d'édition dans la même carte, mais masqué -->
+            {{ afficher_formulaire_edition_flan(flan, form) }}
+        </div>
     </div>
-    <!-- Assurez-vous que le formulaire d'édition a bien les IDs attendus -->
-    {{ afficher_formulaire_edition_flan(flan, form) }}
 
     <script>
         function editFlan(idFlan) {
@@ -320,45 +323,44 @@
     </script>
 {% endmacro %}
 
-
-
 {% macro afficher_formulaire_edition_flan(flan, form) %}
     {% if form %}
-    <div id="flan-{{ flan.id_flan }}-edit" style="display: none;">
-        <form method="POST" action="{{ url_for('main.modifier_flan', id_flan=flan.id_flan) }}" class="form-container">
-            {{ form.hidden_tag() }}
-            <div class="form-group">
-                <label class="form-label" for="edit-flan-nom">{{ form.nom.label }}</label>
-                {{ form.nom(class="form-control", id="edit-flan-nom") }}
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="edit-flan-description">{{ form.description.label }}</label>
-                {{ form.description(class="form-control", id="edit-flan-description") }}
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="edit-flan-prix">{{ form.prix.label }}</label>
-                {{ form.prix(class="form-control", id="edit-flan-prix") }}
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="edit-flan-type_pate">{{ form.type_pate.label }}</label>
-                {{ form.type_pate(class="form-control", id="edit-flan-type_pate") }}
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="edit-flan-type_saveur">{{ form.type_saveur.label }}</label>
-                {{ form.type_saveur(class="form-control", id="edit-flan-type_saveur") }}
-            </div>
-            <div class="form-group">
-                <label class="form-label" for="edit-flan-type_texture">{{ form.type_texture.label }}</label>
-                {{ form.type_texture(class="form-control", id="edit-flan-type_texture") }}
-            </div>
-            <div class="form-group">
-                <button type="submit" class="btn btn-success">Enregistrer</button>
-                <button type="button" class="btn btn-secondary" onclick="cancelEdit({{ flan.id_flan }})">Annuler</button>
-            </div>
-        </form>
-    </div>
+        <div id="flan-{{ flan.id_flan }}-edit" style="display: none;" class="carte-form-edit">
+            <form method="POST" action="{{ url_for('main.modifier_flan', id_flan=flan.id_flan) }}" class="form-container">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    <label class="form-label" for="edit-flan-nom">{{ form.nom.label }}</label>
+                    {{ form.nom(class="form-control", id="edit-flan-nom") }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="edit-flan-description">{{ form.description.label }}</label>
+                    {{ form.description(class="form-control", id="edit-flan-description") }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="edit-flan-prix">{{ form.prix.label }}</label>
+                    {{ form.prix(class="form-control", id="edit-flan-prix") }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="edit-flan-type_pate">{{ form.type_pate.label }}</label>
+                    {{ form.type_pate(class="form-control", id="edit-flan-type_pate") }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="edit-flan-type_saveur">{{ form.type_saveur.label }}</label>
+                    {{ form.type_saveur(class="form-control", id="edit-flan-type_saveur") }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="edit-flan-type_texture">{{ form.type_texture.label }}</label>
+                    {{ form.type_texture(class="form-control", id="edit-flan-type_texture") }}
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Enregistrer</button>
+                    <button type="button" class="btn btn-secondary" onclick="cancelEdit({{ flan.id_flan }})">Annuler</button>
+                </div>
+            </form>
+        </div>
     {% endif %}
 {% endmacro %}
+
 
 
 <!-- EVALUATION -->
@@ -473,18 +475,21 @@
 
 {% macro afficher_grille(objet_type, objets, current_user=None, form_edit=None, form_ajout=None, etablissement=None, flan=None, delete_form=None, validate_form=None, current_page='') %}
     <div class="grille">
-    {% if not objets %}
-    <p>Vide, contribuez !</p>
-    {% endif %}
+        {% if not objets %}
+            <p>Vide, contribuez !</p>
+        {% endif %}
         {% for objet in objets %}
-            {{ afficher_objet(objet_type, objet, current_user, form_edit, current_page, delete_form, validate_form) }}
+            <div class="carte">
+                {{ afficher_objet(objet_type, objet, current_user, form_edit, current_page, delete_form, validate_form) }}
+            </div>
         {% endfor %}
-        <!-- Placer le bouton d'ajout à l'intérieur de la grille -->
+        <!-- Bouton ou formulaire d'ajout -->
         <div class="carte">
             {{ afficher_bouton_ajout(objet_type, current_user, etablissement, form_ajout, flan) }}
         </div>
     </div>
 {% endmacro %}
+
 
 
 
