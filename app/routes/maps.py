@@ -1,6 +1,6 @@
 import traceback
 from werkzeug.datastructures import MultiDict
-from app.outils import enlever_accents, afficher_etablissements
+from app.outils import enlever_accents, afficher_etablissements, calculer_distance
 import re
 
 from flask import Blueprint, render_template, redirect, url_for, request, current_app, flash, jsonify

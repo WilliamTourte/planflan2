@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from app.forms import EvalForm, NewFlanForm, RechercheForm, UpdateProfileForm, EtabForm, DeleteForm, ValidateForm
 from app.models import Etablissement, Flan, Evaluation, Utilisateur
 from app import db, bcrypt
-from app.outils import afficher_etablissements
+from app.outils import afficher_etablissements, calculer_distance
 
 main_bp = Blueprint('main', __name__)
 
@@ -21,18 +21,9 @@ def index():
         google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
         form_recherche=form_recherche
     )
-from math import radians, sin, cos, sqrt, atan2
 
-def calculer_distance(lat1, lon1, lat2, lon2):
-    R = 6371.0
-    # Convertir toutes les valeurs en float avant de les convertir en radians
-    lat1, lon1, lat2, lon2 = map(float, [lat1, lon1, lat2, lon2])
-    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
-    dlat = lat2 - lat1
-    dlon = lon2 - lon1
-    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
-    c = 2 * atan2(sqrt(a), sqrt(1 - a))
-    return R * c
+
+
 
 
 def filtrer_etablissements(query, **kwargs):
@@ -214,26 +205,7 @@ def api_etablissements():
         return jsonify({'error': str(e)}), 500
 
 
-def afficher_badge_etablissement(etablissement):
-    if hasattr(etablissement, 'label') and etablissement.label:
-        return '<span class="badge badge-labellise">❤️ Labellisé</span>'
-    return ''
-
-def afficher_badge_type_etab(etablissement):
-    couleurs = {
-        'BOULANGERIE': '#F5DEB3',
-        'PATISSERIE': '#FFB6C1',
-        'RESTAURANT': '#87CEEB',
-        'CAFE': '#D2B48C'
-    }
-    type_etab = getattr(etablissement, 'type_etab', None)
-    if type_etab:
-        couleur = couleurs.get(type_etab.name, '#D3D3D3')
-        return f'<div class="badge badge-type-etab" style="background-color: {couleur};">{type_etab.value}</div>'
-    return ''
-
-
-
+### INFOWINDOW
 @main_bp.route('/get_infowindow_content')
 def get_infowindow_content():
     id_etab = request.args.get('id_etab', type=int)
@@ -245,7 +217,6 @@ def get_infowindow_content():
     return render_template('infowindow_template.html',
                            etablissement=etablissement,
                            details_url=details_url)
-
 
 
 ### PAGE RECHERCHE
@@ -584,3 +555,23 @@ def supprimer_evaluation(id_eval):
         db.session.rollback()
         flash('Une erreur est survenue lors de la suppression de l\'évaluation.', 'danger')
     return redirect(url_for('main.dashboard'))
+
+### BADGES
+
+def afficher_badge_etablissement(etablissement):
+    if hasattr(etablissement, 'label') and etablissement.label:
+        return '<span class="badge badge-labellise">❤️ Labellisé</span>'
+    return ''
+
+def afficher_badge_type_etab(etablissement):
+    couleurs = {
+        'BOULANGERIE': '#F5DEB3',
+        'PATISSERIE': '#FFB6C1',
+        'RESTAURANT': '#87CEEB',
+        'CAFE': '#D2B48C'
+    }
+    type_etab = getattr(etablissement, 'type_etab', None)
+    if type_etab:
+        couleur = couleurs.get(type_etab.name, '#D3D3D3')
+        return f'<div class="badge badge-type-etab" style="background-color: {couleur};">{type_etab.value}</div>'
+    return ''
