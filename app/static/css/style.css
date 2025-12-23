@@ -182,6 +182,7 @@ input[type="submit"]:active,
 }
 
 .btn-sm {
+    color:white
     padding: 0.15rem 0.15rem;
     font-size: 0.75rem;
     margin: 0 0.15rem;
@@ -257,10 +258,6 @@ input.back:hover {
     color: white !important;
 }
 
-.btn-icon i {
-    font-size: 1rem !important;
-    margin: 0 !important;
-}
 
 .btn-group {
     display: flex;
@@ -909,7 +906,6 @@ input.back:hover {
     align-items: center;
     gap: 5px;
 }
-
 /* =============================================
    16. FILTRES SUR LA MAP
    ============================================= */
@@ -917,9 +913,11 @@ input.back:hover {
     position: absolute;
     top: 10px;
     left: 50%;
+    transform: translateX(-50%);
     z-index: 1000;
-    background: transparent !important;
-    padding: 0;
+    background: transparent;
+    padding: 10px;
+    border-radius: 10px;
     width: 100%;
     max-width: 500px;
     border: none !important;
@@ -927,7 +925,9 @@ input.back:hover {
 
 .main-filters {
     display: flex;
-    gap: 8px;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
     background: transparent;
     justify-content: flex-end;
     margin-left: auto;
@@ -943,6 +943,20 @@ input.back:hover {
     line-height: 2;
     white-space: nowrap;
     background: #ffcf40;
+}
+
+#proximity-filter {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+#proximity-radius {
+    width: 50px;
+    text-align: center;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    padding: 5px;
 }
 
 .sub-filters {
@@ -1022,6 +1036,25 @@ input.back:hover {
     padding: 0 var(--padding-md);
     margin: 0 auto;
     background-color: transparent !important;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+    flex-wrap: nowrap;
+}
+
+.header-yellow form {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+}
+
+.header-yellow .user-buttons {
+    display: flex;
+    align-items: center;
 }
 
 .header-yellow .btn,
