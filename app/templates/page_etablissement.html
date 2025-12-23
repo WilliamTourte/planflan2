@@ -7,10 +7,9 @@
  <h3>Flans</h3>
 {{ afficher_grille('flan', etablissement.flans, current_user, None, form_flan, etablissement, None, delete_form, validate_form) }}
 <!-- Bouton retour -->
-<div>
-<a href="{{ url_for('main.index') }}" class="btn btn-back btn-with-icon">
-    <i class="fas fa-arrow-left"></i>
-    Retour à l'accueil
-</a>
+<div class="action-buttons">
+    <a href="{{ url_for('main.index') }}" class="btn btn-danger">
+        <i class="bi bi-arrow-return-left"></i>
+    </a>
 </div>
 {% endblock %}

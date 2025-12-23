@@ -3,6 +3,7 @@
 
 <!-- Détails du flan -->
 {% set current_page = 'page_flan' %}
+
 {{ afficher_objet('flan', flan, current_user, form_flan, current_page) }}
 
 <!-- Grille des évaluations avec bouton d'ajout -->
@@ -10,10 +11,9 @@
  {{ afficher_grille('evaluation', flan.evaluations, current_user, None, form_eval, None, flan) }}
 
 <!-- Bouton retour -->
-<div>
-    <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=flan.etablissement.id_etab) }}" class="btn btn-back btn-with-icon">
-        <i class="fas fa-arrow-left"></i>
-        Retour à {{ flan.etablissement.nom }}
+<div class="action-buttons">
+    <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=flan.etablissement.id_etab) }}" class="btn btn-danger">
+        <i class="bi bi-arrow-return-left"></i>
     </a>
 </div>
 {% endblock %}
