@@ -53,19 +53,21 @@ def filtrer_etablissements(query, **kwargs):
             query = query.filter(Flan.prix >= 5)
     return query
 
+import logging
+
 @main_bp.route('/liste_etablissements', methods=['GET', 'POST'])
 def liste_etablissements():
     form_ajout = EtabForm(prefix='ajout-etab')
     form_edit = EtabForm(prefix='edit-etab')
 
     if request.method == 'POST':
-        form_recherche = RechercheForm()
+        form_recherche = RechercheForm(request.form)
     else:
         form_recherche = RechercheForm(request.args)
 
-    # 1. Recherche simple
+    # 1. Recherche simple (GET uniquement)
     recherche_simple = request.args.get('recherche_simple', None)
-    if recherche_simple:
+    if recherche_simple and request.method == 'GET':
         query = Etablissement.query.filter(
             (Etablissement.nom.ilike(f'%{recherche_simple}%')) |
             (Etablissement.ville.ilike(f'%{recherche_simple}%'))
@@ -74,8 +76,17 @@ def liste_etablissements():
         query = Etablissement.query
 
     # 2. Filtres avancés
-    if form_recherche.validate():
-        query = query.join(Flan)
+    if form_recherche.validate_on_submit() or (request.method == 'GET' and form_recherche.validate()):
+        # On ne fait la jointure que si un filtre sur Flan est activé
+        need_join = (
+            (form_recherche.type_saveur.data and form_recherche.type_saveur.data != 'tous') or
+            (form_recherche.type_pate.data and form_recherche.type_pate.data != 'tous') or
+            (form_recherche.type_texture.data and form_recherche.type_texture.data != 'tous') or
+            (form_recherche.prix.data and form_recherche.prix.data != 'tous')
+        )
+        if need_join:
+            query = query.join(Flan)
+
         if form_recherche.nom.data:
             query = query.filter(Etablissement.nom.ilike(f'%{form_recherche.nom.data}%'))
         if form_recherche.ville.data:
@@ -98,21 +109,18 @@ def liste_etablissements():
         if form_recherche.labellise.data and form_recherche.labellise.data != 'tous':
             query = query.filter(Etablissement.label == (form_recherche.labellise.data == 'oui'))
 
-    # 3. Filtre par proximité (si latitude/longitude fournies)
+    # 3. Filtre par proximité
     user_lat = form_recherche.latitude.data
     user_lon = form_recherche.longitude.data
     if user_lat and user_lon:
-        rayon = form_recherche.rayon.data or 5.0  # Rayon par défaut : 5 km
-        # Récupère tous les établissements pour calculer la distance
+        rayon = form_recherche.rayon.data or 5.0
         etablissements = query.distinct().all()
-        # Filtre les établissements proches
         etablissements = [
             etab for etab in etablissements
             if etab.latitude and etab.longitude and
             calculer_distance(user_lat, user_lon, etab.latitude, etab.longitude) <= rayon
         ]
     else:
-        # Sinon, exécute la requête normale
         etablissements = query.distinct().all()
 
     # 4. Préparation pour le template
@@ -125,10 +133,9 @@ def liste_etablissements():
         form_recherche=form_recherche,
         form_ajout=form_ajout,
         form_edit=form_edit,
-        user_lat=user_lat,  # Passe la latitude pour la carte
-        user_lon=user_lon,  # Passe la longitude pour la carte
+        user_lat=user_lat,
+        user_lon=user_lon,
     )
-
 
 @main_bp.route('/api/etablissements', methods=['GET', 'POST'])
 def api_etablissements():
