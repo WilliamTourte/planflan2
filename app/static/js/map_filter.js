@@ -164,12 +164,8 @@ function createUserMarker() {
 
     if (userLocation) {
         userMarker = L.marker([userLocation.lat, userLocation.lon], {
-            icon: L.divIcon({
-                html: '📍',
-                className: 'user-marker',
-                iconSize: [30, 30],
-                iconAnchor: [15, 15]
-            })
+            icon : createEmojiIcon('📍', 'localisation-icon')
+            
         }).addTo(map);
 
         // Centrer la carte sur l'utilisateur
