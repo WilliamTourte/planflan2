@@ -475,3 +475,4 @@ env/lib/python3.12/site-packages/pip-25.0.1.dist-info/REQUESTED
 env/lib/python3.12/site-packages/pip-25.0.1.dist-info/top_level.txt
 env/lib/python3.12/site-packages/pip-25.0.1.dist-info/WHEEL
 env/pyvenv.cfg
+.vscode/settings.json
