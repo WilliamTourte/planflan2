@@ -44,6 +44,8 @@ def filtrer_etablissements(query, **kwargs):
         query = query.filter(Flan.type_pate == kwargs['type_pate'])
     if kwargs.get('type_saveur') and kwargs['type_saveur'] != 'tous':
         query = query.filter(Flan.type_saveur == kwargs['type_saveur'])
+    if kwargs.get('type_texture') and kwargs['type_texture'] != 'tous':
+        query = query.filter(Flan.type_texture == kwargs['type_texture'])
     if kwargs.get('prix') and kwargs['prix'] != 'tous':
         if kwargs['prix'] == '0':
             query = query.filter(Flan.prix < 2.5)

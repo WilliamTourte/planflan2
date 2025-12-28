@@ -229,6 +229,162 @@ def test_filtrer_etablissements_par_type_saveur(app, setup_data):
         assert results[0].nom == 'Boulangerie Martin'
 
 
+def test_filtrer_etablissements_par_type_texture(app, setup_data):
+    """Test le filtrage des établissements par type de texture."""
+    with app.app_context():
+        query = Etablissement.query.join(Flan)
+        
+        # Filtrer par texture = CREMEUSE
+        filtered_query = filtrer_etablissements(query, type_texture='CREMEUSE')
+        results = filtered_query.all()
+        
+        # Devrait retourner les établissements avec des flans à texture crémeuse
+        # (vanille et chocolat)
+        assert len(results) == 1  # Seul la Boulangerie Martin a des flans crémeux
+        assert results[0].nom == 'Boulangerie Martin'
+        
+        # Filtrer par texture = GELATINEUSE
+        filtered_query = filtrer_etablissements(query, type_texture='GELATINEUSE')
+        results = filtered_query.all()
+        
+        # Devrait retourner seulement la pâtisserie avec le flan citron
+        assert len(results) == 1
+        assert results[0].nom == 'Patisserie Dubois'
+
+
+def test_filtrer_etablissements_type_texture_tous(app, setup_data):
+    """Test le filtrage des établissements avec type_texture='tous'."""
+    with app.app_context():
+        query = Etablissement.query.join(Flan)
+        
+        # Filtrer avec type_texture='tous' (ne devrait pas filtrer)
+        filtered_query = filtrer_etablissements(query, type_texture='tous')
+        results = filtered_query.all()
+        
+        # Devrait retourner tous les établissements avec des flans
+        assert len(results) == 2  # Boulangerie Martin et Patisserie Dubois
+
+
+def test_filtrer_etablissements_jointure_flan(app, setup_data):
+    """Test le filtrage des établissements avec jointure Flan et gestion des résultats."""
+    with app.app_context():
+        # Test 1: Jointure simple sans filtres
+        query = Etablissement.query.join(Flan)
+        filtered_query = filtrer_etablissements(query)
+        results = filtered_query.all()
+        
+        # Devrait retourner tous les établissements qui ont des flans
+        assert len(results) == 2  # Boulangerie Martin et Patisserie Dubois
+        
+        # Test 2: Jointure avec filtre sur Flan
+        query = Etablissement.query.join(Flan)
+        filtered_query = filtrer_etablissements(query, type_pate='BRISEE')
+        results = filtered_query.all()
+        
+        # Devrait retourner seulement les établissements avec des flans à pâte brisée
+        assert len(results) == 1  # Boulangerie Martin
+        assert results[0].nom == 'Boulangerie Martin'
+        
+        # Test 3: Jointure avec filtre sur Etablissement
+        query = Etablissement.query.join(Flan)
+        filtered_query = filtrer_etablissements(query, ville='Lyon')
+        results = filtered_query.all()
+        
+        # Devrait retourner seulement les établissements de Lyon qui ont des flans
+        assert len(results) == 1  # Patisserie Dubois
+        assert results[0].nom == 'Patisserie Dubois'
+        
+        # Test 4: Jointure avec filtres combinés
+        query = Etablissement.query.join(Flan)
+        filtered_query = filtrer_etablissements(
+            query, 
+            ville='Paris', 
+            type_pate='BRISEE',
+            type_saveur='VANILLE'
+        )
+        results = filtered_query.all()
+        
+        # Devrait retourner seulement les établissements de Paris avec des flans vanille à pâte brisée
+        assert len(results) == 1  # Boulangerie Martin
+        assert results[0].nom == 'Boulangerie Martin'
+
+
+def test_filtrer_etablissements_etablissements_sans_flans(app, setup_data):
+    """Test le filtrage des établissements qui n'ont pas de flans."""
+    with app.app_context():
+        # Créer un établissement sans flan
+        etab_sans_flan = Etablissement(
+            nom='Boulangerie Sans Flan',
+            adresse='Test Adresse',
+            ville='Marseille',
+            code_postal='13001',
+            id_user=1
+        )
+        db.session.add(etab_sans_flan)
+        db.session.commit()
+        
+        # Test 1: Requête sans jointure - devrait inclure tous les établissements
+        query = Etablissement.query
+        filtered_query = filtrer_etablissements(query, ville='Marseille')
+        results = filtered_query.all()
+        
+        assert len(results) == 1  # Cafe des Amis
+        assert results[0].nom == 'Cafe des Amis'
+        
+        # Test 2: Requête avec jointure - devrait exclure les établissements sans flans
+        query = Etablissement.query.join(Flan)
+        filtered_query = filtrer_etablissements(query, ville='Marseille')
+        results = filtered_query.all()
+        
+        assert len(results) == 1  # Cafe des Amis
+        assert results[0].nom == 'Cafe des Amis'
+        
+        # Test 3: Filtre sur Flan avec jointure - devrait exclure les établissements sans flans
+        query = Etablissement.query.join(Flan)
+        filtered_query = filtrer_etablissements(query, type_pate='BRISEE')
+        results = filtered_query.all()
+        
+        # Ne devrait pas inclure l'établissement sans flan
+        assert len(results) == 1  # Boulangerie Martin
+        assert results[0].nom == 'Boulangerie Martin'
+
+
+def test_filtrer_etablissements_resultats_dupliques(app, setup_data):
+    """Test la gestion des résultats dupliqués lors de la jointure avec Flan."""
+    with app.app_context():
+        # Ajouter un deuxième flan à la Boulangerie Martin pour créer un cas de duplication
+        boulangerie = Etablissement.query.filter_by(nom='Boulangerie Martin').first()
+        
+        flan_extra = Flan(
+            nom='Flan Chocolat Extra',
+            description='Flan supplémentaire au chocolat',
+            type_pate='BRISEE',
+            type_saveur='NOIX',
+            type_texture='CREMEUSE',
+            prix=4.00,
+            id_etab=boulangerie.id_etab,
+            id_user=1
+        )
+        db.session.add(flan_extra)
+        db.session.commit()
+        
+        # Test: Jointure sans distinct - pourrait retourner des doublons
+        query = Etablissement.query.join(Flan)
+        filtered_query = filtrer_etablissements(query, ville='Paris')
+        results = filtered_query.all()
+        
+        # La Boulangerie Martin devrait apparaître une fois pour chaque flan
+        # Mais comme nous utilisons distinct() dans la route, cela ne devrait pas poser problème
+        boulangerie_results = [r for r in results if r.nom == 'Boulangerie Martin']
+        assert len(boulangerie_results) >= 1  # Au moins une occurrence
+        
+        # Vérifier que les IDs sont bien les mêmes (même établissement)
+        if len(boulangerie_results) > 1:
+            first_id = boulangerie_results[0].id_etab
+            for result in boulangerie_results[1:]:
+                assert result.id_etab == first_id  # Même établissement
+
+
 def test_filtrer_etablissements_par_prix(app, setup_data):
     """Test le filtrage des établissements par prix."""
     with app.app_context():
@@ -464,3 +620,98 @@ def test_afficher_badge_type_etab(app, setup_data):
         # Devrait contenir le badge pour le type d'établissement
         assert 'badge-type-etab' in badge
         assert etab.type_etab.value in badge
+
+
+def test_afficher_badge_etablissement_complet(app, setup_data):
+    """Test complet de la fonction afficher_badge_etablissement."""
+    from app.routes.main import afficher_badge_etablissement
+    
+    with app.app_context():
+        # Test 1: Établissement labellisé
+        etab = Etablissement.query.filter_by(nom='Boulangerie Martin').first()
+        etab.label = True
+        db.session.commit()
+        
+        badge = afficher_badge_etablissement(etab)
+        assert '❤️ Labellisé' in badge
+        assert 'badge badge-labellise' in badge
+        
+        # Test 2: Établissement non labellisé
+        etab.label = False
+        db.session.commit()
+        
+        badge = afficher_badge_etablissement(etab)
+        assert badge == ''
+        
+        # Test 3: Établissement sans attribut label
+        etab_sans_label = Etablissement.query.filter_by(nom='Patisserie Dubois').first()
+        # Supprimer l'attribut label temporairement pour le test
+        original_label = getattr(etab_sans_label, 'label', None)
+        if hasattr(etab_sans_label, 'label'):
+            delattr(etab_sans_label, 'label')
+        
+        badge = afficher_badge_etablissement(etab_sans_label)
+        assert badge == ''
+        
+        # Restaurer l'attribut label
+        if original_label is not None:
+            etab_sans_label.label = original_label
+
+
+def test_afficher_badge_type_etab_complet(app, setup_data):
+    """Test complet de la fonction afficher_badge_type_etab."""
+    from app.routes.main import afficher_badge_type_etab
+    
+    with app.app_context():
+        # Test 1: Boulangerie
+        etab_boulangerie = Etablissement.query.filter_by(nom='Boulangerie Martin').first()
+        badge = afficher_badge_type_etab(etab_boulangerie)
+        assert 'badge-type-etab' in badge
+        assert 'BOULANGERIE' in badge
+        assert '#F5DEB3' in badge  # Couleur pour boulangerie
+        
+        # Test 2: Pâtisserie
+        etab_patisserie = Etablissement.query.filter_by(nom='Patisserie Dubois').first()
+        badge = afficher_badge_type_etab(etab_patisserie)
+        assert 'badge-type-etab' in badge
+        assert 'PATISSERIE' in badge
+        assert '#FFB6C1' in badge  # Couleur pour pâtisserie
+        
+        # Test 3: Restaurant
+        etab_restaurant = Etablissement.query.filter_by(nom='Cafe des Amis').first()
+        badge = afficher_badge_type_etab(etab_restaurant)
+        assert 'badge-type-etab' in badge
+        assert 'RESTAURANT' in badge
+        assert '#87CEEB' in badge  # Couleur pour restaurant
+        
+        # Test 4: Établissement sans type_etab
+        etab_sans_type = Etablissement(
+            nom='Établissement Sans Type',
+            adresse='Test Adresse',
+            ville='Test Ville',
+            code_postal='00000',
+            id_user=1
+        )
+        db.session.add(etab_sans_type)
+        db.session.commit()
+        
+        badge = afficher_badge_type_etab(etab_sans_type)
+        assert badge == ''
+        
+        # Test 5: Type d'établissement inconnu
+        from app.models import TypeEtablissement
+        etab_inconnu = Etablissement(
+            nom='Établissement Inconnu',
+            adresse='Test Adresse',
+            ville='Test Ville',
+            code_postal='00000',
+            type_etab=TypeEtablissement.AUTRE,  # Type non défini dans les couleurs
+            id_user=1
+        )
+        db.session.add(etab_inconnu)
+        db.session.commit()
+        
+        badge = afficher_badge_type_etab(etab_inconnu)
+        assert 'badge-type-etab' in badge
+        assert 'AUTRE' in badge
+        assert '#D3D3D3' in badge  # Couleur par défaut (gris)
