@@ -65,7 +65,9 @@ def etablissements_proches():
                     'adresse': etab.adresse,
                     'latitude': etab.latitude,
                     'longitude': etab.longitude,
-                    'distance': round(distance, 2)  # Arrondi à 2 décimales
+                    'distance': round(distance, 2),  # Arrondi à 2 décimales
+                    'visite' : etab.visite,
+                    'label' : etab.label
                 })
 
         return jsonify({'etablissements': etablissements_proches})
