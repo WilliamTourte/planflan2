@@ -91,7 +91,7 @@ class Etablissement(db.Model):
     statut = db.Column(db.Enum(StatutModeration), nullable=False, server_default='EN_ATTENTE')
 
     # Clé étrangère pour l'utilisateur
-    id_user = db.Column(db.Integer, db.ForeignKey('utilisateurs.id_user'), nullable=False, index=True)
+    id_user = db.Column(db.Integer, db.ForeignKey('utilisateurs.id_user'), nullable=False, index=True, server_default='1')
 
     # Relations
     flans = db.relationship('Flan', back_populates='etablissement', lazy=True,cascade="all, delete-orphan")

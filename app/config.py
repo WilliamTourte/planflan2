@@ -11,3 +11,8 @@ class Config:
     PERMANENT_SESSION_LIFETIME = 3600
     GOOGLE_MAPS_API_KEY = os.getenv('GOOGLE_MAPS_API_KEY')
     UPLOAD_FOLDER = 'app/static/uploads'
+
+class TestConfig(Config):
+    TESTING = True
+    WTF_CSRF_ENABLED = False
+    SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
