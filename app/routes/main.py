@@ -385,7 +385,7 @@ def valider_flan(id_flan):
         flash('Vous n\'avez pas le droit d\'accéder à cette page.', 'danger')
         return redirect(url_for('main.dashboard'))
     flan = Flan.query.get_or_404(id_flan)
-    flan.statut = 'valide'
+    flan.statut = 'VALIDE'
     try:
         db.session.commit()
         flash('Le flan a été validé avec succès!', 'success')
