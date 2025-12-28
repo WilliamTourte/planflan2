@@ -264,30 +264,20 @@ function updateMapAndMarkers() {
 function setupGeolocation() {
     document.getElementById('geolocate-me').addEventListener('click', function() {
         geoloc.getUserLocation(
-            // Callback en cas de succès
             (coords) => {
                 userLocation = { lat: coords.latitude, lon: coords.longitude };
                 activeFilters.proximity = true;
                 createUserMarker();
-                updateMarkersBasedOnFilters();
 
-                // Mettre à jour l'URL
-                const url = new URL(window.location);
-                url.searchParams.set('latitude', userLocation.lat);
-                url.searchParams.set('longitude', userLocation.lon);
-                window.history.pushState({}, '', url);
+                // Met à jour les champs cachés du formulaire
+                document.getElementById('latitude').value = coords.latitude;
+                document.getElementById('longitude').value = coords.longitude;
 
-                // Optionnel : Envoyer au serveur si nécessaire
-                geoloc.sendToServer(userLocation.lat, userLocation.lon, (data) => {
-                    console.log('Établissements proches :', data.etablissements);
-                    // Mettre à jour les données des établissements si besoin
-                    const etablissementsDataElement = document.getElementById('etablissements-data');
-                    etablissementsDataElement.setAttribute('data-etablissements', JSON.stringify(data.etablissements));
-                    updateMapAndMarkers();
-                });
+                // Soumet le formulaire
+                document.querySelector('form').submit();
             },
-            // Callback en cas d'erreur
             (error) => {
+                // Gestion des erreurs (comme dans ton code)
                 let message = "Erreur de géolocalisation: ";
                 switch(error.code) {
                     case error.PERMISSION_DENIED:
@@ -306,15 +296,7 @@ function setupGeolocation() {
             }
         );
     });
-
-    // Gestion du rayon de proximité
-    document.getElementById('proximity-radius').addEventListener('change', function() {
-        proximityRadius = parseInt(this.value);
- 
-        updateMarkersBasedOnFilters();
-    });
 }
-
 
 
 
