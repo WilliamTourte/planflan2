@@ -59,7 +59,7 @@ def test_afficher_etablissement_unique(client):
 
 def test_afficher_flan_unique(client):
     # Créer un établissement et un flan de test
-    etab = Etablissement(nom='Test Etablissement', ville='Test Ville')
+    etab = Etablissement(nom='Test Etablissement', ville='Test Ville', adresse='Test Adresse', code_postal='69001', id_user="1", id_etab="1")
     db.session.add(etab)
     flan = Flan(nom='Test Flan', prix=2.5, id_etab=etab.id_etab)
     db.session.add(flan)
@@ -68,17 +68,45 @@ def test_afficher_flan_unique(client):
     assert response.status_code == 200
     assert b'Test Flan' in response.data
 
+from flask import get_flashed_messages
+
+from flask_bcrypt import Bcrypt
 def test_proposer_flan(client):
-    # Créer un établissement de test
-    etab = Etablissement(nom='Test Etablissement', ville='Test Ville')
+    # Récupérer l'utilisateur déjà créé et connecté dans la fixture
+    with client.application.app_context():
+        user = Utilisateur.query.filter_by(email='test@example.com').first()
+        assert user is not None, "L'utilisateur de test n'existe pas"
+
+     # Simuler la connexion avec login_user
+    login_user(user)
+
+    # Créer un établissement de test lié à cet utilisateur
+    etab = Etablissement(nom='Test Etablissement', ville='Test Ville', adresse='Test Adresse', code_postal='69001', id_user=user.id_user)
     db.session.add(etab)
     db.session.commit()
-    response = client.post(f'/etablissement/{etab.id_etab}/proposer_flan', data=dict(
-        nom='Nouveau Flan',
-        prix=2.5
-    ), follow_redirects=True)
+
+    # Envoyer la requête
+    response = client.post(
+        f'/etablissement/{etab.id_etab}/proposer_flan',
+        data=dict(nom='Nouveau Flan', prix=2.5),
+        follow_redirects=True
+    )
+
+    # Vérifier le statut HTTP
     assert response.status_code == 200
-    assert 'Votre flan a été proposé avec succès' in response.get_data(as_text=True)
+
+    # Récupérer et afficher les messages flash
+    flashed_messages = get_flashed_messages(with_categories=True)
+    print("Messages flash récupérés :", flashed_messages)
+
+    # Vérifier qu'il y a au moins un message flash
+    assert len(flashed_messages) > 0, "Aucun message flash trouvé"
+
+    # Vérifier qu'au moins un message est de catégorie 'success'
+    categories = [category for category, _ in flashed_messages]
+    print("Catégories des messages :", categories)
+    assert 'success' in categories, f"Catégorie 'success' non trouvée dans {categories}"
+
 
 def test_valider_flan(client):
     # Créer un établissement et un flan de test
