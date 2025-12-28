@@ -374,3 +374,151 @@ def test_supprimer_evaluation(client):
     with client.application.app_context():
         deleted_eval = Evaluation.query.get(eval_id)
         assert deleted_eval is None, "L'évaluation n'a pas été supprimée de la base de données"
+
+def test_dashboard_get(client):
+    """Test la route dashboard en GET"""
+    response = client.get('/dashboard')
+    assert response.status_code == 200
+    assert b'Tableau de bord' in response.data
+
+def test_dashboard_post_update_profile(client):
+    """Test la mise à jour du profil via le dashboard"""
+    user = client.application.config['TEST_USER']
+    
+    # Envoyer une requête POST pour mettre à jour le profil
+    response = client.post('/dashboard', data={
+        'profile-pseudo': 'new_pseudo',
+        'profile-email': 'new_email@example.com',
+        'profile-current_password': 'password',
+        'profile-new_password': 'new_password',
+        'profile-confirm_password': 'new_password'
+    }, follow_redirects=True)
+    
+    assert response.status_code == 200
+    
+    # Vérifier que le profil a été mis à jour
+    with client.application.app_context():
+        updated_user = Utilisateur.query.get(user.id_user)
+        assert updated_user.pseudo == 'new_pseudo'
+        assert updated_user.email == 'new_email@example.com'
+        # Vérifier que le mot de passe a été mis à jour (on vérifie juste qu'il a changé)
+        assert updated_user.password != user.password
+
+def test_afficher_etablissement_unique_get(client):
+    """Test l'affichage d'un établissement unique"""
+    user = client.application.config['TEST_USER']
+    
+    # Créer un établissement de test
+    with client.application.app_context():
+        etab = Etablissement(nom='Test Etablissement', adresse='Test Adresse', code_postal='69001', ville='Test Ville', id_user=user.id_user)
+        db.session.add(etab)
+        db.session.commit()
+        etab_id = etab.id_etab
+    
+    # Accéder à la page de l'établissement
+    response = client.get(f'/etablissement/{etab_id}')
+    assert response.status_code == 200
+    assert b'Test Etablissement' in response.data
+
+def test_afficher_etablissement_unique_post_update(client):
+    """Test la mise à jour d'un établissement"""
+    user = client.application.config['TEST_USER']
+    
+    # Créer un établissement de test
+    with client.application.app_context():
+        etab = Etablissement(nom='Test Etablissement', adresse='Test Adresse', code_postal='69001', ville='Test Ville', id_user=user.id_user)
+        db.session.add(etab)
+        db.session.commit()
+        etab_id = etab.id_etab
+    
+    # Mettre à jour l'établissement
+    response = client.post(f'/etablissement/{etab_id}', data={
+        'edit-etab-nom': 'Nouveau Nom',
+        'edit-etab-description': 'Nouvelle description',
+        'edit-etab-adresse': 'Nouvelle adresse',
+        'edit-etab-ville': 'Nouvelle ville',
+        'edit-etab-code_postal': '69002',
+        'edit-etab-latitude': '45.75',
+        'edit-etab-longitude': '4.85',
+        'edit-etab-type_etab': 'BOULANGERIE',
+        'edit-etab-label': True,
+        'edit-etab-visite': True
+    }, follow_redirects=True)
+    
+    assert response.status_code == 200
+    
+    # Vérifier que l'établissement a été mis à jour
+    with client.application.app_context():
+        updated_etab = Etablissement.query.get(etab_id)
+        assert updated_etab.nom == 'Nouveau Nom'
+        assert updated_etab.description == 'Nouvelle description'
+
+def test_afficher_flan_unique_get(client):
+    """Test l'affichage d'un flan unique"""
+    user = client.application.config['TEST_USER']
+    
+    # Créer un établissement et un flan de test
+    with client.application.app_context():
+        etab = Etablissement(nom='Test Etablissement', adresse='Test Adresse', code_postal='69001', ville='Test Ville', id_user=user.id_user)
+        db.session.add(etab)
+        db.session.commit()
+        
+        flan = Flan(nom='Test Flan', prix=2.5, id_etab=etab.id_etab, id_user=user.id_user)
+        db.session.add(flan)
+        db.session.commit()
+        flan_id = flan.id_flan
+    
+    # Accéder à la page du flan
+    response = client.get(f'/flan/{flan_id}')
+    assert response.status_code == 200
+    assert b'Test Flan' in response.data
+
+def test_afficher_flan_unique_post_update(client):
+    """Test la mise à jour d'un flan"""
+    user = client.application.config['TEST_USER']
+    
+    # Créer un établissement et un flan de test
+    with client.application.app_context():
+        etab = Etablissement(nom='Test Etablissement', adresse='Test Adresse', code_postal='69001', ville='Test Ville', id_user=user.id_user)
+        db.session.add(etab)
+        db.session.commit()
+        
+        flan = Flan(nom='Test Flan', prix=2.5, id_etab=etab.id_etab, id_user=user.id_user)
+        db.session.add(flan)
+        db.session.commit()
+        flan_id = flan.id_flan
+    
+    # Mettre à jour le flan
+    response = client.post(f'/flan/{flan_id}', data={
+        'edit-flan-nom': 'Nouveau Flan',
+        'edit-flan-description': 'Nouvelle description',
+        'edit-flan-prix': 3.0,
+        'edit-flan-type_pate': 'BRISEE',
+        'edit-flan-type_saveur': 'VANILLE',
+        'edit-flan-type_texture': 'CREMEUSE'
+    }, follow_redirects=True)
+    
+    assert response.status_code == 200
+    
+    # Vérifier que le flan a été mis à jour
+    with client.application.app_context():
+        updated_flan = Flan.query.get(flan_id)
+        assert updated_flan.nom == 'Nouveau Flan'
+        assert updated_flan.prix == 3.0
+
+def test_get_infowindow_content(client):
+    """Test la route get_infowindow_content"""
+    user = client.application.config['TEST_USER']
+    
+    # Créer un établissement de test
+    with client.application.app_context():
+        etab = Etablissement(nom='Test Etablissement', adresse='Test Adresse', code_postal='69001', ville='Test Ville', id_user=user.id_user)
+        db.session.add(etab)
+        db.session.commit()
+        etab_id = etab.id_etab
+    
+    # Appeler la route pour obtenir le contenu de l'infowindow
+    response = client.get(f'/get_infowindow_content?id_etab={etab_id}')
+    assert response.status_code == 200
+    assert b'Test Etablissement' in response.data
+
