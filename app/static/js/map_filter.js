@@ -198,7 +198,22 @@ function initMap() {
 
     // Ajouter le marqueur utilisateur si position disponible
     createUserMarker();
+
+    // Légende
+    const legend = L.control({ position: 'bottomright' });
+    legend.onAdd = function() {
+        const div = L.DomUtil.create('div', 'info legend');
+        div.style.backgroundColor = 'white';
+        div.style.padding = '5px';
+        div.style.margin = '10px';
+        div.style.border = '1px solid #ccc';
+        div.innerHTML = `❤️ Labellisé ✅ Visité 👋 Non visité`;
+        return div;
+    };
+    legend.addTo(map);
 }
+
+        icon = createEmojiIcon('', 'unvisited-icon');//
 
 // Chargement des établissements
 function loadEtablissements() {
@@ -292,13 +307,18 @@ function setupGeolocation() {
         );
     });
 
-    // Gestion du rayon de proximité (inchangé)
+    // Gestion du rayon de proximité
     document.getElementById('proximity-radius').addEventListener('change', function() {
         proximityRadius = parseInt(this.value);
  
         updateMarkersBasedOnFilters();
     });
 }
+
+
+
+
+//FILTRES
 
 
 // Fonction pour mettre à jour l'état des boutons actifs
