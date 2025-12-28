@@ -260,3 +260,5 @@ def test_supprimer_etablissement_route(client):
     with client.application.app_context():
         deleted_etab = Etablissement.query.get(etab_id)
         assert deleted_etab is None, "L'établissement n'a pas été supprimé"
+
+
