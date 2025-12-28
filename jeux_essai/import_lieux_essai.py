@@ -7,8 +7,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 # Configuration de l'application Flask en standalone
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:@localhost/planflan_db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://flask_user:flanflask@localhost/planflan_db'
+
 
 # Initialisation de SQLAlchemy
 db = SQLAlchemy(app)

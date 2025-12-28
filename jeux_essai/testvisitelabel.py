@@ -3,8 +3,8 @@ from sqlalchemy.orm import sessionmaker
 import random
 
 # Configuration de la connexion à la base de données
-# Remplacez par vos informations de connexion
-DATABASE_URI = 'mysql://root:@localhost/planflan_db'
+
+DATABASE_URI = 'mysql+pymysql://flask_user:flanflask@localhost/planflan_db'
 engine = create_engine(DATABASE_URI)
 Session = sessionmaker(bind=engine)
 session = Session()

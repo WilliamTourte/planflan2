@@ -140,7 +140,7 @@ class Flan(db.Model):
     statut = db.Column(db.Enum(StatutModeration), nullable=False, server_default='EN_ATTENTE')
 
     # Clé étrangère pour l'utilisateur
-    id_user = db.Column(db.Integer, db.ForeignKey('utilisateurs.id_user'), nullable=False, index=True)
+    id_user = db.Column(db.Integer, db.ForeignKey('utilisateurs.id_user'), nullable=False, index=True, default="1")
 
     # Relations
     evaluations = db.relationship('Evaluation', back_populates='flan', lazy=True, cascade="all, delete-orphan")
