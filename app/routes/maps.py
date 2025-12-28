@@ -255,7 +255,7 @@ def valider_etablissement(id_etab):
         return redirect(url_for('main.index'))
 
     # Mettre à jour le statut de l'établissement
-    etablissement.statut = 'valide'
+    etablissement.statut = 'VALIDE'
     db.session.commit()
     flash('Établissement validé avec succès !', 'success')
     return redirect(url_for('main.index'))
