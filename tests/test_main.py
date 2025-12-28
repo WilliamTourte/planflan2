@@ -474,3 +474,138 @@ def test_get_infowindow_content(client):
     assert response.status_code == 200
     assert b'Test Etablissement' in response.data
 
+def test_liste_etablissements_avec_recherche_simple(client):
+    """Test la route liste_etablissements avec une recherche simple"""
+    user = client.application.config['TEST_USER']
+    
+    # Créer des établissements de test
+    with client.application.app_context():
+        etab1 = Etablissement(nom='Boulangerie Test', adresse='Test Adresse', code_postal='69001', ville='Lyon', id_user=user.id_user)
+        etab2 = Etablissement(nom='Autre Etablissement', adresse='Autre Adresse', code_postal='69002', ville='Paris', id_user=user.id_user)
+        db.session.add_all([etab1, etab2])
+        db.session.commit()
+    
+    # Rechercher avec un terme qui correspond à un établissement
+    response = client.get('/liste_etablissements?recherche_simple=Boulangerie')
+    assert response.status_code == 200
+    assert b'Boulangerie Test' in response.data
+    
+    # Rechercher avec un terme qui correspond à une ville
+    response = client.get('/liste_etablissements?recherche_simple=Lyon')
+    assert response.status_code == 200
+    assert b'Boulangerie Test' in response.data
+
+def test_liste_etablissements_avec_filtres_avances(client):
+    """Test la route liste_etablissements avec des filtres avancés"""
+    user = client.application.config['TEST_USER']
+    
+    # Créer des établissements et flans de test
+    with client.application.app_context():
+        etab1 = Etablissement(nom='Boulangerie Test', adresse='Test Adresse', code_postal='69001', ville='Lyon', id_user=user.id_user, visite=True, label=False)
+        etab2 = Etablissement(nom='Patisserie Test', adresse='Autre Adresse', code_postal='69002', ville='Lyon', id_user=user.id_user, visite=False, label=True)
+        db.session.add_all([etab1, etab2])
+        db.session.commit()
+        
+        # Créer des flans pour les tests
+        flan1 = Flan(nom='Flan Vanille', prix=2.0, type_pate='BRISEE', type_saveur='VANILLE', type_texture='CREMEUSE', id_etab=etab1.id_etab, id_user=user.id_user)
+        flan2 = Flan(nom='Flan Fruits', prix=3.5, type_pate='SABLEE', type_saveur='FRUITS', type_texture='GELATINEUSE', id_etab=etab2.id_etab, id_user=user.id_user)
+        db.session.add_all([flan1, flan2])
+        db.session.commit()
+    
+    # Test filtre par visite
+    response = client.get('/liste_etablissements?visite=oui')
+    assert response.status_code == 200
+    assert b'Boulangerie Test' in response.data
+    
+    # Test filtre par labellisé
+    response = client.get('/liste_etablissements?labellise=oui')
+    assert response.status_code == 200
+    assert b'Patisserie Test' in response.data
+    
+    # Test filtre par type de pâte
+    response = client.get('/liste_etablissements?type_pate=BRISEE')
+    assert response.status_code == 200
+    assert b'Boulangerie Test' in response.data
+    
+    # Test filtre par type de saveur
+    response = client.get('/liste_etablissements?type_saveur=FRUITS')
+    assert response.status_code == 200
+    assert b'Patisserie Test' in response.data
+    
+    # Test filtre par prix
+    response = client.get('/liste_etablissements?prix=0')  # Moins de 2.5€
+    assert response.status_code == 200
+    assert b'Boulangerie Test' in response.data
+
+def test_liste_etablissements_post_recherche(client):
+    """Test la route liste_etablissements avec une recherche POST"""
+    user = client.application.config['TEST_USER']
+    
+    # Créer des établissements de test
+    with client.application.app_context():
+        etab1 = Etablissement(nom='Boulangerie Test', adresse='Test Adresse', code_postal='69001', ville='Lyon', id_user=user.id_user)
+        etab2 = Etablissement(nom='Autre Etablissement', adresse='Autre Adresse', code_postal='69002', ville='Paris', id_user=user.id_user)
+        db.session.add_all([etab1, etab2])
+        db.session.commit()
+    
+    # Rechercher avec une requête POST
+    response = client.post('/liste_etablissements', data={
+        'nom': 'Boulangerie',
+        'ville': 'Lyon'
+    })
+    assert response.status_code == 200
+    assert b'Boulangerie Test' in response.data
+
+def test_rechercher_route(client):
+    """Test la route rechercher"""
+    response = client.get('/rechercher')
+    assert response.status_code == 200
+    assert b'Rechercher' in response.data
+
+def test_index_route(client):
+    """Test la route index"""
+    response = client.get('/')
+    assert response.status_code == 200
+    assert b'PlanFlan' in response.data
+
+
+
+def test_filtrer_etablissements_directement(client):
+    """Test la fonction filtrer_etablissements directement"""
+    from app.routes.main import filtrer_etablissements
+    
+    user = client.application.config['TEST_USER']
+    
+    # Créer des données de test
+    with client.application.app_context():
+        etab1 = Etablissement(nom='Boulangerie A', adresse='Test', code_postal='69001', ville='Lyon', id_user=user.id_user, visite=True)
+        etab2 = Etablissement(nom='Boulangerie B', adresse='Test', code_postal='69002', ville='Paris', id_user=user.id_user, visite=False)
+        db.session.add_all([etab1, etab2])
+        db.session.commit()
+        
+        # Créer la requête de base
+        query = Etablissement.query
+        
+        # Tester le filtre par nom
+        filtered = filtrer_etablissements(query, nom='Boulangerie A')
+        results = filtered.all()
+        assert len(results) == 1
+        assert results[0].nom == 'Boulangerie A'
+        
+        # Tester le filtre par ville
+        filtered = filtrer_etablissements(query, ville='Paris')
+        results = filtered.all()
+        assert len(results) == 1
+        assert results[0].ville == 'Paris'
+        
+        # Tester le filtre par visite
+        filtered = filtrer_etablissements(query, visite='oui')
+        results = filtered.all()
+        assert len(results) == 1
+        assert results[0].visite == True
+        
+        # Tester le filtre par labellisé
+        filtered = filtrer_etablissements(query, labellise='non')
+        results = filtered.all()
+        assert len(results) == 2  # Aucun n'est labellisé
+
