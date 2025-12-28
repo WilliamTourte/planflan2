@@ -536,6 +536,17 @@ def test_liste_etablissements_avec_filtres_avances(client):
     response = client.get('/liste_etablissements?prix=0')  # Moins de 2.5€
     assert response.status_code == 200
     assert b'Boulangerie Test' in response.data
+    
+    # Test filtre par type de texture
+    response = client.get('/liste_etablissements?type_texture=CREMEUSE')
+    assert response.status_code == 200
+    assert b'Boulangerie Test' in response.data
+    assert b'Patisserie Test' not in response.data
+    
+    response = client.get('/liste_etablissements?type_texture=GELATINEUSE')
+    assert response.status_code == 200
+    assert b'Patisserie Test' in response.data
+    assert b'Boulangerie Test' not in response.data
 
 def test_liste_etablissements_post_recherche(client):
     """Test la route liste_etablissements avec une recherche POST"""
@@ -555,6 +566,246 @@ def test_liste_etablissements_post_recherche(client):
     })
     assert response.status_code == 200
     assert b'Boulangerie Test' in response.data
+
+
+def test_liste_etablissements_filtre_proximite(client):
+    """Test la route liste_etablissements avec un filtre par proximité"""
+    user = client.application.config['TEST_USER']
+    
+    # Créer des établissements de test avec des coordonnées géographiques
+    with client.application.app_context():
+        # Lyon centre (45.7640, 4.8357)
+        etab1 = Etablissement(
+            nom='Boulangerie Lyon Centre', 
+            adresse='1 rue de la République', 
+            code_postal='69001', 
+            ville='Lyon', 
+            latitude=45.7640, 
+            longitude=4.8357,
+            id_user=user.id_user
+        )
+        
+        # Lyon Part-Dieu (45.7580, 4.8540) - à environ 1.5km du centre
+        etab2 = Etablissement(
+            nom='Boulangerie Part-Dieu', 
+            adresse='10 rue de la Gare', 
+            code_postal='69003', 
+            ville='Lyon', 
+            latitude=45.7580, 
+            longitude=4.8540,
+            id_user=user.id_user
+        )
+        
+        # Villeurbanne (45.7600, 4.8800) - à environ 4km du centre
+        etab3 = Etablissement(
+            nom='Boulangerie Villeurbanne', 
+            adresse='5 avenue Henri Barbusse', 
+            code_postal='69100', 
+            ville='Villeurbanne', 
+            latitude=45.7600, 
+            longitude=4.8800,
+            id_user=user.id_user
+        )
+        
+        db.session.add_all([etab1, etab2, etab3])
+        db.session.commit()
+    
+    # Test 1: Filtrer avec un rayon de 2km depuis le centre de Lyon
+    # Devrait inclure les établissements 1 et 2, mais pas 3
+    response = client.get('/liste_etablissements', query_string={
+        'latitude': 45.7640,
+        'longitude': 4.8357,
+        'rayon': 2.0
+    })
+    assert response.status_code == 200
+    assert b'Boulangerie Lyon Centre' in response.data
+    assert b'Boulangerie Part-Dieu' in response.data
+    assert b'Boulangerie Villeurbanne' not in response.data
+    
+    # Test 2: Filtrer avec un rayon de 5km depuis le centre de Lyon
+    # Devrait inclure tous les établissements
+    response = client.get('/liste_etablissements', query_string={
+        'latitude': 45.7640,
+        'longitude': 4.8357,
+        'rayon': 5.0
+    })
+    assert response.status_code == 200
+    assert b'Boulangerie Lyon Centre' in response.data
+    assert b'Boulangerie Part-Dieu' in response.data
+    assert b'Boulangerie Villeurbanne' in response.data
+    
+    # Test 3: Filtrer avec un rayon très petit (500m)
+    # Devrait inclure seulement l'établissement 1
+    response = client.get('/liste_etablissements', query_string={
+        'latitude': 45.7640,
+        'longitude': 4.8357,
+        'rayon': 0.5
+    })
+    assert response.status_code == 200
+    assert b'Boulangerie Lyon Centre' in response.data
+    assert b'Boulangerie Part-Dieu' not in response.data
+    assert b'Boulangerie Villeurbanne' not in response.data
+
+
+def test_liste_etablissements_filtre_proximite_sans_coordonnees(client):
+    """Test la route liste_etablissements avec filtre proximité mais sans coordonnées"""
+    user = client.application.config['TEST_USER']
+    
+    # Créer des établissements de test
+    with client.application.app_context():
+        etab1 = Etablissement(nom='Boulangerie Test', adresse='Test Adresse', code_postal='69001', ville='Lyon', id_user=user.id_user)
+        etab2 = Etablissement(nom='Autre Etablissement', adresse='Autre Adresse', code_postal='69002', ville='Paris', id_user=user.id_user)
+        db.session.add_all([etab1, etab2])
+        db.session.commit()
+    
+    # Appeler la route avec un rayon mais sans coordonnées
+    # Devrait retourner tous les établissements (pas de filtre appliqué)
+    response = client.get('/liste_etablissements', query_string={
+        'rayon': 5.0
+    })
+    assert response.status_code == 200
+    assert b'Boulangerie Test' in response.data
+    assert b'Autre Etablissement' in response.data
+
+
+def test_liste_etablissements_filtre_proximite_etablissements_sans_coordonnees(client):
+    """Test la route liste_etablissements avec filtre proximité quand certains établissements n'ont pas de coordonnées"""
+    user = client.application.config['TEST_USER']
+    
+    # Créer des établissements de test, certains sans coordonnées
+    with client.application.app_context():
+        etab1 = Etablissement(
+            nom='Boulangerie Avec Coords', 
+            adresse='Test Adresse', 
+            code_postal='69001', 
+            ville='Lyon', 
+            latitude=45.7640, 
+            longitude=4.8357,
+            id_user=user.id_user
+        )
+        
+        etab2 = Etablissement(
+            nom='Boulangerie Sans Coords', 
+            adresse='Autre Adresse', 
+            code_postal='69002', 
+            ville='Paris',
+            id_user=user.id_user
+        )
+        
+        db.session.add_all([etab1, etab2])
+        db.session.commit()
+    
+    # Filtrer avec un rayon de 1km depuis le centre de Lyon
+    # Devrait inclure seulement l'établissement avec coordonnées
+    response = client.get('/liste_etablissements', query_string={
+        'latitude': 45.7640,
+        'longitude': 4.8357,
+        'rayon': 1.0
+    })
+    assert response.status_code == 200
+    assert b'Boulangerie Avec Coords' in response.data
+    # L'établissement sans coordonnées ne devrait pas apparaître dans les résultats filtrés
+    # Note: Cela dépend de l'implémentation - certains pourraient choisir de l'inclure ou non
+
+
+def test_liste_etablissements_cas_limites_valeurs_vides(client):
+    """Test la route liste_etablissements avec des valeurs vides ou None"""
+    user = client.application.config['TEST_USER']
+    
+    # Créer des établissements de test
+    with client.application.app_context():
+        etab1 = Etablissement(nom='Boulangerie Test', adresse='Test Adresse', code_postal='69001', ville='Lyon', id_user=user.id_user)
+        etab2 = Etablissement(nom='Autre Etablissement', adresse='Autre Adresse', code_postal='69002', ville='Paris', id_user=user.id_user)
+        db.session.add_all([etab1, etab2])
+        db.session.commit()
+    
+    # Test avec des valeurs vides
+    response = client.get('/liste_etablissements', query_string={
+        'nom': '',
+        'ville': '',
+        'visite': '',
+        'labellise': ''
+    })
+    assert response.status_code == 200
+    # Devrait retourner tous les établissements
+    assert b'Boulangerie Test' in response.data
+    assert b'Autre Etablissement' in response.data
+
+
+def test_liste_etablissements_cas_limites_caracteres_speciaux(client):
+    """Test la route liste_etablissements avec des caractères spéciaux"""
+    user = client.application.config['TEST_USER']
+    
+    # Créer des établissements de test avec des caractères spéciaux
+    with client.application.app_context():
+        etab1 = Etablissement(nom="Boulangerie 'L'Épi Doré'", adresse='Test Adresse', code_postal='69001', ville='Lyon', id_user=user.id_user)
+        etab2 = Etablissement(nom='Café & Restaurant', adresse='Autre Adresse', code_postal='69002', ville='Paris', id_user=user.id_user)
+        db.session.add_all([etab1, etab2])
+        db.session.commit()
+    
+    # Test recherche avec caractères spéciaux
+    response = client.get('/liste_etablissements', query_string={
+        'recherche_simple': "Épi"
+    })
+    assert response.status_code == 200
+    assert b"L'Épi Doré" in response.data
+    
+    response = client.get('/liste_etablissements', query_string={
+        'recherche_simple': "Café"
+    })
+    assert response.status_code == 200
+    assert b'Café & Restaurant' in response.data
+
+
+def test_liste_etablissements_cas_limites_aucune_correspondance(client):
+    """Test la route liste_etablissements quand aucun établissement ne correspond"""
+    user = client.application.config['TEST_USER']
+    
+    # Créer des établissements de test
+    with client.application.app_context():
+        etab1 = Etablissement(nom='Boulangerie Test', adresse='Test Adresse', code_postal='69001', ville='Lyon', id_user=user.id_user)
+        etab2 = Etablissement(nom='Autre Etablissement', adresse='Autre Adresse', code_postal='69002', ville='Paris', id_user=user.id_user)
+        db.session.add_all([etab1, etab2])
+        db.session.commit()
+    
+    # Test avec une recherche qui ne correspond à rien
+    response = client.get('/liste_etablissements', query_string={
+        'recherche_simple': 'Restaurant Inconnu'
+    })
+    assert response.status_code == 200
+    # Devrait retourner une page vide ou un message approprié
+    # Vérifier que les établissements existants ne sont pas présents
+    assert b'Boulangerie Test' not in response.data
+    assert b'Autre Etablissement' not in response.data
+    
+    # Test avec des filtres qui ne correspondent à rien
+    response = client.get('/liste_etablissements', query_string={
+        'ville': 'Marseille',
+        'visite': 'oui'
+    })
+    assert response.status_code == 200
+    # Devrait retourner une page vide ou un message approprié
+
+
+def test_liste_etablissements_cas_limites_valeurs_invalides(client):
+    """Test la route liste_etablissements avec des valeurs invalides"""
+    user = client.application.config['TEST_USER']
+    
+    # Créer des établissements de test
+    with client.application.app_context():
+        etab1 = Etablissement(nom='Boulangerie Test', adresse='Test Adresse', code_postal='69001', ville='Lyon', id_user=user.id_user)
+        db.session.add(etab1)
+        db.session.commit()
+    
+    # Test avec des valeurs invalides pour les filtres
+    response = client.get('/liste_etablissements', query_string={
+        'visite': 'invalide',  # Valeur invalide pour visite
+        'labellise': 'peut-etre',  # Valeur invalide pour labellise
+        'prix': 'inconnu'  # Valeur invalide pour prix
+    })
+    assert response.status_code == 200
+    # Devrait gérer les valeurs invalides gracieusement et retourner les résultats
+    # ou ignorer les filtres invalides
 
 def test_rechercher_route(client):
     """Test la route rechercher"""
