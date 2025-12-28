@@ -1,57 +1,9 @@
-from app import create_app, db
-from app.config import TestConfig
-import pytest
-
+from app import db
 from app.models import Etablissement, Flan, Evaluation, Utilisateur
 from app.forms import RechercheForm, EtabForm, NewFlanForm, EvalForm, UpdateProfileForm, DeleteForm, ValidateForm
-from flask_login import current_user, login_user
-from flask import session, template_rendered, request
+from flask_login import current_user
 from flask import get_flashed_messages
-
-from flask_bcrypt import Bcrypt
-
-@pytest.fixture
-def client():
-    app = create_app(TestConfig)
-    app.config['TESTING'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-    app.config['WTF_CSRF_ENABLED'] = False  # Désactiver CSRF pour les tests
-
-    with app.test_client() as client:
-        with app.app_context():
-            db.create_all()
-            # Créer des données de test avec mot de passe haché
-            bcrypt = Bcrypt()
-            user = Utilisateur(pseudo='testuser', email='test@example.com', is_admin=True)
-            user.set_password('password', bcrypt)
-            db.session.add(user)
-            db.session.commit()
-            
-            # Vérifier que l'utilisateur a bien été créé
-            created_user = Utilisateur.query.filter_by(email='test@example.com').first()
-            assert created_user is not None, "L'utilisateur de test n'a pas été créé"
-            assert created_user.is_admin == True, "L'utilisateur n'est pas admin"
-            
-            # Connexion de l'utilisateur - utiliser 'pseudo' au lieu de 'email' comme dans la route /login
-            login_response = client.post('/login', data=dict(
-                pseudo='testuser',  # Utiliser le pseudo au lieu de l'email
-                password='password'
-            ), follow_redirects=True)
-            
-            # Vérifier que la connexion a réussi
-            assert login_response.status_code == 200, f"La connexion a échoué avec le statut {login_response.status_code}"
-            
-            # Vérifier que l'utilisateur est bien connecté en vérifiant la session
-            with client.session_transaction() as sess:
-                print("Contenu de la session après connexion:", dict(sess))
-                if 'user_id' in sess:
-                    print(f"Utilisateur connecté avec ID: {sess['user_id']}")
-                else:
-                    print("Avertissement: user_id non trouvé dans la session")
-            
-            # Stocker l'utilisateur créé pour les tests
-            app.config['TEST_USER'] = created_user
-        yield client
+import pytest
 
 
 def test_example(client):
