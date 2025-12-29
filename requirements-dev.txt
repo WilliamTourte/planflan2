@@ -1,0 +1,21 @@
+# Dépendances de développement pour PlanFlan
+
+# Testing
+pytest==9.0.2
+pytest-cov==7.0.0
+coverage==7.5.1
+
+# Linting (optionnel - à décommenter si utilisé)
+# flake8==7.0.0
+# pylint==3.1.0
+# black==24.3.0
+# isort==5.13.2
+
+# Type checking (optionnel)
+# mypy==1.9.0
+# types-flask==1.1.11
+# types-flask-sqlalchemy==2.5.7
+
+# Documentation (optionnel)
+# sphinx==7.2.6
+# sphinx-rtd-theme==2.0.0
