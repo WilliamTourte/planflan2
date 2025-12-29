@@ -184,7 +184,7 @@ def validate_optional_number_field(form, field):
 class RechercheForm(FlaskForm):
     latitude = HiddenField()  # Champ caché pour la latitude (sans validateur par défaut)
     longitude = HiddenField()  # Champ caché pour la longitude (sans validateur par défaut)
-    rayon = FloatField('Rayon (km)', default=5.0)  # Optionnel : laisser l'utilisateur choisir le rayon
+    rayon = StringField('Rayon (km)', default='5.0')  # Optionnel : laisser l'utilisateur choisir le rayon
     nom = StringField('Nom', validators=[Optional(), Length(min=3, max=50, message='Doit contenir entre %(min)d et %(max)d caractères.')])
     ville = StringField('Ville', validators=[Optional(), Length(min=3, max=50, message='Doit contenir entre %(min)d et %(max)d caractères.')])
     type_saveur = SelectField('Saveur', choices=[('tous', 'Tous')] + [(choice.name, choice.value) for choice in TypeSaveur], default='tous')
