@@ -143,10 +143,26 @@ class EvalForm(FlaskForm):
     description = StringField('Description', validators=[Length(min=0, max=1000, message='Doit contenir entre %(min)d et %(max)d caractères.')]) #Vérifier si obligatoire dans base de données
     submit = SubmitField('Proposer une évaluation')
 
+# Custom validator for optional numeric fields
+def validate_optional_number(form, field, min_val, max_val, message):
+    if field.data is None or field.data == '':
+        return  # Skip validation if empty
+    
+    try:
+        # Try to convert to float
+        num_value = float(field.data)
+        
+        # Check if it's a valid number (not NaN, not infinity)
+        if not (min_val <= num_value <= max_val):
+            raise ValidationError(message)
+    except (ValueError, TypeError):
+        # If conversion fails, it's not a valid number
+        raise ValidationError(message)
+
 # Formulaire de recherche
 class RechercheForm(FlaskForm):
-    latitude = HiddenField(validators=[NumberRange(min=-90, max=90, message='Doit être compris entre -90 et 90.')])  # Champ caché pour la latitude
-    longitude = HiddenField(validators=[NumberRange(min=-180, max=180, message='Doit être compris entre -180 et 180.')])  # Champ caché pour la longitude
+    latitude = HiddenField()  # Champ caché pour la latitude (sans validateur par défaut)
+    longitude = HiddenField()  # Champ caché pour la longitude (sans validateur par défaut)
     rayon = FloatField('Rayon (km)', default=5.0, validators=[NumberRange(min=0, message='Doit être supérieur ou égal à 0.')])  # Optionnel : laisser l'utilisateur choisir le rayon
     nom = StringField('Nom', validators=[Optional(), Length(min=3, max=50, message='Doit contenir entre %(min)d et %(max)d caractères.')])
     ville = StringField('Ville', validators=[Optional(), Length(min=3, max=50, message='Doit contenir entre %(min)d et %(max)d caractères.')])
@@ -159,6 +175,12 @@ class RechercheForm(FlaskForm):
     # SEULEMENT POUR ADMIN #
     visite = RadioField('Visité', choices=[('tous', 'Tous'), ('oui', 'Oui'), ('non', 'Non')], default='tous')
     labellise = RadioField('Labellisé', choices=[('tous', 'Tous'), ('oui', 'Oui'), ('non', 'Non')], default='tous')
+    
+    def validate_latitude(form, field):
+        validate_optional_number(form, field, -90, 90, 'Doit être compris entre -90 et 90.')
+    
+    def validate_longitude(form, field):
+        validate_optional_number(form, field, -180, 180, 'Doit être compris entre -180 et 180.')
 
 # Formulaire pour modifier le profil de l'utilisateur
 class UpdateProfileForm(FlaskForm):
