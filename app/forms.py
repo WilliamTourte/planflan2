@@ -1,3 +1,4 @@
+import math
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, RadioField, HiddenField, \
@@ -159,11 +160,31 @@ def validate_optional_number(form, field, min_val, max_val, message):
         # If conversion fails, it's not a valid number
         raise ValidationError(message)
 
+# Custom validator for optional numeric fields that handles empty strings properly
+def validate_optional_number_field(form, field):
+    if field.data is None or field.data == '' or field.data is False:
+        return  # Skip validation if empty or False
+    
+    try:
+        # Try to convert to float
+        num_value = float(field.data)
+        
+        # Check if it's a valid number (not NaN, not infinity)
+        if math.isnan(num_value) or math.isinf(num_value):
+            raise ValidationError('Doit être un nombre valide.')
+        
+        # Check if the value is within valid range for rayon (>= 0)
+        if num_value < 0:
+            raise ValidationError('Doit être supérieur ou égal à 0.')
+    except (ValueError, TypeError, OverflowError):
+        # If conversion fails, it's not a valid number
+        raise ValidationError('Doit être un nombre valide.')
+
 # Formulaire de recherche
 class RechercheForm(FlaskForm):
     latitude = HiddenField()  # Champ caché pour la latitude (sans validateur par défaut)
     longitude = HiddenField()  # Champ caché pour la longitude (sans validateur par défaut)
-    rayon = FloatField('Rayon (km)', default=5.0, validators=[NumberRange(min=0, message='Doit être supérieur ou égal à 0.')])  # Optionnel : laisser l'utilisateur choisir le rayon
+    rayon = FloatField('Rayon (km)', default=5.0)  # Optionnel : laisser l'utilisateur choisir le rayon
     nom = StringField('Nom', validators=[Optional(), Length(min=3, max=50, message='Doit contenir entre %(min)d et %(max)d caractères.')])
     ville = StringField('Ville', validators=[Optional(), Length(min=3, max=50, message='Doit contenir entre %(min)d et %(max)d caractères.')])
     type_saveur = SelectField('Saveur', choices=[('tous', 'Tous')] + [(choice.name, choice.value) for choice in TypeSaveur], default='tous')
@@ -181,6 +202,9 @@ class RechercheForm(FlaskForm):
     
     def validate_longitude(form, field):
         validate_optional_number(form, field, -180, 180, 'Doit être compris entre -180 et 180.')
+    
+    def validate_rayon(form, field):
+        validate_optional_number_field(form, field)
 
 # Formulaire pour modifier le profil de l'utilisateur
 class UpdateProfileForm(FlaskForm):
