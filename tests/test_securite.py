@@ -511,7 +511,7 @@ def test_deconnexion_automatique_apres_inactivite(client, setup_data):
     """Test la déconnexion automatique après inactivité."""
     # Se connecter
     client.post('/login', data={
-        'email': 'test@example.com',
+        'pseudo': 'testuser',
         'password': 'password'
     }, follow_redirects=True)
     
@@ -528,7 +528,7 @@ def test_session_utilisateur_isolee(client, setup_data):
     """Test que les sessions utilisateur sont correctement isolées."""
     # Se connecter avec un utilisateur
     client.post('/login', data={
-        'email': 'test@example.com',
+        'pseudo': 'testuser',
         'password': 'password'
     }, follow_redirects=True)
     
@@ -555,7 +555,7 @@ def test_acces_api_avec_authentification(client, setup_data):
     """Test l'accès à l'API avec authentification."""
     # Se connecter
     client.post('/login', data={
-        'email': 'test@example.com',
+        'pseudo': 'testuser',
         'password': 'password'
     }, follow_redirects=True)
     
@@ -573,7 +573,7 @@ def test_upload_fichier_type_invalide(client, setup_data):
     """Test l'upload d'un fichier avec un type invalide."""
     # Se connecter
     client.post('/login', data={
-        'email': 'test@example.com',
+        'pseudo': 'testuser',
         'password': 'password'
     }, follow_redirects=True)
     
@@ -590,7 +590,7 @@ def test_upload_fichier_taille_excessive(client, setup_data):
     """Test l'upload d'un fichier avec une taille excessive."""
     # Se connecter
     client.post('/login', data={
-        'email': 'test@example.com',
+        'pseudo': 'testuser',
         'password': 'password'
     }, follow_redirects=True)
     
