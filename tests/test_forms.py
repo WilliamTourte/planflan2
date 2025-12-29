@@ -22,7 +22,7 @@ def app():
     app.config['WTF_CSRF_ENABLED'] = False
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
     
-    with app.app_context():
+    with client.application.app_context():
         db.create_all()
         yield app
         db.drop_all()
@@ -31,7 +31,7 @@ def app():
 @pytest.fixture
 def setup_data(app):
     """Crée des données de test pour les établissements et flans."""
-    with app.app_context():
+    with client.application.app_context():
         # Créer un utilisateur
         user = Utilisateur(
             pseudo='testuser',
@@ -74,9 +74,9 @@ def setup_data(app):
 
 # Tests pour EtabForm
 
-def test_etabform_donnees_valides(app, setup_data):
+def test_etabform_donnees_valides(client):
     """Test EtabForm avec des données valides."""
-    with app.app_context():
+    with client.application.app_context():
         form = EtabForm()
         
         # Remplir le formulaire avec des données valides
@@ -95,9 +95,9 @@ def test_etabform_donnees_valides(app, setup_data):
         assert form.validate()
 
 
-def test_etabform_donnees_invalides(app, setup_data):
+def test_etabform_donnees_invalides(client):
     """Test EtabForm avec des données invalides."""
-    with app.app_context():
+    with client.application.app_context():
         form = EtabForm()
         
         # Remplir le formulaire avec des données invalides
@@ -119,9 +119,9 @@ def test_etabform_donnees_invalides(app, setup_data):
         assert 'This field is required.' in str(form.ville.errors)
 
 
-def test_etabform_code_postal_invalide(app, setup_data):
+def test_etabform_code_postal_invalide(client):
     """Test EtabForm avec des codes postaux invalides."""
-    with app.app_context():
+    with client.application.app_context():
         form = EtabForm()
         
         # Remplir les champs requis pour que le formulaire soit valide
@@ -143,9 +143,9 @@ def test_etabform_code_postal_invalide(app, setup_data):
             assert 'Field must be exactly 5 characters long.' in str(form.code_postal.errors)
 
 
-def test_etabform_coordonnees_geographiques_invalides(app, setup_data):
+def test_etabform_coordonnees_geographiques_invalides(client):
     """Test EtabForm avec des coordonnées géographiques invalides."""
-    with app.app_context():
+    with client.application.app_context():
         form = EtabForm()
         
         # Coordonnées invalides
@@ -162,9 +162,9 @@ def test_etabform_coordonnees_geographiques_invalides(app, setup_data):
 
 # Tests pour NewFlanForm
 
-def test_newflanform_donnees_valides(app, setup_data):
+def test_newflanform_donnees_valides(client):
     """Test NewFlanForm avec des données valides."""
-    with app.app_context():
+    with client.application.app_context():
         form = NewFlanForm()
         
         # Remplir le formulaire avec des données valides
@@ -179,9 +179,9 @@ def test_newflanform_donnees_valides(app, setup_data):
         assert form.validate()
 
 
-def test_newflanform_donnees_invalides(app, setup_data):
+def test_newflanform_donnees_invalides(client):
     """Test NewFlanForm avec des données invalides."""
-    with app.app_context():
+    with client.application.app_context():
         form = NewFlanForm()
         
         # Remplir le formulaire avec des données invalides
@@ -201,9 +201,9 @@ def test_newflanform_donnees_invalides(app, setup_data):
         assert 'Le prix doit être compris entre 0 et 20€' in str(form.prix.errors)
 
 
-def test_newflanform_prix_invalide(app, setup_data):
+def test_newflanform_prix_invalide(client):
     """Test NewFlanForm avec des prix invalides."""
-    with app.app_context():
+    with client.application.app_context():
         form = NewFlanForm()
         
         # Tester différents prix invalides
@@ -239,9 +239,9 @@ def test_evalform_donnees_valides(client):
         assert form.validate()
 
 
-def test_evalform_donnees_invalides(app, setup_data):
+def test_evalform_donnees_invalides(client):
     """Test EvalForm avec des données invalides."""
-    with app.app_context():
+    with client.application.app_context():
         form = EvalForm()
         
         # Remplir le formulaire avec des données invalides
@@ -262,9 +262,9 @@ def test_evalform_donnees_invalides(app, setup_data):
         assert 'Field must be between 3 and 255 characters long.' in str(form.description.errors)
 
 
-def test_evalform_notes_hors_plage(app, setup_data):
+def test_evalform_notes_hors_plage(client):
     """Test EvalForm avec des notes hors de la plage valide."""
-    with app.app_context():
+    with client.application.app_context():
         form = EvalForm()
         
         # Tester différentes notes invalides
@@ -336,9 +336,9 @@ def test_updateprofileform_mots_de_passe_non_correspondants(client):
 
 # Tests pour RechercheForm
 
-def test_rechercheform_donnees_valides(app, setup_data):
+def test_rechercheform_donnees_valides(client):
     """Test RechercheForm avec des données valides."""
-    with app.app_context():
+    with client.application.app_context():
         form = RechercheForm()
         
         # Remplir le formulaire avec des données valides
@@ -359,9 +359,9 @@ def test_rechercheform_donnees_valides(app, setup_data):
 
 
 @pytest.mark.skip("Les champs de RechercheForm n'ont pas de validation spécifique")
-def test_rechercheform_donnees_invalides(app, setup_data):
+def test_rechercheform_donnees_invalides(client):
     """Test RechercheForm avec des données invalides."""
-    with app.app_context():
+    with client.application.app_context():
         form = RechercheForm()
         
         # Remplir le formulaire avec des données invalides
@@ -380,9 +380,9 @@ def test_rechercheform_donnees_invalides(app, setup_data):
 
 # Tests pour DeleteForm et ValidateForm
 
-def test_deleteform_validation(app, setup_data):
+def test_deleteform_validation(client):
     """Test DeleteForm validation."""
-    with app.app_context():
+    with client.application.app_context():
         form = DeleteForm()
         
         # Le formulaire devrait être valide sans données spécifiques
@@ -390,9 +390,9 @@ def test_deleteform_validation(app, setup_data):
         assert form.validate()
 
 
-def test_validateform_validation(app, setup_data):
+def test_validateform_validation(client):
     """Test ValidateForm validation."""
-    with app.app_context():
+    with client.application.app_context():
         form = ValidateForm()
         
         # Le formulaire devrait être valide sans données spécifiques
@@ -403,9 +403,9 @@ def test_validateform_validation(app, setup_data):
 # Tests d'intégration des formulaires
 
 @pytest.mark.skip("Nécessite des données en base de données")
-def test_formulaire_etablissement_avec_etablissement_existant(app, setup_data):
+def test_formulaire_etablissement_avec_etablissement_existant(client):
     """Test EtabForm pré-rempli avec un établissement existant."""
-    with app.app_context():
+    with client.application.app_context():
         etab = Etablissement.query.first()
         form = EtabForm(obj=etab)
         
@@ -419,9 +419,9 @@ def test_formulaire_etablissement_avec_etablissement_existant(app, setup_data):
 
 
 @pytest.mark.skip("Nécessite des données en base de données")
-def test_formulaire_flan_avec_flan_existant(app, setup_data):
+def test_formulaire_flan_avec_flan_existant(client):
     """Test NewFlanForm pré-rempli avec un flan existant."""
-    with app.app_context():
+    with client.application.app_context():
         flan = Flan.query.first()
         form = NewFlanForm(obj=flan)
         
@@ -435,9 +435,9 @@ def test_formulaire_flan_avec_flan_existant(app, setup_data):
 
 
 @pytest.mark.skip("Nécessite des données en base de données")
-def test_formulaire_evaluation_avec_evaluation_existante(app, setup_data):
+def test_formulaire_evaluation_avec_evaluation_existante(client):
     """Test EvalForm pré-rempli avec une évaluation existante."""
-    with app.app_context():
+    with client.application.app_context():
         # Créer une évaluation pour le test
         flan = Flan.query.first()
         user = Utilisateur.query.first()
