@@ -1,0 +1,19 @@
+[run]
+source = app
+omit =
+    app/static/*
+    app/templates/*
+    */__init__.py
+    */__pycache__/*
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    if TYPE_CHECKING:
+    @abstractmethod
+
+[html]
+directory = htmlcov

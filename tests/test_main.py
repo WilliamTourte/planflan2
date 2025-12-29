@@ -748,13 +748,13 @@ def test_liste_etablissements_cas_limites_caracteres_speciaux(client):
         'recherche_simple': "Épi"
     })
     assert response.status_code == 200
-    assert b"L'Épi Doré" in response.data
+    assert "L'Épi Doré".encode('utf-8') in response.data
     
     response = client.get('/liste_etablissements', query_string={
         'recherche_simple': "Café"
     })
     assert response.status_code == 200
-    assert b'Café & Restaurant' in response.data
+    assert "Café & Restaurant".encode('utf-8') in response.data
 
 
 def test_liste_etablissements_cas_limites_aucune_correspondance(client):
