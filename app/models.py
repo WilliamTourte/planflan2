@@ -28,6 +28,7 @@ class TypePate(Enum):
 
 class TypeSaveur(Enum):
     VANILLE = "Vanille"
+    CHOCOLAT = "Chocolat"
     NOIX = "Noix"
     FRUITS = "Fruits"
     INSOLITE = 'Insolite'
@@ -36,6 +37,7 @@ class TypeSaveur(Enum):
 class TypeTexture(Enum):
     GELATINEUSE = 'Gélatineuse'
     CREMEUSE = 'Crémeuse'
+    FONDANTE = 'Fondante'
     COSTAUD = 'Costaud'
     OEUF = 'Oeuf'
     MIX_PARFAIT = 'Mix parfait'
