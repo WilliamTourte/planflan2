@@ -1094,3 +1094,420 @@ input.back:hover {
     font-style: italic;
     color: #666;
 }
+
+/* =============================================
+   20. CLASSES SPECIFIQUES AJOUTEES
+   ============================================= */
+
+/* Classes pour les cartes */
+.carte-body {
+    padding: var(--padding-lg);
+}
+
+.carte-header {
+    padding: var(--padding-md);
+    border-bottom: 1px solid #eee;
+    background-color: var(--color-white);
+}
+
+.carte-form-edit {
+    background-color: #f8f9fa;
+    padding: var(--padding-md);
+    border-radius: var(--border-radius);
+    margin-bottom: var(--margin-md);
+}
+
+/* Classes pour les flans */
+.flan-attribute {
+    display: flex;
+    justify-content: space-between;
+    padding: var(--padding-sm) 0;
+    border-bottom: 1px solid #eee;
+}
+
+.flan-attribute:last-child {
+    border-bottom: none;
+}
+
+.flans-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.flans-count {
+    font-weight: bold;
+    color: var(--color-info);
+    margin-bottom: var(--margin-md);
+}
+
+/* Classes pour les évaluations */
+.evaluations-section {
+    margin-top: var(--margin-lg);
+    padding-top: var(--margin-lg);
+    border-top: 1px solid #eee;
+}
+
+.evaluations-title {
+    font-family: var(--font-bubblegum);
+    color: var(--color-secondary);
+    margin-bottom: var(--margin-md);
+}
+
+.evaluation-date-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--margin-sm);
+}
+
+/* Classes pour les adresses et descriptions */
+.adresse {
+    font-style: italic;
+    color: var(--color-text-light);
+    margin-bottom: var(--margin-sm);
+}
+
+.description {
+    color: var(--color-text);
+    line-height: 1.5;
+    margin-bottom: var(--margin-md);
+}
+
+/* Classes pour les types */
+.type {
+    display: inline-block;
+    padding: var(--padding-sm) var(--padding-md);
+    background-color: #f0f0f0;
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-sm);
+    margin-right: var(--margin-sm);
+}
+
+/* Classes pour les boutons spécifiques */
+.btn-submit {
+    background-color: var(--color-success);
+    color: var(--color-white);
+    padding: var(--padding-sm) var(--padding-lg);
+    font-weight: bold;
+}
+
+.btn-submit:hover {
+    background-color: var(--color-success-dark);
+}
+
+.btn-geolocate {
+    background-color: var(--color-info);
+    color: var(--color-white);
+}
+
+.btn-geolocate:hover {
+    background-color: var(--color-info-dark);
+}
+
+/* Classes pour les formulaires */
+.form-label {
+    display: block;
+    margin-bottom: var(--margin-sm);
+    font-weight: bold;
+    color: var(--color-text);
+}
+
+.form-select {
+    width: 100%;
+    padding: var(--padding-sm);
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    font-family: var(--font-primary);
+    background-color: var(--color-white);
+}
+
+/* Classes pour les gap */
+.gap-1 {
+    gap: var(--gap-sm);
+}
+
+.gap-2 {
+    gap: var(--gap-md);
+}
+
+/* Classes pour les marges */
+.mt-1 {
+    margin-top: var(--margin-sm);
+}
+
+.mt-3 {
+    margin-top: var(--margin-md);
+}
+
+.mt-5 {
+    margin-top: var(--margin-lg);
+}
+
+.mb-3 {
+    margin-bottom: var(--margin-md);
+}
+
+.mb-4 {
+    margin-bottom: var(--margin-lg);
+}
+
+/* Classes pour les classes spécifiques */
+.classe {
+    display: inline-block;
+    padding: var(--padding-sm) var(--padding-md);
+    background-color: #e3f2fd;
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-sm);
+    color: var(--color-info);
+}
+
+/* Classes pour les catégories */
+.category {
+    font-weight: bold;
+    color: var(--color-secondary);
+    margin-bottom: var(--margin-sm);
+}
+
+/* Classes pour les uploads */
+.upload {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-md);
+    margin-top: var(--margin-md);
+}
+
+.uploads {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--gap-md);
+}
+
+/* Classes pour les formulaires spécifiques */
+.etablissement-header {
+    background-color: var(--color-secondary);
+    color: var(--color-white);
+    padding: var(--padding-md) var(--padding-lg);
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    font-family: var(--font-bubblegum);
+    font-size: var(--font-size-lg);
+    margin-bottom: 0;
+}
+
+.etablissement-hidden-fields {
+    display: none;
+}
+
+.etablissement-map-container {
+    display: none;
+    height: 500px;
+    width: 100%;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+}
+
+.etablissement-map {
+    height: 100%;
+    width: 100%;
+    border-radius: 8px;
+}
+
+.etablissement-checkbox-group {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 15px;
+}
+
+/* Classes pour les filtres */
+.main-filters {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    background: transparent;
+    justify-content: flex-end;
+    margin-left: auto;
+    width: fit-content;
+}
+
+.sub-filters {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: transparent;
+    padding: 4px 8px;
+    margin-top: 6px;
+    z-index: 1001;
+    min-width: 160px;
+    color: white;
+}
+
+.sub-filters.show {
+    display: block;
+}
+
+/* Classes pour les tailles spécifiques */
+.w-100 {
+    width: 100%;
+}
+
+/* Classes pour le texte */
+.text-center {
+    text-align: center;
+}
+
+.text-danger {
+    color: var(--color-danger);
+}
+
+.text-decoration-none {
+    text-decoration: none;
+}
+
+/* Classes pour les boutons spécifiques */
+.btn-lg {
+    padding: var(--padding-md) var(--padding-lg);
+    font-size: var(--font-size-lg);
+}
+
+.btn-secondary {
+    background-color: var(--color-back);
+    color: var(--color-white);
+}
+
+.btn-secondary:hover {
+    background-color: var(--color-back-dark);
+}
+
+.btn-danger {
+    background-color: var(--color-danger);
+    color: var(--color-white);
+}
+
+.btn-danger:hover {
+    background-color: var(--color-danger-dark);
+}
+
+.btn-back {
+    background-color: var(--color-back);
+    color: var(--color-white);
+}
+
+.btn-back:hover {
+    background-color: var(--color-back-dark);
+}
+
+/* Classes pour les polices */
+.fw-bold {
+    font-weight: bold;
+}
+
+.fw-medium {
+    font-weight: 500;
+}
+
+/* Classes pour les colonnes */
+.col-md-6 {
+    flex: 0 0 auto;
+    width: 50%;
+}
+
+.col-lg-5 {
+    flex: 0 0 auto;
+    width: 41.666667%;
+}
+
+.col-xl-4 {
+    flex: 0 0 auto;
+    width: 33.333333%;
+}
+
+/* Classes pour les alignements */
+.d-flex {
+    display: flex;
+}
+
+.d-grid {
+    display: grid;
+}
+
+.align-items-center {
+    align-items: center;
+}
+
+.justify-content-between {
+    justify-content: space-between;
+}
+
+.justify-content-center {
+    justify-content: center;
+}
+
+.flex-column {
+    flex-direction: column;
+}
+
+.flex-grow-1 {
+    flex-grow: 1;
+}
+
+.flex-nowrap {
+    flex-wrap: nowrap;
+}
+
+/* Classes pour les marges et paddings */
+.mx-2 {
+    margin-left: var(--margin-sm);
+    margin-right: var(--margin-sm);
+}
+
+.p-md-5 {
+    padding: var(--padding-lg);
+}
+
+/* Classes pour les ombres */
+.shadow-sm {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+/* Classes pour les tailles de texte */
+.small {
+    font-size: var(--font-size-sm);
+}
+
+/* Classes pour les formulaires */
+.form {
+    width: 100%;
+}
+
+.form-check-container {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-sm);
+}
+
+.form-control-lg {
+    padding: var(--padding-md) var(--padding-lg);
+    font-size: var(--font-size-lg);
+}
+
+/* Classes pour les couleurs de texte */
+.text-white {
+    color: var(--color-white);
+}
+
+/* Classes pour les icônes Bootstrap (à définir si nécessaire) */
+.bi {
+    font-family: 'bootstrap-icons' !important;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    vertical-align: -0.125em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+
