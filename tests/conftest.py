@@ -3,6 +3,7 @@ from app import create_app, db
 from app.config import TestConfig
 from flask_login import login_user
 from flask_bcrypt import Bcrypt
+from app.models import Utilisateur, Etablissement, Flan, Evaluation
 
 @pytest.fixture(scope='function')
 def client():
@@ -65,3 +66,116 @@ def clean_db():
     """Fixture pour nettoyer la base de données entre les tests"""
     yield
     # Le nettoyage est géré par la fixture client
+
+
+@pytest.fixture
+def setup_minimal_data(app):
+    """Crée des données de test minimales pour les tests."""
+    with app.app_context():
+        bcrypt = Bcrypt()
+        
+        # Créer un utilisateur regular
+        user = Utilisateur(
+            pseudo='testuser',
+            email='test@example.com',
+            is_admin=False
+        )
+        user.set_password('password', bcrypt)
+        
+        # Créer un utilisateur admin
+        admin = Utilisateur(
+            pseudo='admin',
+            email='admin@example.com',
+            is_admin=True
+        )
+        admin.set_password('adminpassword', bcrypt)
+        
+        db.session.add_all([user, admin])
+        db.session.commit()
+
+
+@pytest.fixture
+def setup_full_data(app):
+    """Crée des données de test complètes pour les tests."""
+    with app.app_context():
+        bcrypt = Bcrypt()
+        
+        # Créer un utilisateur regular
+        user = Utilisateur(
+            pseudo='testuser',
+            email='test@example.com',
+            is_admin=False
+        )
+        user.set_password('password', bcrypt)
+        
+        # Créer un utilisateur admin
+        admin = Utilisateur(
+            pseudo='admin',
+            email='admin@example.com',
+            is_admin=True
+        )
+        admin.set_password('adminpassword', bcrypt)
+        
+        db.session.add_all([user, admin])
+        db.session.commit()
+        
+        # Créer un établissement pour l'utilisateur regular
+        etab_user = Etablissement(
+            nom='Boulangerie User',
+            adresse='1 rue de Test',
+            ville='Testville',
+            code_postal='69001',
+            id_user=user.id_user
+        )
+        
+        # Créer un établissement pour l'admin
+        etab_admin = Etablissement(
+            nom='Boulangerie Admin',
+            adresse='2 rue de Test',
+            ville='Testville',
+            code_postal='69001',
+            id_user=admin.id_user
+        )
+        
+        db.session.add_all([etab_user, etab_admin])
+        db.session.commit()
+        
+        # Créer des flans
+        flan_user = Flan(
+            nom='Flan User',
+            prix=3.5,
+            id_etab=etab_user.id_etab,
+            id_user=user.id_user
+        )
+        
+        flan_admin = Flan(
+            nom='Flan Admin',
+            prix=4.0,
+            id_etab=etab_admin.id_etab,
+            id_user=admin.id_user
+        )
+        
+        db.session.add_all([flan_user, flan_admin])
+        db.session.commit()
+        
+        # Créer des évaluations
+        eval_user = Evaluation(
+            visuel=4.0,
+            texture=4.5,
+            pate=3.5,
+            gout=4.0,
+            id_flan=flan_user.id_flan,
+            id_user=user.id_user
+        )
+        
+        eval_admin = Evaluation(
+            visuel=5.0,
+            texture=5.0,
+            pate=5.0,
+            gout=5.0,
+            id_flan=flan_admin.id_flan,
+            id_user=admin.id_user
+        )
+        
+        db.session.add_all([eval_user, eval_admin])
+        db.session.commit()

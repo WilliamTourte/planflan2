@@ -5,16 +5,21 @@ from flask_login import current_user
 from flask import get_flashed_messages
 import pytest
 
+# Importer les fixtures depuis test_securite
 
+
+@pytest.mark.main
 def test_example(client):
     response = client.get('/')
     assert response.status_code == 200
 
+@pytest.mark.main
 def test_liste_etab(client):
     response = client.get('/liste_etablissements')
     assert response.status_code == 200
 
 
+@pytest.mark.main
 def test_rechercher(client):
     response = client.get('/rechercher')
     assert response.status_code == 200
@@ -106,6 +111,7 @@ def test_proposer_flan(client):
 
 
 
+@pytest.mark.main
 def test_valider_flan(client):
     # Récupérer l'utilisateur admin créé dans la fixture
     user = client.application.config['TEST_USER']
@@ -135,6 +141,7 @@ def test_valider_flan(client):
         # (la route devrait le mettre à 'VALIDE' mais il y a un bug connu avec 'valide' vs 'VALIDE')
         assert updated_flan.statut.value != 'EN_ATTENTE', f"Le statut du flan n'a pas été mis à jour. Statut actuel: {updated_flan.statut.value}"
 
+@pytest.mark.main
 def test_modifier_flan(client):
     # Récupérer l'utilisateur créé dans la fixture
     user = client.application.config['TEST_USER']
@@ -174,6 +181,7 @@ def test_modifier_flan(client):
     messages = [message for category, message in flashed_messages]
     assert any('mis à jour' in message.lower() for message in messages), f"Aucun message de mise à jour trouvé: {messages}"
 
+@pytest.mark.main
 def test_supprimer_flan(client):
     # Récupérer l'utilisateur créé dans la fixture
     user = client.application.config['TEST_USER']
@@ -199,6 +207,7 @@ def test_supprimer_flan(client):
         deleted_flan = Flan.query.get(flan_id)
         assert deleted_flan is None, "Le flan n'a pas été supprimé de la base de données"
 
+@pytest.mark.main
 def test_evaluer_flan(client):
     # Récupérer l'utilisateur créé dans la fixture
     user = client.application.config['TEST_USER']

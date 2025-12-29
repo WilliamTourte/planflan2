@@ -1,5 +1,8 @@
 # tests/test_app.py
 from app import create_app, db
+
+
+# Importer les fixtures depuis test_securite
 import pytest
 
 @pytest.fixture
@@ -13,6 +16,7 @@ def client():
         yield client
 
 
+@pytest.mark.app
 def test_example(client):
     response = client.get('/')
     assert response.status_code == 200

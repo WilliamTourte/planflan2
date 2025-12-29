@@ -6,6 +6,9 @@ from app.models import Etablissement, Flan
 from app import db
 import pytest
 
+# Importer les fixtures depuis test_securite
+
+@pytest.mark.utils
 def test_calculer_distance():
     """Test la fonction calculer_distance avec des coordonnées connues"""
     # Test avec des coordonnées identiques (distance devrait être 0)
@@ -22,6 +25,7 @@ def test_calculer_distance():
     assert distance > 300  # Plus de 300 km
     assert distance < 500  # Moins de 500 km
 
+@pytest.mark.utils
 def test_enlever_accents():
     """Test la fonction enlever_accents"""
     # Test avec des accents français

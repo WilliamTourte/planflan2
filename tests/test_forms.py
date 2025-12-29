@@ -8,6 +8,8 @@ from app import create_app, db
 from app.config import TestConfig
 from app.models import Etablissement, Flan, Utilisateur
 from app.forms import (
+
+# Importer les fixtures depuis test_securite
     RechercheForm, EtabForm, NewFlanForm, EvalForm, 
     UpdateProfileForm, DeleteForm, ValidateForm
 )

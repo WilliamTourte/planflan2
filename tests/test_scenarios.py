@@ -3,8 +3,12 @@ Tests de scénarios utilisateurs complets
 """
 from app.models import Etablissement, Flan, Evaluation
 from app import db
+
+
+# Importer les fixtures depuis test_securite
 import pytest
 
+@pytest.mark.scenarios
 def test_scenario_inscription_connexion_creation_flan(client):
     """Test un flux complet : inscription -> connexion -> création de flan"""
     # Étape 1 : Inscription d'un nouvel utilisateur
@@ -59,6 +63,7 @@ def test_scenario_inscription_connexion_creation_flan(client):
         assert flan.prix == 3.5
         assert flan.id_etab == etab_id
 
+@pytest.mark.scenarios
 def test_scenario_recherche_et_evaluation(client):
     """Test un flux complet : recherche -> consultation -> évaluation"""
     user = client.application.config['TEST_USER']
@@ -116,6 +121,7 @@ def test_scenario_recherche_et_evaluation(client):
         assert eval.gout == 4.0
         assert eval.description == 'Excellent flan!'
 
+@pytest.mark.scenarios
 def test_scenario_administration_complete(client):
     """Test un flux complet d'administration : création utilisateur -> validation contenu"""
     # Ce test nécessite un utilisateur admin
@@ -187,6 +193,7 @@ def test_scenario_administration_complete(client):
         updated_flan = Flan.query.get(flan_id)
         assert updated_flan.statut.value == 'VALIDE'
 
+@pytest.mark.scenarios
 def test_scenario_recherche_avancee(client):
     """Test un scénario de recherche avancée avec multiples filtres"""
     user = client.application.config['TEST_USER']

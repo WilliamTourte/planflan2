@@ -1,6 +1,9 @@
 """
 Tests unitaires pour les fonctions utilitaires de main.py
 """
+
+
+# Importer les fixtures depuis test_securite
 import pytest
 from app import create_app, db
 from app.config import TestConfig
@@ -294,6 +297,7 @@ def setup_data(app):
         db.session.commit()
 
 
+@pytest.mark.unitary
 def test_filtrer_etablissements_par_nom(client):
     """Test le filtrage des établissements par nom."""
     with client.application.app_context():
@@ -309,6 +313,7 @@ def test_filtrer_etablissements_par_nom(client):
             assert 'Boulangerie' in result.nom, f"L'établissement {result.nom} ne contient pas 'Boulangerie'"
 
 
+@pytest.mark.unitary
 def test_filtrer_etablissements_par_ville(client):
     """Test le filtrage des établissements par ville."""
     with client.application.app_context():
@@ -324,6 +329,7 @@ def test_filtrer_etablissements_par_ville(client):
             assert result.ville == 'Lyon', f"L'établissement {result.nom} n'est pas à Lyon"
 
 
+@pytest.mark.unitary
 def test_filtrer_etablissements_par_visite(client):
     """Test le filtrage des établissements par statut de visite."""
     with client.application.app_context():
@@ -344,6 +350,7 @@ def test_filtrer_etablissements_par_visite(client):
         assert results[0].visite == False
 
 
+@pytest.mark.unitary
 def test_filtrer_etablissements_par_labellise(client):
     """Test le filtrage des établissements par statut labellisé."""
     with client.application.app_context():
@@ -364,6 +371,7 @@ def test_filtrer_etablissements_par_labellise(client):
         assert all(etab.label == False for etab in results)
 
 
+@pytest.mark.unitary
 def test_filtrer_etablissements_par_type_pate(client):
     """Test le filtrage des établissements par type de pâte."""
     with client.application.app_context():
@@ -385,6 +393,7 @@ def test_filtrer_etablissements_par_type_pate(client):
         assert len(results) > 0  # Boulangerie Martin seulement
 
 
+@pytest.mark.unitary
 def test_filtrer_etablissements_par_type_saveur(client):
     """Test le filtrage des établissements par type de saveur."""
     with client.application.app_context():
@@ -398,6 +407,7 @@ def test_filtrer_etablissements_par_type_saveur(client):
         assert results[0].nom == 'Boulangerie Martin'
 
 
+@pytest.mark.unitary
 def test_filtrer_etablissements_par_type_texture(client):
     """Test le filtrage des établissements par type de texture."""
     with client.application.app_context():
@@ -421,6 +431,7 @@ def test_filtrer_etablissements_par_type_texture(client):
         assert results[0].nom == 'Patisserie Dubois'
 
 
+@pytest.mark.unitary
 def test_filtrer_etablissements_type_texture_tous(client):
     """Test le filtrage des établissements avec type_texture='tous'."""
     with client.application.app_context():
@@ -434,6 +445,7 @@ def test_filtrer_etablissements_type_texture_tous(client):
         assert len(results) > 0  # Boulangerie Martin et Patisserie Dubois
 
 
+@pytest.mark.unitary
 def test_filtrer_etablissements_jointure_flan(client):
     """Test le filtrage des établissements avec jointure Flan et gestion des résultats."""
     with client.application.app_context():
@@ -480,6 +492,7 @@ def test_filtrer_etablissements_jointure_flan(client):
         assert results[0].nom == 'Boulangerie Martin'
 
 
+@pytest.mark.unitary
 def test_filtrer_etablissements_etablissements_sans_flans(client):
     """Test le filtrage des établissements qui n'ont pas de flans."""
     with client.application.app_context():
@@ -520,6 +533,7 @@ def test_filtrer_etablissements_etablissements_sans_flans(client):
         assert results[0].nom == 'Boulangerie Martin'
 
 
+@pytest.mark.unitary
 def test_filtrer_etablissements_resultats_dupliques(client):
     """Test la gestion des résultats dupliqués lors de la jointure avec Flan."""
     with client.application.app_context():
@@ -556,6 +570,7 @@ def test_filtrer_etablissements_resultats_dupliques(client):
                 assert result.id_etab == first_id  # Même établissement
 
 
+@pytest.mark.unitary
 def test_filtrer_etablissements_par_prix(client):
     """Test le filtrage des établissements par prix."""
     with client.application.app_context():
@@ -580,6 +595,7 @@ def test_filtrer_etablissements_par_prix(client):
         assert len(results) > 0  # Aucun flan à 5€ ou plus
 
 
+@pytest.mark.unitary
 def test_filtrer_etablissements_combinaison_filtres(client):
     """Test le filtrage avec une combinaison de filtres."""
     with client.application.app_context():
@@ -598,6 +614,7 @@ def test_filtrer_etablissements_combinaison_filtres(client):
         assert results[0].nom == 'Boulangerie Martin'
 
 
+@pytest.mark.unitary
 def test_filtrer_etablissements_sans_filtres(client):
     """Test le filtrage sans aucun filtre."""
     with client.application.app_context():
@@ -610,6 +627,7 @@ def test_filtrer_etablissements_sans_filtres(client):
         assert len(results) > 0  # Tous les établissements
 
 
+@pytest.mark.unitary
 def test_filtrer_etablissements_avec_tous_comme_valeur(client):
     """Test le filtrage avec 'tous' comme valeur (ne devrait pas filtrer)."""
     with client.application.app_context():
@@ -623,6 +641,7 @@ def test_filtrer_etablissements_avec_tous_comme_valeur(client):
         assert len(results) > 0  # 2 établissements ont des flans (etab1 et etab2)
 
 
+@pytest.mark.unitary
 def test_liste_etablissements_route_get(client, setup_data):
     """Test la route liste_etablissements avec une requête GET."""
     response = client.get('/liste_etablissements')
@@ -632,6 +651,7 @@ def test_liste_etablissements_route_get(client, setup_data):
     assert b'Patisserie Dubois' in response.data
 
 
+@pytest.mark.unitary
 def test_liste_etablissements_recherche_simple(client, setup_data):
     """Test la recherche simple dans liste_etablissements."""
     response = client.get('/liste_etablissements?recherche_simple=Paris')
@@ -642,6 +662,7 @@ def test_liste_etablissements_recherche_simple(client, setup_data):
     assert b'Lyon' not in response.data
 
 
+@pytest.mark.unitary
 def test_liste_etablissements_filtres_avances(client, setup_data):
     """Test les filtres avancés dans liste_etablissements."""
     response = client.get('/liste_etablissements?ville=Paris&visite=oui')
@@ -650,6 +671,7 @@ def test_liste_etablissements_filtres_avances(client, setup_data):
     assert b'Boulangerie Martin' in response.data
 
 
+@pytest.mark.unitary
 def test_liste_etablissements_filtre_prix(client, setup_data):
     """Test le filtre par prix dans liste_etablissements."""
     response = client.get('/liste_etablissements?prix=2.5')  # Prix entre 2.5 et 5
@@ -659,6 +681,7 @@ def test_liste_etablissements_filtre_prix(client, setup_data):
 
 
 @pytest.mark.skip(reason="API tests require more complex setup, skipping for now")
+@pytest.mark.unitary
 def test_api_etablissements_get(client, setup_data):
     """Test l'API etablissements avec une requête GET."""
     response = client.get('/api/etablissements?format=json')
@@ -676,6 +699,7 @@ def test_api_etablissements_get(client, setup_data):
 
 
 @pytest.mark.skip(reason="API tests require more complex setup, skipping for now")
+@pytest.mark.unitary
 def test_api_etablissements_filtres(client, setup_data):
     """Test l'API etablissements avec des filtres."""
     response = client.get('/api/etablissements?ville=Paris&format=json')
@@ -688,6 +712,7 @@ def test_api_etablissements_filtres(client, setup_data):
 
 
 @pytest.mark.skip(reason="API tests require more complex setup, skipping for now")
+@pytest.mark.unitary
 def test_api_etablissements_format_html(client, setup_data):
     """Test l'API etablissements avec format HTML."""
     response = client.get('/api/etablissements?format=html')
@@ -698,6 +723,7 @@ def test_api_etablissements_format_html(client, setup_data):
 
 
 @pytest.mark.skip(reason="API tests require more complex setup, skipping for now")
+@pytest.mark.unitary
 def test_api_etablissements_post(client, setup_data):
     """Test l'API etablissements avec une requête POST."""
     response = client.post('/api/etablissements', json={
@@ -713,6 +739,7 @@ def test_api_etablissements_post(client, setup_data):
 
 
 @pytest.mark.skip(reason="API tests require more complex setup, skipping for now")
+@pytest.mark.unitary
 def test_api_etablissements_erreur(client, setup_data):
     """Test l'API etablissements avec une erreur."""
     # Envoyer une requête POST avec des données invalides
@@ -727,6 +754,7 @@ def test_api_etablissements_erreur(client, setup_data):
     assert len(data) == 3
 
 
+@pytest.mark.unitary
 def test_get_infowindow_content(client, setup_data):
     """Test la route get_infowindow_content."""
     with client.application.app_context():
@@ -739,6 +767,7 @@ def test_get_infowindow_content(client, setup_data):
     assert b'Boulangerie Martin' in response.data
 
 
+@pytest.mark.unitary
 def test_get_infowindow_content_etablissement_inexistant(client):
     """Test get_infowindow_content avec un établissement inexistant."""
     response = client.get('/get_infowindow_content?id_etab=999999')
@@ -746,6 +775,7 @@ def test_get_infowindow_content_etablissement_inexistant(client):
     assert b'D\xc3\xa9tails non disponibles' in response.data or b'Details non disponibles' in response.data
 
 
+@pytest.mark.unitary
 def test_rechercher_route(client):
     """Test la route rechercher."""
     response = client.get('/rechercher')
@@ -754,6 +784,7 @@ def test_rechercher_route(client):
     assert b'form_recherche' in response.data or b'Recherche' in response.data
 
 
+@pytest.mark.unitary
 def test_afficher_badge_etablissement(client):
     """Test la fonction afficher_badge_etablissement."""
     from app.routes.main import afficher_badge_etablissement
@@ -779,6 +810,7 @@ def test_afficher_badge_etablissement(client):
         assert badge == ''
 
 
+@pytest.mark.unitary
 def test_afficher_badge_type_etab(client):
     """Test la fonction afficher_badge_type_etab."""
     from app.routes.main import afficher_badge_type_etab
@@ -793,6 +825,7 @@ def test_afficher_badge_type_etab(client):
         assert etab.type_etab.value in badge
 
 
+@pytest.mark.unitary
 def test_afficher_badge_etablissement_complet(client):
     """Test complet de la fonction afficher_badge_etablissement."""
     from app.routes.main import afficher_badge_etablissement
@@ -829,6 +862,7 @@ def test_afficher_badge_etablissement_complet(client):
             etab_sans_label.label = original_label
 
 
+@pytest.mark.unitary
 def test_afficher_badge_type_etab_complet(client):
     """Test complet de la fonction afficher_badge_type_etab."""
     from app.routes.main import afficher_badge_type_etab

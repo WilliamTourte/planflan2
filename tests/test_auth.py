@@ -5,12 +5,17 @@ from app import db, bcrypt
 from app.models import Utilisateur
 import pytest
 
+# Importer les fixtures depuis test_securite
+
+@pytest.mark.auth
+@pytest.mark.critical
 def test_register_get(client):
     """Test la route d'inscription en GET"""
     response = client.get('/register')
     assert response.status_code == 200
     assert b'Creer un compte' in response.data
 
+@pytest.mark.auth
 def test_register_post_success(client):
     """Test l'inscription d'un nouvel utilisateur"""
     # Envoyer une requête POST pour créer un nouvel utilisateur
@@ -32,6 +37,7 @@ def test_register_post_success(client):
         assert new_user.email == 'newuser@example.com'
         assert new_user.is_admin == False
 
+@pytest.mark.auth
 def test_register_post_duplicate_email(client):
     """Test l'inscription avec un email déjà utilisé"""
     # Creer un utilisateur existant
@@ -56,6 +62,7 @@ def test_register_post_duplicate_email(client):
         user_count = Utilisateur.query.filter_by(email='existing@example.com').count()
         assert user_count == 1  # Seul l'utilisateur existant doit être présent
 
+@pytest.mark.auth
 def test_register_post_duplicate_pseudo(client):
     """Test l'inscription avec un pseudo déjà utilisé"""
     # Creer un utilisateur existant
@@ -80,12 +87,14 @@ def test_register_post_duplicate_pseudo(client):
         user_count = Utilisateur.query.filter_by(pseudo='existing').count()
         assert user_count == 1  # Seul l'utilisateur existant doit être présent
 
+@pytest.mark.auth
 def test_login_get(client):
     """Test la route de connexion en GET"""
     response = client.get('/login')
     assert response.status_code == 200
     assert b'Se connecter' in response.data
 
+@pytest.mark.auth
 def test_login_post_success(client):
     """Test la connexion avec des identifiants valides"""
     # Créer un utilisateur pour le test
@@ -118,6 +127,7 @@ def test_login_post_invalid_credentials(client):
     with client.session_transaction() as sess:
         assert 'user_id' not in sess
 
+@pytest.mark.auth
 def test_logout(client):
     """Test la déconnexion"""
     # D'abord, connecter un utilisateur

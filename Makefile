@@ -1,67 +1,76 @@
-# Makefile pour l'automatisation des tests et du déploiement
+# Makefile pour PlanFlan - Commandes de test optimisées
 
-.PHONY: help test test-forms test-coverage test-html lint format clean
+.PHONY: test, test-quick, test-auth, test-admin, test-critical, test-slow, test-all
 
-# Affiche l'aide
-help:
-	@echo "Makefile pour PlanFlan - Automatisation des tests"
-	@echo ""
-	@echo "Cibles disponibles:"
-	@echo "  help              Affiche cette aide"
-	@echo "  test              Exécute tous les tests"
-	@echo "  test-forms        Exécute uniquement les tests de formulaires"
-	@echo "  test-coverage     Exécute les tests avec coverage"
-	@echo "  test-html         Exécute les tests avec rapport HTML de coverage"
-	@echo "  lint              Vérifie la qualité du code (à configurer)"
-	@echo "  format            Formate le code (à configurer)"
-	@echo "  clean             Nettoie les fichiers temporaires"
-	@echo ""
+# Exécuter tous les tests (complet, pour CI/CD)
+test-all:
+	python -m pytest tests/ -v
 
-# Exécute tous les tests
-test:
-	@echo "🧪 Exécution de tous les tests..."
-	PYTHONPATH=$(CURDIR) pytest tests/ -v
+# Exécuter les tests critiques seulement (pour développement rapide)
+test-critical:
+	python -m pytest tests/ -m "critical" -v
 
-# Exécute uniquement les tests de formulaires
+# Exécuter les tests d'authentification (tous les fichiers)
+test-all-auth:
+	python -m pytest tests/ -m "auth" -v
+
+# Exécuter les tests d'authentification seulement
+test-auth:
+	python -m pytest tests/test_securite.py -m "auth" -v
+
+# Exécuter les tests d'administration seulement
+test-admin:
+	python -m pytest tests/test_securite.py tests/test_auth.py -m "admin" -v
+
+# Exécuter les tests principaux seulement
+test-main:
+	python -m pytest tests/test_main.py -m "main" -v
+
+# Exécuter les tests de formulaires seulement
 test-forms:
-	@echo "📝 Exécution des tests de formulaires..."
-	PYTHONPATH=$(CURDIR) pytest tests/test_forms.py -v
+	python -m pytest tests/test_forms.py -m "forms" -v
 
-# Exécute les tests avec coverage
+# Exécuter les tests d'outils seulement
+test-utils:
+	python -m pytest tests/test_outils.py -m "utils" -v
+
+# Exécuter les tests de carte seulement
+test-maps:
+	python -m pytest tests/test_maps.py -m "maps" -v
+
+# Exécuter les tests de scénarios seulement
+test-scenarios:
+	python -m pytest tests/test_scenarios.py -m "scenarios" -v
+
+# Exécuter les tests unitaires seulement
+test-unitary:
+	python -m pytest tests/test_main_unitary.py -m "unitary" -v
+
+# Exécuter les tests d'application seulement
+test-app:
+	python -m pytest tests/test_app.py -m "app" -v
+
+# Exécuter les tests lents (API, upload, etc.)
+test-slow:
+	python -m pytest tests/test_securite.py -m "slow" -v
+
+# Exécuter les tests rapides (pour développement quotidien)
+test-quick:
+	python -m pytest tests/ -m "critical and not slow" -v
+
+# Exécuter un test spécifique
+test-specific:
+	@echo "Usage: make test-specific TEST=test_nom_du_test"
+	python -m pytest tests/test_securite.py::$(TEST) -v
+
+# Voir la liste des tests disponibles
+test-list:
+	python -m pytest tests/test_securite.py --collect-only -v
+
+# Exécuter les tests avec coverage
 test-coverage:
-	@echo "📊 Exécution des tests avec coverage..."
-	PYTHONPATH=$(CURDIR) pytest tests/ --cov=app --cov-report=term
+	python -m pytest tests/test_securite.py --cov=app --cov-report=html -v
 
-# Exécute les tests avec rapport HTML de coverage
-test-html:
-	@echo "📊 Exécution des tests avec rapport HTML de coverage..."
-	PYTHONPATH=$(CURDIR) pytest tests/ --cov=app --cov-report=html --cov-report=term
-	@echo "📁 Rapport généré dans htmlcov/index.html"
-
-# Vérifie la qualité du code (à configurer selon vos outils)
-lint:
-	@echo "🔍 Vérification de la qualité du code..."
-	# flake8 app/ tests/
-	# pylint app/ tests/
-	@echo "⚠️  À configurer avec vos outils de linting"
-
-# Formate le code (à configurer selon vos outils)
-format:
-	@echo "🎨 Formatage du code..."
-	# black app/ tests/
-	# isort app/ tests/
-	@echo "⚠️  À configurer avec vos outils de formatage"
-
-# Nettoie les fichiers temporaires
-clean:
-	@echo "🧹 Nettoyage des fichiers temporaires..."
-	rm -rf .pytest_cache
-	rm -rf __pycache__
-	rm -rf app/__pycache__
-	rm -rf tests/__pycache__
-	rm -rf .coverage
-	rm -rf htmlcov
-	@echo "✅ Nettoyage terminé"
-
-# Cible par défaut
-default: help
+# Exécuter les tests critiques avec coverage
+test-critical-coverage:
+	python -m pytest tests/test_securite.py -m "critical" --cov=app --cov-report=html -v

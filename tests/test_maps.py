@@ -1,6 +1,9 @@
 from app import create_app, db
 from app.config import TestConfig
 
+
+
+# Importer les fixtures depuis test_securite
 import pytest
 from flask import get_flashed_messages
 from app.models import Etablissement, Evaluation
@@ -14,6 +17,7 @@ from flask import get_flashed_messages
 from flask_bcrypt import Bcrypt
 
 
+@pytest.mark.maps
 def test_geoloc_route(client):
     """Test de la route /geoloc pour la géolocalisation"""
     response = client.post('/geoloc', json={
@@ -25,6 +29,7 @@ def test_geoloc_route(client):
     assert 'latitude' in data
     assert 'longitude' in data
 
+@pytest.mark.maps
 def test_etablissements_proches_route(client):
     """Test de la route /etablissements_proches"""
     user = client.application.config['TEST_USER']
@@ -67,6 +72,7 @@ def test_etablissements_proches_route(client):
     data = response.get_json()
     assert len(data) > 0, "Aucun établissement proche trouvé"
 
+@pytest.mark.maps
 def test_extraire_infos_adresse_route(client):
     """Test de la route /extraire_infos_adresse"""
     response = client.post('/extraire_infos_adresse', json={
@@ -79,6 +85,7 @@ def test_extraire_infos_adresse_route(client):
     assert 'code_postal' in data
     assert 'ville' in data
 
+@pytest.mark.maps
 def test_proposer_etablissement_get(client):
     """Test de la route /proposer_etablissement en GET"""
     response = client.get('/proposer_etablissement')
@@ -87,6 +94,7 @@ def test_proposer_etablissement_get(client):
     assert b'form' in response.data
     assert b'input' in response.data
 
+@pytest.mark.maps
 def test_proposer_etablissement_post(client):
     """Test de la route /proposer_etablissement en POST - cette route ne crée pas d'établissement, elle affiche juste le formulaire"""
     user = client.application.config['TEST_USER']
@@ -110,6 +118,7 @@ def test_proposer_etablissement_post(client):
     # La route /proposer_etablissement ne crée pas d'établissement, elle affiche juste le formulaire
     # Donc aucun message de succès n'est attendu
 
+@pytest.mark.maps
 def test_verifier_etablissement_route(client):
     """Test de la route /verifier_etablissement"""
     user = client.application.config['TEST_USER']
@@ -137,6 +146,7 @@ def test_verifier_etablissement_route(client):
     assert data['exists'] == True
     assert data['id_etab'] == etab_id
 
+@pytest.mark.maps
 def test_ajouter_etablissement_route(client):
     """Test de la route /ajouter_etablissement"""
     user = client.application.config['TEST_USER']
@@ -164,6 +174,7 @@ def test_ajouter_etablissement_route(client):
         count_after = Etablissement.query.filter_by(id_user=user.id_user).count()
         assert count_after == count_before + 1, "L'établissement n'a pas été ajouté"
 
+@pytest.mark.maps
 def test_modifier_etablissement_route(client):
     """Test de la route /modifier_etablissement"""
     user = client.application.config['TEST_USER']
@@ -207,6 +218,7 @@ def test_modifier_etablissement_route(client):
         assert updated_etab.adresse == '2 rue Modifiée', "L'adresse n'a pas été modifiée"
 
 
+@pytest.mark.maps
 def test_valider_etablissement_route(client):
     """Test de la route /valider_etablissement (admin seulement)"""
     user = client.application.config['TEST_USER']
@@ -235,6 +247,7 @@ def test_valider_etablissement_route(client):
         updated_etab = Etablissement.query.get(etab_id)
         assert updated_etab.statut.value == 'VALIDE', f"L'établissement n'a pas été validé. Statut: {updated_etab.statut.value}"
 
+@pytest.mark.maps
 def test_supprimer_etablissement_route(client):
     """Test de la route /supprimer_etablissement"""
     user = client.application.config['TEST_USER']
