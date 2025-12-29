@@ -352,7 +352,7 @@ def test_rechercheform_donnees_valides(client):
         form.labellise.data = 'non'
         form.latitude.data = 45.7640
         form.longitude.data = 4.8357
-        form.rayon.data = 5.0
+        form.rayon.data = '5.0'  # Maintenant une chaîne
         
         # Le formulaire devrait être valide
         assert form.validate()

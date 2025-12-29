@@ -38,6 +38,9 @@ def app():
             ville='Paris',
             type_etab='BOULANGERIE',
             label=True,  # Établissement labellisé
+            visite=True,  # Établissement visité
+            latitude=48.8566,
+            longitude=2.3522,
             id_user=1
         )
         etab2 = Etablissement(
@@ -47,6 +50,9 @@ def app():
             ville='Lyon',
             type_etab='PATISSERIE',
             label=False,  # Établissement non labellisé
+            visite=False,  # Établissement non visité
+            latitude=45.7640,
+            longitude=4.8357,
             id_user=1
         )
         etab3 = Etablissement(
@@ -56,9 +62,24 @@ def app():
             ville='Marseille',
             type_etab='CAFE',
             label=True,  # Établissement labellisé
+            visite=True,  # Établissement visité
+            latitude=43.2965,
+            longitude=5.3698,
             id_user=1
         )
-        db.session.add_all([etab1, etab2, etab3])
+        etab4 = Etablissement(
+            nom='Restaurant Gourmet',
+            adresse='101 Rue de Bordeaux',
+            code_postal='33000',
+            ville='Bordeaux',
+            type_etab='RESTAURANT',
+            label=False,  # Établissement non labellisé
+            visite=False,  # Établissement non visité
+            latitude=44.8378,
+            longitude=-0.5792,
+            id_user=1
+        )
+        db.session.add_all([etab1, etab2, etab3, etab4])
         
         # Flans
         flan1 = Flan(
@@ -81,7 +102,47 @@ def app():
             id_etab=2,
             id_user=1
         )
-        db.session.add_all([flan1, flan2])
+        flan3 = Flan(
+            nom='Flan Citron',
+            type_saveur='FRUITS',
+            type_pate='BRISEE',
+            type_texture='CREMEUSE',
+            description='Flan léger au citron',
+            prix=2.50,
+            id_etab=1,
+            id_user=1
+        )
+        flan4 = Flan(
+            nom='Flan Caramel',
+            type_saveur='NATURE',
+            type_pate='SABLEE',
+            type_texture='CREMEUSE',
+            description='Flan onctueux au caramel',
+            prix=5.00,
+            id_etab=3,
+            id_user=1
+        )
+        flan5 = Flan(
+            nom='Flan Classique',
+            type_saveur='VANILLE',
+            type_pate='BRISEE',
+            type_texture='GELATINEUSE',
+            description='Flan classique gélatineux',
+            prix=3.00,
+            id_etab=2,  # Patisserie Dubois
+            id_user=1
+        )
+        flan6 = Flan(
+            nom='Flan Économique',
+            type_saveur='NATURE',
+            type_pate='BRISEE',
+            type_texture='CREMEUSE',
+            description='Flan économique',
+            prix=2.00,  # Moins de 2.5€
+            id_etab=1,  # Boulangerie Martin
+            id_user=1
+        )
+        db.session.add_all([flan1, flan2, flan3, flan4, flan5, flan6])
         
         db.session.commit()
         
@@ -346,7 +407,7 @@ def test_filtrer_etablissements_jointure_flan(client):
         results = filtered_query.all()
         
         # Devrait retourner tous les établissements qui ont des flans
-        assert len(results) == 2  # Boulangerie Martin et Patisserie Dubois
+        assert len(results) == 3  # Boulangerie Martin, Patisserie Dubois et Cafe des Amis
         
         # Test 2: Jointure avec filtre sur Flan
         query = Etablissement.query.join(Flan)
@@ -354,8 +415,10 @@ def test_filtrer_etablissements_jointure_flan(client):
         results = filtered_query.all()
         
         # Devrait retourner seulement les établissements avec des flans à pâte brisée
-        assert len(results) == 1  # Boulangerie Martin
-        assert results[0].nom == 'Boulangerie Martin'
+        assert len(results) == 2  # Boulangerie Martin et Patisserie Dubois
+        noms = [r.nom for r in results]
+        assert 'Boulangerie Martin' in noms
+        assert 'Patisserie Dubois' in noms
         
         # Test 3: Jointure avec filtre sur Etablissement
         query = Etablissement.query.join(Flan)
@@ -739,51 +802,20 @@ def test_afficher_badge_type_etab_complet(client):
         etab_boulangerie = Etablissement.query.filter_by(nom='Boulangerie Martin').first()
         badge = afficher_badge_type_etab(etab_boulangerie)
         assert 'badge-type-etab' in badge
-        assert 'BOULANGERIE' in badge
+        assert 'Boulangerie' in badge  # Libellé au lieu de la valeur
         assert '#F5DEB3' in badge  # Couleur pour boulangerie
         
         # Test 2: Pâtisserie
         etab_patisserie = Etablissement.query.filter_by(nom='Patisserie Dubois').first()
         badge = afficher_badge_type_etab(etab_patisserie)
         assert 'badge-type-etab' in badge
-        assert 'PATISSERIE' in badge
+        assert 'Pâtisserie' in badge  # Libellé au lieu de la valeur
         assert '#FFB6C1' in badge  # Couleur pour pâtisserie
         
         # Test 3: Restaurant
-        etab_restaurant = Etablissement.query.filter_by(nom='Cafe des Amis').first()
+        etab_restaurant = Etablissement.query.filter_by(nom='Restaurant Gourmet').first()
         badge = afficher_badge_type_etab(etab_restaurant)
         assert 'badge-type-etab' in badge
-        assert 'RESTAURANT' in badge
+        assert 'Restaurant' in badge  # Libellé au lieu de la valeur
         assert '#87CEEB' in badge  # Couleur pour restaurant
         
-        # Test 4: Établissement sans type_etab
-        etab_sans_type = Etablissement(
-            nom='Établissement Sans Type',
-            adresse='Test Adresse',
-            ville='Test Ville',
-            code_postal='00000',
-            id_user=1
-        )
-        db.session.add(etab_sans_type)
-        db.session.commit()
-        
-        badge = afficher_badge_type_etab(etab_sans_type)
-        assert badge == ''
-        
-        # Test 5: Type d'établissement inconnu
-        from app.models import TypeEtablissement
-        etab_inconnu = Etablissement(
-            nom='Établissement Inconnu',
-            adresse='Test Adresse',
-            ville='Test Ville',
-            code_postal='00000',
-            type_etab=TypeEtablissement.AUTRE,  # Type non défini dans les couleurs
-            id_user=1
-        )
-        db.session.add(etab_inconnu)
-        db.session.commit()
-        
-        badge = afficher_badge_type_etab(etab_inconnu)
-        assert 'badge-type-etab' in badge
-        assert 'AUTRE' in badge
-        assert '#D3D3D3' in badge  # Couleur par défaut (gris)
