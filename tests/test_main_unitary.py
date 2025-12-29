@@ -148,6 +148,14 @@ def app():
         
         yield app
         
+        # Nettoyage: supprimer les données de test supplémentaires
+        # ajoutées par certains tests
+        from app.models import Etablissement as EtabModel
+        EtabModel.query.filter(
+            EtabModel.nom.in_(['Établissement Sans Type', 'Établissement Inconnu', 'Établissement Test'])
+        ).delete(synchronize_session=False)
+        db.session.commit()
+        
         db.session.remove()
         db.drop_all()
 
@@ -156,6 +164,34 @@ def app():
 def client(app):
     """Crée un client de test."""
     return app.test_client()
+
+
+@pytest.fixture
+def boulangerie_martin(app):
+    """Retourne l'établissement Boulangerie Martin."""
+    with app.app_context():
+        return Etablissement.query.filter_by(nom='Boulangerie Martin').first()
+
+
+@pytest.fixture
+def patisserie_dubois(app):
+    """Retourne l'établissement Patisserie Dubois."""
+    with app.app_context():
+        return Etablissement.query.filter_by(nom='Patisserie Dubois').first()
+
+
+@pytest.fixture
+def cafe_des_amis(app):
+    """Retourne l'établissement Cafe des Amis."""
+    with app.app_context():
+        return Etablissement.query.filter_by(nom='Cafe des Amis').first()
+
+
+@pytest.fixture
+def restaurant_gourmet(app):
+    """Retourne l'établissement Restaurant Gourmet."""
+    with app.app_context():
+        return Etablissement.query.filter_by(nom='Restaurant Gourmet').first()
 
 
 @pytest.fixture
