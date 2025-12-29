@@ -120,7 +120,7 @@ def liste_etablissements():
         etablissements = [
             etab for etab in etablissements
             if etab.latitude and etab.longitude and
-            calculer_distance(user_lat, user_lon, etab.latitude, etab.longitude) <= rayon
+            calculer_distance(float(user_lat), float(user_lon), float(etab.latitude), float(etab.longitude)) <= float(rayon)
         ]
     else:
         etablissements = query.distinct().all()
