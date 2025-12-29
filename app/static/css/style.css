@@ -184,7 +184,7 @@ input[type="reset"],
     justify-content: center;
     padding: var(--padding-sm) var(--padding-md);
     text-decoration: none;
-    border-radius: var(--border-radius-btn) !important;
+    border-radius: 10px !important;
     border: none;
     cursor: pointer;
     font-weight: bold;
@@ -235,7 +235,9 @@ button.success,
 input.success,
 .btn-validate {
     background-color: var(--color-success);
+    border-radius: 10px;
     color: var(--color-white);
+    
 }
 
 .btn-success:hover,
