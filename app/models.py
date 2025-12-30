@@ -1,7 +1,8 @@
 from enum import Enum
-from app import db
 from flask_login import UserMixin
-from flask import Blueprint, session, render_template, redirect, url_for, request, current_app
+from flask import url_for
+from app import db
+
 
 # Enumérations
 class TypeEtab(Enum):
@@ -151,29 +152,29 @@ class Flan(db.Model):
     utilisateur = db.relationship('Utilisateur', back_populates='flans')
 
     def to_dict(self, include_etablissement=True, include_evaluations=True, include_photos=False):
-            data = {
-                'id_flan': self.id_flan,
-                'id_etab': self.id_etab,
-                'nom': self.nom,
-                'description': self.description,
-                'prix': float(self.prix) if self.prix else None,
-                'type_saveur': self.type_saveur.value if self.type_saveur else None,
-                'type_pate': self.type_pate.value if self.type_pate else None,
-                'type_texture': self.type_texture.value if self.type_texture else None,
-                'statut': self.statut.value if self.statut else None,
-                'id_user': self.id_user,
-            }
+        data = {
+            'id_flan': self.id_flan,
+            'id_etab': self.id_etab,
+            'nom': self.nom,
+            'description': self.description,
+            'prix': float(self.prix) if self.prix else None,
+            'type_saveur': self.type_saveur.value if self.type_saveur else None,
+            'type_pate': self.type_pate.value if self.type_pate else None,
+            'type_texture': self.type_texture.value if self.type_texture else None,
+            'statut': self.statut.value if self.statut else None,
+            'id_user': self.id_user,
+        }
 
-            if include_etablissement:
-                data['etablissement'] = self.etablissement.to_dict(include_flans=False)
+        if include_etablissement:
+            data['etablissement'] = self.etablissement.to_dict(include_flans=False)
 
-            if include_evaluations:
-                data['evaluations'] = [eval.to_dict(include_flan=False) for eval in self.evaluations]
+        if include_evaluations:
+            data['evaluations'] = [eval.to_dict(include_flan=False) for eval in self.evaluations]
 
-            if include_photos:
-                data['photos'] = [photo.to_dict() for photo in self.photos]
+        if include_photos:
+            data['photos'] = [photo.to_dict() for photo in self.photos]
 
-            return data
+        return data
 
 class Evaluation(db.Model):
     __tablename__ = 'evaluations'

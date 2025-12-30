@@ -1,6 +1,6 @@
-from flask import Blueprint, session, render_template, redirect, url_for, request, current_app, flash, render_template_string, make_response, jsonify
+from flask import Blueprint, render_template, redirect, url_for, request, current_app, flash, make_response, jsonify
 
-from flask_login import login_required, current_user, AnonymousUserMixin
+from flask_login import login_required, current_user
 from sqlalchemy.exc import IntegrityError
 from app.forms import EvalForm, NewFlanForm, RechercheForm, UpdateProfileForm, EtabForm, DeleteForm, ValidateForm
 from app.models import Etablissement, Flan, Evaluation, Utilisateur
@@ -21,9 +21,6 @@ def index():
         google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
         form_recherche=form_recherche
     )
-
-
-
 
 
 def filtrer_etablissements(query, **kwargs):
@@ -55,7 +52,7 @@ def filtrer_etablissements(query, **kwargs):
             query = query.filter(Flan.prix >= 5)
     return query
 
-import logging
+
 
 @main_bp.route('/liste_etablissements', methods=['GET', 'POST'])
 def liste_etablissements():
@@ -192,7 +189,7 @@ def api_etablissements():
         # Récupère les résultats uniques
         etablissements = []
         seen = set()
-        for etab, flan in query.all():
+        for etab in query.all():
             if etab.id_etab not in seen:
                 seen.add(etab.id_etab)
                 etablissements.append(etab)
@@ -436,7 +433,7 @@ def supprimer_flan(id_flan):
 @main_bp.route('/flan/<int:id_flan>/evaluer', methods=['GET', 'POST'])
 @login_required
 def evaluer_flan(id_flan):
-    flan_unique = Flan.query.get_or_404(id_flan)
+  
     form = EvalForm(prefix='flan-eval')
     evaluation = Evaluation.query.filter_by(id_flan=id_flan, id_user=current_user.id_user).first()
     if request.method == 'GET' and evaluation:

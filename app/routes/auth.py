@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
-from flask_bcrypt import check_password_hash, generate_password_hash
+from flask_bcrypt import check_password_hash
 
 from app import db, bcrypt
 from app.models import Utilisateur

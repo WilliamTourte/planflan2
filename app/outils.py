@@ -1,4 +1,3 @@
-from flask import url_for
 from math import radians, sin, cos, sqrt, atan2
 
 def enlever_accents(text): # Enlève les accents parce que la police ne les gère pas bien
@@ -15,9 +14,6 @@ def afficher_etablissements(resultats):
         etablissements.append(etab)
         etablissements_json.append(etab.to_dict(include_flans=True))
     return etablissements, etablissements_json
-
-from math import radians, sin, cos, sqrt, atan2
-
 
 
 def calculer_distance(lat1, lon1, lat2, lon2):

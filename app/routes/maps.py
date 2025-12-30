@@ -1,6 +1,6 @@
 import traceback
 from werkzeug.datastructures import MultiDict
-from app.outils import enlever_accents, afficher_etablissements, calculer_distance
+from app.outils import afficher_etablissements, calculer_distance
 import re
 
 from flask import Blueprint, render_template, redirect, url_for, request, current_app, flash, jsonify
@@ -55,11 +55,11 @@ def etablissements_proches():
         etablissements = Etablissement.query.all()
 
         # Filtre les établissements dans le rayon de 5 km
-        etablissements_proches = []
+        etablissements_proches_liste = []
         for etab in etablissements:
             distance = calculer_distance(user_lat, user_lon, etab.latitude, etab.longitude)
             if distance <= rayon_km:
-                etablissements_proches.append({
+                etablissements_proches_liste.append({
                     'id_etab': etab.id_etab,
                     'nom': etab.nom,
                     'adresse': etab.adresse,
@@ -70,7 +70,7 @@ def etablissements_proches():
                     'label' : etab.label
                 })
 
-        return jsonify({'etablissements': etablissements_proches})
+        return jsonify({'etablissements': etablissements_proches_liste})
 
     except Exception as e:
         current_app.logger.error(f"Erreur : {str(e)}")
