@@ -1,112 +1,155 @@
-from flask import Blueprint, render_template, redirect, url_for, request, current_app, flash, make_response, jsonify
+from flask import (
+    Blueprint,
+    render_template,
+    redirect,
+    url_for,
+    request,
+    current_app,
+    flash,
+    make_response,
+    jsonify,
+)
 
 from flask_login import login_required, current_user
 from sqlalchemy.exc import IntegrityError
-from app.forms import EvalForm, NewFlanForm, RechercheForm, UpdateProfileForm, EtabForm, DeleteForm, ValidateForm
+from app.forms import (
+    EvalForm,
+    NewFlanForm,
+    RechercheForm,
+    UpdateProfileForm,
+    EtabForm,
+    DeleteForm,
+    ValidateForm,
+)
 from app.models import Etablissement, Flan, Evaluation, Utilisateur
 from app import db, bcrypt
 from app.outils import afficher_etablissements, calculer_distance
 
-main_bp = Blueprint('main', __name__)
+main_bp = Blueprint("main", __name__)
+
 
 ## ROUTES PRINCIPALES
-@main_bp.route('/')
+@main_bp.route("/")
 def index():
     form_recherche = RechercheForm()
     etablissements = Etablissement.query.all()
     return render_template(
-        'index.html',
+        "index.html",
         etablissements=etablissements,
         etablissements_json=[etab.to_dict() for etab in etablissements],
-        google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
-        form_recherche=form_recherche
+        google_maps_api_key=current_app.config["GOOGLE_MAPS_API_KEY"],
+        form_recherche=form_recherche,
     )
 
 
 def filtrer_etablissements(query, **kwargs):
     """Applique les filtres communs à une requête Etablissement."""
-    if kwargs.get('nom'):
+    if kwargs.get("nom"):
         query = query.filter(Etablissement.nom.ilike(f'%{kwargs["nom"]}%'))
-    if kwargs.get('ville'):
+    if kwargs.get("ville"):
         query = query.filter(Etablissement.ville.ilike(f'%{kwargs["ville"]}%'))
-    if kwargs.get('visite') == 'oui':
+    if kwargs.get("visite") == "oui":
         query = query.filter(Etablissement.visite == True)
-    elif kwargs.get('visite') == 'non':
+    elif kwargs.get("visite") == "non":
         query = query.filter(Etablissement.visite == False)
-    if kwargs.get('labellise') == 'oui':
+    if kwargs.get("labellise") == "oui":
         query = query.filter(Etablissement.label == True)
-    elif kwargs.get('labellise') == 'non':
+    elif kwargs.get("labellise") == "non":
         query = query.filter(Etablissement.label == False)
-    if kwargs.get('type_pate') and kwargs['type_pate'] != 'tous':
-        query = query.filter(Flan.type_pate == kwargs['type_pate'])
-    if kwargs.get('type_saveur') and kwargs['type_saveur'] != 'tous':
-        query = query.filter(Flan.type_saveur == kwargs['type_saveur'])
-    if kwargs.get('type_texture') and kwargs['type_texture'] != 'tous':
-        query = query.filter(Flan.type_texture == kwargs['type_texture'])
-    if kwargs.get('prix') and kwargs['prix'] != 'tous':
-        if kwargs['prix'] == '0':
+    if kwargs.get("type_pate") and kwargs["type_pate"] != "tous":
+        query = query.filter(Flan.type_pate == kwargs["type_pate"])
+    if kwargs.get("type_saveur") and kwargs["type_saveur"] != "tous":
+        query = query.filter(Flan.type_saveur == kwargs["type_saveur"])
+    if kwargs.get("type_texture") and kwargs["type_texture"] != "tous":
+        query = query.filter(Flan.type_texture == kwargs["type_texture"])
+    if kwargs.get("prix") and kwargs["prix"] != "tous":
+        if kwargs["prix"] == "0":
             query = query.filter(Flan.prix < 2.5)
-        elif kwargs['prix'] == '2.5':
+        elif kwargs["prix"] == "2.5":
             query = query.filter(Flan.prix >= 2.5, Flan.prix < 5)
-        elif kwargs['prix'] == '5':
+        elif kwargs["prix"] == "5":
             query = query.filter(Flan.prix >= 5)
     return query
 
 
-
-@main_bp.route('/liste_etablissements', methods=['GET', 'POST'])
+@main_bp.route("/liste_etablissements", methods=["GET", "POST"])
 def liste_etablissements():
-    form_ajout = EtabForm(prefix='ajout-etab')
-    form_edit = EtabForm(prefix='edit-etab')
+    form_ajout = EtabForm(prefix="ajout-etab")
+    form_edit = EtabForm(prefix="edit-etab")
 
-    if request.method == 'POST':
+    if request.method == "POST":
         form_recherche = RechercheForm(request.form)
     else:
         form_recherche = RechercheForm(request.args)
 
     # 1. Recherche simple (GET uniquement)
-    recherche_simple = request.args.get('recherche_simple', None)
-    if recherche_simple and request.method == 'GET':
+    recherche_simple = request.args.get("recherche_simple", None)
+    if recherche_simple and request.method == "GET":
         query = Etablissement.query.filter(
-            (Etablissement.nom.ilike(f'%{recherche_simple}%')) |
-            (Etablissement.ville.ilike(f'%{recherche_simple}%'))
+            (Etablissement.nom.ilike(f"%{recherche_simple}%"))
+            | (Etablissement.ville.ilike(f"%{recherche_simple}%"))
         )
     else:
         query = Etablissement.query
 
     # 2. Filtres avancés
-    if form_recherche.validate_on_submit() or (request.method == 'GET' and form_recherche.validate()):
+    if form_recherche.validate_on_submit() or (
+        request.method == "GET" and form_recherche.validate()
+    ):
         # On ne fait la jointure que si un filtre sur Flan est activé
         need_join = (
-            (form_recherche.type_saveur.data and form_recherche.type_saveur.data != 'tous') or
-            (form_recherche.type_pate.data and form_recherche.type_pate.data != 'tous') or
-            (form_recherche.type_texture.data and form_recherche.type_texture.data != 'tous') or
-            (form_recherche.prix.data and form_recherche.prix.data != 'tous')
+            (
+                form_recherche.type_saveur.data
+                and form_recherche.type_saveur.data != "tous"
+            )
+            or (
+                form_recherche.type_pate.data
+                and form_recherche.type_pate.data != "tous"
+            )
+            or (
+                form_recherche.type_texture.data
+                and form_recherche.type_texture.data != "tous"
+            )
+            or (form_recherche.prix.data and form_recherche.prix.data != "tous")
         )
         if need_join:
             query = query.join(Flan)
 
         if form_recherche.nom.data:
-            query = query.filter(Etablissement.nom.ilike(f'%{form_recherche.nom.data}%'))
+            query = query.filter(
+                Etablissement.nom.ilike(f"%{form_recherche.nom.data}%")
+            )
         if form_recherche.ville.data:
-            query = query.filter(Etablissement.ville.ilike(f'%{form_recherche.ville.data}%'))
-        if form_recherche.type_saveur.data and form_recherche.type_saveur.data != 'tous':
+            query = query.filter(
+                Etablissement.ville.ilike(f"%{form_recherche.ville.data}%")
+            )
+        if (
+            form_recherche.type_saveur.data
+            and form_recherche.type_saveur.data != "tous"
+        ):
             query = query.filter(Flan.type_saveur == form_recherche.type_saveur.data)
-        if form_recherche.type_pate.data and form_recherche.type_pate.data != 'tous':
+        if form_recherche.type_pate.data and form_recherche.type_pate.data != "tous":
             query = query.filter(Flan.type_pate == form_recherche.type_pate.data)
-        if form_recherche.type_texture.data and form_recherche.type_texture.data != 'tous':
+        if (
+            form_recherche.type_texture.data
+            and form_recherche.type_texture.data != "tous"
+        ):
             query = query.filter(Flan.type_texture == form_recherche.type_texture.data)
-        if form_recherche.prix.data and form_recherche.prix.data != 'tous':
-            if form_recherche.prix.data == '0':
+        if form_recherche.prix.data and form_recherche.prix.data != "tous":
+            if form_recherche.prix.data == "0":
                 query = query.filter(Flan.prix < 2.5)
-            elif form_recherche.prix.data == '2.5':
+            elif form_recherche.prix.data == "2.5":
                 query = query.filter(Flan.prix >= 2.5, Flan.prix < 5)
-            elif form_recherche.prix.data == '5':
+            elif form_recherche.prix.data == "5":
                 query = query.filter(Flan.prix >= 5)
-        if form_recherche.visite.data and form_recherche.visite.data != 'tous':
-            query = query.filter(Etablissement.visite == (form_recherche.visite.data == 'oui'))
-        if form_recherche.labellise.data and form_recherche.labellise.data != 'tous':
-            query = query.filter(Etablissement.label == (form_recherche.labellise.data == 'oui'))
+        if form_recherche.visite.data and form_recherche.visite.data != "tous":
+            query = query.filter(
+                Etablissement.visite == (form_recherche.visite.data == "oui")
+            )
+        if form_recherche.labellise.data and form_recherche.labellise.data != "tous":
+            query = query.filter(
+                Etablissement.label == (form_recherche.labellise.data == "oui")
+            )
 
     # 3. Filtre par proximité
     user_lat = form_recherche.latitude.data
@@ -115,9 +158,17 @@ def liste_etablissements():
         rayon = form_recherche.rayon.data or 5.0
         etablissements = query.distinct().all()
         etablissements = [
-            etab for etab in etablissements
-            if etab.latitude and etab.longitude and
-            calculer_distance(float(user_lat), float(user_lon), float(etab.latitude), float(etab.longitude)) <= float(rayon)
+            etab
+            for etab in etablissements
+            if etab.latitude
+            and etab.longitude
+            and calculer_distance(
+                float(user_lat),
+                float(user_lon),
+                float(etab.latitude),
+                float(etab.longitude),
+            )
+            <= float(rayon)
         ]
     else:
         etablissements = query.distinct().all()
@@ -125,10 +176,10 @@ def liste_etablissements():
     # 4. Préparation pour le template
     etablissements, etablissements_json = afficher_etablissements(etablissements)
     return render_template(
-        'liste_etablissements.html',
+        "liste_etablissements.html",
         etablissements=etablissements,
         etablissements_json=etablissements_json,
-        google_maps_api_key=current_app.config['GOOGLE_MAPS_API_KEY'],
+        google_maps_api_key=current_app.config["GOOGLE_MAPS_API_KEY"],
         form_recherche=form_recherche,
         form_ajout=form_ajout,
         form_edit=form_edit,
@@ -136,55 +187,58 @@ def liste_etablissements():
         user_lon=user_lon,
     )
 
-@main_bp.route('/api/etablissements', methods=['GET', 'POST'])
+
+@main_bp.route("/api/etablissements", methods=["GET", "POST"])
 def api_etablissements():
     try:
         # Récupère les paramètres de filtre
-        if request.method == 'POST':
-            data = request.get_json()  # Récupère les données JSON envoyées avec la requête POST
-            nom = data.get('nom', '')
-            visite = data.get('visite', '')
-            labellise = data.get('labellise', '')
-            ville = data.get('ville', '')
+        if request.method == "POST":
+            data = (
+                request.get_json()
+            )  # Récupère les données JSON envoyées avec la requête POST
+            nom = data.get("nom", "")
+            visite = data.get("visite", "")
+            labellise = data.get("labellise", "")
+            ville = data.get("ville", "")
 
-            type_pate = data.get('type_pate', 'tous')
-            type_saveur = data.get('type_saveur', 'tous')
-            prix = data.get('prix', 'tous')
-            format = data.get('format', 'json')  # 'html' ou 'json'
+            type_pate = data.get("type_pate", "tous")
+            type_saveur = data.get("type_saveur", "tous")
+            prix = data.get("prix", "tous")
+            format = data.get("format", "json")  # 'html' ou 'json'
         else:
-            nom = request.args.get('nom', '')
-            visite = request.args.get('visite', '')
-            labellise = request.args.get('labellise', '')
-            ville = request.args.get('ville', '')
+            nom = request.args.get("nom", "")
+            visite = request.args.get("visite", "")
+            labellise = request.args.get("labellise", "")
+            ville = request.args.get("ville", "")
 
-            type_pate = request.args.get('type_pate', 'tous')
-            type_saveur = request.args.get('type_saveur', 'tous')
-            prix = request.args.get('prix', 'tous')
-            format = request.args.get('format', 'json')  # 'html' ou 'json'
+            type_pate = request.args.get("type_pate", "tous")
+            type_saveur = request.args.get("type_saveur", "tous")
+            prix = request.args.get("prix", "tous")
+            format = request.args.get("format", "json")  # 'html' ou 'json'
         # Applique les filtres
         query = Etablissement.query.join(Flan)
         if nom:
-            query = query.filter(Etablissement.nom.ilike(f'%{nom}%'))
-        if visite == 'oui':
+            query = query.filter(Etablissement.nom.ilike(f"%{nom}%"))
+        if visite == "oui":
             query = query.filter(Etablissement.visite == True)
-        elif visite == 'non':
+        elif visite == "non":
             query = query.filter(Etablissement.visite == False)
-        if labellise == 'oui':
+        if labellise == "oui":
             query = query.filter(Etablissement.label == True)
-        elif labellise == 'non':
+        elif labellise == "non":
             query = query.filter(Etablissement.label == False)
         if ville:
-            query = query.filter(Etablissement.ville.ilike(f'%{ville}%'))
-        if type_pate != 'tous':
+            query = query.filter(Etablissement.ville.ilike(f"%{ville}%"))
+        if type_pate != "tous":
             query = query.filter(Flan.type_pate == type_pate)
-        if type_saveur != 'tous':
+        if type_saveur != "tous":
             query = query.filter(Flan.type_saveur == type_saveur)
-        if prix != 'tous':
-            if prix == '0':
+        if prix != "tous":
+            if prix == "0":
                 query = query.filter(Flan.prix < 2.5)
-            elif prix == '2.5':
+            elif prix == "2.5":
                 query = query.filter(Flan.prix >= 2.5, Flan.prix < 5)
-            elif prix == '5':
+            elif prix == "5":
                 query = query.filter(Flan.prix >= 5)
         # Récupère les résultats uniques
         etablissements = []
@@ -194,105 +248,129 @@ def api_etablissements():
                 seen.add(etab.id_etab)
                 etablissements.append(etab)
         # Renvoie HTML ou JSON
-        if format == 'html':
+        if format == "html":
             html = render_template(
-                'macros/grille_etablissements.html',
+                "macros/grille_etablissements.html",
                 etablissements=etablissements,
-                current_user=current_user
+                current_user=current_user,
             )
             response = make_response(html)
-            response.headers['Content-Type'] = 'text/html; charset=utf-8'
+            response.headers["Content-Type"] = "text/html; charset=utf-8"
             return response
         else:
             # Utilisez la méthode to_dict pour inclure les flans
             return jsonify([etab.to_dict() for etab in etablissements])
     except Exception as e:
         # En cas d'erreur, renvoie toujours du JSON avec un message d'erreur
-        return jsonify({'error': str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
 
 ### INFOWINDOW
-@main_bp.route('/get_infowindow_content')
+@main_bp.route("/get_infowindow_content")
 def get_infowindow_content():
-    id_etab = request.args.get('id_etab', type=int)
+    id_etab = request.args.get("id_etab", type=int)
     etablissement = Etablissement.query.get(id_etab)
     if not etablissement:
         return "Détails non disponibles", 404
 
-    details_url = url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab)
-    return render_template('infowindow_template.html',
-                           etablissement=etablissement,
-                           details_url=details_url)
+    details_url = url_for(
+        "main.afficher_etablissement_unique", id_etab=etablissement.id_etab
+    )
+    return render_template(
+        "infowindow_template.html", etablissement=etablissement, details_url=details_url
+    )
 
 
 ### PAGE RECHERCHE
-@main_bp.route('/rechercher', methods=['GET'])
+@main_bp.route("/rechercher", methods=["GET"])
 def rechercher():
-    form_recherche=RechercheForm()
-    return render_template(
-        'rechercher.html',
-        form_recherche=form_recherche
-    )
-    
+    form_recherche = RechercheForm()
+    return render_template("rechercher.html", form_recherche=form_recherche)
+
 
 ### DASHBOARD
-@main_bp.route('/dashboard', methods=['GET', 'POST'])
+@main_bp.route("/dashboard", methods=["GET", "POST"])
 @login_required
 def dashboard():
     form_ajout = EtabForm()  # Instancie le formulaire
-    profile_form = UpdateProfileForm(prefix='profile')
-    eval_form = EvalForm(prefix='dashboard-eval')
+    profile_form = UpdateProfileForm(prefix="profile")
+    eval_form = EvalForm(prefix="dashboard-eval")
     pending_evaluations = []
     pending_flans = []
     pending_etablissements = []
     if current_user.is_admin:
-        pending_evaluations = Evaluation.query.filter_by(statut='EN_ATTENTE').join(Utilisateur).filter(Utilisateur.is_admin == False).all()
-        pending_flans = Flan.query.filter_by(statut='EN_ATTENTE').join(Utilisateur).filter(Utilisateur.is_admin == False).all()
-        pending_etablissements = Etablissement.query.filter_by(statut='EN_ATTENTE').join(Utilisateur).filter(Utilisateur.is_admin == False).all()
+        pending_evaluations = (
+            Evaluation.query.filter_by(statut="EN_ATTENTE")
+            .join(Utilisateur)
+            .filter(Utilisateur.is_admin == False)
+            .all()
+        )
+        pending_flans = (
+            Flan.query.filter_by(statut="EN_ATTENTE")
+            .join(Utilisateur)
+            .filter(Utilisateur.is_admin == False)
+            .all()
+        )
+        pending_etablissements = (
+            Etablissement.query.filter_by(statut="EN_ATTENTE")
+            .join(Utilisateur)
+            .filter(Utilisateur.is_admin == False)
+            .all()
+        )
 
-    if request.method == 'POST' and profile_form.validate_on_submit():
+    if request.method == "POST" and profile_form.validate_on_submit():
         if profile_form.email.data and profile_form.email.data != current_user.email:
-            existing_user = Utilisateur.query.filter(Utilisateur.email == profile_form.email.data).first()
+            existing_user = Utilisateur.query.filter(
+                Utilisateur.email == profile_form.email.data
+            ).first()
             if existing_user and existing_user.id_user != current_user.id_user:
-                flash('Cet email est déjà utilisé par un autre utilisateur.', 'danger')
-                return redirect(url_for('main.dashboard'))
+                flash("Cet email est déjà utilisé par un autre utilisateur.", "danger")
+                return redirect(url_for("main.dashboard"))
 
         current_user.pseudo = profile_form.pseudo.data
         if profile_form.email.data:
             current_user.email = profile_form.email.data
         if profile_form.new_password.data:
-            current_user.password = bcrypt.generate_password_hash(profile_form.new_password.data).decode('utf-8')
+            current_user.password = bcrypt.generate_password_hash(
+                profile_form.new_password.data
+            ).decode("utf-8")
         try:
             db.session.commit()
-            flash('Votre profil a été mis à jour!', 'success')
+            flash("Votre profil a été mis à jour!", "success")
         except IntegrityError:
             db.session.rollback()
-            flash('Une erreur est survenue lors de la mise à jour de votre profil.', 'danger')
-        return redirect(url_for('main.dashboard'))
+            flash(
+                "Une erreur est survenue lors de la mise à jour de votre profil.",
+                "danger",
+            )
+        return redirect(url_for("main.dashboard"))
 
-    elif request.method == 'GET':
+    elif request.method == "GET":
         profile_form.pseudo.data = current_user.pseudo
         profile_form.email.data = current_user.email
 
-    return render_template('dashboard.html',
-                          title='Tableau de bord',
-                          form_ajout=form_ajout,
-                          profile_form=profile_form,
-                          eval_form=eval_form,
-                          pending_evaluations=pending_evaluations,
-                           pending_flans=pending_flans,
-                           pending_etablissements=pending_etablissements)
+    return render_template(
+        "dashboard.html",
+        title="Tableau de bord",
+        form_ajout=form_ajout,
+        profile_form=profile_form,
+        eval_form=eval_form,
+        pending_evaluations=pending_evaluations,
+        pending_flans=pending_flans,
+        pending_etablissements=pending_etablissements,
+    )
 
 
 ### Routes établissement, flan, évaluation
 
-@main_bp.route('/etablissement/<int:id_etab>', methods=['GET', 'POST'])
+
+@main_bp.route("/etablissement/<int:id_etab>", methods=["GET", "POST"])
 def afficher_etablissement_unique(id_etab):
     etablissement = Etablissement.query.get_or_404(id_etab)
-    form_etab = EtabForm(prefix='edit-etab', obj=etablissement)
+    form_etab = EtabForm(prefix="edit-etab", obj=etablissement)
     delete_form = DeleteForm()
     validate_form = ValidateForm()
-    form_flan = NewFlanForm(prefix='ajout-flan')
+    form_flan = NewFlanForm(prefix="ajout-flan")
 
     if form_etab.validate_on_submit():
         etablissement.nom = form_etab.nom.data
@@ -307,27 +385,27 @@ def afficher_etablissement_unique(id_etab):
             etablissement.label = form_etab.label.data
             etablissement.visite = form_etab.visite.data
         db.session.commit()
-        flash('L\'établissement a été mis à jour avec succès!', 'success')
-        return redirect(url_for('main.afficher_etablissement_unique', id_etab=id_etab))
+        flash("L'établissement a été mis à jour avec succès!", "success")
+        return redirect(url_for("main.afficher_etablissement_unique", id_etab=id_etab))
 
-    return render_template('page_etablissement.html',
-                          etablissement=etablissement,
-                           form_flan=form_flan,
+    return render_template(
+        "page_etablissement.html",
+        etablissement=etablissement,
+        form_flan=form_flan,
+        form_etab=form_etab,
+        current_user=current_user,
+        delete_form=delete_form,
+        validate_form=validate_form,
+    )
 
-                          form_etab=form_etab,
-                          current_user=current_user,
-                           delete_form=delete_form,
-                           validate_form=validate_form)
 
-@main_bp.route('/flan/<int:id_flan>', methods=['GET', 'POST'])
+@main_bp.route("/flan/<int:id_flan>", methods=["GET", "POST"])
 def afficher_flan_unique(id_flan):
     flan_unique = Flan.query.get_or_404(id_flan)
-    form_eval = EvalForm(prefix='flan-eval')
-    form_flan = NewFlanForm(prefix='edit-flan', obj=flan_unique)
+    form_eval = EvalForm(prefix="flan-eval")
+    form_flan = NewFlanForm(prefix="edit-flan", obj=flan_unique)
     delete_form = DeleteForm()
     validate_form = ValidateForm()
-
-
 
     # Traitement de la soumission du formulaire d'édition du flan
     if form_flan.validate_on_submit():
@@ -338,27 +416,25 @@ def afficher_flan_unique(id_flan):
         flan_unique.type_saveur = form_flan.type_saveur.data
         flan_unique.type_texture = form_flan.type_texture.data
         db.session.commit()
-        flash('Le flan a été mis à jour avec succès!', 'success')
-        return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
+        flash("Le flan a été mis à jour avec succès!", "success")
+        return redirect(url_for("main.afficher_flan_unique", id_flan=id_flan))
+
+    return render_template(
+        "page_flan.html",
+        flan=flan_unique,
+        form_eval=form_eval,
+        form_flan=form_flan,
+        current_user=current_user,
+        delete_form=delete_form,
+        validate_form=validate_form,
+    )
 
 
-
-    return render_template('page_flan.html',
-                          flan=flan_unique,
-
-                           form_eval=form_eval,
-                          form_flan=form_flan,
-
-                            current_user=current_user,
-                           delete_form=delete_form,
-                           validate_form=validate_form
-                           )
-
-@main_bp.route('/etablissement/<int:id_etab>/proposer_flan', methods=['GET', 'POST'])
+@main_bp.route("/etablissement/<int:id_etab>/proposer_flan", methods=["GET", "POST"])
 @login_required
 def proposer_flan(id_etab):
     etablissement = Etablissement.query.get_or_404(id_etab)
-    form = NewFlanForm(prefix='ajout-flan')
+    form = NewFlanForm(prefix="ajout-flan")
     form.id_etab.data = id_etab
     if form.validate_on_submit():
         flan = Flan(
@@ -369,38 +445,42 @@ def proposer_flan(id_etab):
             type_saveur=form.type_saveur.data,
             type_texture=form.type_texture.data,
             id_etab=id_etab,
-            id_user=current_user.id_user
+            id_user=current_user.id_user,
         )
         db.session.add(flan)
         db.session.commit()
-        flash('Votre flan a été proposé avec succès !', 'success')
-        return redirect(url_for('main.afficher_etablissement_unique', id_etab=id_etab))
-    return render_template('page_etablissement.html', form=form, etablissement=etablissement)
+        flash("Votre flan a été proposé avec succès !", "success")
+        return redirect(url_for("main.afficher_etablissement_unique", id_etab=id_etab))
+    return render_template(
+        "page_etablissement.html", form=form, etablissement=etablissement
+    )
 
-@main_bp.route('/valider_flan/<int:id_flan>', methods=['POST'])
+
+@main_bp.route("/valider_flan/<int:id_flan>", methods=["POST"])
 @login_required
 def valider_flan(id_flan):
     if not current_user.is_admin:
-        flash('Vous n\'avez pas le droit d\'accéder à cette page.', 'danger')
-        return redirect(url_for('main.dashboard'))
+        flash("Vous n'avez pas le droit d'accéder à cette page.", "danger")
+        return redirect(url_for("main.dashboard"))
     flan = Flan.query.get_or_404(id_flan)
-    flan.statut = 'VALIDE'
+    flan.statut = "VALIDE"
     try:
         db.session.commit()
-        flash('Le flan a été validé avec succès!', 'success')
+        flash("Le flan a été validé avec succès!", "success")
     except IntegrityError:
         db.session.rollback()
-        flash('Une erreur est survenue lors de la validation du flan.', 'danger')
-    return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
+        flash("Une erreur est survenue lors de la validation du flan.", "danger")
+    return redirect(url_for("main.afficher_flan_unique", id_flan=id_flan))
 
-@main_bp.route('/modifier_flan/<int:id_flan>', methods=['POST'])
+
+@main_bp.route("/modifier_flan/<int:id_flan>", methods=["POST"])
 @login_required
 def modifier_flan(id_flan):
     flan = Flan.query.get_or_404(id_flan)
-    form = NewFlanForm(prefix='edit-flan')
+    form = NewFlanForm(prefix="edit-flan")
     if current_user.id_user != flan.id_user and not current_user.is_admin:
-        flash('Vous n\'avez pas le droit de modifier ce flan.', 'danger')
-        return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
+        flash("Vous n'avez pas le droit de modifier ce flan.", "danger")
+        return redirect(url_for("main.afficher_flan_unique", id_flan=id_flan))
     if form.validate_on_submit():
         flan.nom = form.nom.data
         flan.type_saveur = form.type_saveur.data
@@ -409,34 +489,40 @@ def modifier_flan(id_flan):
         flan.description = form.description.data
         flan.prix = form.prix.data
         db.session.commit()
-        flash('Le flan a été mis à jour avec succès!', 'success')
+        flash("Le flan a été mis à jour avec succès!", "success")
     else:
-        flash('Le formulaire n\'a pas été validé. Veuillez vérifier les erreurs.', 'danger')
-    return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
+        flash(
+            "Le formulaire n'a pas été validé. Veuillez vérifier les erreurs.", "danger"
+        )
+    return redirect(url_for("main.afficher_flan_unique", id_flan=id_flan))
 
-@main_bp.route('/supprimer_flan/<int:id_flan>', methods=['POST'])
+
+@main_bp.route("/supprimer_flan/<int:id_flan>", methods=["POST"])
 @login_required
 def supprimer_flan(id_flan):
     flan = Flan.query.get_or_404(id_flan)
     if current_user.id_user != flan.id_user and not current_user.is_admin:
-        flash('Vous n\'avez pas le droit de supprimer ce flan.', 'danger')
-        return redirect(url_for('main.dashboard'))
+        flash("Vous n'avez pas le droit de supprimer ce flan.", "danger")
+        return redirect(url_for("main.dashboard"))
     db.session.delete(flan)
     try:
         db.session.commit()
-        flash('Le flan a été supprimé avec succès!', 'success')
+        flash("Le flan a été supprimé avec succès!", "success")
     except IntegrityError:
         db.session.rollback()
-        flash('Une erreur est survenue lors de la suppression du flan.', 'danger')
-    return redirect(url_for('main.dashboard'))
+        flash("Une erreur est survenue lors de la suppression du flan.", "danger")
+    return redirect(url_for("main.dashboard"))
 
-@main_bp.route('/flan/<int:id_flan>/evaluer', methods=['GET', 'POST'])
+
+@main_bp.route("/flan/<int:id_flan>/evaluer", methods=["GET", "POST"])
 @login_required
 def evaluer_flan(id_flan):
-  
-    form = EvalForm(prefix='flan-eval')
-    evaluation = Evaluation.query.filter_by(id_flan=id_flan, id_user=current_user.id_user).first()
-    if request.method == 'GET' and evaluation:
+
+    form = EvalForm(prefix="flan-eval")
+    evaluation = Evaluation.query.filter_by(
+        id_flan=id_flan, id_user=current_user.id_user
+    ).first()
+    if request.method == "GET" and evaluation:
         form.visuel.data = str(evaluation.visuel)
         form.texture.data = str(evaluation.texture)
         form.pate.data = str(evaluation.pate)
@@ -444,53 +530,84 @@ def evaluer_flan(id_flan):
         form.description.data = evaluation.description
     if form.validate_on_submit():
         try:
-            evaluation = mise_a_jour_evaluation(form, id_flan, current_user.id_user, current_user.is_admin)
-            flash('Votre évaluation a été mise à jour avec succès!', 'success')
+            evaluation = mise_a_jour_evaluation(
+                form, id_flan, current_user.id_user, current_user.is_admin
+            )
+            flash("Votre évaluation a été mise à jour avec succès!", "success")
         except Exception as e:
             print("Error during form submission:", e)
-            flash('Une erreur est survenue lors de la mise à jour de l\'évaluation: ' + str(e), 'danger')
+            flash(
+                "Une erreur est survenue lors de la mise à jour de l'évaluation: "
+                + str(e),
+                "danger",
+            )
     else:
-        if request.method == 'POST':
+        if request.method == "POST":
             print("Form validation errors:", form.errors)
-            flash('Le formulaire n\'a pas été validé correctement. Veuillez vérifier les erreurs.', 'danger')
-    return redirect(url_for('main.afficher_flan_unique', id_flan=id_flan))
+            flash(
+                "Le formulaire n'a pas été validé correctement. Veuillez vérifier les erreurs.",
+                "danger",
+            )
+    return redirect(url_for("main.afficher_flan_unique", id_flan=id_flan))
 
 
-@main_bp.route('/evaluation/<int:id_eval>', methods=['GET', 'POST'])
+@main_bp.route("/evaluation/<int:id_eval>", methods=["GET", "POST"])
 @login_required
 def afficher_evaluation_unique(id_eval):
     evaluation = Evaluation.query.get_or_404(id_eval)
     flan_unique = Flan.query.get_or_404(evaluation.id_flan)
-    form = EvalForm(prefix='eval-detail')
+    form = EvalForm(prefix="eval-detail")
     delete_form = DeleteForm()
     validate_form = ValidateForm()
 
-
-    if request.method == 'GET':
+    if request.method == "GET":
         form.visuel.data = evaluation.visuel
         form.texture.data = evaluation.texture
         form.pate.data = evaluation.pate
         form.gout.data = evaluation.gout
         form.description.data = evaluation.description
     if form.validate_on_submit():
-        evaluation = mise_a_jour_evaluation(form, flan_unique.id_flan, current_user.id_user, current_user.is_admin)
-        flash('L\'évaluation a été mise à jour avec succès!', 'success')
-        return redirect(url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval))
-    return render_template('page_evaluation.html',
-                           evaluation=evaluation, form=form, current_user=current_user,
-                           delete_form=delete_form,  # <-- Passe delete_form au template
-                            validate_form=validate_form,
-                           current_page='page_evaluation')
-
+        evaluation = mise_a_jour_evaluation(
+            form, flan_unique.id_flan, current_user.id_user, current_user.is_admin
+        )
+        flash("L'évaluation a été mise à jour avec succès!", "success")
+        return redirect(
+            url_for("main.afficher_evaluation_unique", id_eval=evaluation.id_eval)
+        )
+    return render_template(
+        "page_evaluation.html",
+        evaluation=evaluation,
+        form=form,
+        current_user=current_user,
+        delete_form=delete_form,  # <-- Passe delete_form au template
+        validate_form=validate_form,
+        current_page="page_evaluation",
+    )
 
 
 def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
     print("Form data received:", form.data)
-    visuel = float(str(form.visuel.data).replace(',', '.')) if form.visuel.data is not None else None
-    texture = float(str(form.texture.data).replace(',', '.')) if form.texture.data is not None else None
-    pate = float(str(form.pate.data).replace(',', '.')) if form.pate.data is not None else None
-    gout = float(str(form.gout.data).replace(',', '.')) if form.gout.data is not None else None
-    description = form.description.data if form.description.data is not None else ''
+    visuel = (
+        float(str(form.visuel.data).replace(",", "."))
+        if form.visuel.data is not None
+        else None
+    )
+    texture = (
+        float(str(form.texture.data).replace(",", "."))
+        if form.texture.data is not None
+        else None
+    )
+    pate = (
+        float(str(form.pate.data).replace(",", "."))
+        if form.pate.data is not None
+        else None
+    )
+    gout = (
+        float(str(form.gout.data).replace(",", "."))
+        if form.gout.data is not None
+        else None
+    )
+    description = form.description.data if form.description.data is not None else ""
 
     evaluation = Evaluation.query.filter_by(id_flan=id_flan, id_user=id_user).first()
     if evaluation:
@@ -501,18 +618,18 @@ def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
         evaluation.gout = gout
         evaluation.description = description
         moyenne = (
-            float(evaluation.visuel or 0) +
-            float(evaluation.texture or 0) +
-            float(evaluation.pate or 0) +
-            float(evaluation.gout or 0)
+            float(evaluation.visuel or 0)
+            + float(evaluation.texture or 0)
+            + float(evaluation.pate or 0)
+            + float(evaluation.gout or 0)
         ) / 4
         evaluation.moyenne = moyenne
     else:
         moyenne = (
-            float(visuel or 0) +
-            float(texture or 0) +
-            float(pate or 0) +
-            float(gout or 0)
+            float(visuel or 0)
+            + float(texture or 0)
+            + float(pate or 0)
+            + float(gout or 0)
         ) / 4
         evaluation = Evaluation(
             visuel=visuel,
@@ -522,62 +639,71 @@ def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
             description=description,
             id_flan=id_flan,
             id_user=id_user,
-            moyenne=moyenne
+            moyenne=moyenne,
         )
     if is_admin:
-        evaluation.statut = 'VALIDE'
+        evaluation.statut = "VALIDE"
     db.session.add(evaluation)
     db.session.commit()
     return evaluation
 
-@main_bp.route('/valider_evaluation/<int:id_eval>', methods=['POST'])
+
+@main_bp.route("/valider_evaluation/<int:id_eval>", methods=["POST"])
 @login_required
 def valider_evaluation(id_eval):
     if not current_user.is_admin:
-        flash('Vous n\'avez pas le droit d\'accéder à cette page.', 'danger')
-        return redirect(url_for('main.dashboard'))
+        flash("Vous n'avez pas le droit d'accéder à cette page.", "danger")
+        return redirect(url_for("main.dashboard"))
     evaluation = Evaluation.query.get_or_404(id_eval)
-    evaluation.statut = 'VALIDE'
+    evaluation.statut = "VALIDE"
     try:
         db.session.commit()
-        flash('L\'évaluation a été validée avec succès!', 'success')
+        flash("L'évaluation a été validée avec succès!", "success")
     except IntegrityError:
         db.session.rollback()
-        flash('Une erreur est survenue lors de la validation de l\'évaluation.', 'danger')
-    return redirect(url_for('main.dashboard'))
+        flash(
+            "Une erreur est survenue lors de la validation de l'évaluation.", "danger"
+        )
+    return redirect(url_for("main.dashboard"))
 
-@main_bp.route('/supprimer_evaluation/<int:id_eval>', methods=['POST'])
+
+@main_bp.route("/supprimer_evaluation/<int:id_eval>", methods=["POST"])
 @login_required
 def supprimer_evaluation(id_eval):
     evaluation = Evaluation.query.get_or_404(id_eval)
     if current_user.id_user != evaluation.id_user and not current_user.is_admin:
-        flash('Vous n\'avez pas le droit de supprimer cette évaluation.', 'danger')
-        return redirect(url_for('main.dashboard'))
+        flash("Vous n'avez pas le droit de supprimer cette évaluation.", "danger")
+        return redirect(url_for("main.dashboard"))
     db.session.delete(evaluation)
     try:
         db.session.commit()
-        flash('L\'évaluation a été supprimée avec succès!', 'success')
+        flash("L'évaluation a été supprimée avec succès!", "success")
     except IntegrityError:
         db.session.rollback()
-        flash('Une erreur est survenue lors de la suppression de l\'évaluation.', 'danger')
-    return redirect(url_for('main.dashboard'))
+        flash(
+            "Une erreur est survenue lors de la suppression de l'évaluation.", "danger"
+        )
+    return redirect(url_for("main.dashboard"))
+
 
 ### BADGES
 
+
 def afficher_badge_etablissement(etablissement):
-    if hasattr(etablissement, 'label') and etablissement.label:
+    if hasattr(etablissement, "label") and etablissement.label:
         return '<span class="badge badge-labellise">❤️ Labellisé</span>'
-    return ''
+    return ""
+
 
 def afficher_badge_type_etab(etablissement):
     couleurs = {
-        'BOULANGERIE': '#F5DEB3',
-        'PATISSERIE': '#FFB6C1',
-        'RESTAURANT': '#87CEEB',
-        'CAFE': '#D2B48C'
+        "BOULANGERIE": "#F5DEB3",
+        "PATISSERIE": "#FFB6C1",
+        "RESTAURANT": "#87CEEB",
+        "CAFE": "#D2B48C",
     }
-    type_etab = getattr(etablissement, 'type_etab', None)
+    type_etab = getattr(etablissement, "type_etab", None)
     if type_etab:
-        couleur = couleurs.get(type_etab.name, '#D3D3D3')
+        couleur = couleurs.get(type_etab.name, "#D3D3D3")
         return f'<div class="badge badge-type-etab" style="background-color: {couleur};">{type_etab.value}</div>'
-    return ''
+    return ""

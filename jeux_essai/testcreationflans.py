@@ -3,38 +3,42 @@ from sqlalchemy.orm import sessionmaker
 import random
 from enum import Enum
 
+
 # Définition des énumérations
 class TypePate(Enum):
-    FEUILLETEE = 'Feuilletée'
-    BRISEE = 'Brisée'
-    SUCREE = 'Sucrée'
-    SABLEE = 'Sablée'
-    MIXTE = 'Mixte'
+    FEUILLETEE = "Feuilletée"
+    BRISEE = "Brisée"
+    SUCREE = "Sucrée"
+    SABLEE = "Sablée"
+    MIXTE = "Mixte"
+
 
 class TypeSaveur(Enum):
     VANILLE = "Vanille"
     NOIX = "Noix"
     FRUITS = "Fruits"
-    INSOLITE = 'Insolite'
-    NATURE = 'Nature'
+    INSOLITE = "Insolite"
+    NATURE = "Nature"
+
 
 class TypeTexture(Enum):
-    GELATINEUSE = 'Gélatineuse'
-    CREMEUSE = 'Crémeuse'
-    COSTAUD = 'Costaud'
-    OEUF = 'Oeuf'
-    MIX_PARFAIT = 'Mix parfait'
+    GELATINEUSE = "Gélatineuse"
+    CREMEUSE = "Crémeuse"
+    COSTAUD = "Costaud"
+    OEUF = "Oeuf"
+    MIX_PARFAIT = "Mix parfait"
+
 
 # Configuration de la connexion à la base de données
-DATABASE_URI = 'mysql+pymysql://flask_user:flanflask@localhost/planflan_db'
+DATABASE_URI = "mysql+pymysql://flask_user:flanflask@localhost/planflan_db"
 engine = create_engine(DATABASE_URI)
 Session = sessionmaker(bind=engine)
 session = Session()
 
 # Récupérer les tables
 metadata = MetaData()
-etablissements = Table('etablissements', metadata, autoload_with=engine)
-flans = Table('flans', metadata, autoload_with=engine)
+etablissements = Table("etablissements", metadata, autoload_with=engine)
+flans = Table("flans", metadata, autoload_with=engine)
 
 # 1. Supprimer tous les flans existants
 session.execute(delete(flans))
@@ -47,7 +51,14 @@ result = session.execute(query)
 etablissement_records = result.fetchall()
 
 # Liste de noms de flans
-noms_flans = ["Flan Vanille", "Flan Chocolat", "Flan Caramel", "Flan Café", "Flan Noisette", "Flan Citron"]
+noms_flans = [
+    "Flan Vanille",
+    "Flan Chocolat",
+    "Flan Caramel",
+    "Flan Café",
+    "Flan Noisette",
+    "Flan Citron",
+]
 
 # Liste de descriptions
 descriptions = [
@@ -56,7 +67,7 @@ descriptions = [
     "Un flan au caramel avec une touche de sel.",
     "Un flan au café pour les amateurs de café.",
     "Un flan à la noisette avec une texture onctueuse.",
-    "Un flan au citron rafraîchissant."
+    "Un flan au citron rafraîchissant.",
 ]
 
 # 2. Créer des flans aléatoires pour chaque établissement
@@ -81,11 +92,13 @@ for etablissement in etablissement_records:
             type_pate=type_pate,
             type_saveur=type_saveur,
             type_texture=type_texture,
-            id_user=1
+            id_user=1,
         )
         session.execute(stmt)
 
 # Valider les modifications
 session.commit()
-print(f"✅ {len(etablissement_records)} établissements mis à jour avec des flans aléatoires.")
+print(
+    f"✅ {len(etablissement_records)} établissements mis à jour avec des flans aléatoires."
+)
 session.close()

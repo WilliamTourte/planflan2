@@ -10,10 +10,11 @@ from flask_migrate import Migrate
 db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
-login_manager.login_view = 'auth.login'
+login_manager.login_view = "auth.login"
 login_manager.login_message = "Veuillez vous connecter pour accéder à cette page."
 bcrypt = Bcrypt()
 csrf = CSRFProtect()
+
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -30,18 +31,21 @@ def create_app(config_class=Config):
     with app.app_context():
         try:
             db.session.execute(text("SELECT 1"))
-            print("✅ Connexion réussie avec l'URL :", app.config['SQLALCHEMY_DATABASE_URI'])
+            print(
+                "✅ Connexion réussie avec l'URL :",
+                app.config["SQLALCHEMY_DATABASE_URI"],
+            )
         except Exception as e:
             print(f"❌ Erreur de connexion : {e}")
             print(f"URL utilisée : {app.config['SQLALCHEMY_DATABASE_URI']}")
 
-
     @login_manager.user_loader
     def load_user(user_id):
         from .models import Utilisateur
+
         return Utilisateur.query.get(int(user_id))
 
-    @app.template_filter('enlever_accents')
+    @app.template_filter("enlever_accents")
     def filtre_enlever_accents(text):
         return enlever_accents(text)
 

@@ -6,19 +6,23 @@ app = create_app()
 # Crée le contexte d'application
 with app.app_context():
 
-
     # Crée toutes les tables
     db.create_all()
 
     # Importe les modèles après la création de l'app
-    from app.models import Utilisateur, TypeEtab, Etablissement, Flan, Evaluation, Photo, StatutEval, TypeCible
+    from app.models import (
+        Utilisateur,
+        TypeEtab,
+        Etablissement,
+        Flan,
+        Evaluation,
+        Photo,
+        StatutEval,
+        TypeCible,
+    )
 
     # Exemple : Création d'un utilisateur admin
-    admin = Utilisateur(
-        pseudo="admin",
-        email="admin@example.com",
-        is_admin=True
-    )
+    admin = Utilisateur(pseudo="admin", email="admin@example.com", is_admin=True)
     admin.set_password("adminpassword", bcrypt)
     db.session.add(admin)
 
@@ -29,7 +33,7 @@ with app.app_context():
         adresse="123 Rue de Test",
         code_postal="75000",
         ville="Paris",
-        label=True
+        label=True,
     )
     db.session.add(etab)
 
@@ -37,7 +41,7 @@ with app.app_context():
         nom="Flan Nature",
         description="Un délicieux flan nature.",
         prix=3.50,
-        etablissement=etab
+        etablissement=etab,
     )
     db.session.add(flan)
 

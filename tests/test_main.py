@@ -1,6 +1,14 @@
 from app import db
 from app.models import Etablissement, Flan, Evaluation, Utilisateur
-from app.forms import RechercheForm, EtabForm, NewFlanForm, EvalForm, UpdateProfileForm, DeleteForm, ValidateForm
+from app.forms import (
+    RechercheForm,
+    EtabForm,
+    NewFlanForm,
+    EvalForm,
+    UpdateProfileForm,
+    DeleteForm,
+    ValidateForm,
+)
 from flask_login import current_user
 from flask import get_flashed_messages
 import pytest
@@ -10,73 +18,92 @@ import pytest
 
 @pytest.mark.main
 def test_example(client):
-    response = client.get('/')
+    response = client.get("/")
     assert response.status_code == 200
+
 
 @pytest.mark.main
 def test_liste_etab(client):
-    response = client.get('/liste_etablissements')
+    response = client.get("/liste_etablissements")
     assert response.status_code == 200
 
 
 @pytest.mark.main
 def test_rechercher(client):
-    response = client.get('/rechercher')
+    response = client.get("/rechercher")
     assert response.status_code == 200
-    assert b'Rechercher' in response.data
+    assert b"Rechercher" in response.data
 
 
 def test_afficher_etablissement_unique(client):
     # Créer un établissement de test
-    etab = Etablissement(nom='Test Etablissement', ville='Test Ville', adresse='Test Adresse', code_postal='69001', id_user=1)
+    etab = Etablissement(
+        nom="Test Etablissement",
+        ville="Test Ville",
+        adresse="Test Adresse",
+        code_postal="69001",
+        id_user=1,
+    )
     db.session.add(etab)
     db.session.commit()
-    response = client.get(f'/etablissement/{etab.id_etab}')
+    response = client.get(f"/etablissement/{etab.id_etab}")
     assert response.status_code == 200
 
 
 def test_afficher_flan_unique(client):
     # Créer un établissement et un flan de test
-    etab = Etablissement(nom='Test Etablissement', ville='Test Ville', adresse='Test Adresse', code_postal='69001', id_user="1", id_etab="1")
+    etab = Etablissement(
+        nom="Test Etablissement",
+        ville="Test Ville",
+        adresse="Test Adresse",
+        code_postal="69001",
+        id_user="1",
+        id_etab="1",
+    )
     db.session.add(etab)
-    flan = Flan(nom='Test Flan', prix=2.5, id_etab=etab.id_etab)
+    flan = Flan(nom="Test Flan", prix=2.5, id_etab=etab.id_etab)
     db.session.add(flan)
     db.session.commit()
-    response = client.get(f'/flan/{flan.id_flan}')
+    response = client.get(f"/flan/{flan.id_flan}")
     assert response.status_code == 200
-    assert b'Test Flan' in response.data
-
+    assert b"Test Flan" in response.data
 
 
 def test_proposer_flan(client):
     # Récupérer l'utilisateur créé dans la fixture (déjà connecté via la fixture)
-    user = client.application.config['TEST_USER']
+    user = client.application.config["TEST_USER"]
     assert user is not None, "L'utilisateur de test n'existe pas"
-    
+
     # Créer un établissement de test lié à cet utilisateur
     with client.application.app_context():
-        etab = Etablissement(nom='Test Etablissement', ville='Test Ville', adresse='Test Adresse', code_postal='69001', id_user=user.id_user)
+        etab = Etablissement(
+            nom="Test Etablissement",
+            ville="Test Ville",
+            adresse="Test Adresse",
+            code_postal="69001",
+            id_user=user.id_user,
+        )
         db.session.add(etab)
         db.session.commit()
         etab_id = etab.id_etab
-    
+
     # Compter le nombre de flans avant la création
     with client.application.app_context():
         flans_before = Flan.query.filter_by(id_etab=etab_id).count()
-    
+
     # Envoyer la requête - l'utilisateur est déjà connecté via la fixture
     # Utiliser les données du formulaire comme attendues par la route
     response = client.post(
-        f'/etablissement/{etab_id}/proposer_flan',
+        f"/etablissement/{etab_id}/proposer_flan",
         data={
-            'ajout-flan-nom': 'Nouveau Flan',
-            'ajout-flan-prix': 2.5,
-            'ajout-flan-description': 'Description du flan',
-            'ajout-flan-type_pate': 'BRISEE',
-            'ajout-flan-type_saveur': 'VANILLE',
-            'ajout-flan-type_texture': 'CREMEUSE'
+            "ajout-flan-nom": "Nouveau Flan",
+            "ajout-flan-prix": 2.5,
+            "ajout-flan-description": "Description du flan",
+            "ajout-flan-type_pate": "BRISEE",
+            "ajout-flan-type_saveur": "VANILLE",
+            "ajout-flan-type_texture": "CREMEUSE",
         },
-        follow_redirects=True
+        follow_redirects=True,
     )
 
     # Vérifier le statut HTTP (200 pour la page ou 302 pour redirection)
@@ -85,13 +112,21 @@ def test_proposer_flan(client):
     # Vérifier que le flan a été créé dans la base de données
     with client.application.app_context():
         flans_after = Flan.query.filter_by(id_etab=etab_id).count()
-        assert flans_after == flans_before + 1, f"Le flan n'a pas été créé. Avant: {flans_before}, Après: {flans_after}"
-        
+        assert (
+            flans_after == flans_before + 1
+        ), f"Le flan n'a pas été créé. Avant: {flans_before}, Après: {flans_after}"
+
         # Vérifier que le flan a les bonnes propriétés
-        nouveau_flan = Flan.query.filter_by(nom='Nouveau Flan').first()
-        assert nouveau_flan is not None, "Le nouveau flan n'a pas été trouvé dans la base de données"
-        assert nouveau_flan.prix == 2.5, f"Le prix du flan est incorrect: {nouveau_flan.prix}"
-        assert nouveau_flan.id_user == user.id_user, "L'ID de l'utilisateur n'est pas correct"
+        nouveau_flan = Flan.query.filter_by(nom="Nouveau Flan").first()
+        assert (
+            nouveau_flan is not None
+        ), "Le nouveau flan n'a pas été trouvé dans la base de données"
+        assert (
+            nouveau_flan.prix == 2.5
+        ), f"Le prix du flan est incorrect: {nouveau_flan.prix}"
+        assert (
+            nouveau_flan.id_user == user.id_user
+        ), "L'ID de l'utilisateur n'est pas correct"
 
     # Récupérer et afficher les messages flash
     flashed_messages = get_flashed_messages(with_categories=True)
@@ -99,670 +134,923 @@ def test_proposer_flan(client):
 
     # Vérifier qu'il y a au moins un message flash de succès
     assert len(flashed_messages) > 0, "Aucun message flash trouvé"
-    
+
     # Vérifier que le message contient une indication de succès
     messages = [message for category, message in flashed_messages]
     categories = [category for category, message in flashed_messages]
     print("Messages :", messages)
     print("Catégories :", categories)
-    
-    success_condition = any('succès' in message.lower() for message in messages)
-    assert success_condition, f"Aucun message de succès trouvé. Messages: {messages}"
 
+    success_condition = any("succès" in message.lower() for message in messages)
+    assert success_condition, f"Aucun message de succès trouvé. Messages: {messages}"
 
 
 @pytest.mark.main
 def test_valider_flan(client):
     # Récupérer l'utilisateur admin créé dans la fixture
-    user = client.application.config['TEST_USER']
+    user = client.application.config["TEST_USER"]
     assert user.is_admin, "L'utilisateur doit être admin pour valider les flans"
-    
+
     # Créer un établissement et un flan de test
     with client.application.app_context():
-        etab = Etablissement(nom='Test Etablissement', adresse='Test Adresse', code_postal='69001', ville='Test Ville', id_user=user.id_user)
+        etab = Etablissement(
+            nom="Test Etablissement",
+            adresse="Test Adresse",
+            code_postal="69001",
+            ville="Test Ville",
+            id_user=user.id_user,
+        )
         db.session.add(etab)
         db.session.commit()
-        
-        flan = Flan(nom='Test Flan', prix=2.5, id_etab=etab.id_etab, id_user=user.id_user)
+
+        flan = Flan(
+            nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user
+        )
         db.session.add(flan)
         db.session.commit()
-        
+
         # Stocker l'ID du flan pour l'utiliser après la requête
         flan_id = flan.id_flan
-    
+
     # Envoyer la requête de validation
-    response = client.post(f'/valider_flan/{flan_id}')
+    response = client.post(f"/valider_flan/{flan_id}")
     assert response.status_code == 302  # Redirection
-    
+
     # Vérifier que le flan a été validé
     with client.application.app_context():
         updated_flan = Flan.query.get(flan_id)
         # Vérifier que le statut n'est plus 'EN_ATTENTE'
         # (la route devrait le mettre à 'VALIDE' mais il y a un bug connu avec 'valide' vs 'VALIDE')
-        assert updated_flan.statut.value != 'EN_ATTENTE', f"Le statut du flan n'a pas été mis à jour. Statut actuel: {updated_flan.statut.value}"
+        assert (
+            updated_flan.statut.value != "EN_ATTENTE"
+        ), f"Le statut du flan n'a pas été mis à jour. Statut actuel: {updated_flan.statut.value}"
+
 
 @pytest.mark.main
 def test_modifier_flan(client):
     # Récupérer l'utilisateur créé dans la fixture
-    user = client.application.config['TEST_USER']
+    user = client.application.config["TEST_USER"]
     assert user is not None, "L'utilisateur de test n'existe pas"
-    
+
     # Créer un établissement et un flan de test
     with client.application.app_context():
-        etab = Etablissement(nom='Test Etablissement', adresse='Test Adresse', code_postal='69001', ville='Test Ville', id_user=user.id_user)
+        etab = Etablissement(
+            nom="Test Etablissement",
+            adresse="Test Adresse",
+            code_postal="69001",
+            ville="Test Ville",
+            id_user=user.id_user,
+        )
         db.session.add(etab)
         db.session.commit()
-        
-        flan = Flan(nom='Test Flan', prix=2.5, id_etab=etab.id_etab, id_user=user.id_user)
+
+        flan = Flan(
+            nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user
+        )
         db.session.add(flan)
         db.session.commit()
         flan_id = flan.id_flan
-    
+
     # Envoyer la requête de modification avec les bons noms de champs
-    response = client.post(f'/modifier_flan/{flan_id}', data={
-        'edit-flan-nom': 'Nouveau Nom',
-        'edit-flan-prix': 3.0,
-        'edit-flan-description': 'Nouvelle description',
-        'edit-flan-type_pate': 'BRISEE',
-        'edit-flan-type_saveur': 'VANILLE',
-        'edit-flan-type_texture': 'CREMEUSE'
-    }, follow_redirects=True)
-    
+    response = client.post(
+        f"/modifier_flan/{flan_id}",
+        data={
+            "edit-flan-nom": "Nouveau Nom",
+            "edit-flan-prix": 3.0,
+            "edit-flan-description": "Nouvelle description",
+            "edit-flan-type_pate": "BRISEE",
+            "edit-flan-type_saveur": "VANILLE",
+            "edit-flan-type_texture": "CREMEUSE",
+        },
+        follow_redirects=True,
+    )
+
     assert response.status_code == 200
-    
+
     # Vérifier que le flan a été mis à jour dans la base de données
     with client.application.app_context():
         updated_flan = Flan.query.get(flan_id)
-        assert updated_flan.nom == 'Nouveau Nom', f"Le nom du flan n'a pas été mis à jour: {updated_flan.nom}"
-        assert updated_flan.prix == 3.0, f"Le prix du flan n'a pas été mis à jour: {updated_flan.prix}"
-    
+        assert (
+            updated_flan.nom == "Nouveau Nom"
+        ), f"Le nom du flan n'a pas été mis à jour: {updated_flan.nom}"
+        assert (
+            updated_flan.prix == 3.0
+        ), f"Le prix du flan n'a pas été mis à jour: {updated_flan.prix}"
+
     # Vérifier le message de succès
     flashed_messages = get_flashed_messages(with_categories=True)
     messages = [message for category, message in flashed_messages]
-    assert any('mis à jour' in message.lower() for message in messages), f"Aucun message de mise à jour trouvé: {messages}"
+    assert any(
+        "mis à jour" in message.lower() for message in messages
+    ), f"Aucun message de mise à jour trouvé: {messages}"
+
 
 @pytest.mark.main
 def test_supprimer_flan(client):
     # Récupérer l'utilisateur créé dans la fixture
-    user = client.application.config['TEST_USER']
+    user = client.application.config["TEST_USER"]
     assert user is not None, "L'utilisateur de test n'existe pas"
-    
+
     # Créer un établissement et un flan de test
     with client.application.app_context():
-        etab = Etablissement(nom='Test Etablissement', adresse='Test Adresse', code_postal='69001', ville='Test Ville', id_user=user.id_user)
+        etab = Etablissement(
+            nom="Test Etablissement",
+            adresse="Test Adresse",
+            code_postal="69001",
+            ville="Test Ville",
+            id_user=user.id_user,
+        )
         db.session.add(etab)
         db.session.commit()
-        
-        flan = Flan(nom='Test Flan', prix=2.5, id_etab=etab.id_etab, id_user=user.id_user)
+
+        flan = Flan(
+            nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user
+        )
         db.session.add(flan)
         db.session.commit()
         flan_id = flan.id_flan
-    
+
     # Envoyer la requête de suppression
-    response = client.post(f'/supprimer_flan/{flan_id}')
+    response = client.post(f"/supprimer_flan/{flan_id}")
     assert response.status_code == 302  # Redirection
-    
+
     # Vérifier que le flan a été supprimé de la base de données
     with client.application.app_context():
         deleted_flan = Flan.query.get(flan_id)
-        assert deleted_flan is None, "Le flan n'a pas été supprimé de la base de données"
+        assert (
+            deleted_flan is None
+        ), "Le flan n'a pas été supprimé de la base de données"
+
 
 @pytest.mark.main
 def test_evaluer_flan(client):
     # Récupérer l'utilisateur créé dans la fixture
-    user = client.application.config['TEST_USER']
+    user = client.application.config["TEST_USER"]
     assert user is not None, "L'utilisateur de test n'existe pas"
-    
+
     # Créer un établissement et un flan de test
     with client.application.app_context():
-        etab = Etablissement(nom='Test Etablissement', adresse='Test Adresse', code_postal='69001', ville='Test Ville', id_user=user.id_user)
+        etab = Etablissement(
+            nom="Test Etablissement",
+            adresse="Test Adresse",
+            code_postal="69001",
+            ville="Test Ville",
+            id_user=user.id_user,
+        )
         db.session.add(etab)
         db.session.commit()
-        
-        flan = Flan(nom='Test Flan', prix=2.5, id_etab=etab.id_etab, id_user=user.id_user)
+
+        flan = Flan(
+            nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user
+        )
         db.session.add(flan)
         db.session.commit()
         flan_id = flan.id_flan
-    
+
     # Envoyer la requête d'évaluation avec les bons noms de champs
-    response = client.post(f'/flan/{flan_id}/evaluer', data={
-        'flan-eval-visuel': 5,
-        'flan-eval-texture': 5,
-        'flan-eval-pate': 5,
-        'flan-eval-gout': 5,
-        'flan-eval-description': 'Test Description'
-    }, follow_redirects=True)
-    
+    response = client.post(
+        f"/flan/{flan_id}/evaluer",
+        data={
+            "flan-eval-visuel": 5,
+            "flan-eval-texture": 5,
+            "flan-eval-pate": 5,
+            "flan-eval-gout": 5,
+            "flan-eval-description": "Test Description",
+        },
+        follow_redirects=True,
+    )
+
     assert response.status_code == 200
-    
+
     # Vérifier que l'évaluation a été créée dans la base de données
     with client.application.app_context():
-        evaluations = Evaluation.query.filter_by(id_flan=flan_id, id_user=user.id_user).all()
+        evaluations = Evaluation.query.filter_by(
+            id_flan=flan_id, id_user=user.id_user
+        ).all()
         assert len(evaluations) > 0, "Aucune évaluation n'a été créée"
-        
+
         # Vérifier les valeurs de l'évaluation
         eval = evaluations[0]
         assert eval.visuel == 5, f"La note visuel est incorrecte: {eval.visuel}"
         assert eval.texture == 5, f"La note texture est incorrecte: {eval.texture}"
         assert eval.pate == 5, f"La note pate est incorrecte: {eval.pate}"
         assert eval.gout == 5, f"La note gout est incorrecte: {eval.gout}"
-        assert eval.description == 'Test Description', f"La description est incorrecte: {eval.description}"
-    
+        assert (
+            eval.description == "Test Description"
+        ), f"La description est incorrecte: {eval.description}"
+
     # Vérifier le message de succès
     flashed_messages = get_flashed_messages(with_categories=True)
     messages = [message for category, message in flashed_messages]
-    assert any('évaluation' in message.lower() and 'succès' in message.lower() for message in messages), f"Aucun message de succès trouvé: {messages}"
+    assert any(
+        "évaluation" in message.lower() and "succès" in message.lower()
+        for message in messages
+    ), f"Aucun message de succès trouvé: {messages}"
+
 
 def test_afficher_evaluation_unique(client):
     # Récupérer l'utilisateur créé dans la fixture
-    user = client.application.config['TEST_USER']
+    user = client.application.config["TEST_USER"]
     assert user is not None, "L'utilisateur de test n'existe pas"
-    
+
     # Créer un établissement, un flan et une évaluation de test
     with client.application.app_context():
-        etab = Etablissement(nom='Test Etablissement', adresse='Test Adresse', code_postal='69001', ville='Test Ville', id_user=user.id_user)
+        etab = Etablissement(
+            nom="Test Etablissement",
+            adresse="Test Adresse",
+            code_postal="69001",
+            ville="Test Ville",
+            id_user=user.id_user,
+        )
         db.session.add(etab)
         db.session.commit()
-        
-        flan = Flan(nom='Test Flan', prix=2.5, id_etab=etab.id_etab, id_user=user.id_user)
+
+        flan = Flan(
+            nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user
+        )
         db.session.add(flan)
         db.session.commit()
-        
-        eval = Evaluation(visuel=5, texture=5, pate=5, gout=5, description='Test Description', id_flan=flan.id_flan, id_user=user.id_user)
+
+        eval = Evaluation(
+            visuel=5,
+            texture=5,
+            pate=5,
+            gout=5,
+            description="Test Description",
+            id_flan=flan.id_flan,
+            id_user=user.id_user,
+        )
         db.session.add(eval)
         db.session.commit()
         eval_id = eval.id_eval
-    
+
     # Accéder à la page de l'évaluation
-    response = client.get(f'/evaluation/{eval_id}')
+    response = client.get(f"/evaluation/{eval_id}")
     assert response.status_code == 200
-    assert b'Test Description' in response.data
+    assert b"Test Description" in response.data
+
 
 def test_valider_evaluation(client):
     # Récupérer l'utilisateur admin créé dans la fixture
-    user = client.application.config['TEST_USER']
+    user = client.application.config["TEST_USER"]
     assert user.is_admin, "L'utilisateur doit être admin pour valider les évaluations"
-    
+
     # Créer un établissement, un flan et une évaluation de test
     with client.application.app_context():
-        etab = Etablissement(nom='Test Etablissement', adresse='Test Adresse', code_postal='69001', ville='Test Ville', id_user=user.id_user)
+        etab = Etablissement(
+            nom="Test Etablissement",
+            adresse="Test Adresse",
+            code_postal="69001",
+            ville="Test Ville",
+            id_user=user.id_user,
+        )
         db.session.add(etab)
         db.session.commit()
-        
-        flan = Flan(nom='Test Flan', prix=2.5, id_etab=etab.id_etab, id_user=user.id_user)
+
+        flan = Flan(
+            nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user
+        )
         db.session.add(flan)
         db.session.commit()
-        
-        eval = Evaluation(visuel=5, texture=5, pate=5, gout=5, description='Test Description', id_flan=flan.id_flan, id_user=user.id_user)
+
+        eval = Evaluation(
+            visuel=5,
+            texture=5,
+            pate=5,
+            gout=5,
+            description="Test Description",
+            id_flan=flan.id_flan,
+            id_user=user.id_user,
+        )
         db.session.add(eval)
         db.session.commit()
         eval_id = eval.id_eval
-    
+
     # Envoyer la requête de validation
-    response = client.post(f'/valider_evaluation/{eval_id}')
+    response = client.post(f"/valider_evaluation/{eval_id}")
     assert response.status_code == 302  # Redirection
-    
+
     # Vérifier que l'évaluation a été validée
     with client.application.app_context():
         updated_eval = Evaluation.query.get(eval_id)
-        assert updated_eval.statut.value == 'VALIDE', f"Le statut de l'évaluation n'a pas été mis à jour. Statut actuel: {updated_eval.statut.value}"
+        assert (
+            updated_eval.statut.value == "VALIDE"
+        ), f"Le statut de l'évaluation n'a pas été mis à jour. Statut actuel: {updated_eval.statut.value}"
+
 
 def test_supprimer_evaluation(client):
     # Récupérer l'utilisateur créé dans la fixture
-    user = client.application.config['TEST_USER']
+    user = client.application.config["TEST_USER"]
     assert user is not None, "L'utilisateur de test n'existe pas"
-    
+
     # Créer un établissement, un flan et une évaluation de test
     with client.application.app_context():
-        etab = Etablissement(nom='Test Etablissement', adresse='Test Adresse', code_postal='69001', ville='Test Ville', id_user=user.id_user)
+        etab = Etablissement(
+            nom="Test Etablissement",
+            adresse="Test Adresse",
+            code_postal="69001",
+            ville="Test Ville",
+            id_user=user.id_user,
+        )
         db.session.add(etab)
         db.session.commit()
-        
-        flan = Flan(nom='Test Flan', prix=2.5, id_etab=etab.id_etab, id_user=user.id_user)
+
+        flan = Flan(
+            nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user
+        )
         db.session.add(flan)
         db.session.commit()
-        
-        eval = Evaluation(visuel=5, texture=5, pate=5, gout=5, description='Test Description', id_flan=flan.id_flan, id_user=user.id_user)
+
+        eval = Evaluation(
+            visuel=5,
+            texture=5,
+            pate=5,
+            gout=5,
+            description="Test Description",
+            id_flan=flan.id_flan,
+            id_user=user.id_user,
+        )
         db.session.add(eval)
         db.session.commit()
         eval_id = eval.id_eval
-    
+
     # Envoyer la requête de suppression
-    response = client.post(f'/supprimer_evaluation/{eval_id}')
+    response = client.post(f"/supprimer_evaluation/{eval_id}")
     assert response.status_code == 302  # Redirection
-    
+
     # Vérifier que l'évaluation a été supprimée de la base de données
     with client.application.app_context():
         deleted_eval = Evaluation.query.get(eval_id)
-        assert deleted_eval is None, "L'évaluation n'a pas été supprimée de la base de données"
+        assert (
+            deleted_eval is None
+        ), "L'évaluation n'a pas été supprimée de la base de données"
+
 
 def test_dashboard_get(client):
     """Test la route dashboard en GET"""
-    response = client.get('/dashboard')
+    response = client.get("/dashboard")
     assert response.status_code == 200
-    assert b'Tableau de bord' in response.data
+    assert b"Tableau de bord" in response.data
+
 
 def test_dashboard_post_update_profile(client):
     """Test la mise à jour du profil via le dashboard"""
-    user = client.application.config['TEST_USER']
-    
+    user = client.application.config["TEST_USER"]
+
     # Envoyer une requête POST pour mettre à jour le profil
-    response = client.post('/dashboard', data={
-        'profile-pseudo': 'new_pseudo',
-        'profile-email': 'new_email@example.com',
-        'profile-current_password': 'password',
-        'profile-new_password': 'new_password',
-        'profile-confirm_password': 'new_password'
-    }, follow_redirects=True)
-    
+    response = client.post(
+        "/dashboard",
+        data={
+            "profile-pseudo": "new_pseudo",
+            "profile-email": "new_email@example.com",
+            "profile-current_password": "password",
+            "profile-new_password": "new_password",
+            "profile-confirm_password": "new_password",
+        },
+        follow_redirects=True,
+    )
+
     assert response.status_code == 200
-    
+
     # Vérifier que le profil a été mis à jour
     with client.application.app_context():
         updated_user = Utilisateur.query.get(user.id_user)
-        assert updated_user.pseudo == 'new_pseudo'
-        assert updated_user.email == 'new_email@example.com'
+        assert updated_user.pseudo == "new_pseudo"
+        assert updated_user.email == "new_email@example.com"
         # Vérifier que le mot de passe a été mis à jour (on vérifie juste qu'il a changé)
         assert updated_user.password != user.password
 
+
 def test_afficher_etablissement_unique_get(client):
     """Test l'affichage d'un établissement unique"""
-    user = client.application.config['TEST_USER']
-    
+    user = client.application.config["TEST_USER"]
+
     # Créer un établissement de test
     with client.application.app_context():
-        etab = Etablissement(nom='Test Etablissement', adresse='Test Adresse', code_postal='69001', ville='Test Ville', id_user=user.id_user)
+        etab = Etablissement(
+            nom="Test Etablissement",
+            adresse="Test Adresse",
+            code_postal="69001",
+            ville="Test Ville",
+            id_user=user.id_user,
+        )
         db.session.add(etab)
         db.session.commit()
         etab_id = etab.id_etab
-    
+
     # Accéder à la page de l'établissement
-    response = client.get(f'/etablissement/{etab_id}')
+    response = client.get(f"/etablissement/{etab_id}")
     assert response.status_code == 200
-    assert b'Test Etablissement' in response.data
+    assert b"Test Etablissement" in response.data
+
 
 def test_afficher_etablissement_unique_post_update(client):
     """Test la mise à jour d'un établissement"""
-    user = client.application.config['TEST_USER']
-    
+    user = client.application.config["TEST_USER"]
+
     # Créer un établissement de test
     with client.application.app_context():
-        etab = Etablissement(nom='Test Etablissement', adresse='Test Adresse', code_postal='69001', ville='Test Ville', id_user=user.id_user)
+        etab = Etablissement(
+            nom="Test Etablissement",
+            adresse="Test Adresse",
+            code_postal="69001",
+            ville="Test Ville",
+            id_user=user.id_user,
+        )
         db.session.add(etab)
         db.session.commit()
         etab_id = etab.id_etab
-    
+
     # Mettre à jour l'établissement
-    response = client.post(f'/etablissement/{etab_id}', data={
-        'edit-etab-nom': 'Nouveau Nom',
-        'edit-etab-description': 'Nouvelle description',
-        'edit-etab-adresse': 'Nouvelle adresse',
-        'edit-etab-ville': 'Nouvelle ville',
-        'edit-etab-code_postal': '69002',
-        'edit-etab-latitude': '45.75',
-        'edit-etab-longitude': '4.85',
-        'edit-etab-type_etab': 'BOULANGERIE',
-        'edit-etab-label': True,
-        'edit-etab-visite': True
-    }, follow_redirects=True)
-    
+    response = client.post(
+        f"/etablissement/{etab_id}",
+        data={
+            "edit-etab-nom": "Nouveau Nom",
+            "edit-etab-description": "Nouvelle description",
+            "edit-etab-adresse": "Nouvelle adresse",
+            "edit-etab-ville": "Nouvelle ville",
+            "edit-etab-code_postal": "69002",
+            "edit-etab-latitude": "45.75",
+            "edit-etab-longitude": "4.85",
+            "edit-etab-type_etab": "BOULANGERIE",
+            "edit-etab-label": True,
+            "edit-etab-visite": True,
+        },
+        follow_redirects=True,
+    )
+
     assert response.status_code == 200
-    
+
     # Vérifier que l'établissement a été mis à jour
     with client.application.app_context():
         updated_etab = Etablissement.query.get(etab_id)
-        assert updated_etab.nom == 'Nouveau Nom'
-        assert updated_etab.description == 'Nouvelle description'
+        assert updated_etab.nom == "Nouveau Nom"
+        assert updated_etab.description == "Nouvelle description"
+
 
 def test_afficher_flan_unique_get(client):
     """Test l'affichage d'un flan unique"""
-    user = client.application.config['TEST_USER']
-    
+    user = client.application.config["TEST_USER"]
+
     # Créer un établissement et un flan de test
     with client.application.app_context():
-        etab = Etablissement(nom='Test Etablissement', adresse='Test Adresse', code_postal='69001', ville='Test Ville', id_user=user.id_user)
+        etab = Etablissement(
+            nom="Test Etablissement",
+            adresse="Test Adresse",
+            code_postal="69001",
+            ville="Test Ville",
+            id_user=user.id_user,
+        )
         db.session.add(etab)
         db.session.commit()
-        
-        flan = Flan(nom='Test Flan', prix=2.5, id_etab=etab.id_etab, id_user=user.id_user)
+
+        flan = Flan(
+            nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user
+        )
         db.session.add(flan)
         db.session.commit()
         flan_id = flan.id_flan
-    
+
     # Accéder à la page du flan
-    response = client.get(f'/flan/{flan_id}')
+    response = client.get(f"/flan/{flan_id}")
     assert response.status_code == 200
-    assert b'Test Flan' in response.data
+    assert b"Test Flan" in response.data
+
 
 def test_afficher_flan_unique_post_update(client):
     """Test la mise à jour d'un flan"""
-    user = client.application.config['TEST_USER']
-    
+    user = client.application.config["TEST_USER"]
+
     # Créer un établissement et un flan de test
     with client.application.app_context():
-        etab = Etablissement(nom='Test Etablissement', adresse='Test Adresse', code_postal='69001', ville='Test Ville', id_user=user.id_user)
+        etab = Etablissement(
+            nom="Test Etablissement",
+            adresse="Test Adresse",
+            code_postal="69001",
+            ville="Test Ville",
+            id_user=user.id_user,
+        )
         db.session.add(etab)
         db.session.commit()
-        
-        flan = Flan(nom='Test Flan', prix=2.5, id_etab=etab.id_etab, id_user=user.id_user)
+
+        flan = Flan(
+            nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user
+        )
         db.session.add(flan)
         db.session.commit()
         flan_id = flan.id_flan
-    
+
     # Mettre à jour le flan
-    response = client.post(f'/flan/{flan_id}', data={
-        'edit-flan-nom': 'Nouveau Flan',
-        'edit-flan-description': 'Nouvelle description',
-        'edit-flan-prix': 3.0,
-        'edit-flan-type_pate': 'BRISEE',
-        'edit-flan-type_saveur': 'VANILLE',
-        'edit-flan-type_texture': 'CREMEUSE'
-    }, follow_redirects=True)
-    
+    response = client.post(
+        f"/flan/{flan_id}",
+        data={
+            "edit-flan-nom": "Nouveau Flan",
+            "edit-flan-description": "Nouvelle description",
+            "edit-flan-prix": 3.0,
+            "edit-flan-type_pate": "BRISEE",
+            "edit-flan-type_saveur": "VANILLE",
+            "edit-flan-type_texture": "CREMEUSE",
+        },
+        follow_redirects=True,
+    )
+
     assert response.status_code == 200
-    
+
     # Vérifier que le flan a été mis à jour
     with client.application.app_context():
         updated_flan = Flan.query.get(flan_id)
-        assert updated_flan.nom == 'Nouveau Flan'
+        assert updated_flan.nom == "Nouveau Flan"
         assert updated_flan.prix == 3.0
+
 
 def test_get_infowindow_content(client):
     """Test la route get_infowindow_content"""
-    user = client.application.config['TEST_USER']
-    
+    user = client.application.config["TEST_USER"]
+
     # Créer un établissement de test
     with client.application.app_context():
-        etab = Etablissement(nom='Test Etablissement', adresse='Test Adresse', code_postal='69001', ville='Test Ville', id_user=user.id_user)
+        etab = Etablissement(
+            nom="Test Etablissement",
+            adresse="Test Adresse",
+            code_postal="69001",
+            ville="Test Ville",
+            id_user=user.id_user,
+        )
         db.session.add(etab)
         db.session.commit()
         etab_id = etab.id_etab
-    
+
     # Appeler la route pour obtenir le contenu de l'infowindow
-    response = client.get(f'/get_infowindow_content?id_etab={etab_id}')
+    response = client.get(f"/get_infowindow_content?id_etab={etab_id}")
     assert response.status_code == 200
-    assert b'Test Etablissement' in response.data
+    assert b"Test Etablissement" in response.data
+
 
 def test_liste_etablissements_avec_recherche_simple(client):
     """Test la route liste_etablissements avec une recherche simple"""
-    user = client.application.config['TEST_USER']
-    
+    user = client.application.config["TEST_USER"]
+
     # Créer des établissements de test
     with client.application.app_context():
-        etab1 = Etablissement(nom='Boulangerie Test', adresse='Test Adresse', code_postal='69001', ville='Lyon', id_user=user.id_user)
-        etab2 = Etablissement(nom='Autre Etablissement', adresse='Autre Adresse', code_postal='69002', ville='Paris', id_user=user.id_user)
+        etab1 = Etablissement(
+            nom="Boulangerie Test",
+            adresse="Test Adresse",
+            code_postal="69001",
+            ville="Lyon",
+            id_user=user.id_user,
+        )
+        etab2 = Etablissement(
+            nom="Autre Etablissement",
+            adresse="Autre Adresse",
+            code_postal="69002",
+            ville="Paris",
+            id_user=user.id_user,
+        )
         db.session.add_all([etab1, etab2])
         db.session.commit()
-    
+
     # Rechercher avec un terme qui correspond à un établissement
-    response = client.get('/liste_etablissements?recherche_simple=Boulangerie')
+    response = client.get("/liste_etablissements?recherche_simple=Boulangerie")
     assert response.status_code == 200
-    assert b'Boulangerie Test' in response.data
-    
+    assert b"Boulangerie Test" in response.data
+
     # Rechercher avec un terme qui correspond à une ville
-    response = client.get('/liste_etablissements?recherche_simple=Lyon')
+    response = client.get("/liste_etablissements?recherche_simple=Lyon")
     assert response.status_code == 200
-    assert b'Boulangerie Test' in response.data
+    assert b"Boulangerie Test" in response.data
+
 
 def test_liste_etablissements_avec_filtres_avances(client):
     """Test la route liste_etablissements avec des filtres avancés"""
-    user = client.application.config['TEST_USER']
-    
+    user = client.application.config["TEST_USER"]
+
     # Créer des établissements et flans de test
     with client.application.app_context():
-        etab1 = Etablissement(nom='Boulangerie Test', adresse='Test Adresse', code_postal='69001', ville='Lyon', id_user=user.id_user, visite=True, label=False)
-        etab2 = Etablissement(nom='Patisserie Test', adresse='Autre Adresse', code_postal='69002', ville='Lyon', id_user=user.id_user, visite=False, label=True)
+        etab1 = Etablissement(
+            nom="Boulangerie Test",
+            adresse="Test Adresse",
+            code_postal="69001",
+            ville="Lyon",
+            id_user=user.id_user,
+            visite=True,
+            label=False,
+        )
+        etab2 = Etablissement(
+            nom="Patisserie Test",
+            adresse="Autre Adresse",
+            code_postal="69002",
+            ville="Lyon",
+            id_user=user.id_user,
+            visite=False,
+            label=True,
+        )
         db.session.add_all([etab1, etab2])
         db.session.commit()
-        
+
         # Créer des flans pour les tests
-        flan1 = Flan(nom='Flan Vanille', prix=2.0, type_pate='BRISEE', type_saveur='VANILLE', type_texture='CREMEUSE', id_etab=etab1.id_etab, id_user=user.id_user)
-        flan2 = Flan(nom='Flan Fruits', prix=3.5, type_pate='SABLEE', type_saveur='FRUITS', type_texture='GELATINEUSE', id_etab=etab2.id_etab, id_user=user.id_user)
+        flan1 = Flan(
+            nom="Flan Vanille",
+            prix=2.0,
+            type_pate="BRISEE",
+            type_saveur="VANILLE",
+            type_texture="CREMEUSE",
+            id_etab=etab1.id_etab,
+            id_user=user.id_user,
+        )
+        flan2 = Flan(
+            nom="Flan Fruits",
+            prix=3.5,
+            type_pate="SABLEE",
+            type_saveur="FRUITS",
+            type_texture="GELATINEUSE",
+            id_etab=etab2.id_etab,
+            id_user=user.id_user,
+        )
         db.session.add_all([flan1, flan2])
         db.session.commit()
-    
+
     # Test filtre par visite
-    response = client.get('/liste_etablissements?visite=oui')
+    response = client.get("/liste_etablissements?visite=oui")
     assert response.status_code == 200
-    assert b'Boulangerie Test' in response.data
-    
+    assert b"Boulangerie Test" in response.data
+
     # Test filtre par labellisé
-    response = client.get('/liste_etablissements?labellise=oui')
+    response = client.get("/liste_etablissements?labellise=oui")
     assert response.status_code == 200
-    assert b'Patisserie Test' in response.data
-    
+    assert b"Patisserie Test" in response.data
+
     # Test filtre par type de pâte
-    response = client.get('/liste_etablissements?type_pate=BRISEE')
+    response = client.get("/liste_etablissements?type_pate=BRISEE")
     assert response.status_code == 200
-    assert b'Boulangerie Test' in response.data
-    
+    assert b"Boulangerie Test" in response.data
+
     # Test filtre par type de saveur
-    response = client.get('/liste_etablissements?type_saveur=FRUITS')
+    response = client.get("/liste_etablissements?type_saveur=FRUITS")
     assert response.status_code == 200
-    assert b'Patisserie Test' in response.data
-    
+    assert b"Patisserie Test" in response.data
+
     # Test filtre par prix
-    response = client.get('/liste_etablissements?prix=0')  # Moins de 2.5€
+    response = client.get("/liste_etablissements?prix=0")  # Moins de 2.5€
     assert response.status_code == 200
-    assert b'Boulangerie Test' in response.data
-    
+    assert b"Boulangerie Test" in response.data
+
     # Test filtre par type de texture
-    response = client.get('/liste_etablissements?type_texture=CREMEUSE')
+    response = client.get("/liste_etablissements?type_texture=CREMEUSE")
     assert response.status_code == 200
-    assert b'Boulangerie Test' in response.data
-    assert b'Patisserie Test' not in response.data
-    
-    response = client.get('/liste_etablissements?type_texture=GELATINEUSE')
+    assert b"Boulangerie Test" in response.data
+    assert b"Patisserie Test" not in response.data
+
+    response = client.get("/liste_etablissements?type_texture=GELATINEUSE")
     assert response.status_code == 200
-    assert b'Patisserie Test' in response.data
-    assert b'Boulangerie Test' not in response.data
+    assert b"Patisserie Test" in response.data
+    assert b"Boulangerie Test" not in response.data
+
 
 def test_liste_etablissements_post_recherche(client):
     """Test la route liste_etablissements avec une recherche POST"""
-    user = client.application.config['TEST_USER']
-    
+    user = client.application.config["TEST_USER"]
+
     # Créer des établissements de test
     with client.application.app_context():
-        etab1 = Etablissement(nom='Boulangerie Test', adresse='Test Adresse', code_postal='69001', ville='Lyon', id_user=user.id_user)
-        etab2 = Etablissement(nom='Autre Etablissement', adresse='Autre Adresse', code_postal='69002', ville='Paris', id_user=user.id_user)
+        etab1 = Etablissement(
+            nom="Boulangerie Test",
+            adresse="Test Adresse",
+            code_postal="69001",
+            ville="Lyon",
+            id_user=user.id_user,
+        )
+        etab2 = Etablissement(
+            nom="Autre Etablissement",
+            adresse="Autre Adresse",
+            code_postal="69002",
+            ville="Paris",
+            id_user=user.id_user,
+        )
         db.session.add_all([etab1, etab2])
         db.session.commit()
-    
+
     # Rechercher avec une requête POST
-    response = client.post('/liste_etablissements', data={
-        'nom': 'Boulangerie',
-        'ville': 'Lyon'
-    })
+    response = client.post(
+        "/liste_etablissements", data={"nom": "Boulangerie", "ville": "Lyon"}
+    )
     assert response.status_code == 200
-    assert b'Boulangerie Test' in response.data
+    assert b"Boulangerie Test" in response.data
 
 
 def test_liste_etablissements_filtre_proximite(client):
     """Test la route liste_etablissements avec un filtre par proximité"""
-    user = client.application.config['TEST_USER']
-    
+    user = client.application.config["TEST_USER"]
+
     # Créer des établissements de test avec des coordonnées géographiques
     with client.application.app_context():
         # Lyon centre (45.7640, 4.8357)
         etab1 = Etablissement(
-            nom='Boulangerie Lyon Centre', 
-            adresse='1 rue de la République', 
-            code_postal='69001', 
-            ville='Lyon', 
-            latitude=45.7640, 
+            nom="Boulangerie Lyon Centre",
+            adresse="1 rue de la République",
+            code_postal="69001",
+            ville="Lyon",
+            latitude=45.7640,
             longitude=4.8357,
-            id_user=user.id_user
+            id_user=user.id_user,
         )
-        
+
         # Lyon Part-Dieu (45.7580, 4.8540) - à environ 1.5km du centre
         etab2 = Etablissement(
-            nom='Boulangerie Part-Dieu', 
-            adresse='10 rue de la Gare', 
-            code_postal='69003', 
-            ville='Lyon', 
-            latitude=45.7580, 
+            nom="Boulangerie Part-Dieu",
+            adresse="10 rue de la Gare",
+            code_postal="69003",
+            ville="Lyon",
+            latitude=45.7580,
             longitude=4.8540,
-            id_user=user.id_user
+            id_user=user.id_user,
         )
-        
+
         # Villeurbanne (45.7600, 4.8800) - à environ 4km du centre
         etab3 = Etablissement(
-            nom='Boulangerie Villeurbanne', 
-            adresse='5 avenue Henri Barbusse', 
-            code_postal='69100', 
-            ville='Villeurbanne', 
-            latitude=45.7600, 
+            nom="Boulangerie Villeurbanne",
+            adresse="5 avenue Henri Barbusse",
+            code_postal="69100",
+            ville="Villeurbanne",
+            latitude=45.7600,
             longitude=4.8800,
-            id_user=user.id_user
+            id_user=user.id_user,
         )
-        
+
         db.session.add_all([etab1, etab2, etab3])
         db.session.commit()
-    
+
     # Test 1: Filtrer avec un rayon de 2km depuis le centre de Lyon
     # Devrait inclure les établissements 1 et 2, mais pas 3
-    response = client.get('/liste_etablissements', query_string={
-        'latitude': 45.7640,
-        'longitude': 4.8357,
-        'rayon': 2.0
-    })
+    response = client.get(
+        "/liste_etablissements",
+        query_string={"latitude": 45.7640, "longitude": 4.8357, "rayon": 2.0},
+    )
     assert response.status_code == 200
-    assert b'Boulangerie Lyon Centre' in response.data
-    assert b'Boulangerie Part-Dieu' in response.data
-    assert b'Boulangerie Villeurbanne' not in response.data
-    
+    assert b"Boulangerie Lyon Centre" in response.data
+    assert b"Boulangerie Part-Dieu" in response.data
+    assert b"Boulangerie Villeurbanne" not in response.data
+
     # Test 2: Filtrer avec un rayon de 5km depuis le centre de Lyon
     # Devrait inclure tous les établissements
-    response = client.get('/liste_etablissements', query_string={
-        'latitude': 45.7640,
-        'longitude': 4.8357,
-        'rayon': 5.0
-    })
+    response = client.get(
+        "/liste_etablissements",
+        query_string={"latitude": 45.7640, "longitude": 4.8357, "rayon": 5.0},
+    )
     assert response.status_code == 200
-    assert b'Boulangerie Lyon Centre' in response.data
-    assert b'Boulangerie Part-Dieu' in response.data
-    assert b'Boulangerie Villeurbanne' in response.data
-    
+    assert b"Boulangerie Lyon Centre" in response.data
+    assert b"Boulangerie Part-Dieu" in response.data
+    assert b"Boulangerie Villeurbanne" in response.data
+
     # Test 3: Filtrer avec un rayon très petit (500m)
     # Devrait inclure seulement l'établissement 1
-    response = client.get('/liste_etablissements', query_string={
-        'latitude': 45.7640,
-        'longitude': 4.8357,
-        'rayon': 0.5
-    })
+    response = client.get(
+        "/liste_etablissements",
+        query_string={"latitude": 45.7640, "longitude": 4.8357, "rayon": 0.5},
+    )
     assert response.status_code == 200
-    assert b'Boulangerie Lyon Centre' in response.data
-    assert b'Boulangerie Part-Dieu' not in response.data
-    assert b'Boulangerie Villeurbanne' not in response.data
+    assert b"Boulangerie Lyon Centre" in response.data
+    assert b"Boulangerie Part-Dieu" not in response.data
+    assert b"Boulangerie Villeurbanne" not in response.data
 
 
 def test_liste_etablissements_filtre_proximite_sans_coordonnees(client):
     """Test la route liste_etablissements avec filtre proximité mais sans coordonnées"""
-    user = client.application.config['TEST_USER']
-    
+    user = client.application.config["TEST_USER"]
+
     # Créer des établissements de test
     with client.application.app_context():
-        etab1 = Etablissement(nom='Boulangerie Test', adresse='Test Adresse', code_postal='69001', ville='Lyon', id_user=user.id_user)
-        etab2 = Etablissement(nom='Autre Etablissement', adresse='Autre Adresse', code_postal='69002', ville='Paris', id_user=user.id_user)
+        etab1 = Etablissement(
+            nom="Boulangerie Test",
+            adresse="Test Adresse",
+            code_postal="69001",
+            ville="Lyon",
+            id_user=user.id_user,
+        )
+        etab2 = Etablissement(
+            nom="Autre Etablissement",
+            adresse="Autre Adresse",
+            code_postal="69002",
+            ville="Paris",
+            id_user=user.id_user,
+        )
         db.session.add_all([etab1, etab2])
         db.session.commit()
-    
+
     # Appeler la route avec un rayon mais sans coordonnées
     # Devrait retourner tous les établissements (pas de filtre appliqué)
-    response = client.get('/liste_etablissements', query_string={
-        'rayon': 5.0
-    })
+    response = client.get("/liste_etablissements", query_string={"rayon": 5.0})
     assert response.status_code == 200
-    assert b'Boulangerie Test' in response.data
-    assert b'Autre Etablissement' in response.data
+    assert b"Boulangerie Test" in response.data
+    assert b"Autre Etablissement" in response.data
 
 
 def test_liste_etablissements_filtre_proximite_etablissements_sans_coordonnees(client):
     """Test la route liste_etablissements avec filtre proximité quand certains établissements n'ont pas de coordonnées"""
-    user = client.application.config['TEST_USER']
-    
+    user = client.application.config["TEST_USER"]
+
     # Créer des établissements de test, certains sans coordonnées
     with client.application.app_context():
         etab1 = Etablissement(
-            nom='Boulangerie Avec Coords', 
-            adresse='Test Adresse', 
-            code_postal='69001', 
-            ville='Lyon', 
-            latitude=45.7640, 
+            nom="Boulangerie Avec Coords",
+            adresse="Test Adresse",
+            code_postal="69001",
+            ville="Lyon",
+            latitude=45.7640,
             longitude=4.8357,
-            id_user=user.id_user
+            id_user=user.id_user,
         )
-        
+
         etab2 = Etablissement(
-            nom='Boulangerie Sans Coords', 
-            adresse='Autre Adresse', 
-            code_postal='69002', 
-            ville='Paris',
-            id_user=user.id_user
+            nom="Boulangerie Sans Coords",
+            adresse="Autre Adresse",
+            code_postal="69002",
+            ville="Paris",
+            id_user=user.id_user,
         )
-        
+
         db.session.add_all([etab1, etab2])
         db.session.commit()
-    
+
     # Filtrer avec un rayon de 1km depuis le centre de Lyon
     # Devrait inclure seulement l'établissement avec coordonnées
-    response = client.get('/liste_etablissements', query_string={
-        'latitude': 45.7640,
-        'longitude': 4.8357,
-        'rayon': 1.0
-    })
+    response = client.get(
+        "/liste_etablissements",
+        query_string={"latitude": 45.7640, "longitude": 4.8357, "rayon": 1.0},
+    )
     assert response.status_code == 200
-    assert b'Boulangerie Avec Coords' in response.data
+    assert b"Boulangerie Avec Coords" in response.data
     # L'établissement sans coordonnées ne devrait pas apparaître dans les résultats filtrés
     # Note: Cela dépend de l'implémentation - certains pourraient choisir de l'inclure ou non
 
 
 def test_liste_etablissements_cas_limites_valeurs_vides(client):
     """Test la route liste_etablissements avec des valeurs vides ou None"""
-    user = client.application.config['TEST_USER']
-    
+    user = client.application.config["TEST_USER"]
+
     # Créer des établissements de test
     with client.application.app_context():
-        etab1 = Etablissement(nom='Boulangerie Test', adresse='Test Adresse', code_postal='69001', ville='Lyon', id_user=user.id_user)
-        etab2 = Etablissement(nom='Autre Etablissement', adresse='Autre Adresse', code_postal='69002', ville='Paris', id_user=user.id_user)
+        etab1 = Etablissement(
+            nom="Boulangerie Test",
+            adresse="Test Adresse",
+            code_postal="69001",
+            ville="Lyon",
+            id_user=user.id_user,
+        )
+        etab2 = Etablissement(
+            nom="Autre Etablissement",
+            adresse="Autre Adresse",
+            code_postal="69002",
+            ville="Paris",
+            id_user=user.id_user,
+        )
         db.session.add_all([etab1, etab2])
         db.session.commit()
-    
+
     # Test avec des valeurs vides
-    response = client.get('/liste_etablissements', query_string={
-        'nom': '',
-        'ville': '',
-        'visite': '',
-        'labellise': ''
-    })
+    response = client.get(
+        "/liste_etablissements",
+        query_string={"nom": "", "ville": "", "visite": "", "labellise": ""},
+    )
     assert response.status_code == 200
     # Devrait retourner tous les établissements
-    assert b'Boulangerie Test' in response.data
-    assert b'Autre Etablissement' in response.data
+    assert b"Boulangerie Test" in response.data
+    assert b"Autre Etablissement" in response.data
 
 
 def test_liste_etablissements_cas_limites_caracteres_speciaux(client):
     """Test la route liste_etablissements avec des caractères spéciaux"""
-    user = client.application.config['TEST_USER']
-    
+    user = client.application.config["TEST_USER"]
+
     # Créer des établissements de test avec des caractères spéciaux
     with client.application.app_context():
-        etab1 = Etablissement(nom="Boulangerie 'L'Épi Doré'", adresse='Test Adresse', code_postal='69001', ville='Lyon', id_user=user.id_user)
-        etab2 = Etablissement(nom='Café & Restaurant', adresse='Autre Adresse', code_postal='69002', ville='Paris', id_user=user.id_user)
+        etab1 = Etablissement(
+            nom="Boulangerie 'L'Épi Doré'",
+            adresse="Test Adresse",
+            code_postal="69001",
+            ville="Lyon",
+            id_user=user.id_user,
+        )
+        etab2 = Etablissement(
+            nom="Café & Restaurant",
+            adresse="Autre Adresse",
+            code_postal="69002",
+            ville="Paris",
+            id_user=user.id_user,
+        )
         db.session.add_all([etab1, etab2])
         db.session.commit()
-    
+
     # Test recherche avec caractères spéciaux
-    response = client.get('/liste_etablissements', query_string={
-        'recherche_simple': "Épi"
-    })
+    response = client.get(
+        "/liste_etablissements", query_string={"recherche_simple": "Épi"}
+    )
     assert response.status_code == 200
     # Vérifier que l'établissement est présent dans la réponse (le nom peut être légèrement différent)
     assert b"Boulangerie" in response.data or b"\u00c9pi" in response.data
-    
-    response = client.get('/liste_etablissements', query_string={
-        'recherche_simple': "Café"
-    })
+
+    response = client.get(
+        "/liste_etablissements", query_string={"recherche_simple": "Café"}
+    )
     assert response.status_code == 200
     # Vérifier que l'établissement est présent dans la réponse (le nom peut être légèrement différent)
     assert b"Caf" in response.data or b"Restaurant" in response.data
@@ -770,104 +1058,139 @@ def test_liste_etablissements_cas_limites_caracteres_speciaux(client):
 
 def test_liste_etablissements_cas_limites_aucune_correspondance(client):
     """Test la route liste_etablissements quand aucun établissement ne correspond"""
-    user = client.application.config['TEST_USER']
-    
+    user = client.application.config["TEST_USER"]
+
     # Créer des établissements de test
     with client.application.app_context():
-        etab1 = Etablissement(nom='Boulangerie Test', adresse='Test Adresse', code_postal='69001', ville='Lyon', id_user=user.id_user)
-        etab2 = Etablissement(nom='Autre Etablissement', adresse='Autre Adresse', code_postal='69002', ville='Paris', id_user=user.id_user)
+        etab1 = Etablissement(
+            nom="Boulangerie Test",
+            adresse="Test Adresse",
+            code_postal="69001",
+            ville="Lyon",
+            id_user=user.id_user,
+        )
+        etab2 = Etablissement(
+            nom="Autre Etablissement",
+            adresse="Autre Adresse",
+            code_postal="69002",
+            ville="Paris",
+            id_user=user.id_user,
+        )
         db.session.add_all([etab1, etab2])
         db.session.commit()
-    
+
     # Test avec une recherche qui ne correspond à rien
-    response = client.get('/liste_etablissements', query_string={
-        'recherche_simple': 'Restaurant Inconnu'
-    })
+    response = client.get(
+        "/liste_etablissements", query_string={"recherche_simple": "Restaurant Inconnu"}
+    )
     assert response.status_code == 200
     # Devrait retourner une page vide ou un message approprié
     # Vérifier que les établissements existants ne sont pas présents
-    assert b'Boulangerie Test' not in response.data
-    assert b'Autre Etablissement' not in response.data
-    
+    assert b"Boulangerie Test" not in response.data
+    assert b"Autre Etablissement" not in response.data
+
     # Test avec des filtres qui ne correspondent à rien
-    response = client.get('/liste_etablissements', query_string={
-        'ville': 'Marseille',
-        'visite': 'oui'
-    })
+    response = client.get(
+        "/liste_etablissements", query_string={"ville": "Marseille", "visite": "oui"}
+    )
     assert response.status_code == 200
     # Devrait retourner une page vide ou un message approprié
 
 
 def test_liste_etablissements_cas_limites_valeurs_invalides(client):
     """Test la route liste_etablissements avec des valeurs invalides"""
-    user = client.application.config['TEST_USER']
-    
+    user = client.application.config["TEST_USER"]
+
     # Créer des établissements de test
     with client.application.app_context():
-        etab1 = Etablissement(nom='Boulangerie Test', adresse='Test Adresse', code_postal='69001', ville='Lyon', id_user=user.id_user)
+        etab1 = Etablissement(
+            nom="Boulangerie Test",
+            adresse="Test Adresse",
+            code_postal="69001",
+            ville="Lyon",
+            id_user=user.id_user,
+        )
         db.session.add(etab1)
         db.session.commit()
-    
+
     # Test avec des valeurs invalides pour les filtres
-    response = client.get('/liste_etablissements', query_string={
-        'visite': 'invalide',  # Valeur invalide pour visite
-        'labellise': 'peut-etre',  # Valeur invalide pour labellise
-        'prix': 'inconnu'  # Valeur invalide pour prix
-    })
+    response = client.get(
+        "/liste_etablissements",
+        query_string={
+            "visite": "invalide",  # Valeur invalide pour visite
+            "labellise": "peut-etre",  # Valeur invalide pour labellise
+            "prix": "inconnu",  # Valeur invalide pour prix
+        },
+    )
     assert response.status_code == 200
     # Devrait gérer les valeurs invalides gracieusement et retourner les résultats
     # ou ignorer les filtres invalides
 
+
 def test_rechercher_route(client):
     """Test la route rechercher"""
-    response = client.get('/rechercher')
+    response = client.get("/rechercher")
     assert response.status_code == 200
-    assert b'Rechercher' in response.data
+    assert b"Rechercher" in response.data
+
 
 def test_index_route(client):
     """Test la route index"""
-    response = client.get('/')
+    response = client.get("/")
     assert response.status_code == 200
-    assert b'PlanFlan' in response.data
-
+    assert b"PlanFlan" in response.data
 
 
 def test_filtrer_etablissements_directement(client):
     """Test la fonction filtrer_etablissements directement"""
     from app.routes.main import filtrer_etablissements
-    
-    user = client.application.config['TEST_USER']
-    
+
+    user = client.application.config["TEST_USER"]
+
     # Créer des données de test
     with client.application.app_context():
-        etab1 = Etablissement(nom='Boulangerie A', adresse='Test', code_postal='69001', ville='Lyon', id_user=user.id_user, visite=True)
-        etab2 = Etablissement(nom='Boulangerie B', adresse='Test', code_postal='69002', ville='Paris', id_user=user.id_user, visite=False)
+        etab1 = Etablissement(
+            nom="Boulangerie A",
+            adresse="Test",
+            code_postal="69001",
+            ville="Lyon",
+            id_user=user.id_user,
+            visite=True,
+        )
+        etab2 = Etablissement(
+            nom="Boulangerie B",
+            adresse="Test",
+            code_postal="69002",
+            ville="Paris",
+            id_user=user.id_user,
+            visite=False,
+        )
         db.session.add_all([etab1, etab2])
         db.session.commit()
-        
+
         # Créer la requête de base
         query = Etablissement.query
-        
+
         # Tester le filtre par nom
-        filtered = filtrer_etablissements(query, nom='Boulangerie A')
+        filtered = filtrer_etablissements(query, nom="Boulangerie A")
         results = filtered.all()
         assert len(results) == 1
-        assert results[0].nom == 'Boulangerie A'
-        
+        assert results[0].nom == "Boulangerie A"
+
         # Tester le filtre par ville
-        filtered = filtrer_etablissements(query, ville='Paris')
+        filtered = filtrer_etablissements(query, ville="Paris")
         results = filtered.all()
         assert len(results) == 1
-        assert results[0].ville == 'Paris'
-        
+        assert results[0].ville == "Paris"
+
         # Tester le filtre par visite
-        filtered = filtrer_etablissements(query, visite='oui')
+        filtered = filtrer_etablissements(query, visite="oui")
         results = filtered.all()
         assert len(results) == 1
         assert results[0].visite == True
-        
+
         # Tester le filtre par labellisé
-        filtered = filtrer_etablissements(query, labellise='non')
+        filtered = filtrer_etablissements(query, labellise="non")
         results = filtered.all()
         assert len(results) == 2  # Aucun n'est labellisé
 
@@ -876,41 +1199,53 @@ def test_formulaire_evaluation_avec_selectfield(client):
     """Test EvalForm avec SelectField pour les notes."""
     with client.application.app_context():
         form = EvalForm()
-        
+
         # Vérifier que les champs sont bien des SelectField
         from wtforms.fields import SelectField
+
         assert isinstance(form.visuel, SelectField)
         assert isinstance(form.texture, SelectField)
         assert isinstance(form.pate, SelectField)
         assert isinstance(form.gout, SelectField)
-        
+
         # Vérifier que les choix sont corrects
-        valid_choices = ['0', '0.5', '1', '1.5', '2', '2.5', '3', '3.5', '4', '4.5', '5']
+        valid_choices = [
+            "0",
+            "0.5",
+            "1",
+            "1.5",
+            "2",
+            "2.5",
+            "3",
+            "3.5",
+            "4",
+            "4.5",
+            "5",
+        ]
         assert form.visuel.choices == [(choice, choice) for choice in valid_choices]
         assert form.texture.choices == [(choice, choice) for choice in valid_choices]
         assert form.pate.choices == [(choice, choice) for choice in valid_choices]
         assert form.gout.choices == [(choice, choice) for choice in valid_choices]
-        
+
         # Tester avec des données valides
-        form.visuel.data = '4.5'
-        form.texture.data = '3'
-        form.pate.data = '5'
-        form.gout.data = '2.5'
-        form.description.data = 'Test evaluation avec SelectField'
-        
+        form.visuel.data = "4.5"
+        form.texture.data = "3"
+        form.pate.data = "5"
+        form.gout.data = "2.5"
+        form.description.data = "Test evaluation avec SelectField"
+
         # Le formulaire devrait être valide
         # Note: La validation CSRF est désactivée pour ce test unitaire
         assert form.validate()
-        
+
         # Vérifier que les données sont bien des chaînes
         assert isinstance(form.visuel.data, str)
         assert isinstance(form.texture.data, str)
         assert isinstance(form.pate.data, str)
         assert isinstance(form.gout.data, str)
-        
+
         # Vérifier que les valeurs sont parmi les choix valides
         assert form.visuel.data in valid_choices
         assert form.texture.data in valid_choices
         assert form.pate.data in valid_choices
         assert form.gout.data in valid_choices
-
