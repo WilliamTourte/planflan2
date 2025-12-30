@@ -237,6 +237,13 @@ def test_evalform_donnees_valides(client):
         
         # Le formulaire devrait être valide
         assert form.validate()
+        
+        # Vérifier que les données sont bien des chaînes parmi les choix valides
+        valid_choices = ['0', '0.5', '1', '1.5', '2', '2.5', '3', '3.5', '4', '4.5', '5']
+        assert str(form.visuel.data) in valid_choices
+        assert str(form.texture.data) in valid_choices
+        assert str(form.pate.data) in valid_choices
+        assert str(form.gout.data) in valid_choices
 
 
 def test_evalform_donnees_invalides(client):
@@ -245,8 +252,8 @@ def test_evalform_donnees_invalides(client):
         form = EvalForm()
         
         # Remplir le formulaire avec des données invalides
-        form.visuel.data = 6.0  # Note > 5
-        form.texture.data = -1.0  # Note < 0
+        form.visuel.data = '6.0'  # Note > 5 (chaîne non valide)
+        form.texture.data = '-1.0'  # Note < 0 (chaîne non valide)
         form.pate.data = 'abc'  # Valeur non numérique
         form.gout.data = None  # Valeur nulle
         form.description.data = 'a' * 1001  # Description trop longue
@@ -267,8 +274,8 @@ def test_evalform_notes_hors_plage(client):
     with client.application.app_context():
         form = EvalForm()
         
-        # Tester différentes notes invalides
-        notes_invalides = [-0.1, 5.1, 10, -10]
+        # Tester différentes notes invalides (chaînes non valides)
+        notes_invalides = ['-0.1', '5.1', '10', '-10', '2.3']  # 2.3 n'est pas dans les choix valides
         
         for note in notes_invalides:
             form.visuel.data = note
@@ -462,6 +469,31 @@ def test_formulaire_evaluation_avec_evaluation_existante(client):
         assert form.validate()
         
         # Vérifier que les données sont correctement chargées
-        assert form.visuel.data == eval.visuel
-        assert form.texture.data == eval.texture
+        # Les données doivent être converties en chaînes pour les SelectField
+        assert str(form.visuel.data) == str(eval.visuel)
+        assert str(form.texture.data) == str(eval.texture)
+        assert str(form.pate.data) == str(eval.pate)
+        assert str(form.gout.data) == str(eval.gout)
         assert form.description.data == eval.description
+
+
+def test_evalform_selectfield_choices(client):
+    """Test EvalForm pour vérifier que les SelectField ont les bons choix."""
+    with client.application.app_context():
+        form = EvalForm()
+        
+        # Vérifier que les choix sont corrects pour tous les champs
+        valid_choices = ['0', '0.5', '1', '1.5', '2', '2.5', '3', '3.5', '4', '4.5', '5']
+        
+        assert form.visuel.choices == [(choice, choice) for choice in valid_choices]
+        assert form.texture.choices == [(choice, choice) for choice in valid_choices]
+        assert form.pate.choices == [(choice, choice) for choice in valid_choices]
+        assert form.gout.choices == [(choice, choice) for choice in valid_choices]
+        
+        # Vérifier que les choix sont bien des chaînes
+        for choice in form.visuel.choices:
+            assert isinstance(choice[0], str)
+            assert isinstance(choice[1], str)
+
+
+# Tests pour UpdateProfileForm

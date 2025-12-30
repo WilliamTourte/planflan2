@@ -137,10 +137,17 @@ def validate_note(form, field):
         raise ValidationError('Doit être compris entre 0 et 5.')
 
 class EvalForm(FlaskForm):
-    visuel = FloatField("Visuel", validators=[DataRequired(message='Ce champ est obligatoire.'), validate_note] )
-    texture = FloatField("Texture", validators=[DataRequired(message='Ce champ est obligatoire.'), validate_note] )
-    pate = FloatField("Pâte", validators=[DataRequired(message='Ce champ est obligatoire.'), validate_note] )
-    gout = FloatField("Goût", validators=[DataRequired(message='Ce champ est obligatoire.'), validate_note] )
+    # Choix valides pour les notes (0 à 5 par incréments de 0.5)
+    # Utiliser des chaînes directement pour éviter les problèmes de conversion
+    note_choices = [
+        ('0', '0'), ('0.5', '0.5'), ('1', '1'), ('1.5', '1.5'), ('2', '2'),
+        ('2.5', '2.5'), ('3', '3'), ('3.5', '3.5'), ('4', '4'), ('4.5', '4.5'), ('5', '5')
+    ]
+    
+    visuel = SelectField("Visuel", choices=note_choices, validators=[DataRequired(message='Ce champ est obligatoire.')])
+    texture = SelectField("Texture", choices=note_choices, validators=[DataRequired(message='Ce champ est obligatoire.')])
+    pate = SelectField("Pâte", choices=note_choices, validators=[DataRequired(message='Ce champ est obligatoire.')])
+    gout = SelectField("Goût", choices=note_choices, validators=[DataRequired(message='Ce champ est obligatoire.')])
     description = StringField('Description', validators=[Length(min=0, max=1000, message='Doit contenir entre %(min)d et %(max)d caractères.')]) #Vérifier si obligatoire dans base de données
     submit = SubmitField('Proposer une évaluation')
 

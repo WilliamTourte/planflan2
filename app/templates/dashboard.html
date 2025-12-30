@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
-  <div class="container">
-      <h1>Tableau de bord</h1>
+<div class="container">
+<h1>Tableau de bord</h1>
 
       <!-- Section Infos Utilisateur -->
-<div id="user-info" class="form-container etablissement-header">
+<div id="user-info" class="carte">
     <p><strong>Pseudo:</strong> {{ current_user.pseudo }}</p>
     <p><strong>Email:</strong> {{ current_user.email }}</p>
     <div class="action-buttons">
@@ -19,56 +19,55 @@
     </div>
 </div>
 
-      <!-- Formulaire d'édition du profil (masqué par défaut) -->
-      <div id="edit-profile-form" class="form-container" style="display: none; margin-top: 20px;">
-          <form method="POST" action="" class="form">
-              {{ profile_form.hidden_tag() }}
-              <div class="form-group">
-                  {{ profile_form.pseudo.label(class="form-label") }}
-                  {{ profile_form.pseudo(size=20, class="form-control") }}
-                  {% for error in profile_form.pseudo.errors %}
-                      <span class="error-message">[{{ error }}]</span>
-                  {% endfor %}
-              </div>
-              <div class="form-group">
-                  {{ profile_form.email.label(class="form-label") }}
-                  {{ profile_form.email(size=20, class="form-control") }}
-                  {% for error in profile_form.email.errors %}
-                      <span class="error-message">[{{ error }}]</span>
-                  {% endfor %}
-              </div>
-              <div class="form-group">
-                  {{ profile_form.current_password.label(class="form-label") }}
-                  {{ profile_form.current_password(size=20, class="form-control") }}
-                  {% for error in profile_form.current_password.errors %}
-                      <span class="error-message">[{{ error }}]</span>
-                  {% endfor %}
-              </div>
-              <div class="form-group">
-                  {{ profile_form.new_password.label(class="form-label") }}
-                  {{ profile_form.new_password(size=20, class="form-control") }}
-                  {% for error in profile_form.new_password.errors %}
-                      <span class="error-message">[{{ error }}]</span>
-                  {% endfor %}
-              </div>
-              <div class="form-group">
-                  {{ profile_form.confirm_password.label(class="form-label") }}
-                  {{ profile_form.confirm_password(size=20, class="form-control") }}
-                  {% for error in profile_form.confirm_password.errors %}
-                      <span class="error-message">[{{ error }}]</span>
-                  {% endfor %}
-              </div>
-              <div class="form-group">
-                  {{ profile_form.submit(class="btn btn-submit") }}
-                  <button id="cancel-edit-btn" type="button" class="btn btn-back" style="margin-left: 10px;">Annuler</button>
-              </div>
-          </form>
-      </div>
+<!-- Formulaire d'édition du profil (masqué par défaut) -->
+<div id="edit-profile-form" class="form-container" style="display: none; margin-top: 20px;">
+    <form method="POST" action="" class="form">
+        {{ profile_form.hidden_tag() }}
+        <div class="form-group">
+            {{ profile_form.pseudo.label(class="form-label") }}
+            {{ profile_form.pseudo(size=20, class="form-control") }}
+            {% for error in profile_form.pseudo.errors %}
+                <span class="error-message">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            {{ profile_form.email.label(class="form-label") }}
+            {{ profile_form.email(size=20, class="form-control") }}
+            {% for error in profile_form.email.errors %}
+                <span class="error-message">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            {{ profile_form.current_password.label(class="form-label") }}
+            {{ profile_form.current_password(size=20, class="form-control") }}
+            {% for error in profile_form.current_password.errors %}
+                <span class="error-message">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            {{ profile_form.new_password.label(class="form-label") }}
+            {{ profile_form.new_password(size=20, class="form-control") }}
+            {% for error in profile_form.new_password.errors %}
+                <span class="error-message">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            {{ profile_form.confirm_password.label(class="form-label") }}
+            {{ profile_form.confirm_password(size=20, class="form-control") }}
+            {% for error in profile_form.confirm_password.errors %}
+                <span class="error-message">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div class="form-group">
+            {{ profile_form.submit(class="btn btn-submit") }}
+            <button id="cancel-edit-btn" type="button" class="btn btn-back" style="margin-left: 10px;">Annuler</button>
+        </div>
+    </form>
+</div>
 
 <!-- Section Mes Évaluations -->
-
-    <h2 class="evaluations-title">Mes evaluations</h2>
-    {{ afficher_grille('evaluation', current_user.evaluations, current_user) }}
+<h2>Mes evaluations</h2>
+{{ afficher_grille('evaluation', current_user.evaluations, current_user) }}
 
 <!-- Sections Admin -->
 {% if current_user.is_admin %}
@@ -89,15 +88,15 @@
 
   </div>
 
-  <!-- Script pour basculer entre affichage infos et formulaire -->
-  <script>
-      document.getElementById('edit-profile-btn').addEventListener('click', function() {
-          document.getElementById('user-info').style.display = 'none';
-          document.getElementById('edit-profile-form').style.display = 'block';
-      });
-      document.getElementById('cancel-edit-btn').addEventListener('click', function() {
-          document.getElementById('user-info').style.display = 'block';
-          document.getElementById('edit-profile-form').style.display = 'none';
-      });
-  </script>
+<!-- Script pour basculer entre affichage infos et formulaire -->
+<script>
+    document.getElementById('edit-profile-btn').addEventListener('click', function() {
+        document.getElementById('user-info').style.display = 'none';
+        document.getElementById('edit-profile-form').style.display = 'block';
+    });
+    document.getElementById('cancel-edit-btn').addEventListener('click', function() {
+        document.getElementById('user-info').style.display = 'block';
+        document.getElementById('edit-profile-form').style.display = 'none';
+    });
+</script>
 {% endblock %}

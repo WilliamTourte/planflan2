@@ -871,3 +871,46 @@ def test_filtrer_etablissements_directement(client):
         results = filtered.all()
         assert len(results) == 2  # Aucun n'est labellisé
 
+
+def test_formulaire_evaluation_avec_selectfield(client):
+    """Test EvalForm avec SelectField pour les notes."""
+    with client.application.app_context():
+        form = EvalForm()
+        
+        # Vérifier que les champs sont bien des SelectField
+        from wtforms.fields import SelectField
+        assert isinstance(form.visuel, SelectField)
+        assert isinstance(form.texture, SelectField)
+        assert isinstance(form.pate, SelectField)
+        assert isinstance(form.gout, SelectField)
+        
+        # Vérifier que les choix sont corrects
+        valid_choices = ['0', '0.5', '1', '1.5', '2', '2.5', '3', '3.5', '4', '4.5', '5']
+        assert form.visuel.choices == [(choice, choice) for choice in valid_choices]
+        assert form.texture.choices == [(choice, choice) for choice in valid_choices]
+        assert form.pate.choices == [(choice, choice) for choice in valid_choices]
+        assert form.gout.choices == [(choice, choice) for choice in valid_choices]
+        
+        # Tester avec des données valides
+        form.visuel.data = '4.5'
+        form.texture.data = '3'
+        form.pate.data = '5'
+        form.gout.data = '2.5'
+        form.description.data = 'Test evaluation avec SelectField'
+        
+        # Le formulaire devrait être valide
+        # Note: La validation CSRF est désactivée pour ce test unitaire
+        assert form.validate()
+        
+        # Vérifier que les données sont bien des chaînes
+        assert isinstance(form.visuel.data, str)
+        assert isinstance(form.texture.data, str)
+        assert isinstance(form.pate.data, str)
+        assert isinstance(form.gout.data, str)
+        
+        # Vérifier que les valeurs sont parmi les choix valides
+        assert form.visuel.data in valid_choices
+        assert form.texture.data in valid_choices
+        assert form.pate.data in valid_choices
+        assert form.gout.data in valid_choices
+
