@@ -617,6 +617,30 @@ input.back:hover {
     color: var(--color-success);
 }
 
+/* Style pour la moyenne des évaluations dans les flans */
+.flan-moyenne {
+    display: flex;
+    align-items: center;
+    gap: var(--margin-sm);
+    margin-top: var(--margin-sm);
+    padding: var(--padding-sm);
+    background-color: #f5f5f5;
+    border-radius: var(--border-radius-btn);
+}
+
+.flan-moyenne .moyenne-label {
+    font-weight: bold;
+    color: var(--color-text);
+}
+
+.flan-moyenne .moyenne-value {
+    background: #e8f5e9;
+    padding: var(--padding-xs) var(--padding-sm);
+    border-radius: var(--border-radius-btn);
+    font-weight: bold;
+    color: var(--color-success);
+}
+
 .evaluation-date {
     color: var(--color-text-light);
     font-size: var(--font-size-sm);

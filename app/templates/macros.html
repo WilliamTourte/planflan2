@@ -281,6 +281,14 @@
                             </span>
                         </div>
                         <div class="flan-price-tag">{{ "%.2f"|format(flan.prix) }} €</div>
+                        <!-- Affichage de la moyenne des évaluations -->
+                        {% set moyenne_flan = flan.get_moyenne_evaluations() %}
+                        {% if moyenne_flan is not none %}
+                        <div class="flan-moyenne">
+                            <span class="moyenne-label">Moyenne :</span>
+                            <span class="moyenne-value">{{ moyenne_flan }}/5</span>
+                        </div>
+                        {% endif %}
                     </div>
                 </div>
             </a>

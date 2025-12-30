@@ -888,4 +888,95 @@ def test_afficher_badge_type_etab_complet(client):
         assert 'badge-type-etab' in badge
         assert 'Restaurant' in badge  # Libellé au lieu de la valeur
         assert '#87CEEB' in badge  # Couleur pour restaurant
+
+
+def test_flan_get_moyenne_evaluations(app):
+    """Test la méthode get_moyenne_evaluations de la classe Flan."""
+    from app.models import Flan, Evaluation, StatutModeration
+    from datetime import datetime
+    
+    with app.app_context():
+        # Créer un flan avec des évaluations valides
+        flan = Flan(
+            nom='Flan Test',
+            description='Un flan de test',
+            prix=3.50,
+            id_etab=1,
+            id_user=1
+        )
+        
+        # Ajouter des évaluations valides
+        eval1 = Evaluation(
+            visuel=4.0,
+            texture=3.5,
+            pate=4.5,
+            gout=5.0,
+            moyenne=4.25,
+            statut=StatutModeration.VALIDE,
+            date_creation=datetime.now()
+        )
+        
+        eval2 = Evaluation(
+            visuel=3.0,
+            texture=3.0,
+            pate=3.5,
+            gout=3.5,
+            moyenne=3.25,
+            statut=StatutModeration.VALIDE,
+            date_creation=datetime.now()
+        )
+        
+        # Ajouter une évaluation non valide (ne devrait pas être prise en compte)
+        eval3 = Evaluation(
+            visuel=2.0,
+            texture=2.5,
+            pate=2.0,
+            gout=3.0,
+            moyenne=2.375,
+            statut=StatutModeration.EN_ATTENTE,
+            date_creation=datetime.now()
+        )
+        
+        flan.evaluations = [eval1, eval2, eval3]
+        
+        # Test 1: Moyenne avec évaluations valides
+        moyenne = flan.get_moyenne_evaluations()
+        expected_moyenne = 3.3  # (4.25 + 3.25 +2.375) / 3
+        assert moyenne == expected_moyenne, f"Moyenne attendue: {expected_moyenne}, obtenue: {moyenne}"
+        
+        # Test 2: Flan sans évaluations
+        flan_sans_eval = Flan(
+            nom='Flan sans évaluations',
+            description='Un flan sans évaluations',
+            prix=2.50,
+            id_etab=1,
+            id_user=1
+        )
+        
+        moyenne_sans_eval = flan_sans_eval.get_moyenne_evaluations()
+        assert moyenne_sans_eval is None, "Un flan sans évaluations devrait retourner None"
+        
+        # Test 4: Flan avec une seule évaluation valide
+        flan_unique = Flan(
+            nom='Flan avec une seule évaluation',
+            description='Un flan avec une seule évaluation',
+            prix=3.00,
+            id_etab=1,
+            id_user=1
+        )
+        
+        eval_unique = Evaluation(
+            visuel=5.0,
+            texture=5.0,
+            pate=5.0,
+            gout=5.0,
+            moyenne=5.0,
+            statut=StatutModeration.VALIDE,
+            date_creation=datetime.now()
+        )
+        
+        flan_unique.evaluations = [eval_unique]
+        
+        moyenne_unique = flan_unique.get_moyenne_evaluations()
+        assert moyenne_unique == 5.0, f"Moyenne attendue: 5.0, obtenue: {moyenne_unique}"
         
