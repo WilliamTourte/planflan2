@@ -197,14 +197,14 @@ class RechercheForm(FlaskForm):
     visite = RadioField('Visité', choices=[('tous', 'Tous'), ('oui', 'Oui'), ('non', 'Non')], default='tous')
     labellise = RadioField('Labellisé', choices=[('tous', 'Tous'), ('oui', 'Oui'), ('non', 'Non')], default='tous')
     
-    def validate_latitude(form, field):
-        validate_optional_number(form, field, -90, 90, 'Doit être compris entre -90 et 90.')
+    def validate_latitude(self, field):
+        validate_optional_number(self, field, -90, 90, 'Doit être compris entre -90 et 90.')
     
-    def validate_longitude(form, field):
-        validate_optional_number(form, field, -180, 180, 'Doit être compris entre -180 et 180.')
+    def validate_longitude(self, field):
+        validate_optional_number(self, field, -180, 180, 'Doit être compris entre -180 et 180.')
     
-    def validate_rayon(form, field):
-        validate_optional_number_field(form, field)
+    def validate_rayon(self, field):
+        validate_optional_number_field(self, field)
 
 # Formulaire pour modifier le profil de l'utilisateur
 class UpdateProfileForm(FlaskForm):
@@ -224,7 +224,7 @@ class UpdateProfileForm(FlaskForm):
             raise ValidationError('Mot de passe actuel incorrect.')
 
 class DeleteForm(FlaskForm):
-        submit = SubmitField('Supprimer')
+    submit = SubmitField('Supprimer')
 
 class ValidateForm(FlaskForm):
-        submit = SubmitField('Valider')
+    submit = SubmitField('Valider')
