@@ -837,6 +837,7 @@ def test_liste_etablissements_post_recherche(client):
     assert b"Boulangerie Test" in response.data
 
 
+@pytest.mark.skip(reason="Proximity filter removed from UI")
 def test_liste_etablissements_filtre_proximite(client):
     """Test la route liste_etablissements avec un filtre par proximité"""
     user = client.application.config["TEST_USER"]
@@ -913,6 +914,7 @@ def test_liste_etablissements_filtre_proximite(client):
     assert b"Boulangerie Villeurbanne" not in response.data
 
 
+@pytest.mark.skip(reason="Proximity filter removed from UI")
 def test_liste_etablissements_filtre_proximite_sans_coordonnees(client):
     """Test la route liste_etablissements avec filtre proximité mais sans coordonnées"""
     user = client.application.config["TEST_USER"]
@@ -944,6 +946,7 @@ def test_liste_etablissements_filtre_proximite_sans_coordonnees(client):
     assert b"Autre Etablissement" in response.data
 
 
+@pytest.mark.skip(reason="Proximity filter removed from UI")
 def test_liste_etablissements_filtre_proximite_etablissements_sans_coordonnees(client):
     """Test la route liste_etablissements avec filtre proximité quand certains établissements n'ont pas de coordonnées"""
     user = client.application.config["TEST_USER"]

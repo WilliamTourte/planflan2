@@ -48,7 +48,7 @@ function initDataElements() {
             lat: parseFloat(userLocationElement.getAttribute('data-lat')),
             lon: parseFloat(userLocationElement.getAttribute('data-lon'))
         };
-        activeFilters.proximity = true;
+        // activeFilters.proximity = true; (désactivé - on ne filtre plus par proximité)
     }
 
     // Récupérer la ville sélectionnée si disponible
@@ -130,16 +130,16 @@ function updateMarkersBasedOnFilters() {
         const etablissement = marker.options.etablissement;
         let showMarker = true;
 
-        // Filtre de proximité
-        if (activeFilters.proximity && userLocation) {
-            const distance = calculateDistance(
-                userLocation.lat, userLocation.lon,
-                etablissement.latitude, etablissement.longitude
-            );
-            if (distance > proximityRadius) {
-                showMarker = false;
-            }
-        }
+        // Filtre de proximité (désactivé - on ne filtre plus par proximité)
+        // if (activeFilters.proximity && userLocation) {
+        //     const distance = calculateDistance(
+        //         userLocation.lat, userLocation.lon,
+        //         etablissement.latitude, etablissement.longitude
+        //     );
+        //     if (distance > proximityRadius) {
+        //         showMarker = false;
+        //     }
+        // }
 
         // Filtre par type de pâte
         if (activeFilters.type_pate && showMarker) {
@@ -212,6 +212,116 @@ function createUserMarker() {
     }
 }
 
+// Fonction pour ajouter le bouton de géolocalisation comme contrôle Leaflet
+function addGeolocateControl() {
+    // Créer un contrôle personnalisé pour la géolocalisation
+    const geolocateControl = L.control({ position: 'bottomright' });
+    
+    geolocateControl.onAdd = function(map) {
+        // Créer le conteneur avec le style original
+        const container = L.DomUtil.create('div', 'leaflet-control-geolocate');
+        container.style.width = '50px';
+        container.style.height = '50px';
+        container.style.backgroundColor = 'transparent';
+        container.style.border = '2px solid #4CAF50';
+        container.style.borderRadius = '50%';
+        container.style.cursor = 'pointer';
+        container.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+        container.style.transition = 'all 0.3s ease';
+        container.style.marginBottom = '10px';
+        container.style.marginRight = '10px';
+        
+        // Ajouter les classes Leaflet pour le positionnement
+        L.DomUtil.addClass(container, 'leaflet-bar leaflet-control');
+        
+        const link = L.DomUtil.create('a', '', container);
+        link.href = '#';
+        link.title = 'Géolocalisation';
+        link.style.display = 'flex';
+        link.style.alignItems = 'center';
+        link.style.justifyContent = 'center';
+        link.style.width = '100%';
+        link.style.height = '100%';
+        
+        // Créer l'icône de géolocalisation
+        const icon = L.DomUtil.create('i', 'bi bi-geo-alt-fill', link);
+        icon.style.fontSize = '24px';
+        icon.style.color = '#4c5eafff';
+        icon.style.transition = 'color 0.3s ease';
+        icon.style.backgroundColor='transparent';
+        
+        // Ajouter les styles de survol
+        container.onmouseover = function() {
+            container.style.backgroundColor = '#4CAF50';
+            container.style.transform = 'scale(1.1)';
+            icon.style.color = 'white';
+        };
+        
+        container.onmouseout = function() {
+            container.style.backgroundColor = 'white';
+            container.style.transform = 'scale(1)';
+            icon.style.color = '#4CAF50';
+        };
+        
+        // Ajouter les classes Leaflet pour l'interactivité
+        L.DomUtil.addClass(link, 'leaflet-interactive');
+        
+        // Gérer le clic sur le bouton
+        L.DomEvent.on(link, 'click', L.DomEvent.stopPropagation)
+            .on(link, 'click', L.DomEvent.preventDefault)
+            .on(link, 'click', function() {
+                geoloc.getUserLocation(
+                    (coords) => {
+                        userLocation = { lat: coords.latitude, lon: coords.longitude };
+                        activeFilters.proximity = true;
+                        createUserMarker();
+
+                        // Met à jour les champs cachés du formulaire (si ils existent)
+                        const latitudeInput = document.getElementById('latitude');
+                        const longitudeInput = document.getElementById('longitude');
+                        
+                        if (latitudeInput && longitudeInput) {
+                            latitudeInput.value = coords.latitude;
+                            longitudeInput.value = coords.longitude;
+                            
+                            // Soumet le formulaire seulement si les champs de coordonnées existent
+                            const form = document.querySelector('form');
+                            if (form) {
+                                form.submit();
+                            }
+                        } else {
+                            // Si les champs n'existent pas, on recrée juste la carte avec la nouvelle position
+                            createUserMarker();
+                            updateMarkersBasedOnFilters();
+                        }
+                    },
+                    (error) => {
+                        // Gestion des erreurs
+                        let message = "Erreur de géolocalisation: ";
+                        switch(error.code) {
+                            case error.PERMISSION_DENIED:
+                                message += "L'utilisateur a refusé la demande de géolocalisation.";
+                                break;
+                            case error.POSITION_UNAVAILABLE:
+                                message += "Les informations de position sont indisponibles.";
+                                break;
+                            case error.TIMEOUT:
+                                message += "La demande de position a expiré.";
+                                break;
+                            default:
+                                message += error.message;
+                        }
+                        alert(message);
+                    }
+                );
+            });
+        
+        return container;
+    };
+    
+    geolocateControl.addTo(map);
+}
+
 // Initialisation de la carte Leaflet
 function initMap() {
     const mapElement = document.getElementById("map");
@@ -238,15 +348,18 @@ function initMap() {
     // Ajouter le marqueur utilisateur si position disponible
     createUserMarker();
 
+    // Ajouter le bouton de géolocalisation comme contrôle Leaflet
+    addGeolocateControl();
+
     // Légende
-    const legend = L.control({ position: 'bottomright' });
+    const legend = L.control({ position: 'bottomleft' });
     legend.onAdd = function() {
-        const div = L.DomUtil.create('div', 'info legend');
-        div.style.backgroundColor = 'white';
-        div.style.padding = '5px';
-        div.style.margin = '10px';
-        div.style.border = '1px solid #ccc';
-        div.innerHTML = `❤️ Labellisé ✅ Visité 👋 Non visité`;
+        const div = L.DomUtil.create('div', 'carte');
+        
+        div.innerHTML = 
+        `<p>👋 Non visité</p>
+        <p>✅ Visité</p>
+        <p>❤️ Labellisé</p>`;
         return div;
     };
     legend.addTo(map);
@@ -305,42 +418,44 @@ function updateMapAndMarkers() {
     updateMarkersBasedOnFilters();
 }
 
-// Fonction pour gérer la géolocalisation
+// Fonction pour gérer la géolocalisation - zoom seulement, sans filtrage
 function setupGeolocation() {
-    document.getElementById('geolocate-me').addEventListener('click', function() {
-        geoloc.getUserLocation(
-            (coords) => {
-                userLocation = { lat: coords.latitude, lon: coords.longitude };
-                activeFilters.proximity = true;
-                createUserMarker();
-
-                // Met à jour les champs cachés du formulaire
-                document.getElementById('latitude').value = coords.latitude;
-                document.getElementById('longitude').value = coords.longitude;
-
-                // Soumet le formulaire
-                document.querySelector('form').submit();
-            },
-            (error) => {
-                // Gestion des erreurs (comme dans ton code)
-                let message = "Erreur de géolocalisation: ";
-                switch(error.code) {
-                    case error.PERMISSION_DENIED:
-                        message += "L'utilisateur a refusé la demande de géolocalisation.";
-                        break;
-                    case error.POSITION_UNAVAILABLE:
-                        message += "Les informations de position sont indisponibles.";
-                        break;
-                    case error.TIMEOUT:
-                        message += "La demande de position a expiré.";
-                        break;
-                    default:
-                        message += error.message;
+    const geolocateButton = document.getElementById('geolocate-me');
+    if (geolocateButton) {
+        geolocateButton.addEventListener('click', function() {
+            geoloc.getUserLocation(
+                (coords) => {
+                    userLocation = { lat: coords.latitude, lon: coords.longitude };
+                    
+                    // Créer le marqueur utilisateur
+                    createUserMarker();
+                    
+                    // Zoomer sur la position utilisateur (sans filtrer les établissements)
+                    if (map) {
+                        map.setView([coords.latitude, coords.longitude], 15);
+                    }
+                },
+                (error) => {
+                    // Gestion des erreurs
+                    let message = "Erreur de géolocalisation: ";
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            message += "L'utilisateur a refusé la demande de géolocalisation.";
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            message += "Les informations de position sont indisponibles.";
+                            break;
+                        case error.TIMEOUT:
+                            message += "La demande de position a expiré.";
+                            break;
+                        default:
+                            message += error.message;
+                    }
+                    alert(message);
                 }
-                alert(message);
-            }
-        );
-    });
+            );
+        });
+    }
 }
 
 
