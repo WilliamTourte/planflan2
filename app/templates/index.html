@@ -83,7 +83,7 @@
         <input type="text" 
                id="ville-autocomplete" 
                class="autocomplete-input py-2" 
-               placeholder="Rechercher une ville..." 
+               placeholder="Ville" 
                autocomplete="off">
         <div id="autocomplete-results" class="autocomplete-results"></div>
     </div>
@@ -119,12 +119,7 @@ function initAutocomplete() {
     
     console.log('Elements found, initializing autocomplete');
     
-    // Add visual indicator that script is working
-    input.style.border = '2px solid #4CAF50';
-    input.placeholder = 'Rechercher une ville (script actif)';
-    
 
-    
     // Rest of the autocomplete code
     // Débounce function pour limiter les requêtes API
     function debounce(func, timeout = 300) {
