@@ -363,9 +363,8 @@ class RechercheForm(FlaskForm):
             ),
         ],
     )
-    ville = SelectField(
+    ville = StringField(
         "Ville",
-        choices=[],  # Les choix seront ajoutés dynamiquement dans la vue
         validators=[Optional()],
     )
     type_saveur = SelectField(

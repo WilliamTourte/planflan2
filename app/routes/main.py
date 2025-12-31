@@ -35,13 +35,6 @@ def index():
     form_recherche = RechercheForm()
     etablissements = Etablissement.query.all()
     
-    # Récupérer la liste distincte des villes
-    villes = db.session.query(Etablissement.ville).distinct().all()
-    villes = [ville[0] for ville in villes if ville[0]]
-    
-    # Ajouter les choix au champ ville du formulaire
-    form_recherche.ville.choices = [("", "Toutes les villes")] + [(ville, ville) for ville in sorted(villes)]
-    
     return render_template(
         "index.html",
         etablissements=etablissements,
@@ -49,6 +42,26 @@ def index():
         google_maps_api_key=current_app.config["GOOGLE_MAPS_API_KEY"],
         form_recherche=form_recherche,
     )
+
+
+@main_bp.route("/api/villes")
+def get_villes():
+    """Route API pour récupérer les villes pour l'autocomplete"""
+    search_term = request.args.get("q", "").lower()
+    
+    print(f"API /api/villes called with search_term: '{search_term}'")
+    
+    # Récupérer les villes qui correspondent à la recherche
+    query = db.session.query(Etablissement.ville).distinct()
+    if search_term:
+        query = query.filter(Etablissement.ville.ilike(f"%{search_term}%"))
+    
+    villes = query.all()
+    villes = [ville[0] for ville in villes if ville[0]]
+    
+    print(f"Found {len(villes)} villes: {villes[:5]}{'...' if len(villes) > 5 else ''}")
+    
+    return jsonify(sorted(villes))
 
 
 def filtrer_etablissements(query, **kwargs):

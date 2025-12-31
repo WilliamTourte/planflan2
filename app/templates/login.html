@@ -2,9 +2,7 @@
 {% block content %}
 <div class="container py-5">
     <div class="row justify-content-center">
-        <div class="col-md-6 col-lg-5 col-xl-4">
-            <div class="carte shadow-sm">
-                <div class="carte-body p-4 p-md-5">
+<div class="carte">
                     <h2 class="text-center mb-4 fw-bold">Connexion</h2>
                     <form method="POST" action="{{ url_for('auth.login') }}">
                         {{ form.hidden_tag() }}
@@ -47,7 +45,6 @@
                     </form>
                 </div>
             </div>
-        </div>
-    </div>
+
 </div>
 {% endblock %}
