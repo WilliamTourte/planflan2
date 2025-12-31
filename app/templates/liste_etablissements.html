@@ -39,6 +39,14 @@ document.addEventListener('DOMContentLoaded', function() {
     userLocationElement.setAttribute('data-lon', {{ user_lon }});
     document.body.appendChild(userLocationElement);
     {% endif %}
+    
+    // Ajout de la ville sélectionnée si disponible
+    {% if ville_selectionnee %}
+    const villeSelectionneeElement = document.createElement('div');
+    villeSelectionneeElement.id = 'ville-selectionnee';
+    villeSelectionneeElement.setAttribute('data-ville', '{{ ville_selectionnee }}');
+    document.body.appendChild(villeSelectionneeElement);
+    {% endif %}
 });
 </script>
 {% endblock %}

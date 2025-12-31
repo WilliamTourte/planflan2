@@ -12,6 +12,7 @@ from flask import (
 
 from flask_login import login_required, current_user
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import select
 from app.forms import (
     EvalForm,
     NewFlanForm,
@@ -33,6 +34,14 @@ main_bp = Blueprint("main", __name__)
 def index():
     form_recherche = RechercheForm()
     etablissements = Etablissement.query.all()
+    
+    # Récupérer la liste distincte des villes
+    villes = db.session.query(Etablissement.ville).distinct().all()
+    villes = [ville[0] for ville in villes if ville[0]]
+    
+    # Ajouter les choix au champ ville du formulaire
+    form_recherche.ville.choices = [("", "Toutes les villes")] + [(ville, ville) for ville in sorted(villes)]
+    
     return render_template(
         "index.html",
         etablissements=etablissements,
@@ -92,7 +101,19 @@ def liste_etablissements():
     else:
         query = Etablissement.query
 
-    # 2. Filtres avancés
+    # 2. Nouvelle logique: toujours afficher tous les établissements
+    # et utiliser le zoom JavaScript pour la ville sélectionnée
+    ville_selectionnee = None
+    
+    # Récupérer la ville sélectionnée depuis les paramètres (GET ou POST)
+    if request.method == "POST":
+        if request.form.get('ville'):
+            ville_selectionnee = request.form.get('ville')
+    elif request.method == "GET":
+        if request.args.get('ville'):
+            ville_selectionnee = request.args.get('ville')
+    
+    # Appliquer les autres filtres (sauf la ville)
     if form_recherche.validate_on_submit() or (
         request.method == "GET" and form_recherche.validate()
     ):
@@ -119,10 +140,9 @@ def liste_etablissements():
             query = query.filter(
                 Etablissement.nom.ilike(f"%{form_recherche.nom.data}%")
             )
-        if form_recherche.ville.data:
-            query = query.filter(
-                Etablissement.ville.ilike(f"%{form_recherche.ville.data}%")
-            )
+        
+        # Note: On ne filtre plus par ville ici, on utilise le zoom JavaScript
+        
         if (
             form_recherche.type_saveur.data
             and form_recherche.type_saveur.data != "tous"
@@ -175,6 +195,7 @@ def liste_etablissements():
 
     # 4. Préparation pour le template
     etablissements, etablissements_json = afficher_etablissements(etablissements)
+    
     return render_template(
         "liste_etablissements.html",
         etablissements=etablissements,
@@ -185,6 +206,7 @@ def liste_etablissements():
         form_edit=form_edit,
         user_lat=user_lat,
         user_lon=user_lon,
+        ville_selectionnee=ville_selectionnee,  # Nouvelle variable pour le zoom
     )
 
 

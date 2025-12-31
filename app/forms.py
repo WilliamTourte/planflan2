@@ -363,16 +363,10 @@ class RechercheForm(FlaskForm):
             ),
         ],
     )
-    ville = StringField(
+    ville = SelectField(
         "Ville",
-        validators=[
-            Optional(),
-            Length(
-                min=3,
-                max=50,
-                message="Doit contenir entre %(min)d et %(max)d caractères.",
-            ),
-        ],
+        choices=[],  # Les choix seront ajoutés dynamiquement dans la vue
+        validators=[Optional()],
     )
     type_saveur = SelectField(
         "Saveur",

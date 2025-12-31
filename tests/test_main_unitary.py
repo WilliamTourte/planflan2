@@ -664,7 +664,7 @@ def test_liste_etablissements_recherche_simple(client, setup_data):
     """Test la recherche simple dans liste_etablissements."""
     response = client.get("/liste_etablissements?recherche_simple=Paris")
     assert response.status_code == 200
-    # Devrait trouver seulement la boulangerie à Paris
+    # Devrait trouver seulement la boulangerie à Paris (recherche_simple filtre toujours)
     assert b"Boulangerie Martin" in response.data
     # Ne devrait pas trouver les établissements de Lyon ou Marseille
     assert b"Lyon" not in response.data
@@ -675,8 +675,11 @@ def test_liste_etablissements_filtres_avances(client, setup_data):
     """Test les filtres avancés dans liste_etablissements."""
     response = client.get("/liste_etablissements?ville=Paris&visite=oui")
     assert response.status_code == 200
-    # Devrait trouver la boulangerie à Paris avec visite=oui
+    # Nouvelle logique: tous les établissements sont affichés, mais la ville est transmise pour zoom
     assert b"Boulangerie Martin" in response.data
+    assert b"Patisserie Dubois" in response.data  # Tous les établissements sont présents
+    # Vérifier que la ville sélectionnée est transmise au JavaScript
+    assert b"ville-selectionnee" in response.data
 
 
 @pytest.mark.unitary

@@ -7,6 +7,7 @@ let userMarker = null;
 let baseUrl = window.location.origin;
 let userLocation = null;
 let proximityRadius = 5;
+let villeSelectionnee = null;
 
 // Variables pour les filtres
 let activeFilters = {
@@ -48,6 +49,12 @@ function initDataElements() {
             lon: parseFloat(userLocationElement.getAttribute('data-lon'))
         };
         activeFilters.proximity = true;
+    }
+
+    // Récupérer la ville sélectionnée si disponible
+    const villeSelectionneeElement = document.getElementById('ville-selectionnee');
+    if (villeSelectionneeElement) {
+        villeSelectionnee = villeSelectionneeElement.getAttribute('data-ville');
     }
 }
 
@@ -157,6 +164,38 @@ function updateMarkersBasedOnFilters() {
     });
 }
 
+// Fonction pour zoomer sur une ville spécifique
+function zoomOnVille(ville) {
+    if (!ville || !etablissements || etablissements.length === 0) {
+        return false;
+    }
+
+    // Trouver les établissements de cette ville
+    const etablissementsVille = etablissements.filter(etab => 
+        etab.ville && etab.ville.toLowerCase().includes(ville.toLowerCase())
+    );
+
+    if (etablissementsVille.length === 0) {
+        return false;
+    }
+
+    // Créer un groupe de coordonnées pour ces établissements
+    const villeBounds = L.latLngBounds();
+    etablissementsVille.forEach(etab => {
+        if (etab.latitude && etab.longitude) {
+            villeBounds.extend([etab.latitude, etab.longitude]);
+        }
+    });
+
+    if (villeBounds.isValid()) {
+        // Zoomer sur les établissements de cette ville
+        map.fitBounds(villeBounds);
+        return true;
+    }
+
+    return false;
+}
+
 // Fonction pour créer un marqueur utilisateur
 function createUserMarker() {
     if (userMarker) map.removeLayer(userMarker);
@@ -253,7 +292,13 @@ function updateMapAndMarkers() {
 
     // Ajuste la vue de la carte pour inclure tous les marqueurs (si pas de position utilisateur)
     if (markers.length > 0 && !userLocation) {
-        map.fitBounds(bounds);
+        // Si une ville est sélectionnée, zoomer dessus
+        if (villeSelectionnee && zoomOnVille(villeSelectionnee)) {
+            console.log(`Zoom sur la ville: ${villeSelectionnee}`);
+        } else {
+            // Sinon, afficher tous les établissements
+            map.fitBounds(bounds);
+        }
     }
 
     // Appliquer les filtres initiaux
