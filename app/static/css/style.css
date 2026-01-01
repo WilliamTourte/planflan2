@@ -806,14 +806,6 @@ input[type="submit"]:active {
     font-size: var(--font-size-md);
 }
 
-/* Réutilisation des styles existants pour les badges */
-.carte-legende .badge {
-    position: relative;
-    top: 0;
-    left: 0;
-    margin: 0;
-    box-shadow: var(--box-shadow);
-}
 
 /* Style spécifique pour les emojis dans la légende */
 .carte-legende .badge {
