@@ -211,61 +211,22 @@ function createUserMarker() {
         map.setView([userLocation.lat, userLocation.lon], 13);
     }
 }
-
 // Fonction pour ajouter le bouton de géolocalisation comme contrôle Leaflet
 function addGeolocateControl() {
-    // Créer un contrôle personnalisé pour la géolocalisation
     const geolocateControl = L.control({ position: 'bottomright' });
-    
+
     geolocateControl.onAdd = function(map) {
-        // Créer le conteneur avec le style original
-        const container = L.DomUtil.create('div', 'leaflet-control-geolocate');
-        container.style.width = '50px';
-        container.style.height = '50px';
-        container.style.backgroundColor = 'transparent';
-        container.style.border = '2px solid #4CAF50';
-        container.style.borderRadius = '50%';
-        container.style.cursor = 'pointer';
-        container.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
-        container.style.transition = 'all 0.3s ease';
-        container.style.marginBottom = '10px';
-        container.style.marginRight = '10px';
-        
-        // Ajouter les classes Leaflet pour le positionnement
+        // Créer le conteneur avec les classes CSS
+        const container = L.DomUtil.create('div', 'leaflet-control-geolocate geolocate-button');
         L.DomUtil.addClass(container, 'leaflet-bar leaflet-control');
-        
+
         const link = L.DomUtil.create('a', '', container);
         link.href = '#';
         link.title = 'Géolocalisation';
-        link.style.display = 'flex';
-        link.style.alignItems = 'center';
-        link.style.justifyContent = 'center';
-        link.style.width = '100%';
-        link.style.height = '100%';
-        
+
         // Créer l'icône de géolocalisation
         const icon = L.DomUtil.create('i', 'bi bi-geo-alt-fill', link);
-        icon.style.fontSize = '24px';
-        icon.style.color = '#4c5eafff';
-        icon.style.transition = 'color 0.3s ease';
-        icon.style.backgroundColor='transparent';
-        
-        // Ajouter les styles de survol
-        container.onmouseover = function() {
-            container.style.backgroundColor = '#4CAF50';
-            container.style.transform = 'scale(1.1)';
-            icon.style.color = 'white';
-        };
-        
-        container.onmouseout = function() {
-            container.style.backgroundColor = 'white';
-            container.style.transform = 'scale(1)';
-            icon.style.color = '#4CAF50';
-        };
-        
-        // Ajouter les classes Leaflet pour l'interactivité
-        L.DomUtil.addClass(link, 'leaflet-interactive');
-        
+
         // Gérer le clic sur le bouton
         L.DomEvent.on(link, 'click', L.DomEvent.stopPropagation)
             .on(link, 'click', L.DomEvent.preventDefault)
@@ -279,11 +240,11 @@ function addGeolocateControl() {
                         // Met à jour les champs cachés du formulaire (si ils existent)
                         const latitudeInput = document.getElementById('latitude');
                         const longitudeInput = document.getElementById('longitude');
-                        
+
                         if (latitudeInput && longitudeInput) {
                             latitudeInput.value = coords.latitude;
                             longitudeInput.value = coords.longitude;
-                            
+
                             // Soumet le formulaire seulement si les champs de coordonnées existent
                             const form = document.querySelector('form');
                             if (form) {
@@ -315,12 +276,13 @@ function addGeolocateControl() {
                     }
                 );
             });
-        
+
         return container;
     };
-    
+
     geolocateControl.addTo(map);
 }
+
 
 // Initialisation de la carte Leaflet
 function initMap() {

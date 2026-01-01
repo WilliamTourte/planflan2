@@ -13,62 +13,6 @@
 
 
 
-<!-- Style pour le bouton de géolocalisation avec fond transparent - Spécificité renforcée -->
-<style>
-    /* Style de base avec !important pour éviter les conflits */
-    button#geolocate-me {
-        background-color: transparent !important;
-        border: 2px solid #4CAF50 !important;
-        border-radius: 50% !important;
-        width: 50px !important;
-        height: 50px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        box-shadow: none !important;
-        transition: all 0.3s ease !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        line-height: normal !important;
-    }
-    
-    /* Effet de survol */
-    button#geolocate-me:hover {
-        background-color: transparent !important;
-        transform: scale(1.1) !important;
-        border-color: #2E7D32 !important;
-    }
-    
-    /* Style de l'icône */
-    button#geolocate-me i.bi-geo-alt {
-        font-size: 24px !important;
-        color: #4CAF50 !important;
-        transition: color 0.3s ease !important;
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-    
-    /* Effet de survol de l'icône */
-    button#geolocate-me:hover i.bi-geo-alt {
-        color: #2E7D32 !important;
-    }
-    
-    /* Réinitialisation des styles Bootstrap qui pourraient interférer */
-    button#geolocate-me.btn,
-    button.geolocate-button {
-        background-image: none !important;
-        background: none !important;
-        outline: none !important;
-        box-shadow: none !important;
-    }
-    
-    /* Style supplémentaire pour la classe spécifique */
-    .geolocate-button {
-        appearance: none !important;
-        -webkit-appearance: none !important;
-        -moz-appearance: none !important;
-    }
-</style>
 
 <!-- Inclure le fichier JavaScript externe -->
 <script src="{{ url_for('static', filename='js/map_filter.js') }}" defer></script>
@@ -126,11 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <div id="sub-filters" class="sub-filters"></div>
 </div>
 
-<!-- Bouton de géolocalisation avec fond transparent et classe spécifique -->
-<button type="button" id='geolocate-me' class="geolocate-button" style="position: absolute; bottom: 20px; right: 20px; z-index: 1000;">
-    <i class="bi bi-geo-alt"></i>
-</button>
-    
+
 
 
 

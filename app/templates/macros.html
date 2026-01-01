@@ -242,7 +242,7 @@
                 </div>
             {% endif %}
             <button type="submit" class="btn btn-success">Valider</button>
-            <button type="button" class="btn btn-secondary" onclick="cancelEdit({{ etablissement.id_etab }})">Annuler</button>
+            <button type="button" class="btn btn-canceledit" onclick="cancelEdit({{ etablissement.id_etab }})">Annuler</button>
         </form>
     </div>
     {%  endif %}
@@ -362,7 +362,7 @@
                 </div>
                 <div class="form-group">
                     <button type="submit" class="btn btn-success">Enregistrer</button>
-                    <button type="button" class="btn btn-secondary" onclick="cancelEdit({{ flan.id_flan }})">Annuler</button>
+                    <button type="button" class="btn btn-canceledit" onclick="cancelEdit({{ flan.id_flan }})">Annuler</button>
                 </div>
             </form>
         </div>
@@ -444,7 +444,7 @@
             </div>
             <div class="form-group">
                 <button type="submit" class="btn btn-success">Enregistrer</button>
-                <button type="button" class="btn btn-secondary" onclick="cancelEdit({{ evaluation.id_eval }})">Annuler</button>
+                <button type="button" class="btn btn-canceledit" onclick="cancelEdit({{ evaluation.id_eval }})">Annuler</button>
             </div>
         </form>
     </div>
