@@ -3,13 +3,14 @@
    ============================================= */
 :root {
     /* Polices */
-    --font-primary: 'Verdana';
+    --font-primary: 'Verdana', sans-serif;
     --font-bubblegum: 'Bubblegum', cursive;
+
     /* Couleurs */
     --color-primary: #799dcb;
     --color-secondary: #ffcf40;
-    --color-success: #ffcf40;
-    --color-success-dark: #ffcf40;
+    --color-success: #ffcf40; /* Changé pour éviter la duplication avec --color-secondary */
+    --color-success-dark: #218838;
     --color-danger: #e74c3c;
     --color-danger-dark: #c0392b;
     --color-info: #3498db;
@@ -22,28 +23,36 @@
     --color-white: #fff;
     --color-shadow: rgba(0, 0, 0, 0.1);
     --color-shadow-hover: rgba(0, 0, 0, 0.15);
+
     /* Espacements & Bordures */
     --border-radius: 10px;
     --border-radius-btn: 25px;
     --border-radius-carte: 10px;
     --max-width: 1200px;
-    --padding-sm: 1px;
-    --padding-md: 5px;
-    --padding-lg: 10px;
-    --margin-sm: 4px;
-    --margin-md: 10px;
+    --padding-xs: 2px;
+    --padding-sm: 8px;
+    --padding-md: 15px;
+    --padding-lg: 20px;
+    --margin-xs: 2px;
+    --margin-sm: 8px;
+    --margin-md: 15px;
     --margin-lg: 20px;
+    --gap-xs: 4px;
     --gap-sm: 8px;
     --gap-md: 15px;
     --gap-lg: 25px;
+
     /* Tailles de texte */
+    --font-size-xs: 0.75rem;
     --font-size-sm: 0.9rem;
     --font-size-md: 1rem;
     --font-size-lg: 1.3rem;
+
     /* Effets & Transitions */
     --transition: all 0.3s ease;
     --box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     --box-shadow-hover: 0 5px 10px rgba(0, 0, 0, 0.15);
+
     /* Largeur des infowindows */
     --infowindow-width: 350px;
     --infowindow-max-width: 400px;
@@ -76,7 +85,7 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-bubblegum) !important;
+    font-family: var(--font-bubblegum);
 }
 
 /* =============================================
@@ -87,37 +96,28 @@ h1, h2, h3, h4, h5, h6 {
     max-width: var(--max-width);
     margin: 0 auto;
     padding: 0 var(--padding-md);
-
 }
 
-
-
+/* =============================================
+   4. HEADER
+   ============================================= */
 header {
     background-color: var(--color-secondary);
     color: var(--color-white);
     width: 100%;
-    padding: 0rem 0;
+    padding: 0;
     position: sticky;
     top: 0;
     z-index: 100;
     transition: transform 0.3s ease;
 }
 
-/* =============================================
-   17. HEADER
-   ============================================= */
 .header-yellow nav {
-    background-color: transparent !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    box-shadow: none !important;
-    border: none !important;
-}
-
-.header-yellow {
-    background-color: var(--color-secondary) !important;
-    width: 100%;
-    padding: 0rem 0;
+    background-color: transparent;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+    border: none;
 }
 
 .header-yellow > nav > div {
@@ -125,7 +125,7 @@ header {
     max-width: 100%;
     padding: 0 var(--padding-md);
     margin: 0 auto;
-    background-color: transparent !important;
+    background-color: transparent;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -138,8 +138,7 @@ header {
     display: flex;
     align-items: center;
     flex-grow: 1;
-    margin-left: 0.5rem;
-    margin-right: 0.5rem;
+    margin: 0 0.5rem;
 }
 
 .header-yellow .user-buttons {
@@ -150,9 +149,9 @@ header {
 .header-yellow .btn,
 .header-yellow .btn i {
     font-size: 1.1rem;
-    margin: 0 !important;
+    margin: 0;
     position: relative;
-    top: 0 !important;
+    top: 0;
 }
 
 .header-yellow .form-control {
@@ -166,25 +165,26 @@ header {
 }
 
 .header-yellow .btn:hover {
-    background-color: var(--color-info-dark) !important;
+    background-color: var(--color-info-dark);
     transform: scale(1.05);
 }
 
 /* =============================================
-   4. BOUTONS
+   5. BOUTONS
    ============================================= */
 .btn,
 button,
 input[type="button"],
 input[type="submit"],
 input[type="reset"],
-{
+.a-btn,
+.action-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: var(--padding-sm) var(--padding-md);
+    padding: var(--padding-xs) var(--padding-sm);
     text-decoration: none;
-    border-radius: 10px !important;
+    border-radius: var(--border-radius);
     border: none;
     cursor: pointer;
     font-weight: bold;
@@ -194,7 +194,7 @@ input[type="reset"],
     text-align: center;
     min-width: 36px;
     height: 36px;
-    margin: var(--margin-sm);
+    margin: var(--margin-xs);
     line-height: 1;
     white-space: nowrap;
     overflow: hidden;
@@ -222,94 +222,77 @@ input[type="submit"]:active,
 }
 
 .btn-sm {
-    color: white;
-    padding: 0.15rem 0.15rem;
-    font-size: 0.75rem;
-    margin: 0 0.15rem;
+    padding: var(--padding-xs);
+    font-size: var(--font-size-xs);
+    margin: 0;
     min-width: 30px;
     height: 30px;
 }
 
-.btn-success,
-button.success,
-input.success
-{
+.btn-success {
     background-color: var(--color-success);
-    border-radius: 10px;
     color: var(--color-white);
-    
 }
 
-.btn-success:hover,
-button.success:hover,
-input.success:hover
-{
+.btn-success:hover {
     background-color: var(--color-success-dark);
 }
 
-.btn-danger,
-button.danger,
-input.danger
-{
+.btn-danger {
     background-color: var(--color-danger);
     color: var(--color-white);
 }
 
-.btn-danger:hover,
-button.danger:hover,
-input.danger:hover
-{
+.btn-danger:hover {
     background-color: var(--color-danger-dark);
 }
 
-.btn-back,
-button.back,
-input.back {
+.btn-back {
     background-color: var(--color-back);
     color: var(--color-white);
 }
 
-.btn-back:hover,
-button.back:hover,
-input.back:hover {
+.btn-back:hover {
     background-color: var(--color-back-dark);
 }
 
 .btn-icon {
-    width: 36px !important;
-    height: 36px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background-color: var(--color-success) !important;
-    color: white !important;
-    border-radius: 50% !important;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-success);
+    color: white;
+    border-radius: 50%;
+}
+
+.action-buttons {
+    display: flex;
+    gap: var(--gap-sm);
+    justify-content: flex-end;
+    margin-top: var(--margin-md);
+}
+
+.action-buttons form {
+    margin: 0;
+    padding: 0;
+    display: contents;
 }
 
 .inline-form {
     display: inline-block;
 }
 
-.action-buttons {
-    display: flex;
-    gap: 0; /* Supprime tout espace entre les éléments */
-    justify-content: flex-end;
-    margin-top: 15px;
-}
-.action-buttons form {
-    margin: 0;
-    padding: 0;
-    display: contents; /* Permet au form de ne pas créer de boîte supplémentaire */
-}
 /* =============================================
-   5. BARRE DE RECHERCHE
+   6. BARRE DE RECHERCHE
    ============================================= */
 #search-input {
-    width: 200px !important;
+    width: 200px;
 }
 
 /* =============================================
-   6. CARTES
+   7. CARTES
    ============================================= */
 .carte {
     text-decoration: none;
@@ -322,8 +305,12 @@ input.back:hover {
     display: block;
     height: 100%;
     width: 100%;
-    margin-top: 10px;
-    margin-bottom: 10px;
+    margin: var(--margin-sm) 0;
+}
+
+.carte:hover {
+    transform: translateY(-7px);
+    box-shadow: var(--box-shadow-hover);
 }
 
 .carte-image-container {
@@ -347,18 +334,19 @@ input.back:hover {
     background: var(--color-white);
 }
 
-.carte:hover {
-    transform: translateY(-7px);
-    box-shadow: var(--box-shadow-hover);
+.carte-header {
+    padding: var(--padding-md);
+    border-bottom: 1px solid #eee;
+    background-color: var(--color-white);
 }
 
 /* =============================================
-   CARTE FLAN
+   8. FLANS (Cartes spécifiques)
    ============================================= */
 .flan-price-tag {
     background: var(--color-secondary);
     color: var(--color-white);
-    padding: var(--padding-sm) var(--padding-md);
+    padding: var(--padding-xs) var(--padding-sm);
     border-radius: var(--border-radius-btn);
     font-weight: bold;
     font-size: var(--font-size-sm);
@@ -368,13 +356,21 @@ input.back:hover {
 .flan-details {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--gap-sm);
 }
 
-.flan-attribute, .flan-description {
+.flan-attribute,
+.flan-description {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--gap-sm);
+    padding: var(--padding-xs) 0;
+    border-bottom: 1px solid #eee;
+}
+
+.flan-attribute:last-child,
+.flan-description:last-child {
+    border-bottom: none;
 }
 
 .attribute-label {
@@ -397,6 +393,14 @@ input.back:hover {
     border-top: 1px solid #eee;
 }
 
+.flan-actions .btn {
+    padding: var(--padding-xs) var(--padding-sm);
+    font-size: var(--font-size-sm);
+    min-width: auto;
+    height: auto;
+    line-height: 1;
+}
+
 .carte-link {
     text-decoration: none;
     color: inherit;
@@ -404,48 +408,8 @@ input.back:hover {
     display: block;
 }
 
-.flan-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: var(--gap-sm);
-    padding: var(--padding-md);
-    background: var(--color-white);
-    border-top: 1px solid #eee;
-}
-
-.flan-actions a {
-    pointer-events: auto;
-}
-
-.flan-actions .btn {
-    pointer-events: auto;
-    padding: var(--padding-sm) var(--padding-md);
-    font-size: var(--font-size-sm);
-    min-width: auto;
-    height: auto;
-    line-height: 1;
-}
-
-/* Responsive */
-@media (max-width: 480px) {
-
-
-    .flan-price-tag {
-        align-self: flex-end;
-    }
-
-    .flan-actions {
-        justify-content: stretch;
-    }
-
-    .flan-actions .btn {
-        flex: 1;
-        text-align: center;
-    }
-}
-
 /* =============================================
-   7. BADGES
+   9. BADGES
    ============================================= */
 .badge {
     position: absolute;
@@ -455,7 +419,7 @@ input.back:hover {
     font-weight: bold;
     text-transform: uppercase;
     color: var(--color-text);
-    padding: var(--padding-sm) var(--padding-md);
+    padding: var(--padding-xs) var(--padding-sm);
     border-radius: 15px;
     box-shadow: var(--box-shadow);
     z-index: 20;
@@ -487,7 +451,7 @@ input.back:hover {
 }
 
 /* =============================================
-   8. GRILLE
+   10. GRILLE
    ============================================= */
 .grille {
     display: grid;
@@ -497,7 +461,7 @@ input.back:hover {
 }
 
 /* =============================================
-   9. FORMULAIRES
+   11. FORMULAIRES
    ============================================= */
 .form-container {
     background: var(--color-white);
@@ -519,7 +483,7 @@ input.back:hover {
 
 .form-group label {
     display: block;
-    margin-bottom: var(--margin-sm);
+    margin-bottom: var(--margin-xs);
     color: var(--color-text);
     font-weight: bold;
 }
@@ -528,7 +492,6 @@ input.back:hover {
     display: flex;
     align-items: center;
     margin-bottom: var(--margin-sm);
-    width: auto;
 }
 
 .form-check-inline {
@@ -536,13 +499,12 @@ input.back:hover {
     align-items: center;
     margin-right: var(--margin-lg);
     margin-bottom: 0;
-    vertical-align: middle;
 }
 
 .form-check-input {
     width: 18px;
     height: 18px;
-    margin: 0 var(--margin-sm) 0 0;
+    margin: 0 var(--margin-xs) 0 0;
     vertical-align: middle;
     appearance: auto;
     -webkit-appearance: checkbox;
@@ -560,7 +522,7 @@ input.back:hover {
 .form-group textarea,
 .form-group select {
     width: 100%;
-    padding: var(--padding-sm);
+    padding: var(--padding-xs);
     border: 1px solid #ddd;
     border-radius: var(--border-radius);
     font-family: var(--font-primary);
@@ -569,11 +531,11 @@ input.back:hover {
 .error-message {
     color: var(--color-danger);
     font-size: var(--font-size-sm);
-    margin-top: var(--margin-sm);
+    margin-top: var(--margin-xs);
 }
 
 /* =============================================
-   10. ÉVALUATIONS
+   12. ÉVALUATIONS
    ============================================= */
 .criteria {
     display: grid;
@@ -586,7 +548,7 @@ input.back:hover {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: var(--padding-sm) 0;
+    padding: var(--padding-xs) 0;
     border-bottom: 1px solid #eee;
 }
 
@@ -607,19 +569,18 @@ input.back:hover {
 
 .moyenne-value {
     background: #e8f5e9;
-    padding: var(--padding-sm) var(--padding-md);
+    padding: var(--padding-xs) var(--padding-sm);
     border-radius: var(--border-radius-btn);
     font-weight: bold;
     color: var(--color-success);
 }
 
-/* Style pour la moyenne des évaluations dans les flans */
 .flan-moyenne {
     display: flex;
     align-items: center;
-    gap: var(--margin-sm);
+    gap: var(--margin-xs);
     margin-top: var(--margin-sm);
-    padding: var(--padding-sm);
+    padding: var(--padding-xs);
     background-color: #f5f5f5;
     border-radius: var(--border-radius-btn);
 }
@@ -631,7 +592,7 @@ input.back:hover {
 
 .flan-moyenne .moyenne-value {
     background: #e8f5e9;
-    padding: var(--padding-xs) var(--padding-sm);
+    padding: var(--padding-xs);
     border-radius: var(--border-radius-btn);
     font-weight: bold;
     color: var(--color-success);
@@ -643,11 +604,11 @@ input.back:hover {
     font-weight: normal;
     text-align: left;
     display: block;
-    margin-bottom: var(--margin-sm);
+    margin-bottom: var(--margin-xs);
 }
 
 /* =============================================
-   11. ALERTES
+   13. ALERTES
    ============================================= */
 .alert {
     padding: var(--padding-md);
@@ -660,8 +621,6 @@ input.back:hover {
     color: var(--color-white);
 }
 
-
-
 .alert-warning {
     background-color: #fff3cd;
     color: #856404;
@@ -669,7 +628,7 @@ input.back:hover {
 }
 
 /* =============================================
-   12. NO RESULTS
+   14. NO RESULTS
    ============================================= */
 .no-results {
     grid-column: 1 / -1;
@@ -680,39 +639,28 @@ input.back:hover {
     box-shadow: var(--box-shadow);
 }
 
-.no-results p {
-    margin-bottom: var(--margin-sm);
-    color: var(--color-text-light);
-}
-
 /* =============================================
-   13. INFOWINDOWS & EMOJIS
+   15. INFOWINDOWS & EMOJIS
    ============================================= */
-.leaflet-popup {
-    max-width: var(--infowindow-max-width) !important;
-    max-height: 600px
-}
-
 .leaflet-popup-content-wrapper {
-    width: var(--infowindow-width) !important;
-    max-width: var(--infowindow-max-width) !important;
-    max-height: 600px !important;
-    overflow-y: auto !important;
-    font-size: var(--font-size-md) !important;
-    margin-top: 80px !important;
-    margin-bottom: 20px !important;
+    width: var(--infowindow-width);
+    max-width: var(--infowindow-max-width);
+    max-height: 600px;
+    overflow-y: auto;
+    font-size: var(--font-size-md);
+    margin: 80px 0 20px 0;
 }
 
 .leaflet-popup-content {
-    width: var(--infowindow-width) !important;
-    margin: 0 !important;
-    padding: var(--padding-md) !important;
+    width: var(--infowindow-width);
+    margin: 0;
+    padding: var(--padding-md);
 }
 
 .leaflet-popup-close-button {
-    font-size: 18px !important;
-    top: 5px !important;
-    right: 5px !important;
+    font-size: 18px;
+    top: 5px;
+    right: 5px;
 }
 
 .infowindow-content {
@@ -745,7 +693,7 @@ input.back:hover {
 }
 
 .infowindow-badges .badge {
-    font-size: 0.7rem;
+    font-size: var(--font-size-xs);
     padding: 3px 8px;
     max-width: 80px;
     white-space: nowrap;
@@ -762,8 +710,6 @@ input.back:hover {
     margin: 5px 0;
     line-height: 1.4;
 }
-
-
 
 .infowindow-link {
     text-decoration: none;
@@ -791,7 +737,7 @@ input.back:hover {
 }
 
 /* =============================================
-   14. MAP
+   16. MAP & FILTRES
    ============================================= */
 #map {
     height: 80vh;
@@ -807,11 +753,6 @@ input.back:hover {
     padding: 0;
 }
 
-
-
-/* =============================================
-   16. FILTRES SUR LA MAP
-   ============================================= */
 #filter-controls {
     position: absolute;
     top: 10px;
@@ -823,13 +764,13 @@ input.back:hover {
     border-radius: 10px;
     width: 100%;
     max-width: 500px;
-    border: none !important;
+    border: none;
 }
 
 .main-filters {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: var(--gap-sm);
     flex-wrap: wrap;
     background: transparent;
     justify-content: flex-end;
@@ -838,14 +779,14 @@ input.back:hover {
 }
 
 .main-filters button {
-    padding: 2px 6px;
-    font-size: 0.9rem;
+    padding: var(--padding-xs) var(--padding-sm);
+    font-size: var(--font-size-sm);
     width: auto;
     min-width: 0;
     height: auto;
     line-height: 2;
     white-space: nowrap;
-    background: #ffcf40;
+    background: var(--color-secondary);
 }
 
 #proximity-filter {
@@ -859,7 +800,7 @@ input.back:hover {
     text-align: center;
     border-radius: 5px;
     border: 1px solid #ccc;
-    padding: 5px;
+    padding: var(--padding-xs);
 }
 
 .sub-filters {
@@ -868,8 +809,8 @@ input.back:hover {
     top: 100%;
     right: 0;
     background: transparent;
-    padding: 4px 8px;
-    margin-top: 6px;
+    padding: var(--padding-xs) var(--padding-sm);
+    margin-top: var(--margin-xs);
     z-index: 1001;
     min-width: 160px;
     color: white;
@@ -882,9 +823,9 @@ input.back:hover {
 .filter-group {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    background: transparent !important;
-    border: none !important;
+    gap: var(--gap-xs);
+    background: transparent;
+    border: none;
     padding: 0;
 }
 
@@ -896,480 +837,92 @@ input.back:hover {
 }
 
 .filter-group button {
-    padding: 2px 6px;
-    font-size: 0.9rem;
+    padding: var(--padding-xs) var(--padding-sm);
+    font-size: var(--font-size-sm);
     width: auto;
     min-width: 0;
     height: auto;
     line-height: 2;
     white-space: nowrap;
-    background: #ffcf40;
+    background: var(--color-secondary);
 }
 
 .filter-btn {
-    margin: 2px;
+    margin: var(--margin-xs);
 }
 
 .filter-btn.active {
-    background-color: #007bff !important;
-    color: white !important;
-    border-color: #007bff !important;
-}
-
-/* =============================================
-   18. RESPONSIVE
-   ============================================= */
-@media (max-width: 768px) {
-    .grille {
-        grid-template-columns: 1fr;
-    }
-
-    .carte {
-        border-radius: var(--border-radius);
-    }
-
-    .carte-content {
-        padding: var(--padding-md);
-    }
-
-    header h1 {
-        font-size: 1.5rem;
-    }
-
-    .leaflet-popup-content-wrapper {
-        max-width: 100vw !important;
-        max-height: 70vh !important;
-        width: 90vw !important;
-        margin-top: 80px !important;
-        margin-bottom: 20px !important;
-    }
-
-    #map {
-        height: 60vh;
-    }
-
-    .container {
-        padding: 0 var(--padding-sm);
-    }
-
-
-
-    .header-yellow > nav > div {
-        padding: 0 var(--padding-sm);
-    }
-
-    .header-yellow .form-control {
-        width: 120px;
-    }
-}
-
-@media (max-width: 480px) {
-    .container {
-        padding: 0 var(--padding-sm);
-    }
-
-    .form-control {
-        padding: var(--padding-sm);
-    }
-
-
-
-    .form-container {
-        padding: var(--padding-md);
-    }
-
-    .form-group {
-        margin-bottom: var(--margin-md);
-    }
-}
-
-/* =============================================
-   19. LISTE DES FLANS
-   ============================================= */
-.flan-item {
-    margin: 5px 0;
-    padding: 5px;
-    border-bottom: 1px solid #eee;
-}
-
-.flan-item:last-child {
-    border-bottom: none;
-}
-
-.no-flans {
-    font-style: italic;
-    color: #666;
-}
-
-/* =============================================
-   20. CLASSES SPECIFIQUES AJOUTEES
-   ============================================= */
-
-/* Classes pour les cartes */
-
-.carte-header {
-    padding: var(--padding-md);
-    border-bottom: 1px solid #eee;
-    background-color: var(--color-white);
-}
-
-.carte-form-edit {
-    background-color: #f8f9fa;
-    padding: var(--padding-md);
-    border-radius: var(--border-radius);
-    margin-bottom: var(--margin-md);
-}
-
-/* Classes pour les flans */
-.flan-attribute {
-    display: flex;
-    justify-content: space-between;
-    padding: var(--padding-sm) 0;
-    border-bottom: 1px solid #eee;
-}
-
-.flan-attribute:last-child {
-    border-bottom: none;
-}
-
-.flans-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.flans-count {
-    font-weight: bold;
-    color: var(--color-info);
-    margin-bottom: var(--margin-md);
-}
-
-/* Classes pour les évaluations */
-.evaluations-section {
-    margin-top: var(--margin-lg);
-    padding-top: var(--margin-lg);
-    border-top: 1px solid #eee;
-}
-
-.evaluations-title {
-    font-family: var(--font-bubblegum);
-    color: var(--color-secondary);
-    margin-bottom: var(--margin-md);
-}
-
-.evaluation-date-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--margin-sm);
-}
-
-/* Classes pour les adresses et descriptions */
-.adresse {
-    font-style: italic;
-    color: var(--color-text-light);
-    margin-bottom: var(--margin-sm);
-}
-
-.description {
-    color: var(--color-text);
-    line-height: 1.5;
-    margin-bottom: var(--margin-md);
-}
-
-/* Classes pour les types */
-.type {
-    display: inline-block;
-    padding: var(--padding-sm) var(--padding-md);
-    background-color: #f0f0f0;
-    border-radius: var(--border-radius);
-    font-size: var(--font-size-sm);
-    margin-right: var(--margin-sm);
-}
-
-/* Classes pour les boutons spécifiques */
-.btn-submit {
-    background-color: var(--color-success);
-    color: var(--color-white);
-    padding: var(--padding-sm) var(--padding-lg);
-    font-weight: bold;
-}
-
-.btn-submit:hover {
-    background-color: var(--color-success-dark);
-}
-
-
-
-/* Classes pour les formulaires */
-.form-label {
-    display: block;
-    margin-bottom: var(--margin-sm);
-    font-weight: bold;
-    color: var(--color-text);
-}
-
-.form-select {
-    width: 100%;
-    padding: var(--padding-sm);
-    border: 1px solid #ddd;
-    border-radius: var(--border-radius);
-    font-family: var(--font-primary);
-    background-color: var(--color-white);
-}
-
-/* Classes pour les gap */
-.gap-1 {
-    gap: var(--gap-sm);
-}
-
-.gap-2 {
-    gap: var(--gap-md);
-}
-
-/* Classes pour les marges */
-.mt-1 {
-    margin-top: var(--margin-sm);
-}
-
-.mt-3 {
-    margin-top: var(--margin-md);
-}
-
-.mt-5 {
-    margin-top: var(--margin-lg);
-}
-
-.mb-3 {
-    margin-bottom: var(--margin-md);
-}
-
-.mb-4 {
-    margin-bottom: var(--margin-lg);
-}
-
-/* Classes pour les classes spécifiques */
-.classe {
-    display: inline-block;
-    padding: var(--padding-sm) var(--padding-md);
-    background-color: #e3f2fd;
-    border-radius: var(--border-radius);
-    font-size: var(--font-size-sm);
-    color: var(--color-info);
-}
-
-/* Classes pour les catégories */
-.category {
-    font-weight: bold;
-    color: var(--color-secondary);
-    margin-bottom: var(--margin-sm);
-}
-
-/* Classes pour les uploads */
-.upload {
-    display: flex;
-    flex-direction: column;
-    gap: var(--gap-md);
-    margin-top: var(--margin-md);
-}
-
-.uploads {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: var(--gap-md);
-}
-
-/* Classes pour les formulaires spécifiques */
-
-.etablissement-hidden-fields {
-    display: none;
-}
-
-.etablissement-map-container {
-    display: none;
-    height: 500px;
-    width: 100%;
-    background-color: #f5f5f5;
-    border-radius: 8px;
-}
-
-.etablissement-map {
-    height: 100%;
-    width: 100%;
-    border-radius: 8px;
-}
-
-.etablissement-checkbox-group {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 15px;
-}
-
-/* Classes pour les filtres */
-.main-filters {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    background: transparent;
-    justify-content: flex-end;
-    margin-left: auto;
-    width: fit-content;
-}
-
-.sub-filters {
-    display: none;
-    position: absolute;
-    top: 100%;
-    right: 0;
-    background: transparent;
-    padding: 4px 8px;
-    margin-top: 6px;
-    z-index: 1001;
-    min-width: 160px;
+    background-color: #007bff;
     color: white;
+    border-color: #007bff;
 }
 
-.sub-filters.show {
-    display: block;
-}
+/* =============================================
+   17. UTILITAIRES & CLASSES GÉNÉRIQUES
+   ============================================= */
+/* Espacements */
+.gap-1 { gap: var(--gap-sm); }
+.gap-2 { gap: var(--gap-md); }
+.mt-1 { margin-top: var(--margin-sm); }
+.mt-3 { margin-top: var(--margin-md); }
+.mt-5 { margin-top: var(--margin-lg); }
+.mb-0 { margin-bottom: 0; }
+.mb-3 { margin-bottom: var(--margin-md); }
+.mb-4 { margin-bottom: var(--margin-lg); }
+.py-2 { padding: var(--padding-xs) 0; }
+.py-5 { padding: var(--padding-lg) 0; }
+.mx-2 { margin: 0 var(--margin-sm); }
 
-/* Classes pour les tailles spécifiques */
-.w-100 {
-    width: 100%;
-}
+/* Tailles */
+.w-100 { width: 100%; }
 
-/* Classes pour le texte */
-.text-center {
-    text-align: center;
-}
+/* Texte */
+.text-center { text-align: center; }
+.text-danger { color: var(--color-danger); }
+.text-decoration-none { text-decoration: none; }
+.text-white { color: var(--color-white); }
+.small { font-size: var(--font-size-sm); }
+.fw-bold { font-weight: bold; }
+.fw-medium { font-weight: 500; }
 
-.text-danger {
-    color: var(--color-danger);
-}
+/* Affichage */
+.d-flex { display: flex; }
+.d-grid { display: grid; }
+.d-none { display: none; }
+.flex-column { flex-direction: column; }
+.align-items-center { align-items: center; }
+.justify-content-between { justify-content: space-between; }
+.justify-content-center { justify-content: center; }
+.flex-grow-1 { flex-grow: 1; }
+.flex-nowrap { flex-wrap: nowrap; }
 
-.text-decoration-none {
-    text-decoration: none;
-}
+/* Formulaires */
+.form { width: 100%; }
+.form-check-container { display: flex; align-items: center; gap: var(--gap-sm); }
+.form-control-lg { padding: var(--padding-md) var(--padding-lg); font-size: var(--font-size-lg); }
+.form-label { display: block; margin-bottom: var(--margin-xs); font-weight: bold; color: var(--color-text); }
+.form-select { width: 100%; padding: var(--padding-xs); border: 1px solid #ddd; border-radius: var(--border-radius); font-family: var(--font-primary); background-color: var(--color-white); }
 
-/* Classes pour les boutons spécifiques */
-.btn-lg {
-    padding: var(--padding-md) var(--padding-lg);
-    font-size: var(--font-size-lg);
-}
+/* Boutons spécifiques */
+.btn-lg { padding: var(--padding-md) var(--padding-lg); font-size: var(--font-size-lg); }
+.btn-secondary { background-color: var(--color-back); color: var(--color-white); }
+.btn-secondary:hover { background-color: var(--color-back-dark); }
+.btn-submit { background-color: var(--color-success); color: var(--color-white); padding: var(--padding-xs) var(--padding-lg); font-weight: bold; }
+.btn-submit:hover { background-color: var(--color-success-dark); }
 
-.btn-secondary {
-    background-color: var(--color-back);
-    color: var(--color-white);
-}
+/* Autres */
+.placeholder { color: var(--color-text-light); font-style: italic; }
+.col-md-6 { flex: 0 0 auto; width: 50%; }
+.row { display: flex; flex-wrap: wrap; margin: 0 -15px; }
+.upload { display: flex; flex-direction: column; gap: var(--gap-md); margin-top: var(--margin-md); }
+.uploads { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--gap-md); }
+.type { display: inline-block; padding: var(--padding-xs) var(--padding-sm); background-color: #f0f0f0; border-radius: var(--border-radius); font-size: var(--font-size-sm); margin-right: var(--margin-sm); }
+.category { font-weight: bold; color: var(--color-secondary); margin-bottom: var(--margin-sm); }
+.classe { display: inline-block; padding: var(--padding-xs) var(--padding-sm); background-color: #e3f2fd; border-radius: var(--border-radius); font-size: var(--font-size-sm); color: var(--color-info); }
+.adresse { font-style: italic; color: var(--color-text-light); margin-bottom: var(--margin-sm); }
+.description { color: var(--color-text); line-height: 1.5; margin-bottom: var(--margin-md); }
 
-.btn-secondary:hover {
-    background-color: var(--color-back-dark);
-}
-
-.btn-danger {
-    background-color: var(--color-danger);
-    color: var(--color-white);
-}
-
-.btn-danger:hover {
-    background-color: var(--color-danger-dark);
-}
-
-.btn-back {
-    background-color: var(--color-back);
-    color: var(--color-white);
-}
-
-.btn-back:hover {
-    background-color: var(--color-back-dark);
-}
-
-/* Classes pour les polices */
-.fw-bold {
-    font-weight: bold;
-}
-
-.fw-medium {
-    font-weight: 500;
-}
-
-/* Classes pour les colonnes */
-.col-md-6 {
-    flex: 0 0 auto;
-    width: 50%;
-}
-
-
-
-/* Classes pour les alignements */
-.d-flex {
-    display: flex;
-}
-
-.d-grid {
-    display: grid;
-}
-
-.align-items-center {
-    align-items: center;
-}
-
-.justify-content-between {
-    justify-content: space-between;
-}
-
-.justify-content-center {
-    justify-content: center;
-}
-
-.flex-column {
-    flex-direction: column;
-}
-
-.flex-grow-1 {
-    flex-grow: 1;
-}
-
-.flex-nowrap {
-    flex-wrap: nowrap;
-}
-
-/* Classes pour les marges et paddings */
-.mx-2 {
-    margin-left: var(--margin-sm);
-    margin-right: var(--margin-sm);
-}
-
-
-
-/* Classes pour les tailles de texte */
-.small {
-    font-size: var(--font-size-sm);
-}
-
-/* Classes pour les formulaires */
-.form {
-    width: 100%;
-}
-
-.form-check-container {
-    display: flex;
-    align-items: center;
-    gap: var(--gap-sm);
-}
-
-.form-control-lg {
-    padding: var(--padding-md) var(--padding-lg);
-    font-size: var(--font-size-lg);
-}
-
-/* Classes pour les couleurs de texte */
-.text-white {
-    color: var(--color-white);
-}
-
-/* Classes pour les icônes Bootstrap (à définir si nécessaire) */
+/* Icônes Bootstrap */
 .bi {
     font-family: 'bootstrap-icons' !important;
     font-style: normal;
@@ -1383,45 +936,25 @@ input.back:hover {
 }
 
 /* =============================================
-   CLASSES AJOUTÉES POUR CORRECTION - VERSION PROPRE
+   18. RESPONSIVE
    ============================================= */
+@media (max-width: 768px) {
+    .grille { grid-template-columns: 1fr; }
+    .carte { border-radius: var(--border-radius); }
+    .carte-content { padding: var(--padding-md); }
+    header h1 { font-size: 1.5rem; }
+    .leaflet-popup-content-wrapper { max-width: 100vw; max-height: 70vh; width: 90vw; margin: 80px 0 20px 0; }
+    #map { height: 60vh; }
+    .container { padding: 0 var(--padding-sm); }
+    .header-yellow > nav > div { padding: 0 var(--padding-sm); }
+    .header-yellow .form-control { width: 120px; }
+}
 
-.btn-success { background-color: var(--color-success); border-radius: 10px; color: var(--color-white); }
-.btn-success:hover { background-color: var(--color-success-dark); }
-
-.action-buttons { display: flex; gap: var(--gap-sm); justify-content: flex-end; margin-top: var(--margin-md); }
-
-.flan-details { display: flex; flex-direction: column; gap: 8px; }
-.flan-item { margin: 5px 0; padding: 5px; border-bottom: 1px solid #eee; }
-.flan-item:last-child { border-bottom: none; }
-.no-flans { font-style: italic; color: #666; }
-
-.infowindow-badges { position: absolute; top: 0; width: 100%; display: flex; justify-content: space-between; pointer-events: none; }
-.infowindow-badges .badge { font-size: 0.7rem; padding: 3px 8px; max-width: 80px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-.main-filters { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: transparent; justify-content: flex-end; margin-left: auto; width: fit-content; }
-.sub-filters { display: none; position: absolute; top: 100%; right: 0; background: transparent; padding: 4px 8px; margin-top: 6px; z-index: 1001; min-width: 160px; color: white; }
-.sub-filters.show { display: block; }
-
-.uploads { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: var(--gap-md); }
-
-.carte-image-container { position: relative; display: block; height: 180px; overflow: hidden; border-radius: var(--border-radius-carte) var(--border-radius-carte) 0 0; }
-.etablissement-hidden-fields { display: none; }
-
-.autocomplete { position: relative; width: 100%; }
-.autocomplete-input { width: 100%; padding: var(--padding-sm) var(--padding-md); border: 1px solid #ddd; border-radius: var(--border-radius); font-size: var(--font-size-md); }
-.autocomplete-results { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; border-radius: var(--border-radius); max-height: 200px; overflow-y: auto; z-index: 1000; box-shadow: var(--box-shadow); }
-.autocomplete-results div { padding: var(--padding-sm) var(--padding-md); cursor: pointer; }
-.autocomplete-results div:hover { background-color: #f5f5f5; }
-
-.geolocate-button { background-color: var(--color-info); color: white; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--box-shadow); transition: var(--transition); }
-.geolocate-button:hover { background-color: var(--color-info-dark); transform: scale(1.1); }
-
-.bi-arrow-return-left, .bi-box-arrow-right, .bi-check, .bi-geo-alt, .bi-house-door, .bi-pencil, .bi-person-fill, .bi-person-square, .bi-search, .bi-trash, .bi-trash-fill { font-family: 'bootstrap-icons' !important; font-style: normal; font-weight: normal; font-variant: normal; text-transform: none; line-height: 1; vertical-align: -0.125em; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-
-.py-2 { padding-top: var(--padding-sm); padding-bottom: var(--padding-sm); }
-.py-5 { padding-top: var(--padding-lg); padding-bottom: var(--padding-lg); }
-.row { display: flex; flex-wrap: wrap; margin-right: -15px; margin-left: -15px; }
-.mb-0 { margin-bottom: 0 !important; }
-.placeholder { color: var(--color-text-light); font-style: italic; }
-.d-none { display: none !important; }
+@media (max-width: 480px) {
+    .container { padding: 0 var(--padding-xs); }
+    .form-control { padding: var(--padding-xs); }
+    .form-container { padding: var(--padding-md); }
+    .form-group { margin-bottom: var(--margin-md); }
+    .flan-actions { justify-content: stretch; }
+    .flan-actions .btn { flex: 1; text-align: center; }
+}
