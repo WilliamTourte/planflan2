@@ -245,14 +245,6 @@ input[type="submit"]:active {
     background-color: var(--color-danger-dark);
 }
 
-.btn-back {
-    background-color: var(--color-back);
-    color: var(--color-white);
-}
-
-.btn-back:hover {
-    background-color: var(--color-back-dark);
-}
 
 .btn-icon {
     width: 36px;
@@ -268,7 +260,7 @@ input[type="submit"]:active {
 .action-buttons {
     display: flex;
     gap: var(--gap-sm);
-    justify-content: flex-end;
+    justify-content: flex-center;
     margin-top: var(--margin-md);
 }
 
@@ -875,121 +867,6 @@ input[type="submit"]:active {
 /* =============================================
    17. UTILITAIRES & CLASSES GÉNÉRIQUES
    ============================================= */
-/* Espacements */
-.gap-1 {
-    gap: var(--gap-sm);
-}
-
-.gap-2 {
-    gap: var(--gap-md);
-}
-
-.mt-1 {
-    margin-top: var(--margin-sm);
-}
-
-.mt-3 {
-    margin-top: var(--margin-md);
-}
-
-.mt-5 {
-    margin-top: var(--margin-lg);
-}
-
-.mb-0 {
-    margin-bottom: 0;
-}
-
-.mb-3 {
-    margin-bottom: var(--margin-md);
-}
-
-.mb-4 {
-    margin-bottom: var(--margin-lg);
-}
-
-.py-2 {
-    padding: var(--padding-xs) 0;
-}
-
-.py-5 {
-    padding: var(--padding-lg) 0;
-}
-
-.mx-2 {
-    margin: 0 var(--margin-sm);
-}
-
-/* Tailles */
-.w-100 {
-    width: 100%;
-}
-
-/* Texte */
-.text-center {
-    text-align: center;
-}
-
-.text-danger {
-    color: var(--color-danger);
-}
-
-.text-decoration-none {
-    text-decoration: none;
-}
-
-.text-white {
-    color: var(--color-white);
-}
-
-.small {
-    font-size: var(--font-size-sm);
-}
-
-.fw-bold {
-    font-weight: bold;
-}
-
-.fw-medium {
-    font-weight: 500;
-}
-
-/* Affichage */
-.d-flex {
-    display: flex;
-}
-
-.d-grid {
-    display: grid;
-}
-
-.d-none {
-    display: none;
-}
-
-.flex-column {
-    flex-direction: column;
-}
-
-.align-items-center {
-    align-items: center;
-}
-
-.justify-content-between {
-    justify-content: space-between;
-}
-
-.justify-content-center {
-    justify-content: center;
-}
-
-.flex-grow-1 {
-    flex-grow: 1;
-}
-
-.flex-nowrap {
-    flex-wrap: nowrap;
-}
 
 /* Formulaires */
 .form {
