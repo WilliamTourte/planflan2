@@ -48,7 +48,7 @@ function initDataElements() {
             lat: parseFloat(userLocationElement.getAttribute('data-lat')),
             lon: parseFloat(userLocationElement.getAttribute('data-lon'))
         };
-        // activeFilters.proximity = true; (désactivé - on ne filtre plus par proximité)
+  
     }
 
     // Récupérer la ville sélectionnée si disponible
@@ -316,13 +316,27 @@ function initMap() {
     // Légende
     const legend = L.control({ position: 'bottomleft' });
     legend.onAdd = function() {
-        const div = L.DomUtil.create('div', 'carte');
-        
-        div.innerHTML = 
-        `<p>👋 Non visité</p>
-        <p>✅ Visité</p>
-        <p>❤️ Labellisé</p>`;
-        return div;
+        const div = L.DomUtil.create('div', 'carte-legende');
+
+div.innerHTML = `
+    <div class="legende-container">
+        <div class="legende-item">
+            ❤️
+            <span class="legende-text">Labellisé</span>
+        </div>
+        <div class="legende-item">
+            ✅
+            <span class="legende-text">Visité</span>
+        </div>
+        <div class="legende-item">
+            👋
+            <span class="legende-text">Non visité</span>
+        </div>
+    </div>
+`;
+
+return div;
+
     };
     legend.addTo(map);
 }

@@ -9,8 +9,7 @@
     /* Couleurs */
     --color-primary: #799dcb;
     --color-secondary: #ffcf40;
-    --color-success: #ffcf40;
-    /* Changé pour éviter la duplication avec --color-secondary */
+    --color-success: #ffcf40; 
     --color-success-dark: #218838;
     --color-danger: #e74c3c;
     --color-danger-dark: #c0392b;
@@ -85,12 +84,7 @@ body {
     font-style: normal;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-bubblegum);
 }
 
@@ -126,7 +120,7 @@ header {
     border: none;
 }
 
-.header-yellow>nav>div {
+.header-yellow > nav > div {
     width: 100%;
     max-width: 100%;
     padding: 0 var(--padding-md);
@@ -146,8 +140,6 @@ header {
     flex-grow: 1;
     margin: 0 0.5rem;
 }
-
-
 
 .header-yellow .btn,
 .header-yellow .btn i {
@@ -173,7 +165,7 @@ header {
 }
 
 /* =============================================
-   5. BOUTONS
+   5. BOUTONS (spécifiques à l'app)
    ============================================= */
 .btn,
 button,
@@ -205,10 +197,9 @@ input[type="reset"] {
 .btn:hover,
 button:hover,
 input[type="button"]:hover,
-input[type="submit"]:hover,
-{
-transform: translateY(-2px);
-box-shadow: var(--box-shadow-hover);
+input[type="submit"]:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--box-shadow-hover);
 }
 
 .btn:active,
@@ -245,7 +236,6 @@ input[type="submit"]:active {
     background-color: var(--color-danger-dark);
 }
 
-
 .btn-icon {
     width: 36px;
     height: 36px;
@@ -257,10 +247,19 @@ input[type="submit"]:active {
     border-radius: 50%;
 }
 
+.btn-canceledit {
+    background-color: var(--color-back);
+    color: var(--color-white);
+}
+
+.btn-canceledit:hover {
+    background-color: var(--color-back-dark);
+}
+
 .action-buttons {
     display: flex;
     gap: var(--gap-sm);
-    justify-content: flex-center;
+    justify-content: center; /* Corrigé */
     margin-top: var(--margin-md);
 }
 
@@ -301,12 +300,6 @@ input[type="submit"]:active {
 .carte:hover {
     transform: translateY(-7px);
     box-shadow: var(--box-shadow-hover);
-}
-.carte-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: var(--border-radius-carte) var(--border-radius-carte) 0 0;
 }
 
 .carte-image-container {
@@ -380,7 +373,6 @@ input[type="submit"]:active {
     color: var(--color-text);
 }
 
-
 .carte-link {
     text-decoration: none;
     color: inherit;
@@ -389,8 +381,9 @@ input[type="submit"]:active {
 }
 
 .moyenne-value {
-    text-decoration:var(--color-success);
+    color: var(--color-success); /* Corrigé (text-decoration → color) */
 }
+
 /* =============================================
    9. BADGES
    ============================================= */
@@ -517,6 +510,33 @@ input[type="submit"]:active {
     margin-top: var(--margin-xs);
 }
 
+.form-label {
+    display: block;
+    margin-bottom: var(--margin-xs);
+    font-weight: bold;
+    color: var(--color-text);
+}
+
+.form-select {
+    width: 100%;
+    padding: var(--padding-xs);
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    font-family: var(--font-primary);
+    background-color: var(--color-white);
+}
+
+.form-check-container {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-sm);
+}
+
+.form-control-lg {
+    padding: var(--padding-md) var(--padding-lg);
+    font-size: var(--font-size-lg);
+}
+
 /* =============================================
    12. ÉVALUATIONS
    ============================================= */
@@ -549,7 +569,6 @@ input[type="submit"]:active {
     text-align: center;
     margin: var(--margin-md) 0;
 }
-
 
 .flan-moyenne {
     display: flex;
@@ -593,7 +612,7 @@ input[type="submit"]:active {
 }
 
 .alert-success {
-    background-color: var(--color-success);
+    background-color: var(--color-success-dark);
     color: var(--color-white);
 }
 
@@ -616,7 +635,7 @@ input[type="submit"]:active {
 }
 
 /* =============================================
-   15. INFOWINDOWS & EMOJIS
+   15. LEAFLET - INFOWINDOWS & EMOJIS
    ============================================= */
 .leaflet-popup-content-wrapper {
     width: var(--infowindow-width);
@@ -760,6 +779,53 @@ input[type="submit"]:active {
     will-change: transform;
 }
 
+/* Légende pour la carte Leaflet */
+.carte-legende {
+    background: var(--color-white);
+    padding: var(--padding-sm);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    font-family: var(--font-primary);
+    max-width: 200px;
+}
+
+.legende-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-sm);
+}
+
+.legende-item {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-sm);
+}
+
+.legende-text {
+    color: var(--color-text);
+    font-size: var(--font-size-md);
+}
+
+/* Réutilisation des styles existants pour les badges */
+.carte-legende .badge {
+    position: relative;
+    top: 0;
+    left: 0;
+    margin: 0;
+    box-shadow: var(--box-shadow);
+}
+
+/* Style spécifique pour les emojis dans la légende */
+.carte-legende .badge {
+    min-width: 30px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--font-size-sm);
+}
+
+
 #filter-controls {
     position: absolute;
     top: 10px;
@@ -796,19 +862,6 @@ input[type="submit"]:active {
     background: var(--color-secondary);
 }
 
-#proximity-filter {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-#proximity-radius {
-    width: 50px;
-    text-align: center;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    padding: var(--padding-xs);
-}
 
 .sub-filters {
     display: none;
@@ -865,68 +918,11 @@ input[type="submit"]:active {
 }
 
 /* =============================================
-   17. UTILITAIRES & CLASSES GÉNÉRIQUES
+   17. UTILITAIRES SPÉCIFIQUES À L'APP
    ============================================= */
-
-/* Formulaires */
-.form {
-    width: 100%;
-}
-
-.form-check-container {
-    display: flex;
-    align-items: center;
-    gap: var(--gap-sm);
-}
-
-.form-control-lg {
-    padding: var(--padding-md) var(--padding-lg);
-    font-size: var(--font-size-lg);
-}
-
-.form-label {
-    display: block;
-    margin-bottom: var(--margin-xs);
-    font-weight: bold;
-    color: var(--color-text);
-}
-
-.form-select {
-    width: 100%;
-    padding: var(--padding-xs);
-    border: 1px solid #ddd;
-    border-radius: var(--border-radius);
-    font-family: var(--font-primary);
-    background-color: var(--color-white);
-}
-
-/* Boutons spécifiques */
-
-.btn-canceledit {
-    background-color: var(--color-back);
-    color: var(--color-white);
-}
-
-.btn-canceledit:hover {
-    background-color: var(--color-back-dark);
-}
-
-
-/* Autres */
 .placeholder {
     color: var(--color-text-light);
     font-style: italic;
-}
-
-.col-md-6 {
-    flex: 0 0 auto;
-    width: 50%;
-}
-
-.row {
-    display: flex;
-    flex-wrap: wrap;
-    margin: 0 -15px;
 }
 
 .upload {
@@ -978,7 +974,7 @@ input[type="submit"]:active {
     margin-bottom: var(--margin-md);
 }
 
-/* Icônes Bootstrap */
+/* Icônes Bootstrap (à garder si tu utilises bootstrap-icons) */
 .bi {
     font-family: 'bootstrap-icons' !important;
     font-style: normal;
@@ -1026,7 +1022,7 @@ input[type="submit"]:active {
         padding: 0 var(--padding-sm);
     }
 
-    .header-yellow>nav>div {
+    .header-yellow > nav > div {
         padding: 0 var(--padding-sm);
     }
 
@@ -1051,5 +1047,4 @@ input[type="submit"]:active {
     .form-group {
         margin-bottom: var(--margin-md);
     }
-
 }
