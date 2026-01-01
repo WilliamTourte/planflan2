@@ -95,7 +95,7 @@
                 const errorMessage = document.createElement('div');
                 errorMessage.className = 'alert alert-danger';
                 errorMessage.textContent = `Erreur: ${error.message}`;
-                document.querySelector('.etablissement-form-container').prepend(errorMessage);
+                document.querySelector('.form-container').prepend(errorMessage);
                 etablissementUrl = null;
                 etablissementId = null;
             });
