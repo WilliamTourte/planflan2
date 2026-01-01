@@ -310,6 +310,12 @@ input[type="submit"]:active {
     transform: translateY(-7px);
     box-shadow: var(--box-shadow-hover);
 }
+.carte-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--border-radius-carte) var(--border-radius-carte) 0 0;
+}
 
 .carte-image-container {
     position: relative;
@@ -319,7 +325,12 @@ input[type="submit"]:active {
     border-radius: var(--border-radius-carte) var(--border-radius-carte) 0 0;
 }
 
-
+.carte-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--border-radius-carte) var(--border-radius-carte) 0 0;
+}
 
 .carte-content {
     padding: var(--padding-lg);
@@ -385,6 +396,9 @@ input[type="submit"]:active {
     display: block;
 }
 
+.moyenne-value {
+    text-decoration:var(--color-success);
+}
 /* =============================================
    9. BADGES
    ============================================= */

@@ -286,7 +286,7 @@
                         {% if moyenne_flan is not none %}
                         <div class="flan-moyenne">
                             <span class="moyenne-label">Moyenne :</span>
-                            <span class="moyenne-value">{{ moyenne_flan }}/5</span>
+                            <span class="criterion-value">{{ moyenne_flan }}/5</span>
                         </div>
                         {% endif %}
                     </div>
@@ -473,11 +473,11 @@
     {% if evaluation.gout is not none and evaluation.texture is not none and evaluation.visuel is not none and evaluation.pate is not none %}
         {% set moyenne = (evaluation.gout + evaluation.texture + evaluation.visuel + evaluation.pate) / 4 %}
         <div class="moyenne">
-            <span class="moyenne-value">{{ moyenne }}/5</span>
+            <span class="criterion-value">{{ moyenne }}/5</span>
         </div>
     {% else %}
         <div class="moyenne">
-            <span class="moyenne-value">N/A</span>
+            <span class="criterion-value">N/A</span>
         </div>
     {% endif %}
     <p class="type">{{ evaluation.description }}</p>

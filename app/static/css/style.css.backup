@@ -609,7 +609,7 @@ input.back:hover {
     margin: var(--margin-md) 0;
 }
 
-.moyenne-value {
+.flan-attribute {
     background: #e8f5e9;
     padding: var(--padding-sm) var(--padding-md);
     border-radius: var(--border-radius-btn);
