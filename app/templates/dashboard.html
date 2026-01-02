@@ -11,11 +11,53 @@
         <button id="edit-profile-btn" class="btn btn-success">
             <i class="bi bi-pencil"></i>
         </button>
-        <form method="POST" action="{{ url_for('auth.supprimer_compte') }}">
-            <button type="submit" class="btn btn-danger">
-                <i class="bi bi-trash-fill"></i>
-            </button>
-        </form>
+        <!-- Formulaire de suppression de compte (masqué par défaut) -->
+        <div id="delete-account-section" style="display: none; margin-top: 20px;">
+            <h3>Supprimer mon compte</h3>
+            <p style="color: #666;">Cette action est irréversible. Veuillez confirmer votre mot de passe pour continuer.</p>
+            <form method="POST" action="{{ url_for('auth.supprimer_compte') }}" class="form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <div class="form-group">
+                    <label for="delete-password" class="form-label">Mot de passe actuel *</label>
+                    <input type="password" name="password" id="delete-password" class="form-control" required>
+                    {% if request.args.get('error') == 'password' %}
+                        <span class="error-message">Mot de passe incorrect</span>
+                    {% elif request.args.get('error') == 'csrf' %}
+                        <span class="error-message">Token CSRF invalide</span>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-danger">Confirmer la suppression</button>
+                    <button type="button" class="btn btn-secondary" onclick="cancelDeleteAccount()">Annuler</button>
+                </div>
+            </form>
+        </div>
+        
+        <button type="button" class="btn btn-danger" onclick="showDeleteAccountForm()">
+            <i class="bi bi-trash-fill"></i>
+        </button>
+        
+        <script>
+        function showDeleteAccountForm() {
+            document.getElementById('delete-account-section').style.display = 'block';
+            document.getElementById('delete-password').focus();
+        }
+        
+        function cancelDeleteAccount() {
+            document.getElementById('delete-account-section').style.display = 'none';
+            // Supprimer les paramètres d'erreur de l'URL
+            const url = new URL(window.location.href);
+            url.searchParams.delete('error');
+            window.history.replaceState({}, '', url);
+        }
+        
+        // Afficher le formulaire si erreur dans l'URL
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.location.search.includes('error=')) {
+                showDeleteAccountForm();
+            }
+        });
+        </script>
     </div>
 </div>
 
