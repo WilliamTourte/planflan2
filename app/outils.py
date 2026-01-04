@@ -1,3 +1,10 @@
+"""Module utilitaire contenant des fonctions diverses pour l'application PlanFlan.
+
+Ce module regroupe des fonctions utilitaires utilisées dans différentes parties
+de l'application, notamment pour le traitement de texte, la vérification CSRF,
+et le calcul de distances géographiques.
+"""
+
 from math import radians, sin, cos, sqrt, atan2
 from flask import request, current_app
 from flask_wtf.csrf import validate_csrf
@@ -6,6 +13,17 @@ from flask_wtf.csrf import validate_csrf
 def enlever_accents(
     text,
 ):  # Enlève les accents parce que la police ne les gère pas bien
+    """Enlève les accents d'un texte.
+    
+    Cette fonction est utilisée pour normaliser les textes contenant des accents,
+    notamment pour l'affichage avec des polices qui ne gèrent pas bien les accents.
+    
+    Args:
+        text (str): Le texte à traiter
+        
+    Returns:
+        str: Le texte sans accents, ou une chaîne vide si text est None
+    """
     import unicodedata
 
     if text is None:

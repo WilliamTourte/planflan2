@@ -1,3 +1,10 @@
+"""Module des routes principales de l'application PlanFlan.
+
+Ce module contient les routes principales de l'application, y compris
+la page d'accueil, les pages de recherche, les pages d'établissements,
+et les fonctionnalités principales accessibles aux utilisateurs.
+"""
+
 from flask import (
     Blueprint,
     render_template,
@@ -32,6 +39,11 @@ main_bp = Blueprint("main", __name__)
 ## ROUTES PRINCIPALES
 @main_bp.route("/")
 def index():
+    """Affiche la page d'accueil de l'application.
+    
+    Returns:
+        Response: Page d'accueil avec la liste des établissements et formulaire de recherche
+    """
     form_recherche = RechercheForm()
     etablissements = Etablissement.query.all()
 

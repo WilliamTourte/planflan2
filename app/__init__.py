@@ -1,3 +1,9 @@
+"""Module principal de l'application PlanFlan.
+
+Ce module initialise l'application Flask et configure les extensions nécessaires.
+Il contient également les fonctions de sécurité et les filtres Jinja personnalisés.
+"""
+
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
@@ -41,17 +47,45 @@ def create_app(config_class=Config):
 
     @login_manager.user_loader
     def load_user(user_id):
+        """Charge un utilisateur à partir de son ID.
+        
+        Args:
+            user_id (int): L'ID de l'utilisateur à charger
+            
+        Returns:
+            Utilisateur: L'objet utilisateur correspondant ou None si non trouvé
+        """
         from .models import Utilisateur
 
         return Utilisateur.query.get(int(user_id))
 
     @app.template_filter("enlever_accents")
     def filtre_enlever_accents(text):
+        """Filtre Jinja pour enlever les accents d'un texte.
+        
+        Args:
+            text (str): Le texte à traiter
+            
+        Returns:
+            str: Le texte sans accents
+        """
         return enlever_accents(text)
 
     # Ajouter des en-têtes de sécurité
     @app.after_request
     def add_security_headers(response):
+        """Ajoute des en-têtes de sécurité HTTP à toutes les réponses.
+        
+        Cette fonction configure la Content Security Policy (CSP) et d'autres
+        en-têtes de sécurité pour protéger l'application contre les attaques
+        courantes comme XSS, clickjacking, etc.
+        
+        Args:
+            response: L'objet réponse Flask à modifier
+            
+        Returns:
+            response: L'objet réponse avec les en-têtes de sécurité ajoutés
+        """
         # Content Security Policy - à adapter selon vos besoins
         # Autorise les ressources nécessaires pour l'application:
         # - cdn.jsdelivr.net pour Bootstrap et autres bibliothèques
