@@ -573,7 +573,7 @@
 
 {% macro proposer_flan(form, action_url) %}
     <form method="POST" action="{{ action_url }}" class="form-container">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        {{ form.hidden_tag() }}
         <div class="form-group">
             <label class="form-label" for="ajout-flan-nom">{{ form.nom.label }}</label>
             {{ form.nom(class="form-control", id="ajout-flan-nom") }}

@@ -14,10 +14,12 @@ from flask import (
     jsonify,
 )
 from flask_login import login_required, current_user
+from flask_wtf.csrf import validate_csrf
 
 from app.forms import EtabForm
 from app.models import Etablissement, TypeEtab
 from app import db
+from app.outils import verifier_csrf_ou_renvoyer_erreur
 
 maps_bp = Blueprint("maps", __name__)
 
@@ -38,6 +40,10 @@ def nettoyer_adresse(adresse):
 
 @maps_bp.route("/geoloc", methods=["POST"])
 def geoloc():
+    # Vérifier le token CSRF en utilisant la fonction utilitaire
+    csrf_valide, response = verifier_csrf_ou_renvoyer_erreur()
+    if not csrf_valide:
+        return response
 
     try:
         data = request.get_json()
@@ -58,6 +64,11 @@ def geoloc():
 
 @maps_bp.route("/etablissements_proches", methods=["POST"])
 def etablissements_proches():
+    # Vérifier le token CSRF en utilisant la fonction utilitaire
+    csrf_valide, response = verifier_csrf_ou_renvoyer_erreur()
+    if not csrf_valide:
+        return response
+    
     try:
         data = request.get_json()
         user_lat = data["latitude"]
@@ -96,6 +107,11 @@ def etablissements_proches():
 
 @maps_bp.route("/extraire_infos_adresse", methods=["POST"])
 def extraire_infos_adresse():
+    # Vérifier le token CSRF en utilisant la fonction utilitaire
+    csrf_valide, response = verifier_csrf_ou_renvoyer_erreur()
+    if not csrf_valide:
+        return response
+    
     try:
         data = request.get_json()
         if not data or "adresse" not in data:
@@ -128,6 +144,11 @@ def proposer_etablissement():
 
 @maps_bp.route("/verifier_etablissement", methods=["POST"])
 def verifier_etablissement():
+    # Vérifier le token CSRF en utilisant la fonction utilitaire
+    csrf_valide, response = verifier_csrf_ou_renvoyer_erreur()
+    if not csrf_valide:
+        return response
+    
     try:
         data = request.get_json()
         if not data or "nom" not in data:

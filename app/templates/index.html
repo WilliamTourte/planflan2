@@ -77,7 +77,7 @@
     </h1>
 
 <form action="{{ url_for('main.liste_etablissements') }}" method="POST" class="form-container">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    {{ form_recherche.hidden_tag() }}
     {{ form_recherche.ville(class="d-none") }}  {# Champ caché pour le formulaire #}
     <div class="form-group autocomplete">
         <input type="text" 

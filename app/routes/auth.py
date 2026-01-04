@@ -5,6 +5,7 @@ from flask_bcrypt import check_password_hash
 from app import db, bcrypt
 from app.models import Utilisateur
 from app.forms import LoginForm, RegistrationForm
+from app.outils import verifier_csrf_token
 
 auth_bp = Blueprint("auth", __name__)
 
@@ -66,11 +67,9 @@ def logout():
 @auth_bp.route("/supprimer_compte", methods=["POST"])
 @login_required
 def supprimer_compte():
-    # Vérifier le token CSRF
-    csrf_token = request.form.get("csrf_token")
-    from flask_wtf.csrf import generate_csrf
-
-    if not csrf_token or csrf_token != generate_csrf():
+    # Vérifier le token CSRF en utilisant la fonction utilitaire
+    csrf_valide, message = verifier_csrf_token()
+    if not csrf_valide:
         return redirect(url_for("main.dashboard", error="csrf"))
 
     # Vérifier le mot de passe pour les actions sensibles
