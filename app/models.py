@@ -14,10 +14,11 @@ from app import db
 # Enumérations
 class TypeEtab(Enum):
     """Types d'établissements possibles.
-    
+
     Cette énumération définit les différents types d'établissements
     qui peuvent être référencés dans l'application.
     """
+
     BOULANGERIE = "Boulangerie"
     PATISSERIE = "Pâtisserie"
     RESTAURANT = "Restaurant"
@@ -26,10 +27,11 @@ class TypeEtab(Enum):
 
 class StatutModeration(Enum):
     """Statuts de modération pour les établissements.
-    
+
     Cette énumération définit les différents statuts que peut avoir
     un établissement dans le processus de modération.
     """
+
     EN_ATTENTE = "EN_ATTENTE"
     VALIDE = "VALIDE"
     SUPPRIME = "SUPPRIME"
@@ -37,20 +39,22 @@ class StatutModeration(Enum):
 
 class TypeCible(Enum):
     """Types de cibles pour les évaluations.
-    
+
     Cette énumération définit les différents types de cibles
     qui peuvent être évaluées dans l'application.
     """
+
     FLAN = "Flan"
     ETABLISSEMENT = "Etablissement"
 
 
 class TypePate(Enum):
     """Types de pâte pour les flans.
-    
+
     Cette énumération définit les différents types de pâte
     qui peuvent être utilisés pour les flans.
     """
+
     FEUILLETEE = "Feuilletée"
     BRISEE = "Brisée"
     SUCREE = "Sucrée"
@@ -60,10 +64,11 @@ class TypePate(Enum):
 
 class TypeSaveur(Enum):
     """Types de saveurs pour les flans.
-    
+
     Cette énumération définit les différentes saveurs
     principales des flans.
     """
+
     VANILLE = "Vanille"
     CHOCOLAT = "Chocolat"
     NOIX = "Noix"
@@ -84,10 +89,11 @@ class TypeTexture(Enum):
 # Classes base de données avec SQLAlchemy
 class Utilisateur(db.Model, UserMixin):
     """Modèle représentant un utilisateur de l'application.
-    
+
     Ce modèle stocke les informations des utilisateurs enregistrés,
     y compris leurs identifiants, mot de passe et rôle.
     """
+
     __tablename__ = "utilisateurs"
     id_user = db.Column(db.Integer, primary_key=True)
     pseudo = db.Column(db.String(50), unique=True, nullable=False)

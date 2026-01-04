@@ -24,11 +24,11 @@ photos_bp = Blueprint("photos", __name__)
 @photos_bp.route("/upload", methods=["POST"])
 def upload_file():
     """Gère le téléchargement de fichiers image.
-    
+
     Cette route permet aux utilisateurs de télécharger des images
     pour les établissements ou les flans. Elle valide le token CSRF,
     vérifie le type de fichier et enregistre l'image dans le dossier approprié.
-    
+
     Returns:
         Response: Redirection vers la page d'upload avec confirmation ou erreur
     """

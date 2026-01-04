@@ -48,10 +48,10 @@ def create_app(config_class=Config):
     @login_manager.user_loader
     def load_user(user_id):
         """Charge un utilisateur à partir de son ID.
-        
+
         Args:
             user_id (int): L'ID de l'utilisateur à charger
-            
+
         Returns:
             Utilisateur: L'objet utilisateur correspondant ou None si non trouvé
         """
@@ -62,10 +62,10 @@ def create_app(config_class=Config):
     @app.template_filter("enlever_accents")
     def filtre_enlever_accents(text):
         """Filtre Jinja pour enlever les accents d'un texte.
-        
+
         Args:
             text (str): Le texte à traiter
-            
+
         Returns:
             str: Le texte sans accents
         """
@@ -75,14 +75,14 @@ def create_app(config_class=Config):
     @app.after_request
     def add_security_headers(response):
         """Ajoute des en-têtes de sécurité HTTP à toutes les réponses.
-        
+
         Cette fonction configure la Content Security Policy (CSP) et d'autres
         en-têtes de sécurité pour protéger l'application contre les attaques
         courantes comme XSS, clickjacking, etc.
-        
+
         Args:
             response: L'objet réponse Flask à modifier
-            
+
         Returns:
             response: L'objet réponse avec les en-têtes de sécurité ajoutés
         """

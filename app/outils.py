@@ -14,13 +14,13 @@ def enlever_accents(
     text,
 ):  # Enlève les accents parce que la police ne les gère pas bien
     """Enlève les accents d'un texte.
-    
+
     Cette fonction est utilisée pour normaliser les textes contenant des accents,
     notamment pour l'affichage avec des polices qui ne gèrent pas bien les accents.
-    
+
     Args:
         text (str): Le texte à traiter
-        
+
     Returns:
         str: Le texte sans accents, ou une chaîne vide si text est None
     """

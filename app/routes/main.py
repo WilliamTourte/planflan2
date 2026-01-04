@@ -40,7 +40,7 @@ main_bp = Blueprint("main", __name__)
 @main_bp.route("/")
 def index():
     """Affiche la page d'accueil de l'application.
-    
+
     Returns:
         Response: Page d'accueil avec la liste des établissements et formulaire de recherche
     """

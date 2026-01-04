@@ -37,10 +37,10 @@ def extraire_code_postal(adresse):
 
 def extraire_ville(adresse):
     """Extrait le nom de la ville à partir d'une adresse complète.
-    
+
     Args:
         adresse (str): L'adresse complète contenant le code postal et la ville
-        
+
     Returns:
         str: Le nom de la ville extrait, ou None si non trouvé
     """
@@ -50,10 +50,10 @@ def extraire_ville(adresse):
 
 def nettoyer_adresse(adresse):
     """Nettoie une adresse en ne gardant que la partie principale.
-    
+
     Args:
         adresse (str): L'adresse complète à nettoyer
-        
+
     Returns:
         str: La partie principale de l'adresse (avant la première virgule)
     """
@@ -63,10 +63,10 @@ def nettoyer_adresse(adresse):
 @maps_bp.route("/geoloc", methods=["POST"])
 def geoloc():
     """Gère la réception des données de géolocalisation.
-    
+
     Cette route reçoit les données GPS envoyées par le navigateur
     et les traite pour mettre à jour la position de l'utilisateur.
-    
+
     Returns:
         Response: JSON avec confirmation ou erreur
     """
