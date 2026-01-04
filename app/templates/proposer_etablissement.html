@@ -106,11 +106,11 @@
     const mapElement = document.getElementById("map");
     if (!mapElement) {
         console.error("Élément #map introuvable !");
-        const mapContainer = document.getElementById("map-container");
+        const mapContainer = document.getElementById("map");
         if (mapContainer) mapContainer.innerHTML = "<p style='color: red;'>Erreur : Impossible de charger la carte.</p>";
         return;
     }
-    const mapContainer = document.getElementById('map-container');
+    const mapContainer = document.getElementById('map');
     mapContainer.style.display = 'block';
 
     // Si une carte existe déjà, la détruire avant d'en créer une nouvelle
