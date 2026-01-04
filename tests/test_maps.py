@@ -102,6 +102,8 @@ def test_proposer_etablissement_get(client):
     # Vérifier que la page contient un formulaire (plus générique)
     assert b"form" in response.data
     assert b"input" in response.data
+    # Vérifier que la page contient le champ de recherche
+    assert b"Recherche d" in response.data
 
 
 @pytest.mark.maps
@@ -134,6 +136,24 @@ def test_proposer_etablissement_post(client):
 
 
 @pytest.mark.maps
+def test_proposer_etablissement_contains_google_maps_api_key(client):
+    """Test que la route /proposer_etablissement contient la clé API Google Maps"""
+    response = client.get("/proposer_etablissement")
+    assert response.status_code == 200
+    # Vérifier que la clé API Google Maps est présente dans la réponse
+    assert b"GOOGLE_MAPS_API_KEY" in response.data or b"google.maps" in response.data
+
+
+@pytest.mark.maps
+def test_proposer_etablissement_form_prefix(client):
+    """Test que le formulaire utilise le bon préfixe"""
+    response = client.get("/proposer_etablissement")
+    assert response.status_code == 200
+    # Vérifier que le formulaire utilise le préfixe "ajout-etab"
+    assert b"ajout-etab" in response.data
+
+
+@pytest.mark.maps
 def test_verifier_etablissement_route(client):
     """Test de la route /verifier_etablissement"""
     user = client.application.config["TEST_USER"]
@@ -160,6 +180,66 @@ def test_verifier_etablissement_route(client):
     data = response.get_json()
     assert data["exists"] == True
     assert data["id_etab"] == etab_id
+
+
+@pytest.mark.maps
+def test_verifier_etablissement_not_found(client):
+    """Test de la route /verifier_etablissement quand l'établissement n'existe pas"""
+    # Tester avec un nom d'établissement qui n'existe pas
+    response = client.post(
+        "/verifier_etablissement", json={"nom": "Établissement Inexistant"}
+    )
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["exists"] == False
+
+
+@pytest.mark.maps
+def test_verifier_etablissement_missing_data(client):
+    """Test de la route /verifier_etablissement avec des données manquantes"""
+    # Tester sans fournir de nom
+    response = client.post("/verifier_etablissement", json={})
+    assert response.status_code == 400
+    data = response.get_json()
+    assert "error" in data
+
+
+@pytest.mark.maps
+def test_verifier_etablissement_empty_name(client):
+    """Test de la route /verifier_etablissement avec un nom vide"""
+    # Tester avec un nom vide
+    response = client.post("/verifier_etablissement", json={"nom": ""})
+    assert response.status_code == 400
+    data = response.get_json()
+    assert "error" in data
+
+
+@pytest.mark.maps
+def test_verifier_etablissement_contains_url(client):
+    """Test que la route /verifier_etablissement retourne une URL valide"""
+    user = client.application.config["TEST_USER"]
+
+    with client.application.app_context():
+        # Créer un établissement
+        etab = Etablissement(
+            nom="Établissement avec URL",
+            adresse="1 rue de Test",
+            code_postal="69001",
+            ville="Lyon",
+            id_user=user.id_user,
+        )
+        db.session.add(etab)
+        db.session.commit()
+
+    # Tester la vérification
+    response = client.post(
+        "/verifier_etablissement", json={"nom": "Établissement avec URL"}
+    )
+    assert response.status_code == 200
+    data = response.get_json()
+    assert data["exists"] == True
+    assert "url" in data
+    assert data["url"].startswith("http")  # Vérifier que l'URL est valide
 
 
 @pytest.mark.maps

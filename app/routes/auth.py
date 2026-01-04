@@ -67,16 +67,17 @@ def logout():
 @login_required
 def supprimer_compte():
     # Vérifier le token CSRF
-    csrf_token = request.form.get('csrf_token')
+    csrf_token = request.form.get("csrf_token")
     from flask_wtf.csrf import generate_csrf
+
     if not csrf_token or csrf_token != generate_csrf():
         return redirect(url_for("main.dashboard", error="csrf"))
-    
+
     # Vérifier le mot de passe pour les actions sensibles
-    password = request.form.get('password')
+    password = request.form.get("password")
     if not password or not bcrypt.check_password_hash(current_user.password, password):
         return redirect(url_for("main.dashboard", error="password"))
-    
+
     user = Utilisateur.query.get(current_user.id_user)
     db.session.delete(user)
     db.session.commit()

@@ -677,7 +677,9 @@ def test_liste_etablissements_filtres_avances(client, setup_data):
     assert response.status_code == 200
     # Nouvelle logique: tous les établissements sont affichés, mais la ville est transmise pour zoom
     assert b"Boulangerie Martin" in response.data
-    assert b"Patisserie Dubois" in response.data  # Tous les établissements sont présents
+    assert (
+        b"Patisserie Dubois" in response.data
+    )  # Tous les établissements sont présents
     # Vérifier que la ville sélectionnée est transmise au JavaScript
     assert b"ville-selectionnee" in response.data
 

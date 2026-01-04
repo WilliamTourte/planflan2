@@ -34,7 +34,7 @@ main_bp = Blueprint("main", __name__)
 def index():
     form_recherche = RechercheForm()
     etablissements = Etablissement.query.all()
-    
+
     return render_template(
         "index.html",
         etablissements=etablissements,
@@ -48,19 +48,19 @@ def index():
 def get_villes():
     """Route API pour récupérer les villes pour l'autocomplete"""
     search_term = request.args.get("q", "").lower()
-    
+
     print(f"API /api/villes called with search_term: '{search_term}'")
-    
+
     # Récupérer les villes qui correspondent à la recherche
     query = db.session.query(Etablissement.ville).distinct()
     if search_term:
         query = query.filter(Etablissement.ville.ilike(f"%{search_term}%"))
-    
+
     villes = query.all()
     villes = [ville[0] for ville in villes if ville[0]]
-    
+
     print(f"Found {len(villes)} villes: {villes[:5]}{'...' if len(villes) > 5 else ''}")
-    
+
     return jsonify(sorted(villes))
 
 
@@ -117,15 +117,15 @@ def liste_etablissements():
     # 2. Nouvelle logique: toujours afficher tous les établissements
     # et utiliser le zoom JavaScript pour la ville sélectionnée
     ville_selectionnee = None
-    
+
     # Récupérer la ville sélectionnée depuis les paramètres (GET ou POST)
     if request.method == "POST":
-        if request.form.get('ville'):
-            ville_selectionnee = request.form.get('ville')
+        if request.form.get("ville"):
+            ville_selectionnee = request.form.get("ville")
     elif request.method == "GET":
-        if request.args.get('ville'):
-            ville_selectionnee = request.args.get('ville')
-    
+        if request.args.get("ville"):
+            ville_selectionnee = request.args.get("ville")
+
     # Appliquer les autres filtres (sauf la ville)
     if form_recherche.validate_on_submit() or (
         request.method == "GET" and form_recherche.validate()
@@ -153,9 +153,9 @@ def liste_etablissements():
             query = query.filter(
                 Etablissement.nom.ilike(f"%{form_recherche.nom.data}%")
             )
-        
+
         # Note: On ne filtre plus par ville ici, on utilise le zoom JavaScript
-        
+
         if (
             form_recherche.type_saveur.data
             and form_recherche.type_saveur.data != "tous"
@@ -208,7 +208,7 @@ def liste_etablissements():
 
     # 4. Préparation pour le template
     etablissements, etablissements_json = afficher_etablissements(etablissements)
-    
+
     return render_template(
         "liste_etablissements.html",
         etablissements=etablissements,

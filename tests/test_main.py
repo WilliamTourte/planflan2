@@ -837,7 +837,6 @@ def test_liste_etablissements_post_recherche(client):
     assert b"Boulangerie Test" in response.data
 
 
-
 def test_liste_etablissements_cas_limites_valeurs_vides(client):
     """Test la route liste_etablissements avec des valeurs vides ou None"""
     user = client.application.config["TEST_USER"]
