@@ -68,7 +68,7 @@ def etablissements_proches():
     csrf_valide, response = verifier_csrf_ou_renvoyer_erreur()
     if not csrf_valide:
         return response
-    
+
     try:
         data = request.get_json()
         user_lat = data["latitude"]
@@ -111,7 +111,7 @@ def extraire_infos_adresse():
     csrf_valide, response = verifier_csrf_ou_renvoyer_erreur()
     if not csrf_valide:
         return response
-    
+
     try:
         data = request.get_json()
         if not data or "adresse" not in data:
@@ -148,7 +148,7 @@ def verifier_etablissement():
     csrf_valide, response = verifier_csrf_ou_renvoyer_erreur()
     if not csrf_valide:
         return response
-    
+
     try:
         data = request.get_json()
         if not data or "nom" not in data:

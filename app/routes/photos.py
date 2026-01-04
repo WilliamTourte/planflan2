@@ -22,7 +22,7 @@ def upload_file():
     if not csrf_valide:
         flash(message or "Token CSRF invalide. Veuillez réessayer.", "danger")
         return redirect(url_for("photos.show_uploads"))
-    
+
     if "file" not in request.files:
         return redirect(request.url)
     file = request.files["file"]

@@ -59,40 +59,49 @@ def create_app(config_class=Config):
         # - maps.googleapis.com pour Google Maps
         # - 'unsafe-inline' nécessaire pour certains scripts et styles
         csp = (
-            "default-src 'self' http://localhost; "  # Autoriser votre domaine  localhost
-            "script-src 'self' 'unsafe-inline' cdn.jsdelivr.net unpkg.com maps.googleapis.com http://localhost ; "
-            "style-src 'self' 'unsafe-inline' cdn.jsdelivr.net unpkg.com http://localhost ; "
-            "img-src 'self' data: cdn.jsdelivr.net maps.googleapis.com unpkg.com maps.gstatic.com a.tile.openstreetmap.org b.tile.openstreetmap.org c.tile.openstreetmap.org; "
+            "default-src 'self' http://localhost; "
+            "script-src 'self' 'unsafe-inline' cdn.jsdelivr.net unpkg.com "
+            "maps.googleapis.com http://localhost; "
+            "style-src 'self' 'unsafe-inline' cdn.jsdelivr.net unpkg.com "
+            "http://localhost; "
+            "img-src 'self' data: cdn.jsdelivr.net maps.googleapis.com "
+            "unpkg.com maps.gstatic.com a.tile.openstreetmap.org "
+            "b.tile.openstreetmap.org c.tile.openstreetmap.org; "
             "font-src 'self' cdn.jsdelivr.net; "
-            "connect-src 'self' cdn.jsdelivr.net unpkg.com maps.googleapis.com http://localhost ; "
+            "connect-src 'self' cdn.jsdelivr.net unpkg.com "
+            "maps.googleapis.com http://localhost; "
             "frame-src 'none'; "
             "object-src 'none'; "
             "base-uri 'self'; "
-            "form-action 'self' http://localhost "
+            "form-action 'self' http://localhost"
         )
 
-        response.headers['Content-Security-Policy'] = csp
+        response.headers["Content-Security-Policy"] = csp
         # Pour les navigateurs modernes, ajouter une Permission Policy pour la géolocalisation
-        
+
         # En développement, autoriser aussi localhost
-        response.headers['Permissions-Policy'] = "geolocation=(self), microphone=(), camera=()"
-        
+        response.headers["Permissions-Policy"] = (
+            "geolocation=(self), microphone=(), camera=()"
+        )
+
         # X-Frame-Options pour prévenir le clickjacking
-        response.headers['X-Frame-Options'] = 'SAMEORIGIN'
-        
+        response.headers["X-Frame-Options"] = "SAMEORIGIN"
+
         # X-Content-Type-Options pour prévenir le MIME sniffing
-        response.headers['X-Content-Type-Options'] = 'nosniff'
-        
+        response.headers["X-Content-Type-Options"] = "nosniff"
+
         # X-XSS-Protection
-        response.headers['X-XSS-Protection'] = '1; mode=block'
-        
+        response.headers["X-XSS-Protection"] = "1; mode=block"
+
         # Referrer-Policy
-        response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
-        
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+
         # Strict-Transport-Security (uniquement en production avec HTTPS)
-        if not app.debug and app.config.get('SESSION_COOKIE_SECURE'):
-            response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains; preload'
-        
+        if not app.debug and app.config.get("SESSION_COOKIE_SECURE"):
+            response.headers["Strict-Transport-Security"] = (
+                "max-age=31536000; includeSubDomains; preload"
+            )
+
         return response
 
     from .routes.auth import auth_bp
