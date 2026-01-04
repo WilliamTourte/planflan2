@@ -1,3 +1,9 @@
+"""Module des routes de gestion des photos de l'application PlanFlan.
+
+Ce module gère le téléchargement et la gestion des photos,
+otamment pour les établissements et les flans.
+"""
+
 from flask import (
     Flask,
     render_template,
@@ -17,6 +23,15 @@ photos_bp = Blueprint("photos", __name__)
 
 @photos_bp.route("/upload", methods=["POST"])
 def upload_file():
+    """Gère le téléchargement de fichiers image.
+    
+    Cette route permet aux utilisateurs de télécharger des images
+    pour les établissements ou les flans. Elle valide le token CSRF,
+    vérifie le type de fichier et enregistre l'image dans le dossier approprié.
+    
+    Returns:
+        Response: Redirection vers la page d'upload avec confirmation ou erreur
+    """
     # Vérifier le token CSRF pour les requêtes POST
     csrf_valide, message = verifier_csrf_token()
     if not csrf_valide:

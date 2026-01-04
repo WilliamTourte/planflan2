@@ -1,3 +1,9 @@
+"""Module des routes de cartes et géolocalisation de l'application PlanFlan.
+
+Ce module gère les fonctionnalités liées aux cartes, à la géolocalisation
+et à la gestion des établissements sur les cartes interactives.
+"""
+
 import traceback
 from werkzeug.datastructures import MultiDict
 from app.outils import afficher_etablissements, calculer_distance
@@ -30,16 +36,40 @@ def extraire_code_postal(adresse):
 
 
 def extraire_ville(adresse):
+    """Extrait le nom de la ville à partir d'une adresse complète.
+    
+    Args:
+        adresse (str): L'adresse complète contenant le code postal et la ville
+        
+    Returns:
+        str: Le nom de la ville extrait, ou None si non trouvé
+    """
     match = re.search(r"\d{5}\s+([^,]+)", adresse)
     return match.group(1).strip() if match else None
 
 
 def nettoyer_adresse(adresse):
+    """Nettoie une adresse en ne gardant que la partie principale.
+    
+    Args:
+        adresse (str): L'adresse complète à nettoyer
+        
+    Returns:
+        str: La partie principale de l'adresse (avant la première virgule)
+    """
     return adresse.split(",")[0].strip()
 
 
 @maps_bp.route("/geoloc", methods=["POST"])
 def geoloc():
+    """Gère la réception des données de géolocalisation.
+    
+    Cette route reçoit les données GPS envoyées par le navigateur
+    et les traite pour mettre à jour la position de l'utilisateur.
+    
+    Returns:
+        Response: JSON avec confirmation ou erreur
+    """
     # Vérifier le token CSRF en utilisant la fonction utilitaire
     csrf_valide, response = verifier_csrf_ou_renvoyer_erreur()
     if not csrf_valide:

@@ -1,3 +1,9 @@
+"""Module des routes d'authentification de l'application PlanFlan.
+
+Ce module gère toutes les fonctionnalités liées à l'authentification des utilisateurs,
+y compris l'inscription, la connexion, la déconnexion et la gestion des comptes.
+"""
+
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_bcrypt import check_password_hash
@@ -12,6 +18,15 @@ auth_bp = Blueprint("auth", __name__)
 
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
+    """Gère l'inscription des nouveaux utilisateurs.
+    
+    Cette route permet aux nouveaux utilisateurs de créer un compte.
+    Elle valide les données du formulaire, hache le mot de passe,
+    et crée un nouvel utilisateur dans la base de données.
+    
+    Returns:
+        Response: Page de création de compte (GET) ou redirection vers la page de connexion (POST)
+    """
     form = RegistrationForm()
     if form.validate_on_submit():
         # Hache le mot de passe directement avec bcrypt
@@ -36,6 +51,14 @@ def register():
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
+    """Gère la connexion des utilisateurs.
+    
+    Cette route permet aux utilisateurs de se connecter à leur compte.
+    Elle valide les identifiants, vérifie le mot de passe et établit une session.
+    
+    Returns:
+        Response: Page de connexion (GET) ou redirection vers la page demandée (POST)
+    """
     form = LoginForm()
     if request.method == "GET":
         # Remplis le champ caché 'next' avec la valeur de l'URL
@@ -59,6 +82,15 @@ def login():
 @auth_bp.route("/logout")
 @login_required
 def logout():
+    """Gère la déconnexion des utilisateurs.
+    
+    Cette route permet aux utilisateurs de se déconnecter de leur session.
+    Elle termine la session utilisateur et redirige vers la page précédente
+    ou vers la page d'accueil si aucune page précédente n'est disponible.
+    
+    Returns:
+        Response: Redirection vers la page précédente ou la page d'accueil
+    """
     logout_user()
     # Redirige vers la page précédente ou vers l'index si la page précédente n'est pas disponible
     return redirect(request.referrer or url_for("main.index"))
