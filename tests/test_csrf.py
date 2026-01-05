@@ -20,29 +20,11 @@ def csrf_test():
 
 
 @pytest.fixture
-def client_with_csrf():
+def client_with_csrf(client):
     """Crée un client de test avec la protection CSRF activée"""
-    app = create_app(TestConfig)
-    app.config["WTF_CSRF_ENABLED"] = True  # Activer la protection CSRF pour ces tests
-
-    with app.test_client() as client:
-        with app.app_context():
-            db.create_all()
-            # Créer un utilisateur de test
-            test_user = Utilisateur(
-                pseudo="testuser",
-                email="test@example.com",
-                password="testpassword",
-                is_admin=False,
-            )
-            db.session.add(test_user)
-            db.session.commit()
-
-            app.config["TEST_USER"] = test_user
-        yield client
-
-        with app.app_context():
-            db.drop_all()
+    # Utiliser le client existant et activer la protection CSRF
+    client.application.config["WTF_CSRF_ENABLED"] = True
+    return client
 
 
 @pytest.mark.csrf
@@ -73,23 +55,27 @@ def test_verifier_csrf_token_avec_token_valide(client_with_csrf):
 
 
 @pytest.mark.csrf
-def test_geoloc_route_responds(client_with_csrf):
+def test_geoloc_route_responds(client):
     """Test que la route /geoloc répond correctement"""
     # Tester avec des données valides
-    response = client_with_csrf.post(
+    # Désactiver temporairement CSRF pour ce test car nous testons la route, pas la protection CSRF
+    client.application.config["WTF_CSRF_ENABLED"] = False
+    response = client.post(
         "/geoloc", json={"latitude": 45.764043, "longitude": 4.835659}
     )
-    # La route devrait répondre avec succès (la protection CSRF est désactivée en test)
+    # La route devrait répondre avec succès
     assert response.status_code == 200
     data = response.get_json()
     assert "latitude" in data
 
 
 @pytest.mark.csrf
-def test_etablissements_proches_route_responds(client_with_csrf):
+def test_etablissements_proches_route_responds(client):
     """Test que la route /etablissements_proches répond correctement"""
+    # Désactiver temporairement CSRF pour ce test
+    client.application.config["WTF_CSRF_ENABLED"] = False
     # Tester avec des données valides
-    response = client_with_csrf.post(
+    response = client.post(
         "/etablissements_proches", json={"latitude": 45.764043, "longitude": 4.835659}
     )
     assert response.status_code == 200
@@ -98,10 +84,12 @@ def test_etablissements_proches_route_responds(client_with_csrf):
 
 
 @pytest.mark.csrf
-def test_extraire_infos_adresse_route_responds(client_with_csrf):
+def test_extraire_infos_adresse_route_responds(client):
     """Test que la route /extraire_infos_adresse répond correctement"""
+    # Désactiver temporairement CSRF pour ce test
+    client.application.config["WTF_CSRF_ENABLED"] = False
     # Tester avec des données valides
-    response = client_with_csrf.post(
+    response = client.post(
         "/extraire_infos_adresse", json={"adresse": "1 rue de Test, 69001 Lyon"}
     )
     assert response.status_code == 200
@@ -110,10 +98,12 @@ def test_extraire_infos_adresse_route_responds(client_with_csrf):
 
 
 @pytest.mark.csrf
-def test_verifier_etablissement_route_responds(client_with_csrf):
+def test_verifier_etablissement_route_responds(client):
     """Test que la route /verifier_etablissement répond correctement"""
+    # Désactiver temporairement CSRF pour ce test
+    client.application.config["WTF_CSRF_ENABLED"] = False
     # Tester avec des données valides
-    response = client_with_csrf.post(
+    response = client.post(
         "/verifier_etablissement", json={"nom": "Test Etablissement"}
     )
     assert response.status_code == 200
@@ -122,10 +112,12 @@ def test_verifier_etablissement_route_responds(client_with_csrf):
 
 
 @pytest.mark.csrf
-def test_upload_route_responds(client_with_csrf):
+def test_upload_route_responds(client):
     """Test que la route /upload répond correctement"""
+    # Désactiver temporairement CSRF pour ce test
+    client.application.config["WTF_CSRF_ENABLED"] = False
     # Tester sans fichier - devrait rediriger
-    response = client_with_csrf.post(
+    response = client.post(
         "/upload", data={}, content_type="multipart/form-data"
     )
     # Devrait rediriger
@@ -133,10 +125,12 @@ def test_upload_route_responds(client_with_csrf):
 
 
 @pytest.mark.csrf
-def test_supprimer_compte_route_requires_login(client_with_csrf):
+def test_supprimer_compte_route_requires_login(client):
     """Test que la route /supprimer_compte nécessite une connexion"""
+    # Désactiver temporairement CSRF pour ce test
+    client.application.config["WTF_CSRF_ENABLED"] = False
     # Tester sans être connecté - devrait rediriger vers la page de login
-    response = client_with_csrf.post(
+    response = client.post(
         "/supprimer_compte", data={"password": "testpassword"}
     )
     # Devrait rediriger vers la page de login
