@@ -12,6 +12,7 @@ let villeSelectionnee = null;
 // Variables pour les filtres
 let activeFilters = {
     type_pate: false,
+    type_saveur: false,
     visited: false,
     unvisited: false,
     label: false,
@@ -141,20 +142,30 @@ function updateMarkersBasedOnFilters() {
         //     }
         // }
 
-        // Filtre par type de pâte
-        if (activeFilters.type_pate && showMarker) {
+        // Filtre par type de pâte (logique ET cumulative)
+        if (activeFilters.type_pate) {
             if (!etablissement.flans || etablissement.flans.length === 0) {
                 showMarker = false;
             } else {
                 const hasMatchingPate = etablissement.flans.some(flan => flan.type_pate === activeFilters.type_pate);
-                if (!hasMatchingPate) showMarker = false;
+                showMarker = showMarker && hasMatchingPate;
             }
         }
 
-        // Autres filtres
-        if (activeFilters.visited && !etablissement.visite && showMarker) showMarker = false;
-        if (activeFilters.unvisited && etablissement.visite && showMarker) showMarker = false;
-        if (activeFilters.label && !etablissement.label && showMarker) showMarker = false;
+        // Filtre par type de saveur (logique ET cumulative)
+        if (activeFilters.type_saveur) {
+            if (!etablissement.flans || etablissement.flans.length === 0) {
+                showMarker = false;
+            } else {
+                const hasMatchingSaveur = etablissement.flans.some(flan => flan.type_saveur === activeFilters.type_saveur);
+                showMarker = showMarker && hasMatchingSaveur;
+            }
+        }
+
+        // Filtres de statut (logique ET cumulative)
+        if (activeFilters.visited) showMarker = showMarker && etablissement.visite;
+        if (activeFilters.unvisited) showMarker = showMarker && !etablissement.visite;
+        if (activeFilters.label) showMarker = showMarker && etablissement.label;
 
         if (showMarker) {
             map.addLayer(marker);
@@ -441,24 +452,39 @@ function setupGeolocation() {
 
 // Fonction pour mettre à jour l'état des boutons actifs
 function updateActiveButtonStates() {
-    // Désactiver tous les boutons de pâte
+    // Gérer les boutons de pâte
     document.querySelectorAll('[id^="filter-type_pate_"]').forEach(button => {
-        button.classList.remove('active');
+        const pateType = button.textContent.trim();
+        if (activeFilters.type_pate === pateType) {
+            button.classList.add('active');
+        } else {
+            button.classList.remove('active');
+        }
     });
-    // Activer le bouton de pâte correspondant si un filtre est actif
-    if (activeFilters.type_pate) {
-        const pateButton = document.getElementById(`filter-type_pate_${activeFilters.type_pate.toUpperCase()}`);
-        if (pateButton) pateButton.classList.add('active');
-    }
 
-    // Désactiver tous les boutons de statut
-    document.querySelectorAll('[id^="filter-"]:not([id^="filter-type_pate_"]):not([id="filter-all"]):not([id="filter-pate-btn"]):not([id="filter-statut-btn"]):not([id="geolocate-me"])').forEach(button => {
-        button.classList.remove('active');
+    // Gérer les boutons de saveur
+    document.querySelectorAll('[id^="filter-type_saveur_"]').forEach(button => {
+        const saveurType = button.textContent.trim();
+        if (activeFilters.type_saveur === saveurType) {
+            button.classList.add('active');
+        } else {
+            button.classList.remove('active');
+        }
     });
-    // Activer les boutons de statut correspondants
-    if (activeFilters.visited) document.getElementById('filter-visited').classList.add('active');
-    if (activeFilters.unvisited) document.getElementById('filter-unvisited').classList.add('active');
-    if (activeFilters.label) document.getElementById('filter-label').classList.add('active');
+
+    // Gérer les boutons de statut
+    document.querySelectorAll('[id^="filter-"]:not([id^="filter-type_pate_"]):not([id^="filter-type_saveur_"]):not([id="filter-all"]):not([id="filter-pate-btn"]):not([id="filter-saveur-btn"]):not([id="filter-statut-btn"]):not([id="geolocate-me"])').forEach(button => {
+        const buttonId = button.id;
+        if (buttonId === 'filter-visited' && activeFilters.visited) {
+            button.classList.add('active');
+        } else if (buttonId === 'filter-unvisited' && activeFilters.unvisited) {
+            button.classList.add('active');
+        } else if (buttonId === 'filter-label' && activeFilters.label) {
+            button.classList.add('active');
+        } else {
+            button.classList.remove('active');
+        }
+    });
 }
 
 // Fonction utilitaire pour basculer l'état actif d'un bouton
@@ -469,6 +495,27 @@ function toggleActiveButton(button, isActive) {
         button.classList.add('active');
     }
 }
+
+// Fonction pour mettre à jour la couleur des boutons principaux
+function updateMainFilterButtons() {
+    // Réinitialiser tous les boutons principaux
+    document.getElementById('filter-pate-btn').classList.remove('filter-active');
+    document.getElementById('filter-saveur-btn').classList.remove('filter-active');
+    document.getElementById('filter-statut-btn').classList.remove('filter-active');
+
+    // Mettre en vert foncé les boutons dont la catégorie a des filtres actifs
+    if (activeFilters.type_pate) {
+        document.getElementById('filter-pate-btn').classList.add('filter-active');
+    }
+    if (activeFilters.type_saveur) {
+        document.getElementById('filter-saveur-btn').classList.add('filter-active');
+    }
+    if (activeFilters.visited || activeFilters.unvisited || activeFilters.label) {
+        document.getElementById('filter-statut-btn').classList.add('filter-active');
+    }
+}
+
+
 
 // Fonction pour configurer les boutons de pâte
 function setupPateButtons() {
@@ -484,11 +531,34 @@ function setupPateButtons() {
         document.getElementById(buttonId).addEventListener('click', function() {
             const isActive = activeFilters.type_pate === pateType;
             activeFilters.type_pate = isActive ? false : pateType;
-            activeFilters.visited = false;
-            activeFilters.unvisited = false;
-            activeFilters.label = false;
+            // Ne plus désactiver les autres filtres - permettre la combinaison
             updateMarkersBasedOnFilters();
             updateActiveButtonStates();
+            updateMainFilterButtons();
+            toggleActiveButton(this, isActive);
+        });
+    });
+}
+
+// Fonction pour configurer les boutons de saveur
+function setupSaveurButtons() {
+    const saveurButtons = {
+        'Vanille': 'filter-type_saveur_VANILLE',
+        'Chocolat': 'filter-type_saveur_CHOCOLAT',
+        'Noix': 'filter-type_saveur_NOIX',
+        'Fruits': 'filter-type_saveur_FRUITS',
+        'Insolite': 'filter-type_saveur_INSOLITE',
+        'Nature': 'filter-type_saveur_NATURE'
+    };
+
+    Object.entries(saveurButtons).forEach(([saveurType, buttonId]) => {
+        document.getElementById(buttonId).addEventListener('click', function() {
+            const isActive = activeFilters.type_saveur === saveurType;
+            activeFilters.type_saveur = isActive ? false : saveurType;
+            // Ne plus désactiver les autres filtres - permettre la combinaison
+            updateMarkersBasedOnFilters();
+            updateActiveButtonStates();
+            updateMainFilterButtons();
             toggleActiveButton(this, isActive);
         });
     });
@@ -512,10 +582,11 @@ function setupStatutButtons() {
                 Object.keys(statutButtons).filter(key => key !== statutType)
                     .forEach(key => activeFilters[key] = false);
             }
-            activeFilters.type_pate = false;
+            // Ne plus désactiver les filtres de pâte/saveur - permettre la combinaison
 
             updateMarkersBasedOnFilters();
             updateActiveButtonStates();
+            updateMainFilterButtons();
             toggleActiveButton(this, isActive);
         });
     });
@@ -530,10 +601,11 @@ function setupFilterButtons() {
     });
 
     document.getElementById('filter-all').addEventListener('click', function() {
-        activeFilters = { type_pate: false, visited: false, unvisited: false, label: false, proximity: false };
+        activeFilters = { type_pate: false, type_saveur: false, visited: false, unvisited: false, label: false, proximity: false };
         updateMarkersBasedOnFilters();
         document.getElementById('sub-filters').classList.remove('show');
         updateActiveButtonStates();
+        updateMainFilterButtons();
     });
 
     // Bouton pour afficher/masquer les options de pâte
@@ -553,6 +625,31 @@ function setupFilterButtons() {
             `;
             subFilters.classList.add('show');
             setupPateButtons();
+            updateActiveButtonStates(); // ← Restaurer les états actifs
+            updateMainFilterButtons(); // ← Mettre à jour les boutons principaux
+        }
+    });
+
+    // Bouton pour afficher/masquer les options de saveur
+    document.getElementById('filter-saveur-btn').addEventListener('click', function() {
+        const subFilters = document.getElementById('sub-filters');
+        if (subFilters.classList.contains('show') && subFilters.querySelector('.filter-group')) {
+            subFilters.classList.remove('show');
+        } else {
+            subFilters.innerHTML = `
+                <div class="filter-group">
+                    <button id="filter-type_saveur_VANILLE" class="btn btn-success">Vanille</button>
+                    <button id="filter-type_saveur_CHOCOLAT" class="btn btn-success">Chocolat</button>
+                    <button id="filter-type_saveur_NOIX" class="btn btn-success">Noix</button>
+                    <button id="filter-type_saveur_FRUITS" class="btn btn-success">Fruits</button>
+                    <button id="filter-type_saveur_INSOLITE" class="btn btn-success">Insolite</button>
+                    <button id="filter-type_saveur_NATURE" class="btn btn-success">Nature</button>
+                </div>
+            `;
+            subFilters.classList.add('show');
+            setupSaveurButtons();
+            updateActiveButtonStates(); // ← Restaurer les états actifs
+            updateMainFilterButtons(); // ← Mettre à jour les boutons principaux
         }
     });
 
@@ -571,16 +668,20 @@ function setupFilterButtons() {
             `;
             subFilters.classList.add('show');
             setupStatutButtons();
+            updateActiveButtonStates(); // ← Restaurer les états actifs
+            updateMainFilterButtons(); // ← Mettre à jour les boutons principaux
         }
     });
 
     document.addEventListener('click', function(event) {
         const subFilters = document.getElementById('sub-filters');
         const filterPateBtn = document.getElementById('filter-pate-btn');
+        const filterSaveurBtn = document.getElementById('filter-saveur-btn');
         const filterStatutBtn = document.getElementById('filter-statut-btn');
 
         // Si le clic n'est pas sur un bouton de filtre ou dans les sous-filtres, on masque les sous-filtres
         if (!filterPateBtn.contains(event.target) &&
+            !filterSaveurBtn.contains(event.target) &&
             !filterStatutBtn.contains(event.target) &&
             !subFilters.contains(event.target)) {
             subFilters.classList.remove('show');

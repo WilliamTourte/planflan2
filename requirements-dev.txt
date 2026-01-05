@@ -3,12 +3,13 @@
 # Testing
 pytest==9.0.2
 pytest-cov==7.0.0
-coverage==7.5.1
+coverage
+pylint
+black
 
-# Linting (optionnel - à décommenter si utilisé)
+
 # flake8==7.0.0
-# pylint==3.1.0
-# black==24.3.0
+
 # isort==5.13.2
 
 # Type checking (optionnel)

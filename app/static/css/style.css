@@ -227,6 +227,48 @@ input[type="submit"]:active {
     background-color: var(--color-success-dark);
 }
 
+/* Style pour les filtres actifs (persistant) */
+.btn.active {
+    background-color: var(--color-success-dark) !important;
+    color: var(--color-white) !important;
+    box-shadow: 0 0 0 2px var(--color-white) inset !important;
+    font-weight: bold !important;
+    transform: scale(1.05) !important;
+}
+
+/* Style pour les boutons de filtre actifs (persistant et simple) */
+#filter-controls .btn.active {
+    background-color: var(--color-success-dark) !important;
+    color: var(--color-white) !important;
+    font-weight: bold !important;
+}
+
+/* Style pour les boutons principaux quand un filtre est actif dans leur catégorie */
+#filter-controls .main-filters .btn.filter-active {
+    background-color: var(--color-success-dark) !important;
+    color: var(--color-white) !important;
+    font-weight: bold !important;
+}
+
+/* Style pour les sous-filtres */
+.filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 8px;
+}
+
+.filter-group .btn {
+    flex: 1;
+    min-width: 100px;
+    font-size: 14px;
+    padding: 6px 12px;
+}
+
 .btn-danger {
     background-color: var(--color-danger);
     color: var(--color-white);
