@@ -131,16 +131,6 @@ function updateMarkersBasedOnFilters() {
         const etablissement = marker.options.etablissement;
         let showMarker = true;
 
-        // Filtre de proximité (désactivé - on ne filtre plus par proximité)
-        // if (activeFilters.proximity && userLocation) {
-        //     const distance = calculateDistance(
-        //         userLocation.lat, userLocation.lon,
-        //         etablissement.latitude, etablissement.longitude
-        //     );
-        //     if (distance > proximityRadius) {
-        //         showMarker = false;
-        //     }
-        // }
 
         // Filtre par type de pâte (logique ET cumulative)
         if (activeFilters.type_pate) {

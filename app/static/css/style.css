@@ -7,10 +7,10 @@
     --font-bubblegum: 'Bubblegum', cursive;
 
     /* Couleurs */
-    --color-primary: #799dcb;
-    --color-secondary: #ffcf40;
-    --color-success: #ffcf40; 
-    --color-success-dark: #218838;
+    --color-primary: #ffcf40;
+    --color-secondary: #799dcb;
+    --color-success: var(--color-primary); 
+    --color-success-dark: var(--color-secondary);
     --color-danger: #e74c3c;
     --color-danger-dark: #c0392b;
     --color-info: #3498db;
@@ -70,7 +70,7 @@ body {
     line-height: 1.6;
     margin: 0;
     padding: 0;
-    background-color: var(--color-primary);
+    background-color: var(--color-secondary);
     color: var(--color-text);
 }
 
@@ -102,7 +102,7 @@ h1, h2, h3, h4, h5, h6 {
    4. HEADER
    ============================================= */
 header {
-    background-color: var(--color-secondary);
+    background-color: var(--color-primary);
     color: var(--color-white);
     width: 100%;
     padding: 0;
@@ -219,17 +219,17 @@ input[type="submit"]:active {
 }
 
 .btn-success {
-    background-color: var(--color-success);
+    background-color: var(--color-primary);
     color: var(--color-white);
 }
 
 .btn-success:hover {
-    background-color: var(--color-success-dark);
+    background-color: var(--color-secondary);
 }
 
 /* Style pour les filtres actifs (persistant) */
 .btn.active {
-    background-color: var(--color-success-dark) !important;
+    background-color: var(--color-secondary) !important;
     color: var(--color-white) !important;
     box-shadow: 0 0 0 2px var(--color-white) inset !important;
     font-weight: bold !important;
@@ -238,14 +238,14 @@ input[type="submit"]:active {
 
 /* Style pour les boutons de filtre actifs (persistant et simple) */
 #filter-controls .btn.active {
-    background-color: var(--color-success-dark) !important;
+    background-color: var(--color-secondary) !important;
     color: var(--color-white) !important;
     font-weight: bold !important;
 }
 
 /* Style pour les boutons principaux quand un filtre est actif dans leur catégorie */
 #filter-controls .main-filters .btn.filter-active {
-    background-color: var(--color-success-dark) !important;
+    background-color: var(--color-primary);
     color: var(--color-white) !important;
     font-weight: bold !important;
 }
@@ -893,7 +893,7 @@ input[type="submit"]:active {
     height: auto;
     line-height: 2;
     white-space: nowrap;
-    background: var(--color-secondary);
+    background: var(--color-primary);
 }
 
 
@@ -938,17 +938,17 @@ input[type="submit"]:active {
     height: auto;
     line-height: 2;
     white-space: nowrap;
-    background: var(--color-secondary);
+    background: var(--color-primary);
 }
 
 .filter-btn {
     margin: var(--margin-xs);
+    background-color: var(--color-primary);
 }
 
 .filter-btn.active {
-    background-color: #007bff;
+    background-color: var(--color-secondary);
     color: white;
-    border-color: #007bff;
 }
 
 /* =============================================
