@@ -9,20 +9,17 @@
     /* Couleurs */
     --color-primary: #ffcf40;
     --color-secondary: #799dcb;
-    --color-success: var(--color-primary); 
-    --color-success-dark: var(--color-secondary);
-    --color-danger: #e74c3c;
-    --color-danger-dark: #c0392b;
+    --color-danger: red;
+    --color-danger-dark: red;
     --color-info: #3498db;
     --color-info-dark: #2980b9;
-    --color-back: #7f8c8d;
-    --color-back-dark: #6c7a7d;
-    --color-text: #333;
+    --color-back: red;
+    --color-back-dark: red;
+    --color-text: black;
     --color-text-light: #7f8c8d;
     --color-text-lighter: #555;
-    --color-white: #fff;
-    --color-shadow: rgba(0, 0, 0, 0.1);
-    --color-shadow-hover: rgba(0, 0, 0, 0.15);
+    --color-shadow: black;
+    --color-shadow-hover: black;
 
     /* Espacements & Bordures */
     --border-radius: 10px;
@@ -103,7 +100,7 @@ h1, h2, h3, h4, h5, h6 {
    ============================================= */
 header {
     background-color: var(--color-primary);
-    color: var(--color-white);
+    color: white;
     width: 100%;
     padding: 0;
     position: sticky;
@@ -220,7 +217,7 @@ input[type="submit"]:active {
 
 .btn-success {
     background-color: var(--color-primary);
-    color: var(--color-white);
+    color: white;
 }
 
 .btn-success:hover {
@@ -230,23 +227,14 @@ input[type="submit"]:active {
 /* Style pour les filtres actifs (persistant) */
 .btn.active {
     background-color: var(--color-secondary) !important;
-    color: var(--color-white) !important;
-    box-shadow: 0 0 0 2px var(--color-white) inset !important;
-    font-weight: bold !important;
-    transform: scale(1.05) !important;
-}
-
-/* Style pour les boutons de filtre actifs (persistant et simple) */
-#filter-controls .btn.active {
-    background-color: var(--color-secondary) !important;
-    color: var(--color-white) !important;
+    color: white !important;
     font-weight: bold !important;
 }
 
 /* Style pour les boutons principaux quand un filtre est actif dans leur catégorie */
 #filter-controls .main-filters .btn.filter-active {
-    background-color: var(--color-primary);
-    color: var(--color-white) !important;
+    background-color: var(--color-secondary);
+    color: white !important;
     font-weight: bold !important;
 }
 
@@ -271,7 +259,7 @@ input[type="submit"]:active {
 
 .btn-danger {
     background-color: var(--color-danger);
-    color: var(--color-white);
+    color: white;
 }
 
 .btn-danger:hover {
@@ -284,14 +272,14 @@ input[type="submit"]:active {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: var(--color-success);
+    background-color: var(--color-primary);
     color: white;
     border-radius: 50%;
 }
 
 .btn-canceledit {
     background-color: var(--color-back);
-    color: var(--color-white);
+    color: white;
 }
 
 .btn-canceledit:hover {
@@ -332,7 +320,7 @@ input[type="submit"]:active {
     overflow: hidden;
     box-shadow: var(--box-shadow);
     transition: var(--transition);
-    background: var(--color-white);
+    background: white;
     display: block;
     height: 100%;
     width: 100%;
@@ -362,13 +350,13 @@ input[type="submit"]:active {
 .carte-content {
     padding: var(--padding-lg);
     border-radius: 0 0 var(--border-radius-carte) var(--border-radius-carte);
-    background: var(--color-white);
+    background: white;
 }
 
 .carte-header {
     padding: var(--padding-md);
     border-bottom: 1px solid #eee;
-    background-color: var(--color-white);
+    background-color: white;
 }
 
 /* =============================================
@@ -376,7 +364,7 @@ input[type="submit"]:active {
    ============================================= */
 .flan-price-tag {
     background: var(--color-secondary);
-    color: var(--color-white);
+    color: white;
     padding: var(--padding-xs) var(--padding-sm);
     border-radius: var(--border-radius-btn);
     font-weight: bold;
@@ -423,7 +411,7 @@ input[type="submit"]:active {
 }
 
 .moyenne-value {
-    color: var(--color-success); /* Corrigé (text-decoration → color) */
+    color: var(--color-primary); /* Corrigé (text-decoration → color) */
 }
 
 /* =============================================
@@ -456,14 +444,14 @@ input[type="submit"]:active {
 
 .statut-valide {
     background-color: green;
-    color: var(--color-white);
+    color: white;
     top: var(--margin-sm);
     right: var(--margin-sm);
 }
 
 .statut-en-attente {
     background-color: orange;
-    color: var(--color-white);
+    color: white;
     top: var(--margin-sm);
     right: var(--margin-sm);
 }
@@ -482,7 +470,7 @@ input[type="submit"]:active {
    11. FORMULAIRES
    ============================================= */
 .form-container {
-    background: var(--color-white);
+    background: white;
     padding: var(--padding-lg);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
@@ -565,7 +553,7 @@ input[type="submit"]:active {
     border: 1px solid #ddd;
     border-radius: var(--border-radius);
     font-family: var(--font-primary);
-    background-color: var(--color-white);
+    background-color: white;
 }
 
 .form-check-container {
@@ -632,7 +620,7 @@ input[type="submit"]:active {
     padding: var(--padding-xs);
     border-radius: var(--border-radius-btn);
     font-weight: bold;
-    color: var(--color-success);
+    color: var(--color-primary);
 }
 
 .evaluation-date {
@@ -654,8 +642,8 @@ input[type="submit"]:active {
 }
 
 .alert-success {
-    background-color: var(--color-success-dark);
-    color: var(--color-white);
+    background-color: var(--color-secondary);
+    color: white;
 }
 
 .alert-warning {
@@ -671,7 +659,7 @@ input[type="submit"]:active {
     grid-column: 1 / -1;
     text-align: center;
     padding: var(--padding-lg);
-    background: var(--color-white);
+    background: white;
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
 }
@@ -704,7 +692,7 @@ input[type="submit"]:active {
 .leaflet-control-geolocate {
     width: 50px;
     height: 50px;
-    background-color: var(--color-success) !important;
+    background-color: var(--color-primary) !important;
     border-radius: 50% !important;
     border: none !important;
     cursor: pointer;
@@ -718,7 +706,7 @@ input[type="submit"]:active {
 }
 
 .leaflet-control-geolocate:hover {
-    background-color: var(--color-success-dark) !important;
+    background-color: var(--color-secondary) !important;
     transform: scale(1.1);
 }
 
@@ -823,7 +811,7 @@ input[type="submit"]:active {
 
 /* Légende pour la carte Leaflet */
 .carte-legende {
-    background: var(--color-white);
+    background: white;
     padding: var(--padding-sm);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
@@ -893,7 +881,6 @@ input[type="submit"]:active {
     height: auto;
     line-height: 2;
     white-space: nowrap;
-    background: var(--color-primary);
 }
 
 
@@ -930,25 +917,8 @@ input[type="submit"]:active {
     width: fit-content;
 }
 
-.filter-group button {
-    padding: var(--padding-xs) var(--padding-sm);
-    font-size: var(--font-size-sm);
-    width: auto;
-    min-width: 0;
-    height: auto;
-    line-height: 2;
-    white-space: nowrap;
-    background: var(--color-primary);
-}
-
 .filter-btn {
     margin: var(--margin-xs);
-    background-color: var(--color-primary);
-}
-
-.filter-btn.active {
-    background-color: var(--color-secondary);
-    color: white;
 }
 
 /* =============================================
