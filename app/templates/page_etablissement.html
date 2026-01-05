@@ -8,8 +8,8 @@
 {{ afficher_grille('flan', etablissement.flans, current_user, None, form_flan, etablissement, None, delete_form, validate_form) }}
 <!-- Bouton retour -->
 <div class="action-buttons">
-    <a href="{{ url_for('main.index') }}" class="btn btn-danger btn-sm">
+    <button onclick="window.history.back()" class="btn btn-danger">
         <i class="bi bi-arrow-return-left"></i>
-    </a>
+    </button>
 </div>
 {% endblock %}
