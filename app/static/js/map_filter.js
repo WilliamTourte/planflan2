@@ -489,19 +489,19 @@ function toggleActiveButton(button, isActive) {
 // Fonction pour mettre à jour la couleur des boutons principaux
 function updateMainFilterButtons() {
     // Réinitialiser tous les boutons principaux
-    document.getElementById('filter-pate-btn').classList.remove('filter-active');
-    document.getElementById('filter-saveur-btn').classList.remove('filter-active');
-    document.getElementById('filter-statut-btn').classList.remove('filter-active');
+    document.getElementById('filter-pate-btn').classList.remove('active');
+    document.getElementById('filter-saveur-btn').classList.remove('active');
+    document.getElementById('filter-statut-btn').classList.remove('active');
 
-    // Mettre en vert foncé les boutons dont la catégorie a des filtres actifs
+    // Mettre en bleu les boutons dont la catégorie a des filtres actifs
     if (activeFilters.type_pate) {
-        document.getElementById('filter-pate-btn').classList.add('filter-active');
+        document.getElementById('filter-pate-btn').classList.add('active');
     }
     if (activeFilters.type_saveur) {
-        document.getElementById('filter-saveur-btn').classList.add('filter-active');
+        document.getElementById('filter-saveur-btn').classList.add('active');
     }
     if (activeFilters.visited || activeFilters.unvisited || activeFilters.label) {
-        document.getElementById('filter-statut-btn').classList.add('filter-active');
+        document.getElementById('filter-statut-btn').classList.add('active');
     }
 }
 

@@ -232,7 +232,7 @@ input[type="submit"]:active {
 }
 
 /* Style pour les boutons principaux quand un filtre est actif dans leur catégorie */
-#filter-controls .main-filters .btn.filter-active {
+#filter-controls .main-filters .btn.active {
     background-color: var(--color-secondary);
     color: white !important;
     font-weight: bold !important;

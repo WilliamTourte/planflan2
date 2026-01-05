@@ -333,7 +333,7 @@
 
 {% macro afficher_formulaire_edition_flan(flan, form) %}
     {% if form %}
-        <div id="flan-{{ flan.id_flan }}-edit" style="display: none;" class="carte-form-edit">
+        <div id="flan-{{ flan.id_flan }}-edit" style="display: none;" class="carte">
             <form method="POST" action="{{ url_for('main.modifier_flan', id_flan=flan.id_flan) }}" class="form-container">
                 {{ form.hidden_tag() }}
                 <div class="form-group">
