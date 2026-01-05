@@ -157,7 +157,7 @@
             {{ afficher_badge_type_etab(etablissement) }}
             {{ afficher_badge_etablissement(etablissement) }}
         </div>
-        <div class="carte-content">
+        <div >
             <div class="carte-header">
                 <h2 id="etablissement-{{ etablissement.id_etab }}-nom">{{ etablissement.nom | enlever_accents }}</h2>
             </div>
@@ -257,7 +257,7 @@
                 {{ afficher_image_ou_placeholder(flan) }}
                 {{ afficher_badge_flan(flan) }}
             </div>
-            <div class="carte-content">
+            <div >
                 <div class="carte-header">
                     <h2 id="flan-{{ flan.id_flan }}-nom">{{ flan.nom | enlever_accents }}</h2>
                 </div>
@@ -375,7 +375,7 @@
 {% macro afficher_evaluation(evaluation, current_user, form, current_page, delete_form, validate_form) %}
     <div class="carte">
         <a href="{{ url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval) }}" class="carte-link">
-        <div class="carte-content">
+        <div >
             <div class="carte-header">
                 <h2>{{ evaluation.flan.etablissement.nom | enlever_accents }}</h2>
                 <h3>{{ evaluation.flan.nom | enlever_accents }}</h3>
@@ -525,7 +525,7 @@
 
 {% macro afficher_bouton_ajout(objet_type, current_user, etablissement=None, form_ajout=None, flan=None) %}
     {% if objet_type == 'etablissement' %}
-        <div class="carte-content">
+        <div >
 
             {% if current_user.is_authenticated %}
                 {{ proposer_etablissement(form_ajout, url_for('maps.ajouter_etablissement'), current_user) }}
@@ -536,7 +536,7 @@
             {% endif %}
         </div>
     {% elif objet_type == 'flan' and etablissement %}
-        <div class="carte-content">
+        <div >
 
             {% if current_user.is_authenticated %}
                 {{ proposer_flan(form_ajout, url_for('main.proposer_flan', id_etab=etablissement.id_etab)) }}
@@ -547,7 +547,7 @@
             {% endif %}
         </div>
     {% elif objet_type == 'evaluation' and flan %}
-        <div class="carte-content">
+        <div >
 
             {% if current_user.is_authenticated %}
                 {{ proposer_evaluation(form_ajout, url_for('main.evaluer_flan', id_flan=flan.id_flan)) }}

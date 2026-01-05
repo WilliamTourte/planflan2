@@ -347,11 +347,7 @@ input[type="submit"]:active {
     border-radius: var(--border-radius-carte) var(--border-radius-carte) 0 0;
 }
 
-.carte-content {
-    padding: var(--padding-lg);
-    border-radius: 0 0 var(--border-radius-carte) var(--border-radius-carte);
-    background: white;
-}
+
 
 .carte-header {
     padding: var(--padding-md);
@@ -1003,9 +999,7 @@ input[type="submit"]:active {
         border-radius: var(--border-radius);
     }
 
-    .carte-content {
-        padding: var(--padding-md);
-    }
+
 
     header h1 {
         font-size: 1.5rem;
