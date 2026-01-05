@@ -93,13 +93,13 @@
         {% if current_page == page_attendue %}
             {% if current_user.id_user == objet.id_user and not objet.statut.value == 'VALIDE' %}
                 <div class="action-buttons">
-                    <button type="button" class="btn btn-success btn-sm" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
+                    <button type="button" class="btn btn-success" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
                         <i class="bi bi-pencil"></i>
                     </button>
                     {% if delete_form %}
                         <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" class="inline-form">
                             {{ delete_form.hidden_tag() }}
-                            <button type="submit" class="btn btn-danger btn-sm" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
+                            <button type="submit" class="btn btn-danger" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </form>
@@ -116,7 +116,7 @@
                                 </button>
                             </form>
                         {% endif %}
-                        <button type="button" class="btn btn-success btn-sm" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
+                        <button type="button" class="btn btn-success" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
                             <i class="bi bi-pencil"></i>
                         </button>
                         {% if delete_form %}
@@ -130,7 +130,7 @@
                     </div>
                 {% else %}
                     <div class="action-buttons d-flex gap-1">
-                        <button type="button" class="btn btn-success btn-sm" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
+                        <button type="button" class="btn btn-success" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
                             <i class="bi bi-pencil"></i>
                         </button>
                         {% if delete_form %}

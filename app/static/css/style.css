@@ -207,13 +207,6 @@ input[type="submit"]:active {
     box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
 }
 
-.btn-sm {
-    padding: var(--padding-xs);
-    font-size: var(--font-size-xs);
-    margin: 0;
-    min-width: 30px;
-    height: 30px;
-}
 
 .btn-success {
     background-color: var(--color-primary);
