@@ -6,10 +6,13 @@
 <!-- Grille des flans avec bouton d'ajout -->
  <h3>Flans</h3>
 {{ afficher_grille('flan', etablissement.flans, current_user, None, form_flan, etablissement, None, delete_form, validate_form) }}
-<!-- Bouton retour -->
+<!-- Boutons retour -->
 <div class="action-buttons">
-    <button onclick="window.history.back()" class="btn btn-danger">
-        <i class="bi bi-arrow-return-left"></i>
+    <button onclick="goBackOrRedirect('{{ url_for('main.liste_etablissements') }}')" class="btn btn-danger" title="Retour à la page précédente">
+        <i class="bi bi-arrow-return-left"></i> Retour
     </button>
+    <a href="{{ url_for('main.liste_etablissements') }}" class="btn btn-primary" title="Retour à la carte">
+        <i class="bi bi-map"></i></i> Carte
+    </a>
 </div>
 {% endblock %}

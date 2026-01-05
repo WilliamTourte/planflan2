@@ -10,10 +10,13 @@
 <h3>Evaluations</h3>
  {{ afficher_grille('evaluation', flan.evaluations, current_user, None, form_eval, None, flan) }}
 
-<!-- Bouton retour -->
+<!-- Boutons retour -->
 <div class="action-buttons">
-    <button onclick="window.history.back()" class="btn btn-danger">
-        <i class="bi bi-arrow-return-left"></i>
+    <button onclick="goBackOrRedirect('{{ url_for('main.afficher_etablissement_unique', id_etab=flan.etablissement.id_etab) }}')" class="btn btn-danger" title="Retour à la page précédente">
+        <i class="bi bi-arrow-return-left"></i> Retour
     </button>
+    <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=flan.etablissement.id_etab) }}" class="btn btn-primary" title="Retour à l'établissement">
+        <i class="bi bi-house"></i> Établissement
+    </a>
 </div>
 {% endblock %}

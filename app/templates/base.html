@@ -70,6 +70,28 @@
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Fonction pour gérer le retour avec fallback -->
+<script>
+function goBackOrRedirect(fallbackUrl) {
+    // Solution simple : utiliser le referrer pour décider
+    var referrer = document.referrer;
+    
+    // Si nous venons d'une page du même site, essayer de revenir en arrière
+    if (referrer && referrer.includes(window.location.host)) {
+        try {
+            window.history.back();
+        } catch (e) {
+            window.location.href = fallbackUrl;
+        }
+    } else {
+        // Si nous sommes arrivés directement (pas de referrer ou referrer externe),
+        // utiliser le fallback
+        window.location.href = fallbackUrl;
+    }
+}
+</script>
+
 {% block scripts %}{% endblock %}
 <script>
     // Logique pour alterner entre recherche simple et complexe
