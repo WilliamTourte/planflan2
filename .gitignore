@@ -39,6 +39,7 @@ build/
 # Fichiers de coverage
 .coverage
 *.cover
+# Note: coverage.xml is NOT ignored as it's needed for CI/CD integration
 
 # Fichiers de pytest
 .pytest_cache/

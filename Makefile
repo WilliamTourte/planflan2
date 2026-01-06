@@ -69,8 +69,38 @@ test-list:
 
 # Exécuter les tests avec coverage
 test-coverage:
-	python -m pytest tests/test_securite.py --cov=app --cov-report=html -v
+	python -m pytest tests/ --cov=app --cov-report=html -v
 
 # Exécuter les tests critiques avec coverage
 test-critical-coverage:
-	python -m pytest tests/test_securite.py -m "critical" --cov=app --cov-report=html -v
+	python -m pytest tests/ -m "critical" --cov=app --cov-report=html -v
+
+# Exécuter les tests avec coverage complet (tous les tests)
+test-full-coverage:
+	python -m pytest tests/ --cov=app --cov-report=html --cov-report=term --cov-report=xml -v
+
+# Exécuter les tests pour CI/CD (optimisé pour les pipelines)
+test-ci:
+	python -m pytest tests/ --cov=app --cov-report=xml --cov-report=term -v --tb=short
+
+# Générer uniquement le rapport HTML à partir du fichier .coverage existant
+coverage-html:
+	coverage html
+
+# Nettoyer les anciens rapports de coverage
+coverage-clean:
+	rm -f .coverage htmlcov/*
+
+# Voir le rapport de coverage textuel
+coverage-report:
+	coverage report
+
+# Vérifier que le fichier XML de coverage existe pour CI
+coverage-check-xml:
+	@if [ -f "coverage.xml" ]; then \
+        echo "✅ coverage.xml existe et est prêt pour CI"; \
+        ls -lh coverage.xml; \
+    else \
+        echo "❌ coverage.xml est manquant!"; \
+        exit 1; \
+    fi
