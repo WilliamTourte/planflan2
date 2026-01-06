@@ -1430,6 +1430,12 @@ def test_api_etablissements_get(client):
             label=True,
         )
         
+        # D'abord, ajouter et commiter les établissements pour obtenir leurs IDs
+        db.session.add_all([etab1, etab2])
+        db.session.commit()
+        
+        # Ensuite, créer les flans avec les IDs des établissements
+        # Note: L'API utilise un JOIN avec Flan, donc chaque établissement doit avoir au moins un flan
         flan1 = Flan(
             nom="Flan Vanille",
             prix=3.5,
@@ -1440,7 +1446,17 @@ def test_api_etablissements_get(client):
             id_user=user.id_user,
         )
         
-        db.session.add_all([etab1, etab2, flan1])
+        flan2 = Flan(
+            nom="Flan Chocolat",
+            prix=4.0,
+            type_pate="SABLEE",
+            type_saveur="CHOCOLAT",
+            type_texture="CREMEUSE",
+            id_etab=etab2.id_etab,
+            id_user=user.id_user,
+        )
+        
+        db.session.add_all([flan1, flan2])
         db.session.commit()
 
     # Appeler l'API GET sans filtres
@@ -1492,6 +1508,11 @@ def test_api_etablissements_post(client):
             label=True,
         )
         
+        # D'abord, ajouter et commiter les établissements pour obtenir leurs IDs
+        db.session.add_all([etab1, etab2])
+        db.session.commit()
+        
+        # Ensuite, créer les flans avec les IDs des établissements
         flan1 = Flan(
             nom="Flan Vanille",
             prix=3.5,
@@ -1512,7 +1533,7 @@ def test_api_etablissements_post(client):
             id_user=user.id_user,
         )
         
-        db.session.add_all([etab1, etab2, flan1, flan2])
+        db.session.add_all([flan1, flan2])
         db.session.commit()
 
     # Appeler l'API POST avec des filtres
