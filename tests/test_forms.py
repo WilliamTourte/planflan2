@@ -125,7 +125,7 @@ def test_etabform_parametrize(client, test_name, form_data, expected_valid):
 
         # Remplir le formulaire avec les données fournies
         for field, value in form_data.items():
-            setattr(getattr(form, field), 'data', value)
+            setattr(getattr(form, field), "data", value)
 
         # Vérifier la validation
         assert form.validate() == expected_valid
@@ -138,9 +138,6 @@ def test_etabform_parametrize(client, test_name, form_data, expected_valid):
                 assert form.adresse.errors and len(form.adresse.errors) > 0
             if not form_data.get("ville"):
                 assert form.ville.errors and len(form.ville.errors) > 0
-
-
-
 
 
 # Tests pour NewFlanForm
@@ -184,7 +181,7 @@ def test_newflanform_parametrize(client, test_name, form_data, expected_valid):
 
         # Remplir le formulaire avec les données fournies
         for field, value in form_data.items():
-            setattr(getattr(form, field), 'data', value)
+            setattr(getattr(form, field), "data", value)
 
         # Vérifier la validation
         assert form.validate() == expected_valid
@@ -193,7 +190,10 @@ def test_newflanform_parametrize(client, test_name, form_data, expected_valid):
         if not expected_valid:
             if not form_data.get("nom"):
                 assert form.nom.errors and len(form.nom.errors) > 0
-            if form_data.get("description", "") and len(form_data["description"]) > 1000:
+            if (
+                form_data.get("description", "")
+                and len(form_data["description"]) > 1000
+            ):
                 assert form.description.errors and len(form.description.errors) > 0
             if form_data.get("prix", 0) < 0:
                 assert form.prix.errors and len(form.prix.errors) > 0
@@ -238,7 +238,7 @@ def test_evalform_parametrize(client, test_name, form_data, expected_valid):
 
         # Remplir le formulaire avec les données fournies
         for field, value in form_data.items():
-            setattr(getattr(form, field), 'data', value)
+            setattr(getattr(form, field), "data", value)
 
         # Vérifier la validation
         assert form.validate() == expected_valid
@@ -267,15 +267,66 @@ def test_evalform_parametrize(client, test_name, form_data, expected_valid):
         # Pour les cas invalides, vérifier les erreurs spécifiques
         if not expected_valid:
             # Vérifier les erreurs (indépendant de la langue)
-            if form_data.get("visuel") not in ["0", "0.5", "1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5"]:
+            if form_data.get("visuel") not in [
+                "0",
+                "0.5",
+                "1",
+                "1.5",
+                "2",
+                "2.5",
+                "3",
+                "3.5",
+                "4",
+                "4.5",
+                "5",
+            ]:
                 assert form.visuel.errors and len(form.visuel.errors) > 0
-            if form_data.get("texture") not in ["0", "0.5", "1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5"]:
+            if form_data.get("texture") not in [
+                "0",
+                "0.5",
+                "1",
+                "1.5",
+                "2",
+                "2.5",
+                "3",
+                "3.5",
+                "4",
+                "4.5",
+                "5",
+            ]:
                 assert form.texture.errors and len(form.texture.errors) > 0
-            if form_data.get("pate") not in ["0", "0.5", "1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5"]:
+            if form_data.get("pate") not in [
+                "0",
+                "0.5",
+                "1",
+                "1.5",
+                "2",
+                "2.5",
+                "3",
+                "3.5",
+                "4",
+                "4.5",
+                "5",
+            ]:
                 assert form.pate.errors and len(form.pate.errors) > 0
-            if form_data.get("gout") not in ["0", "0.5", "1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5"]:
+            if form_data.get("gout") not in [
+                "0",
+                "0.5",
+                "1",
+                "1.5",
+                "2",
+                "2.5",
+                "3",
+                "3.5",
+                "4",
+                "4.5",
+                "5",
+            ]:
                 assert form.gout.errors and len(form.gout.errors) > 0
-            if form_data.get("description", "") and len(form_data["description"]) > 1000:
+            if (
+                form_data.get("description", "")
+                and len(form_data["description"]) > 1000
+            ):
                 assert form.description.errors and len(form.description.errors) > 0
 
 
@@ -500,6 +551,7 @@ def test_formulaire_evaluation_avec_evaluation_existante(client):
         assert str(form.pate.data) == str(eval.pate)
         assert str(form.gout.data) == str(eval.gout)
         assert form.description.data == eval.description
+
 
 @pytest.mark.slow
 @pytest.mark.forms

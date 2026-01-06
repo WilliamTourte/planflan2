@@ -69,7 +69,15 @@ def test_register_get(client):
         ),
     ],
 )
-def test_register_post_parametrize(client, test_name, user_data, setup_existing, expected_success, check_field, check_value):
+def test_register_post_parametrize(
+    client,
+    test_name,
+    user_data,
+    setup_existing,
+    expected_success,
+    check_field,
+    check_value,
+):
     """Test l'inscription avec différents scénarios (paramétrisé)"""
     # Créer un utilisateur existant si nécessaire
     if setup_existing:
@@ -103,7 +111,9 @@ def test_register_post_parametrize(client, test_name, user_data, setup_existing,
             assert new_user.is_admin == user_data["is_admin"]
         else:
             # Pour les échecs, vérifier que l'utilisateur n'a pas été créé
-            user_count = Utilisateur.query.filter_by(**{check_field: check_value}).count()
+            user_count = Utilisateur.query.filter_by(
+                **{check_field: check_value}
+            ).count()
             assert user_count == 1  # Seul l'utilisateur existant doit être présent
 
 
@@ -122,7 +132,11 @@ def test_login_get(client):
         # Test connexion réussie
         (
             "success",
-            {"pseudo": "testlogin", "email": "testlogin@example.com", "password": "testpassword"},
+            {
+                "pseudo": "testlogin",
+                "email": "testlogin@example.com",
+                "password": "testpassword",
+            },
             {"pseudo": "testlogin", "password": "testpassword"},
             True,
         ),
@@ -135,7 +149,9 @@ def test_login_get(client):
         ),
     ],
 )
-def test_login_post_parametrize(client, test_name, setup_user, login_data, expected_success):
+def test_login_post_parametrize(
+    client, test_name, setup_user, login_data, expected_success
+):
     """Test la connexion avec différents scénarios (paramétrisé)"""
     # Créer un utilisateur pour le test si nécessaire
     if setup_user:
@@ -157,7 +173,7 @@ def test_login_post_parametrize(client, test_name, setup_user, login_data, expec
     )
 
     assert response.status_code == 200
-    
+
     # Vérifier le résultat de la connexion
     with client.session_transaction() as sess:
         if expected_success:

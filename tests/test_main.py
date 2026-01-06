@@ -31,7 +31,7 @@ def test_route_status(client, route, expected_status, expected_content):
     """Test multiple routes with parameterized inputs"""
     response = client.get(route)
     assert response.status_code == expected_status
-    
+
     if expected_content is not None:
         assert expected_content in response.data
 
@@ -485,9 +485,6 @@ def test_supprimer_evaluation(client):
         assert (
             deleted_eval is None
         ), "L'évaluation n'a pas été supprimée de la base de données"
-
-
-
 
 
 def test_dashboard_post_update_profile(client):

@@ -312,56 +312,56 @@ def setup_data(app):
             "nom",
             "Boulangerie",
             lambda results: all("Boulangerie" in result.nom for result in results),
-            "Filtrer par nom contenant 'Boulangerie'"
+            "Filtrer par nom contenant 'Boulangerie'",
         ),
         # Test filtrage par ville
         (
             "ville",
             "Lyon",
             lambda results: all(result.ville == "Lyon" for result in results),
-            "Filtrer par ville 'Lyon'"
+            "Filtrer par ville 'Lyon'",
         ),
         # Test filtrage par visite = oui
         (
             "visite",
             "oui",
             lambda results: all(etab.visite == True for etab in results),
-            "Filtrer par visite 'oui'"
+            "Filtrer par visite 'oui'",
         ),
         # Test filtrage par visite = non
         (
             "visite",
             "non",
             lambda results: all(etab.visite == False for etab in results),
-            "Filtrer par visite 'non'"
+            "Filtrer par visite 'non'",
         ),
         # Test filtrage par labellisé = oui
         (
             "labellise",
             "oui",
             lambda results: all(etab.label == True for etab in results),
-            "Filtrer par labellisé 'oui'"
+            "Filtrer par labellisé 'oui'",
         ),
         # Test filtrage par labellisé = non
         (
             "labellise",
             "non",
             lambda results: all(etab.label == False for etab in results),
-            "Filtrer par labellisé 'non'"
+            "Filtrer par labellisé 'non'",
         ),
         # Test filtrage par type de pâte
         (
             "type_pate",
             "BRISEE",
             lambda results: len(results) > 0,
-            "Filtrer par type de pâte 'BRISEE'"
+            "Filtrer par type de pâte 'BRISEE'",
         ),
         # Test filtrage par type de saveur
         (
             "type_saveur",
             "VANILLE",
             lambda results: len(results) > 0,
-            "Filtrer par type de saveur 'VANILLE'"
+            "Filtrer par type de saveur 'VANILLE'",
         ),
     ],
 )
@@ -375,18 +375,19 @@ def test_filtrer_etablissements_parametrize(
         # Appliquer le filtre - utiliser une jointure pour les filtres sur les flans
         if filter_name in ["type_pate", "type_saveur", "type_texture"]:
             query = query.join(Flan)
-        
+
         filtered_query = filtrer_etablissements(query, **{filter_name: filter_param})
         results = filtered_query.all()
 
         # Vérifier que nous avons des résultats
-        assert len(results) > 0, f"Aucun établissement trouvé avec {filter_name}={filter_param}"
+        assert (
+            len(results) > 0
+        ), f"Aucun établissement trouvé avec {filter_name}={filter_param}"
 
         # Vérifier la condition attendue
-        assert expected_condition(results), f"La condition attendue n'est pas satisfaite pour {test_description}"
-
-
-
+        assert expected_condition(
+            results
+        ), f"La condition attendue n'est pas satisfaite pour {test_description}"
 
 
 @pytest.mark.unitary
@@ -493,7 +494,9 @@ def test_filtrer_etablissements_par_type_saveur(client):
         ("GELATINEUSE", "Patisserie Dubois"),
     ],
 )
-def test_filtrer_etablissements_par_type_texture_parametrize(client, texture_type, expected_etablissement):
+def test_filtrer_etablissements_par_type_texture_parametrize(
+    client, texture_type, expected_etablissement
+):
     """Test le filtrage des établissements par type de texture (paramétrisé)"""
     with client.application.app_context():
         query = Etablissement.query.join(Flan)
@@ -654,7 +657,9 @@ def test_filtrer_etablissements_resultats_dupliques(client):
         ("5", ">= 0", "Filtrer par prix >= 5€"),
     ],
 )
-def test_filtrer_etablissements_par_prix_parametrize(client, prix_filter, expected_result_count, description):
+def test_filtrer_etablissements_par_prix_parametrize(
+    client, prix_filter, expected_result_count, description
+):
     """Test le filtrage des établissements par prix (paramétrisé)"""
     with client.application.app_context():
         query = Etablissement.query.join(Flan)

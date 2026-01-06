@@ -145,7 +145,7 @@ def test_scenario_recherche_et_evaluation(client):
 @pytest.mark.regression
 @pytest.mark.skipif(
     os.getenv("CI") == "true" and os.getenv("RUN_SLOW_TESTS") != "true",
-    reason="Skipping complex admin scenario in CI unless RUN_SLOW_TESTS=true"
+    reason="Skipping complex admin scenario in CI unless RUN_SLOW_TESTS=true",
 )
 def test_scenario_administration_complete(client):
     """Test un flux complet d'administration : création utilisateur -> validation contenu"""
