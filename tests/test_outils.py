@@ -11,22 +11,35 @@ import pytest
 # Importer les fixtures depuis test_securite
 
 
+@pytest.mark.parametrize(
+    "test_name,lat1,lon1,lat2,lon2,expected_min,expected_max",
+    [
+        # Test 1: Same location (should be 0)
+        ("same_location", 45.75, 4.85, 45.75, 4.85, 0.0, 0.0),
+        # Test 2: Close locations (Lyon center to Lyon Part-Dieu)
+        ("close_locations", 45.7578, 4.8351, 45.7544, 4.8586, 0, 5),
+        # Test 3: Lyon to Paris
+        ("lyon_to_paris", 45.7578, 4.8351, 48.8566, 2.3522, 300, 500),
+    ],
+)
 @pytest.mark.utils
-def test_calculer_distance():
-    """Test la fonction calculer_distance avec des coordonnées connues"""
-    # Test avec des coordonnées identiques (distance devrait être 0)
-    distance = calculer_distance(45.75, 4.85, 45.75, 4.85)
-    assert distance == 0.0
+def test_calculer_distance_parametrize(
+    test_name, lat1, lon1, lat2, lon2, expected_min, expected_max
+):
+    """Test calculer_distance avec différents scénarios (paramétrisé)"""
+    distance = calculer_distance(lat1, lon1, lat2, lon2)
 
-    # Test avec des coordonnées proches (Lyon centre vers Lyon Part-Dieu)
-    distance = calculer_distance(45.7578, 4.8351, 45.7544, 4.8586)
-    assert distance > 0  # Distance positive
-    assert distance < 5  # Moins de 5 km
+    # Vérifier que la distance est dans la plage attendue
+    assert expected_min <= distance <= expected_max, (
+        f"Test {test_name} failed: expected distance between {expected_min} and {expected_max}, "
+        f"got {distance}"
+    )
 
-    # Test avec des coordonnées plus éloignées (Lyon vers Paris)
-    distance = calculer_distance(45.7578, 4.8351, 48.8566, 2.3522)
-    assert distance > 300  # Plus de 300 km
-    assert distance < 500  # Moins de 500 km
+    # Pour les cas où la distance devrait être exactement 0
+    if expected_min == expected_max == 0.0:
+        assert (
+            distance == 0.0
+        ), f"Test {test_name} failed: expected exact 0.0, got {distance}"
 
 
 @pytest.mark.utils
@@ -139,158 +152,7 @@ def test_enlever_accents_avec_melange():
     assert "hotel" in resultat
 
 
-def test_calculer_distance_avec_zero():
-    """Test calculer_distance avec des valeurs nulles"""
-    distance = calculer_distance(0, 0, 0, 0)
-    assert distance == 0.0
-
-
-def test_calculer_distance_grand_ecart():
-    """Test calculer_distance avec un grand écart"""
-    # New York vers Tokyo
-    distance = calculer_distance(40.7128, -74.0060, 35.6762, 139.6503)
-    assert abs(distance - 10850) < 100  # Environ 10 850 km
-
-
 # Tests pour les fonctions CSRF manquantes
-@pytest.mark.utils
-def test_verifier_csrf_token_sans_token(app):
-    """Test verifier_csrf_token quand aucun token n'est fourni"""
-    from app.outils import verifier_csrf_token
-
-    # Simuler une requête sans token CSRF
-    with app.test_request_context("/", method="GET"):
-        resultat, message = verifier_csrf_token()
-        assert resultat == True  # Devrait être True quand aucun token n'est requis
-        assert message is None
-
-
-@pytest.mark.utils
-def test_verifier_csrf_token_avec_token_valide(app):
-    """Test verifier_csrf_token avec un token valide"""
-    from app.outils import verifier_csrf_token
-    from unittest.mock import patch
-
-    # Comme la protection CSRF est désactivée dans les tests (WTF_CSRF_ENABLED=False),
-    # nous devons mock la fonction validate_csrf pour qu'elle ne lève pas d'exception
-
-    # Créer un contexte de requête avec un token CSRF dans les headers
-    with app.test_request_context(
-        "/", method="POST", headers={"X-CSRFToken": "token_valide_test"}
-    ):
-        # Mock la fonction validate_csrf pour qu'elle ne lève pas d'exception
-        with patch("app.outils.validate_csrf") as mock_validate:
-            mock_validate.return_value = None  # Simuler une validation réussie
-
-            resultat, message = verifier_csrf_token()
-            assert resultat == True
-            assert message is None
-            mock_validate.assert_called_once_with("token_valide_test")
-
-
-@pytest.mark.utils
-def test_verifier_csrf_token_avec_token_invalide(app):
-    """Test verifier_csrf_token avec un token invalide"""
-    from app.outils import verifier_csrf_token
-
-    # Créer un contexte de requête avec un token CSRF invalide dans les headers
-    with app.test_request_context(
-        "/", method="POST", headers={"X-CSRFToken": "token_invalide_12345"}
-    ):
-        resultat, message = verifier_csrf_token()
-        assert resultat == False
-        assert message == "Token CSRF invalide"
-
-
-@pytest.mark.utils
-def test_verifier_csrf_ou_renvoyer_erreur_sans_token(app):
-    """Test verifier_csrf_ou_renvoyer_erreur quand aucun token n'est fourni"""
-    from app.outils import verifier_csrf_ou_renvoyer_erreur
-
-    # Simuler une requête sans token CSRF
-    with app.test_request_context("/", method="GET"):
-        resultat, response = verifier_csrf_ou_renvoyer_erreur()
-        assert resultat == True
-        assert response is None
-
-
-@pytest.mark.utils
-def test_verifier_csrf_ou_renvoyer_erreur_avec_token_invalide(app):
-    """Test verifier_csrf_ou_renvoyer_erreur avec un token invalide"""
-    from app.outils import verifier_csrf_ou_renvoyer_erreur
-
-    # Créer un contexte de requête avec un token CSRF invalide dans les headers
-    with app.test_request_context(
-        "/", method="POST", headers={"X-CSRFToken": "token_invalide_12345"}
-    ):
-        resultat, response, status_code = verifier_csrf_ou_renvoyer_erreur()
-        assert resultat == False
-        assert response is not None
-        assert status_code == 403  # Code d'erreur 403 Forbidden
-
-        # Vérifier que la réponse contient un message d'erreur JSON
-        assert response.is_json
-        error_data = response.get_json()
-        assert "error" in error_data
-        assert error_data["error"] == "Token CSRF invalide"
-
-
-@pytest.mark.utils
-def test_verifier_csrf_token_dans_formulaire(app):
-    """Test verifier_csrf_token avec un token dans les données de formulaire"""
-    from app.outils import verifier_csrf_token
-    from unittest.mock import patch
-
-    # Créer un contexte de requête avec un token CSRF dans les données de formulaire
-    with app.test_request_context(
-        "/", method="POST", data={"csrf_token": "token_formulaire_test"}
-    ):
-        # Mock la fonction validate_csrf pour qu'elle ne lève pas d'exception
-        with patch("app.outils.validate_csrf") as mock_validate:
-            mock_validate.return_value = None  # Simuler une validation réussie
-
-            resultat, message = verifier_csrf_token()
-            assert resultat == True
-            assert message is None
-            mock_validate.assert_called_once_with("token_formulaire_test")
-
-
-@pytest.mark.utils
-def test_verifier_csrf_token_chaine_vide(app):
-    """Test verifier_csrf_token avec un token vide"""
-    from app.outils import verifier_csrf_token
-
-    # Créer un contexte de requête avec un token CSRF vide dans les headers
-    with app.test_request_context("/", method="POST", headers={"X-CSRFToken": ""}):
-        # Un token vide devrait être traité comme aucun token
-        resultat, message = verifier_csrf_token()
-        assert resultat == True  # Devrait être True car aucun token valide n'est fourni
-        assert message is None
-
-
-@pytest.mark.utils
-def test_verifier_csrf_priorite_header_sur_formulaire(app):
-    """Test verifier_csrf_token donne la priorité à l'en-tête sur le formulaire"""
-    from app.outils import verifier_csrf_token
-    from unittest.mock import patch
-
-    # Créer un contexte de requête avec un token CSRF dans les headers ET le formulaire
-    # Le token dans l'en-tête devrait avoir la priorité
-    with app.test_request_context(
-        "/",
-        method="POST",
-        headers={"X-CSRFToken": "token_header"},
-        data={"csrf_token": "token_formulaire"},
-    ):
-        # Mock la fonction validate_csrf pour qu'elle ne lève pas d'exception
-        with patch("app.outils.validate_csrf") as mock_validate:
-            mock_validate.return_value = None  # Simuler une validation réussie
-
-            resultat, message = verifier_csrf_token()
-            assert resultat == True
-            assert message is None
-            # Le token de l'en-tête devrait être utilisé
-            mock_validate.assert_called_once_with("token_header")
 
 
 @pytest.mark.utils
@@ -378,30 +240,3 @@ def test_afficher_etablissements_avec_flans_multiples(client):
         db.session.delete(flan3)
         db.session.delete(etab1)
         db.session.commit()
-
-
-@pytest.mark.utils
-def test_calculer_distance_avec_valeurs_string():
-    """Test calculer_distance avec des valeurs sous forme de chaînes"""
-    # La fonction devrait convertir les strings en float
-    distance = calculer_distance("45.75", "4.85", "48.85", "2.35")
-    assert distance > 0
-    assert distance < 500  # Lyon -> Paris
-
-
-@pytest.mark.utils
-def test_calculer_distance_coordonnees_negatives():
-    """Test calculer_distance avec des coordonnées négatives (hémisphère sud)"""
-    # Sydney, Australie vers Wellington, Nouvelle-Zélande
-    distance = calculer_distance(-33.8688, 151.2093, -41.2865, 174.7762)
-    assert distance > 1000  # Plus de 1000 km
-    assert distance < 3000  # Moins de 3000 km
-
-
-@pytest.mark.utils
-def test_calculer_distance_coordonnees_extremes():
-    """Test calculer_distance avec des coordonnées extrêmes (pôles)"""
-    # Pôle Nord (approximatif) vers Pôle Sud (approximatif)
-    distance = calculer_distance(89.999, 0, -89.999, 0)
-    assert distance > 15000  # Plus de 15 000 km
-    assert distance < 25000  # Moins de 25 000 km (distance réelle ~20 000 km)

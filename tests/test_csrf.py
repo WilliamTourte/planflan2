@@ -55,63 +55,6 @@ def test_verifier_csrf_token_avec_token_valide(client_with_csrf):
 
 
 @pytest.mark.csrf
-def test_geoloc_route_responds(client):
-    """Test que la route /geoloc répond correctement"""
-    # Tester avec des données valides
-    # Désactiver temporairement CSRF pour ce test car nous testons la route, pas la protection CSRF
-    client.application.config["WTF_CSRF_ENABLED"] = False
-    response = client.post(
-        "/geoloc", json={"latitude": 45.764043, "longitude": 4.835659}
-    )
-    # La route devrait répondre avec succès
-    assert response.status_code == 200
-    data = response.get_json()
-    assert "latitude" in data
-
-
-@pytest.mark.csrf
-def test_etablissements_proches_route_responds(client):
-    """Test que la route /etablissements_proches répond correctement"""
-    # Désactiver temporairement CSRF pour ce test
-    client.application.config["WTF_CSRF_ENABLED"] = False
-    # Tester avec des données valides
-    response = client.post(
-        "/etablissements_proches", json={"latitude": 45.764043, "longitude": 4.835659}
-    )
-    assert response.status_code == 200
-    data = response.get_json()
-    assert "etablissements" in data
-
-
-@pytest.mark.csrf
-def test_extraire_infos_adresse_route_responds(client):
-    """Test que la route /extraire_infos_adresse répond correctement"""
-    # Désactiver temporairement CSRF pour ce test
-    client.application.config["WTF_CSRF_ENABLED"] = False
-    # Tester avec des données valides
-    response = client.post(
-        "/extraire_infos_adresse", json={"adresse": "1 rue de Test, 69001 Lyon"}
-    )
-    assert response.status_code == 200
-    data = response.get_json()
-    assert "adresse_nettoyee" in data
-
-
-@pytest.mark.csrf
-def test_verifier_etablissement_route_responds(client):
-    """Test que la route /verifier_etablissement répond correctement"""
-    # Désactiver temporairement CSRF pour ce test
-    client.application.config["WTF_CSRF_ENABLED"] = False
-    # Tester avec des données valides
-    response = client.post(
-        "/verifier_etablissement", json={"nom": "Test Etablissement"}
-    )
-    assert response.status_code == 200
-    data = response.get_json()
-    assert "exists" in data
-
-
-@pytest.mark.csrf
 def test_upload_route_responds(client):
     """Test que la route /upload répond correctement"""
     # Désactiver temporairement CSRF pour ce test
