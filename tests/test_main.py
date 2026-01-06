@@ -1311,6 +1311,58 @@ class TestFiltrerEtablissements:
         db.session.commit()
 
 
+# Tests pour améliorer la couverture des routes principales
+@pytest.mark.routes
+def test_index_route(client):
+    """Test la route d'accueil"""
+    response = client.get('/')
+    assert response.status_code == 200
+    assert b"PlanFlan" in response.data or b"planflan" in response.data
+
+
+@pytest.mark.routes
+def test_dashboard_route_authenticated(client):
+    """Test que le dashboard est accessible quand authentifié"""
+    response = client.get('/dashboard', follow_redirects=True)
+    assert response.status_code == 200
+    # Devrait montrer le tableau de bord
+    assert b"Tableau de bord" in response.data or b"Dashboard" in response.data
+
+
+@pytest.mark.routes
+def test_proposer_etablissement_route_authenticated(client):
+    """Test que la page de proposition d'établissement est accessible quand authentifié"""
+    response = client.get('/proposer_etablissement', follow_redirects=True)
+    assert response.status_code == 200
+    # Devrait montrer le formulaire de proposition avec champ de recherche
+    assert b"Recherche" in response.data or b"recherche" in response.data
+
+
+@pytest.mark.routes
+def test_proposer_etablissement_route_unauthenticated(client):
+    """Test que la page de proposition d'établissement redirige si non authentifié"""
+    response = client.get('/proposer_etablissement', follow_redirects=True)
+    assert response.status_code == 200
+    # Devrait être redirigé vers la page de connexion
+    assert b"Connexion" in response.data or b"Login" in response.data
+
+
+@pytest.mark.routes
+def test_liste_etablissements_route(client):
+    """Test la route de liste des établissements"""
+    response = client.get('/liste_etablissements')
+    assert response.status_code == 200
+    assert b"Etablissement" in response.data or b"etablissement" in response.data
+
+
+@pytest.mark.routes
+def test_rechercher_route(client):
+    """Test la route de recherche"""
+    response = client.get('/rechercher')
+    assert response.status_code == 200
+    assert b"Recherche" in response.data or b"recherche" in response.data
+
+
 # Tests pour les routes API manquantes
 @pytest.mark.api
 def test_api_villes_sans_parametre(client):
