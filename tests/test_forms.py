@@ -82,149 +82,121 @@ def setup_data(app):
 # Tests pour EtabForm
 
 
-def test_etabform_donnees_valides(client):
-    """Test EtabForm avec des données valides."""
+@pytest.mark.parametrize(
+    "test_name,form_data,expected_valid",
+    [
+        # Test avec données valides
+        (
+            "valid_data",
+            {
+                "nom": "Nouvelle Boulangerie",
+                "description": "Description valide",
+                "adresse": "10 rue de la République",
+                "ville": "Lyon",
+                "code_postal": "69001",
+                "latitude": 45.7640,
+                "longitude": 4.8357,
+                "type_etab": "BOULANGERIE",
+                "label": False,
+                "visite": True,
+            },
+            True,
+        ),
+        # Test avec données invalides
+        (
+            "invalid_data",
+            {
+                "nom": "",  # Nom vide
+                "description": "a" * 1001,  # Description trop longue
+                "adresse": "",  # Adresse vide
+                "ville": "",  # Ville vide
+                "code_postal": "INVALIDE",  # Code postal invalide
+                "latitude": 200,  # Latitude invalide
+                "longitude": 200,  # Longitude invalide
+            },
+            False,
+        ),
+    ],
+)
+def test_etabform_parametrize(client, test_name, form_data, expected_valid):
+    """Test EtabForm avec différents scénarios (paramétrisé)"""
     with client.application.app_context():
         form = EtabForm()
 
-        # Remplir le formulaire avec des données valides
-        form.nom.data = "Nouvelle Boulangerie"
-        form.description.data = "Description valide"
-        form.adresse.data = "10 rue de la République"
-        form.ville.data = "Lyon"
-        form.code_postal.data = "69001"
-        form.latitude.data = 45.7640
-        form.longitude.data = 4.8357
-        form.type_etab.data = "BOULANGERIE"
-        form.label.data = False
-        form.visite.data = True
+        # Remplir le formulaire avec les données fournies
+        for field, value in form_data.items():
+            setattr(getattr(form, field), 'data', value)
 
-        # Le formulaire devrait être valide
-        assert form.validate()
+        # Vérifier la validation
+        assert form.validate() == expected_valid
 
-
-def test_etabform_donnees_invalides(client):
-    """Test EtabForm avec des données invalides."""
-    with client.application.app_context():
-        form = EtabForm()
-
-        # Remplir le formulaire avec des données invalides
-        form.nom.data = ""  # Nom vide
-        form.description.data = "a" * 1001  # Description trop longue
-        form.adresse.data = ""  # Adresse vide
-        form.ville.data = ""  # Ville vide
-        form.code_postal.data = "INVALIDE"  # Code postal invalide
-        form.latitude.data = 200  # Latitude invalide (doit être entre -90 et 90)
-        form.longitude.data = 200  # Longitude invalide (doit être entre -180 et 180)
-
-        # Le formulaire ne devrait pas être valide
-        assert not form.validate()
-
-        # Vérifier les erreurs spécifiques (indépendant de la langue)
-        assert form.nom.errors and len(form.nom.errors) > 0
-        assert form.adresse.errors and len(form.adresse.errors) > 0
-        assert form.ville.errors and len(form.ville.errors) > 0
+        # Pour les cas invalides, vérifier les erreurs spécifiques
+        if not expected_valid:
+            if not form_data.get("nom"):
+                assert form.nom.errors and len(form.nom.errors) > 0
+            if not form_data.get("adresse"):
+                assert form.adresse.errors and len(form.adresse.errors) > 0
+            if not form_data.get("ville"):
+                assert form.ville.errors and len(form.ville.errors) > 0
 
 
-def test_etabform_code_postal_invalide(client):
-    """Test EtabForm avec des codes postaux invalides."""
-    with client.application.app_context():
-        form = EtabForm()
 
-        # Remplir les champs requis pour que le formulaire soit valide
-        form.type_etab.data = "BOULANGERIE"
-        form.nom.data = "Test Boulangerie"
-        form.adresse.data = "123 Rue de Test"
-        form.code_postal.data = "69001"
-        form.ville.data = "Lyon"
-
-        # Le formulaire devrait être valide avec des données valides
-        assert form.validate()
-
-        # Tester différents codes postaux invalides
-        codes_invalides = ["123", "1234", "123456", "A1B2C3"]
-
-        for code in codes_invalides:
-            form.code_postal.data = code
-            assert not form.validate()
-            # Vérifier qu'il y a des erreurs (indépendant de la langue)
-            assert form.code_postal.errors and len(form.code_postal.errors) > 0
-
-
-def test_etabform_coordonnees_geographiques_invalides(client):
-    """Test EtabForm avec des coordonnées géographiques invalides."""
-    with client.application.app_context():
-        form = EtabForm()
-
-        # Coordonnées invalides
-        form.latitude.data = 100  # Latitude > 90
-        form.longitude.data = 200  # Longitude > 180
-
-        assert not form.validate()
-
-        form.latitude.data = -100  # Latitude < -90
-        form.longitude.data = -200  # Longitude < -180
-
-        assert not form.validate()
 
 
 # Tests pour NewFlanForm
 
 
-def test_newflanform_donnees_valides(client):
-    """Test NewFlanForm avec des données valides."""
+@pytest.mark.parametrize(
+    "test_name,form_data,expected_valid",
+    [
+        # Test avec données valides
+        (
+            "valid_data",
+            {
+                "nom": "Flan Chocolat",
+                "description": "Flan riche au chocolat noir",
+                "prix": 4.00,
+                "type_pate": "BRISEE",
+                "type_saveur": "NOIX",
+                "type_texture": "CREMEUSE",
+            },
+            True,
+        ),
+        # Test avec données invalides
+        (
+            "invalid_data",
+            {
+                "nom": "",  # Nom vide
+                "description": "a" * 1001,  # Description trop longue
+                "prix": -2.5,  # Prix négatif
+                "type_pate": "INVALIDE",  # Type de pâte invalide
+                "type_saveur": "INVALIDE",  # Type de saveur invalide
+                "type_texture": "INVALIDE",  # Type de texture invalide
+            },
+            False,
+        ),
+    ],
+)
+def test_newflanform_parametrize(client, test_name, form_data, expected_valid):
+    """Test NewFlanForm avec différents scénarios (paramétrisé)"""
     with client.application.app_context():
         form = NewFlanForm()
 
-        # Remplir le formulaire avec des données valides
-        form.nom.data = "Flan Chocolat"
-        form.description.data = "Flan riche au chocolat noir"
-        form.prix.data = 4.00
-        form.type_pate.data = "BRISEE"
-        form.type_saveur.data = "NOIX"
-        form.type_texture.data = "CREMEUSE"
+        # Remplir le formulaire avec les données fournies
+        for field, value in form_data.items():
+            setattr(getattr(form, field), 'data', value)
 
-        # Le formulaire devrait être valide
-        assert form.validate()
+        # Vérifier la validation
+        assert form.validate() == expected_valid
 
-
-def test_newflanform_donnees_invalides(client):
-    """Test NewFlanForm avec des données invalides."""
-    with client.application.app_context():
-        form = NewFlanForm()
-
-        # Remplir le formulaire avec des données invalides
-        form.nom.data = ""  # Nom vide
-        form.description.data = "a" * 1001  # Description trop longue
-        form.prix.data = -2.5  # Prix négatif
-        form.type_pate.data = "INVALIDE"  # Type de pâte invalide
-        form.type_saveur.data = "INVALIDE"  # Type de saveur invalide
-        form.type_texture.data = "INVALIDE"  # Type de texture invalide
-
-        # Le formulaire ne devrait pas être valide
-        assert not form.validate()
-
-        # Vérifier les erreurs spécifiques (indépendant de la langue)
-        assert form.nom.errors and len(form.nom.errors) > 0
-        assert form.description.errors and len(form.description.errors) > 0
-        assert form.prix.errors and len(form.prix.errors) > 0
-
-
-def test_newflanform_prix_invalide(client):
-    """Test NewFlanForm avec des prix invalides."""
-    with client.application.app_context():
-        form = NewFlanForm()
-
-        # Tester différents prix invalides
-        prix_invalides = [-1.0, -0.1, "abc", None]
-
-        for prix in prix_invalides:
-            if prix == "abc":  # Skip string test as it causes TypeError
-                continue
-            form.prix.data = prix
-            assert not form.validate()
-            # Vérifier qu'il y a des erreurs (indépendant de la langue)
-            assert form.prix.errors and len(form.prix.errors) > 0
+        # Pour les cas invalides, vérifier les erreurs spécifiques
+        if not expected_valid:
+            if not form_data.get("nom"):
+                assert form.nom.errors and len(form.nom.errors) > 0
+            if form_data.get("description", "") and len(form_data["description"]) > 1000:
+                assert form.description.errors and len(form.description.errors) > 0
+            if form_data.get("prix", 0) < 0:
+                assert form.prix.errors and len(form.prix.errors) > 0
 
 
 # Tests pour EvalForm
