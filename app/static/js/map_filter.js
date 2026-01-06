@@ -310,6 +310,12 @@ function initMap() {
 
     // Ajouter le marqueur utilisateur si position disponible
     createUserMarker();
+    
+    // Ajouter un écouteur d'événement pour le déplacement de la carte
+    map.on('moveend', function() {
+        // Sauvegarder l'état dans l'URL lorsque la carte est déplacée
+        saveStateToUrl();
+    });
 
     // Ajouter le bouton de géolocalisation comme contrôle Leaflet
     addGeolocateControl();
@@ -489,19 +495,19 @@ function toggleActiveButton(button, isActive) {
 // Fonction pour mettre à jour la couleur des boutons principaux
 function updateMainFilterButtons() {
     // Réinitialiser tous les boutons principaux
-    document.getElementById('filter-pate-btn').classList.remove('filter-active');
-    document.getElementById('filter-saveur-btn').classList.remove('filter-active');
-    document.getElementById('filter-statut-btn').classList.remove('filter-active');
+    document.getElementById('filter-pate-btn').classList.remove('active');
+    document.getElementById('filter-saveur-btn').classList.remove('active');
+    document.getElementById('filter-statut-btn').classList.remove('active');
 
-    // Mettre en vert foncé les boutons dont la catégorie a des filtres actifs
+    // Mettre en bleu les boutons dont la catégorie a des filtres actifs
     if (activeFilters.type_pate) {
-        document.getElementById('filter-pate-btn').classList.add('filter-active');
+        document.getElementById('filter-pate-btn').classList.add('active');
     }
     if (activeFilters.type_saveur) {
-        document.getElementById('filter-saveur-btn').classList.add('filter-active');
+        document.getElementById('filter-saveur-btn').classList.add('active');
     }
     if (activeFilters.visited || activeFilters.unvisited || activeFilters.label) {
-        document.getElementById('filter-statut-btn').classList.add('filter-active');
+        document.getElementById('filter-statut-btn').classList.add('active');
     }
 }
 
@@ -526,6 +532,9 @@ function setupPateButtons() {
             updateActiveButtonStates();
             updateMainFilterButtons();
             toggleActiveButton(this, isActive);
+            
+            // Sauvegarder l'état dans l'URL
+            saveStateToUrl();
         });
     });
 }
@@ -550,6 +559,9 @@ function setupSaveurButtons() {
             updateActiveButtonStates();
             updateMainFilterButtons();
             toggleActiveButton(this, isActive);
+            
+            // Sauvegarder l'état dans l'URL
+            saveStateToUrl();
         });
     });
 }
@@ -578,6 +590,9 @@ function setupStatutButtons() {
             updateActiveButtonStates();
             updateMainFilterButtons();
             toggleActiveButton(this, isActive);
+            
+            // Sauvegarder l'état dans l'URL
+            saveStateToUrl();
         });
     });
 }
@@ -596,6 +611,9 @@ function setupFilterButtons() {
         document.getElementById('sub-filters').classList.remove('show');
         updateActiveButtonStates();
         updateMainFilterButtons();
+        
+        // Sauvegarder l'état dans l'URL
+        saveStateToUrl();
     });
 
     // Bouton pour afficher/masquer les options de pâte
@@ -679,6 +697,89 @@ function setupFilterButtons() {
     });
 }
 
+// Fonction pour sauvegarder l'état dans l'URL
+function saveStateToUrl() {
+    const url = new URL(window.location.href);
+    
+    // Sauvegarder les filtres
+    if (activeFilters.type_pate) {
+        url.searchParams.set('pate', activeFilters.type_pate);
+    } else {
+        url.searchParams.delete('pate');
+    }
+    
+    if (activeFilters.type_saveur) {
+        url.searchParams.set('saveur', activeFilters.type_saveur);
+    } else {
+        url.searchParams.delete('saveur');
+    }
+    
+    if (activeFilters.visited) {
+        url.searchParams.set('visited', 'true');
+    } else {
+        url.searchParams.delete('visited');
+    }
+    
+    if (activeFilters.unvisited) {
+        url.searchParams.set('unvisited', 'true');
+    } else {
+        url.searchParams.delete('unvisited');
+    }
+    
+    if (activeFilters.label) {
+        url.searchParams.set('label', 'true');
+    } else {
+        url.searchParams.delete('label');
+    }
+    
+    // Sauvegarder la position et le zoom de la carte
+    if (map) {
+        const center = map.getCenter();
+        url.searchParams.set('lat', center.lat.toFixed(6));
+        url.searchParams.set('lng', center.lng.toFixed(6));
+        url.searchParams.set('zoom', map.getZoom());
+    }
+    
+    window.history.replaceState({}, '', url);
+}
+
+// Fonction pour restaurer l'état depuis l'URL
+function restoreStateFromUrl() {
+    const url = new URL(window.location.href);
+    
+    // Restaurer les filtres
+    if (url.searchParams.has('pate')) {
+        activeFilters.type_pate = url.searchParams.get('pate');
+    }
+    
+    if (url.searchParams.has('saveur')) {
+        activeFilters.type_saveur = url.searchParams.get('saveur');
+    }
+    
+    if (url.searchParams.has('visited')) {
+        activeFilters.visited = url.searchParams.get('visited') === 'true';
+    }
+    
+    if (url.searchParams.has('unvisited')) {
+        activeFilters.unvisited = url.searchParams.get('unvisited') === 'true';
+    }
+    
+    if (url.searchParams.has('label')) {
+        activeFilters.label = url.searchParams.get('label') === 'true';
+    }
+    
+    // Restaurer la position et le zoom de la carte
+    if (map && url.searchParams.has('lat') && url.searchParams.has('lng') && url.searchParams.has('zoom')) {
+        const lat = parseFloat(url.searchParams.get('lat'));
+        const lng = parseFloat(url.searchParams.get('lng'));
+        const zoom = parseInt(url.searchParams.get('zoom'));
+        
+        if (!isNaN(lat) && !isNaN(lng) && !isNaN(zoom)) {
+            map.setView([lat, lng], zoom);
+        }
+    }
+}
+
 // Initialisation globale
 function initAll() {
     initDataElements();
@@ -686,6 +787,16 @@ function initAll() {
     updateMapAndMarkers();
     setupFilterButtons();
     setupGeolocation();
+    
+    // Restaurer l'état depuis l'URL
+    restoreStateFromUrl();
+    
+    // Mettre à jour les boutons pour refléter l'état restauré
+    updateActiveButtonStates();
+    updateMainFilterButtons();
+    
+    // Sauvegarder l'état initial
+    saveStateToUrl();
 }
 
 // Initialisation au chargement de la page

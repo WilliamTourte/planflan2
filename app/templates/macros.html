@@ -93,13 +93,13 @@
         {% if current_page == page_attendue %}
             {% if current_user.id_user == objet.id_user and not objet.statut.value == 'VALIDE' %}
                 <div class="action-buttons">
-                    <button type="button" class="btn btn-success btn-sm" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
+                    <button type="button" class="btn btn-success" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
                         <i class="bi bi-pencil"></i>
                     </button>
                     {% if delete_form %}
                         <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}" class="inline-form">
                             {{ delete_form.hidden_tag() }}
-                            <button type="submit" class="btn btn-danger btn-sm" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
+                            <button type="submit" class="btn btn-danger" title="Supprimer" onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </form>
@@ -116,7 +116,7 @@
                                 </button>
                             </form>
                         {% endif %}
-                        <button type="button" class="btn btn-success btn-sm" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
+                        <button type="button" class="btn btn-success" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
                             <i class="bi bi-pencil"></i>
                         </button>
                         {% if delete_form %}
@@ -130,7 +130,7 @@
                     </div>
                 {% else %}
                     <div class="action-buttons d-flex gap-1">
-                        <button type="button" class="btn btn-success btn-sm" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
+                        <button type="button" class="btn btn-success" title="Modifier" onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
                             <i class="bi bi-pencil"></i>
                         </button>
                         {% if delete_form %}
@@ -157,7 +157,7 @@
             {{ afficher_badge_type_etab(etablissement) }}
             {{ afficher_badge_etablissement(etablissement) }}
         </div>
-        <div class="carte-content">
+        <div >
             <div class="carte-header">
                 <h2 id="etablissement-{{ etablissement.id_etab }}-nom">{{ etablissement.nom | enlever_accents }}</h2>
             </div>
@@ -257,7 +257,7 @@
                 {{ afficher_image_ou_placeholder(flan) }}
                 {{ afficher_badge_flan(flan) }}
             </div>
-            <div class="carte-content">
+            <div >
                 <div class="carte-header">
                     <h2 id="flan-{{ flan.id_flan }}-nom">{{ flan.nom | enlever_accents }}</h2>
                 </div>
@@ -333,7 +333,7 @@
 
 {% macro afficher_formulaire_edition_flan(flan, form) %}
     {% if form %}
-        <div id="flan-{{ flan.id_flan }}-edit" style="display: none;" class="carte-form-edit">
+        <div id="flan-{{ flan.id_flan }}-edit" style="display: none;" class="carte">
             <form method="POST" action="{{ url_for('main.modifier_flan', id_flan=flan.id_flan) }}" class="form-container">
                 {{ form.hidden_tag() }}
                 <div class="form-group">
@@ -375,7 +375,7 @@
 {% macro afficher_evaluation(evaluation, current_user, form, current_page, delete_form, validate_form) %}
     <div class="carte">
         <a href="{{ url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval) }}" class="carte-link">
-        <div class="carte-content">
+        <div >
             <div class="carte-header">
                 <h2>{{ evaluation.flan.etablissement.nom | enlever_accents }}</h2>
                 <h3>{{ evaluation.flan.nom | enlever_accents }}</h3>
@@ -525,7 +525,7 @@
 
 {% macro afficher_bouton_ajout(objet_type, current_user, etablissement=None, form_ajout=None, flan=None) %}
     {% if objet_type == 'etablissement' %}
-        <div class="carte-content">
+        <div >
 
             {% if current_user.is_authenticated %}
                 {{ proposer_etablissement(form_ajout, url_for('maps.ajouter_etablissement'), current_user) }}
@@ -536,7 +536,7 @@
             {% endif %}
         </div>
     {% elif objet_type == 'flan' and etablissement %}
-        <div class="carte-content">
+        <div >
 
             {% if current_user.is_authenticated %}
                 {{ proposer_flan(form_ajout, url_for('main.proposer_flan', id_etab=etablissement.id_etab)) }}
@@ -547,7 +547,7 @@
             {% endif %}
         </div>
     {% elif objet_type == 'evaluation' and flan %}
-        <div class="carte-content">
+        <div >
 
             {% if current_user.is_authenticated %}
                 {{ proposer_evaluation(form_ajout, url_for('main.evaluer_flan', id_flan=flan.id_flan)) }}
