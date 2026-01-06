@@ -17,6 +17,7 @@ import pytest
 
 
 @pytest.mark.main
+@pytest.mark.smoke
 @pytest.mark.parametrize(
     "route,expected_status,expected_content",
     [

@@ -83,6 +83,42 @@ test-full-coverage:
 test-ci:
 	python -m pytest tests/ --cov=app --cov-report=xml --cov-report=term -v --tb=short
 
+# Exécuter les tests de smoke (rapides pour vérification basique)
+test-smoke:
+	python -m pytest tests/ -m "smoke" -v --tb=short
+
+# Exécuter les tests de régression (complets pour CI)
+test-regression:
+	python -m pytest tests/ -m "regression" -v --tb=short
+
+# Exécuter les tests end-to-end (scénarios utilisateurs)
+test-e2e:
+	python -m pytest tests/ -m "e2e or integration" -v --tb=short
+
+# Exécuter les tests d'API seulement
+test-api:
+	python -m pytest tests/ -m "api" -v --tb=short
+
+# Exécuter les tests de base de données seulement
+test-database:
+	python -m pytest tests/ -m "database" -v --tb=short
+
+# Exécuter les tests sans les lents (pour développement)
+test-without-slow:
+	python -m pytest tests/ -m "not slow" -v --tb=short
+
+# Exécuter uniquement les tests critiques et smoke
+test-critical-smoke:
+	python -m pytest tests/ -m "critical or smoke" -v --tb=short
+
+# Exécuter les tests avec parallelisation optimisée
+test-parallel:
+	python -m pytest tests/ -n auto --dist=loadfile -v --tb=short
+
+# Exécuter les tests avec parallelisation optimisée (sans les lents)
+test-parallel-quick:
+	python -m pytest tests/ -m "not slow" -n auto --dist=loadfile -v --tb=short
+
 # Générer uniquement le rapport HTML à partir du fichier .coverage existant
 coverage-html:
 	coverage html
