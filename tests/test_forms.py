@@ -202,63 +202,81 @@ def test_newflanform_parametrize(client, test_name, form_data, expected_valid):
 # Tests pour EvalForm
 
 
-def test_evalform_donnees_valides(client):
-    """Test EvalForm avec des données valides."""
+@pytest.mark.parametrize(
+    "test_name,form_data,expected_valid",
+    [
+        # Test avec données valides
+        (
+            "valid_data",
+            {
+                "visuel": "4.5",
+                "texture": "5",
+                "pate": "3",
+                "gout": "4",
+                "description": "Très bon flan, texture parfaite.",
+            },
+            True,
+        ),
+        # Test avec données invalides
+        (
+            "invalid_data",
+            {
+                "visuel": "6.0",  # Note > 5
+                "texture": "-1.0",  # Note < 0
+                "pate": "abc",  # Valeur non numérique
+                "gout": None,  # Valeur nulle
+                "description": "a" * 1001,  # Description trop longue
+            },
+            False,
+        ),
+    ],
+)
+def test_evalform_parametrize(client, test_name, form_data, expected_valid):
+    """Test EvalForm avec différents scénarios (paramétrisé)"""
     with client.application.app_context():
         form = EvalForm()
 
-        # Remplir le formulaire avec des données valides
-        # Les valeurs doivent correspondre aux choix disponibles dans le SelectField
-        form.visuel.data = "4.5"  # Doit être une chaîne qui correspond à un choix
-        form.texture.data = "5"  # Doit être une chaîne qui correspond à un choix
-        form.pate.data = "3"  # Doit être une chaîne qui correspond à un choix
-        form.gout.data = "4"  # Doit être une chaîne qui correspond à un choix
-        form.description.data = "Très bon flan, texture parfaite."
+        # Remplir le formulaire avec les données fournies
+        for field, value in form_data.items():
+            setattr(getattr(form, field), 'data', value)
 
-        # Le formulaire devrait être valide
-        assert form.validate()
+        # Vérifier la validation
+        assert form.validate() == expected_valid
 
-        # Vérifier que les données sont bien des chaînes parmi les choix valides
-        valid_choices = [
-            "0",
-            "0.5",
-            "1",
-            "1.5",
-            "2",
-            "2.5",
-            "3",
-            "3.5",
-            "4",
-            "4.5",
-            "5",
-        ]
-        assert str(form.visuel.data) in valid_choices
-        assert str(form.texture.data) in valid_choices
-        assert str(form.pate.data) in valid_choices
-        assert str(form.gout.data) in valid_choices
+        # Pour les cas valides, vérifier que les données sont bien des chaînes parmi les choix valides
+        if expected_valid:
+            valid_choices = [
+                "0",
+                "0.5",
+                "1",
+                "1.5",
+                "2",
+                "2.5",
+                "3",
+                "3.5",
+                "4",
+                "4.5",
+                "5",
+            ]
+            # Vérifier que les valeurs sont dans les choix valides
+            assert form.visuel.data in valid_choices
+            assert form.texture.data in valid_choices
+            assert form.pate.data in valid_choices
+            assert form.gout.data in valid_choices
 
-
-def test_evalform_donnees_invalides(client):
-    """Test EvalForm avec des données invalides."""
-    with client.application.app_context():
-        form = EvalForm()
-
-        # Remplir le formulaire avec des données invalides
-        form.visuel.data = "6.0"  # Note > 5 (chaîne non valide)
-        form.texture.data = "-1.0"  # Note < 0 (chaîne non valide)
-        form.pate.data = "abc"  # Valeur non numérique
-        form.gout.data = None  # Valeur nulle
-        form.description.data = "a" * 1001  # Description trop longue
-
-        # Le formulaire ne devrait pas être valide
-        assert not form.validate()
-
-        # Vérifier les erreurs spécifiques (indépendant de la langue)
-        assert form.visuel.errors and len(form.visuel.errors) > 0
-        assert form.texture.errors and len(form.texture.errors) > 0
-        assert form.pate.errors and len(form.pate.errors) > 0
-        assert form.gout.errors and len(form.gout.errors) > 0
-        assert form.description.errors and len(form.description.errors) > 0
+        # Pour les cas invalides, vérifier les erreurs spécifiques
+        if not expected_valid:
+            # Vérifier les erreurs (indépendant de la langue)
+            if form_data.get("visuel") not in ["0", "0.5", "1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5"]:
+                assert form.visuel.errors and len(form.visuel.errors) > 0
+            if form_data.get("texture") not in ["0", "0.5", "1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5"]:
+                assert form.texture.errors and len(form.texture.errors) > 0
+            if form_data.get("pate") not in ["0", "0.5", "1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5"]:
+                assert form.pate.errors and len(form.pate.errors) > 0
+            if form_data.get("gout") not in ["0", "0.5", "1", "1.5", "2", "2.5", "3", "3.5", "4", "4.5", "5"]:
+                assert form.gout.errors and len(form.gout.errors) > 0
+            if form_data.get("description", "") and len(form_data["description"]) > 1000:
+                assert form.description.errors and len(form.description.errors) > 0
 
 
 def test_evalform_notes_hors_plage(client):

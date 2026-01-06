@@ -19,94 +19,92 @@ def test_register_get(client):
 
 
 @pytest.mark.auth
-def test_register_post_success(client):
-    """Test l'inscription d'un nouvel utilisateur"""
+@pytest.mark.parametrize(
+    "test_name,user_data,setup_existing,expected_success,check_field,check_value",
+    [
+        # Test inscription réussie
+        (
+            "success",
+            {
+                "pseudo": "newuser",
+                "email": "newuser@example.com",
+                "password": "newpassword",
+                "confirm_password": "newpassword",
+                "is_admin": False,
+            },
+            None,
+            True,
+            "email",
+            "newuser@example.com",
+        ),
+        # Test email déjà utilisé
+        (
+            "duplicate_email",
+            {
+                "pseudo": "newuser",
+                "email": "existing@example.com",  # Email déjà utilisé
+                "password": "newpassword",
+                "confirm_password": "newpassword",
+                "is_admin": False,
+            },
+            {"pseudo": "existing", "email": "existing@example.com"},
+            False,
+            "email",
+            "existing@example.com",
+        ),
+        # Test pseudo déjà utilisé
+        (
+            "duplicate_pseudo",
+            {
+                "pseudo": "existing",  # Pseudo déjà utilisé
+                "email": "newuser@example.com",
+                "password": "newpassword",
+                "confirm_password": "newpassword",
+                "is_admin": False,
+            },
+            {"pseudo": "existing", "email": "existing@example.com"},
+            False,
+            "pseudo",
+            "existing",
+        ),
+    ],
+)
+def test_register_post_parametrize(client, test_name, user_data, setup_existing, expected_success, check_field, check_value):
+    """Test l'inscription avec différents scénarios (paramétrisé)"""
+    # Créer un utilisateur existant si nécessaire
+    if setup_existing:
+        with client.application.app_context():
+            existing_user = Utilisateur(
+                pseudo=setup_existing["pseudo"],
+                email=setup_existing["email"],
+                is_admin=False,
+            )
+            existing_user.set_password("password", bcrypt)
+            db.session.add(existing_user)
+            db.session.commit()
+
     # Envoyer une requête POST pour créer un nouvel utilisateur
     response = client.post(
         "/register",
-        data={
-            "pseudo": "newuser",
-            "email": "newuser@example.com",
-            "password": "newpassword",
-            "confirm_password": "newpassword",
-            "is_admin": False,
-        },
+        data=user_data,
         follow_redirects=True,
     )
 
     assert response.status_code == 200
 
-    # Vérifier que l'utilisateur a été créé dans la base de données
+    # Vérifier le résultat attendu
     with client.application.app_context():
-        new_user = Utilisateur.query.filter_by(email="newuser@example.com").first()
-        assert new_user is not None
-        assert new_user.pseudo == "newuser"
-        assert new_user.email == "newuser@example.com"
-        assert new_user.is_admin == False
-
-
-@pytest.mark.auth
-def test_register_post_duplicate_email(client):
-    """Test l'inscription avec un email déjà utilisé"""
-    # Creer un utilisateur existant
-    with client.application.app_context():
-        existing_user = Utilisateur(
-            pseudo="existing", email="existing@example.com", is_admin=False
-        )
-        existing_user.set_password("password", bcrypt)
-        db.session.add(existing_user)
-        db.session.commit()
-
-    # Essayer de creer un nouvel utilisateur avec le meme email
-    response = client.post(
-        "/register",
-        data={
-            "pseudo": "newuser",
-            "email": "existing@example.com",  # Email déjà utilisé
-            "password": "newpassword",
-            "confirm_password": "newpassword",
-            "is_admin": False,
-        },
-        follow_redirects=True,
-    )
-
-    assert response.status_code == 200
-    # Verifier que l'utilisateur n'a pas été créé (compter les utilisateurs)
-    with client.application.app_context():
-        user_count = Utilisateur.query.filter_by(email="existing@example.com").count()
-        assert user_count == 1  # Seul l'utilisateur existant doit être présent
-
-
-@pytest.mark.auth
-def test_register_post_duplicate_pseudo(client):
-    """Test l'inscription avec un pseudo déjà utilisé"""
-    # Creer un utilisateur existant
-    with client.application.app_context():
-        existing_user = Utilisateur(
-            pseudo="existing", email="existing@example.com", is_admin=False
-        )
-        existing_user.set_password("password", bcrypt)
-        db.session.add(existing_user)
-        db.session.commit()
-
-    # Essayer de creer un nouvel utilisateur avec le meme pseudo
-    response = client.post(
-        "/register",
-        data={
-            "pseudo": "existing",  # Pseudo déjà utilisé
-            "email": "newuser@example.com",
-            "password": "newpassword",
-            "confirm_password": "newpassword",
-            "is_admin": False,
-        },
-        follow_redirects=True,
-    )
-
-    assert response.status_code == 200
-    # Verifier que l'utilisateur n'a pas été créé (compter les utilisateurs)
-    with client.application.app_context():
-        user_count = Utilisateur.query.filter_by(pseudo="existing").count()
-        assert user_count == 1  # Seul l'utilisateur existant doit être présent
+        if expected_success:
+            # Pour les inscriptions réussies, vérifier que l'utilisateur a été créé
+            new_user = Utilisateur.query.filter_by(email=user_data["email"]).first()
+            assert new_user is not None
+            assert new_user.pseudo == user_data["pseudo"]
+            assert new_user.email == user_data["email"]
+            assert new_user.is_admin == user_data["is_admin"]
+        else:
+            # Pour les échecs, vérifier que l'utilisateur n'a pas été créé
+            user_count = Utilisateur.query.filter_by(**{check_field: check_value}).count()
+            assert user_count == 1  # Seul l'utilisateur existant doit être présent
 
 
 @pytest.mark.auth
@@ -118,42 +116,54 @@ def test_login_get(client):
 
 
 @pytest.mark.auth
-def test_login_post_success(client):
-    """Test la connexion avec des identifiants valides"""
-    # Créer un utilisateur pour le test
-    with client.application.app_context():
-        user = Utilisateur(
-            pseudo="testlogin", email="testlogin@example.com", is_admin=False
-        )
-        user.set_password("testpassword", bcrypt)
-        db.session.add(user)
-        db.session.commit()
+@pytest.mark.parametrize(
+    "test_name,setup_user,login_data,expected_success",
+    [
+        # Test connexion réussie
+        (
+            "success",
+            {"pseudo": "testlogin", "email": "testlogin@example.com", "password": "testpassword"},
+            {"pseudo": "testlogin", "password": "testpassword"},
+            True,
+        ),
+        # Test identifiants invalides
+        (
+            "invalid_credentials",
+            None,
+            {"pseudo": "nonexistent", "password": "wrongpassword"},
+            False,
+        ),
+    ],
+)
+def test_login_post_parametrize(client, test_name, setup_user, login_data, expected_success):
+    """Test la connexion avec différents scénarios (paramétrisé)"""
+    # Créer un utilisateur pour le test si nécessaire
+    if setup_user:
+        with client.application.app_context():
+            user = Utilisateur(
+                pseudo=setup_user["pseudo"],
+                email=setup_user["email"],
+                is_admin=False,
+            )
+            user.set_password(setup_user["password"], bcrypt)
+            db.session.add(user)
+            db.session.commit()
 
     # Essayer de se connecter
     response = client.post(
         "/login",
-        data={"pseudo": "testlogin", "password": "testpassword"},
+        data=login_data,
         follow_redirects=True,
     )
 
     assert response.status_code == 200
-    # Vérifier que l'utilisateur est bien connecté
+    
+    # Vérifier le résultat de la connexion
     with client.session_transaction() as sess:
-        assert "_user_id" in sess
-
-
-def test_login_post_invalid_credentials(client):
-    """Test la connexion avec des identifiants invalides"""
-    response = client.post(
-        "/login",
-        data={"pseudo": "nonexistent", "password": "wrongpassword"},
-        follow_redirects=True,
-    )
-
-    assert response.status_code == 200
-    # Verifier que l'utilisateur n'est pas connecte
-    with client.session_transaction() as sess:
-        assert "user_id" not in sess
+        if expected_success:
+            assert "_user_id" in sess
+        else:
+            assert "user_id" not in sess
 
 
 @pytest.mark.auth
