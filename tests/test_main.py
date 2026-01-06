@@ -1310,6 +1310,277 @@ class TestFiltrerEtablissements:
         db.session.delete(etab2)
         db.session.commit()
 
+
+# Tests pour les routes API manquantes
+@pytest.mark.api
+def test_api_villes_sans_parametre(client):
+    """Test l'API /api/villes sans paramètre de recherche"""
+    # Créer des établissements avec différentes villes pour le test
+    with client.application.app_context():
+        etab1 = Etablissement(nom="Boulangerie Lyon", ville="Lyon", adresse="123 Rue de Lyon", code_postal="69001")
+        etab2 = Etablissement(nom="Patisserie Paris", ville="Paris", adresse="456 Rue de Paris", code_postal="75001")
+        etab3 = Etablissement(nom="Boulangerie Marseille", ville="Marseille", adresse="789 Rue de Marseille", code_postal="13001")
+        db.session.add_all([etab1, etab2, etab3])
+        db.session.commit()
+
+    # Appeler l'API sans paramètre
+    response = client.get("/api/villes")
+    assert response.status_code == 200
+    assert response.is_json
+    
+    data = response.get_json()
+    assert isinstance(data, list)
+    assert len(data) == 3
+    assert "Lyon" in data
+    assert "Paris" in data
+    assert "Marseille" in data
+    
+    # Nettoyage
+    with client.application.app_context():
+        db.session.delete(etab1)
+        db.session.delete(etab2)
+        db.session.delete(etab3)
+        db.session.commit()
+
+
+@pytest.mark.api
+def test_api_villes_avec_parametre(client):
+    """Test l'API /api/villes avec paramètre de recherche"""
+    # Créer des établissements avec différentes villes pour le test
+    with client.application.app_context():
+        etab1 = Etablissement(nom="Boulangerie Lyon", ville="Lyon", adresse="123 Rue de Lyon", code_postal="69001")
+        etab2 = Etablissement(nom="Patisserie Paris", ville="Paris", adresse="456 Rue de Paris", code_postal="75001")
+        etab3 = Etablissement(nom="Boulangerie Marseille", ville="Marseille", adresse="789 Rue de Marseille", code_postal="13001")
+        db.session.add_all([etab1, etab2, etab3])
+        db.session.commit()
+
+    # Appeler l'API avec paramètre de recherche
+    response = client.get("/api/villes?q=ly")
+    assert response.status_code == 200
+    assert response.is_json
+    
+    data = response.get_json()
+    assert isinstance(data, list)
+    assert "Lyon" in data
+    assert "Marseille" not in data  # Ne devrait pas être dans les résultats
+    
+    # Test avec un autre paramètre
+    response = client.get("/api/villes?q=par")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert "Paris" in data
+    assert "Lyon" not in data
+    
+    # Nettoyage
+    with client.application.app_context():
+        db.session.delete(etab1)
+        db.session.delete(etab2)
+        db.session.delete(etab3)
+        db.session.commit()
+
+
+@pytest.mark.api
+def test_api_villes_aucune_correspondance(client):
+    """Test l'API /api/villes quand aucune ville ne correspond"""
+    # Créer des établissements avec différentes villes pour le test
+    with client.application.app_context():
+        etab1 = Etablissement(nom="Boulangerie Lyon", ville="Lyon", adresse="123 Rue de Lyon", code_postal="69001")
+        etab2 = Etablissement(nom="Patisserie Paris", ville="Paris", adresse="456 Rue de Paris", code_postal="75001")
+        db.session.add_all([etab1, etab2])
+        db.session.commit()
+
+    # Appeler l'API avec un paramètre qui ne correspond à rien
+    response = client.get("/api/villes?q=zzz")
+    assert response.status_code == 200
+    assert response.is_json
+    
+    data = response.get_json()
+    assert isinstance(data, list)
+    assert len(data) == 0  # Aucune correspondance
+    
+    # Nettoyage
+    with client.application.app_context():
+        db.session.delete(etab1)
+        db.session.delete(etab2)
+        db.session.commit()
+
+
+@pytest.mark.api
+def test_api_etablissements_get(client):
+    """Test l'API /api/etablissements avec méthode GET"""
+    # Créer des établissements et flans de test
+    user = client.application.config["TEST_USER"]
+    with client.application.app_context():
+        etab1 = Etablissement(
+            nom="Boulangerie Test",
+            ville="Lyon",
+            adresse="123 Rue Test",
+            code_postal="69001",
+            id_user=user.id_user,
+            visite=True,
+            label=False,
+        )
+        etab2 = Etablissement(
+            nom="Patisserie Test",
+            ville="Paris",
+            adresse="456 Rue Test",
+            code_postal="75001",
+            id_user=user.id_user,
+            visite=False,
+            label=True,
+        )
+        
+        flan1 = Flan(
+            nom="Flan Vanille",
+            prix=3.5,
+            type_pate="BRISEE",
+            type_saveur="VANILLE",
+            type_texture="CREMEUSE",
+            id_etab=etab1.id_etab,
+            id_user=user.id_user,
+        )
+        
+        db.session.add_all([etab1, etab2, flan1])
+        db.session.commit()
+
+    # Appeler l'API GET sans filtres
+    response = client.get("/api/etablissements")
+    assert response.status_code == 200
+    assert response.is_json
+    
+    data = response.get_json()
+    assert isinstance(data, list)
+    assert len(data) == 2  # Les deux établissements
+    
+    # Vérifier la structure des données
+    for etab_data in data:
+        assert "id_etab" in etab_data
+        assert "nom" in etab_data
+        assert "ville" in etab_data
+        assert "flans" in etab_data
+    
+    # Nettoyage
+    with client.application.app_context():
+        db.session.delete(flan1)
+        db.session.delete(etab1)
+        db.session.delete(etab2)
+        db.session.commit()
+
+
+@pytest.mark.api
+def test_api_etablissements_post(client):
+    """Test l'API /api/etablissements avec méthode POST et filtres"""
+    # Créer des établissements et flans de test
+    user = client.application.config["TEST_USER"]
+    with client.application.app_context():
+        etab1 = Etablissement(
+            nom="Boulangerie Lyon",
+            ville="Lyon",
+            adresse="123 Rue Test",
+            code_postal="69001",
+            id_user=user.id_user,
+            visite=True,
+            label=False,
+        )
+        etab2 = Etablissement(
+            nom="Patisserie Paris",
+            ville="Paris",
+            adresse="456 Rue Test",
+            code_postal="75001",
+            id_user=user.id_user,
+            visite=False,
+            label=True,
+        )
+        
+        flan1 = Flan(
+            nom="Flan Vanille",
+            prix=3.5,
+            type_pate="BRISEE",
+            type_saveur="VANILLE",
+            type_texture="CREMEUSE",
+            id_etab=etab1.id_etab,
+            id_user=user.id_user,
+        )
+        
+        flan2 = Flan(
+            nom="Flan Chocolat",
+            prix=4.0,
+            type_pate="SABLEE",
+            type_saveur="CHOCOLAT",
+            type_texture="MIX_PARFAIT",
+            id_etab=etab2.id_etab,
+            id_user=user.id_user,
+        )
+        
+        db.session.add_all([etab1, etab2, flan1, flan2])
+        db.session.commit()
+
+    # Appeler l'API POST avec des filtres
+    response = client.post("/api/etablissements", json={
+        "ville": "Lyon",
+        "visite": "oui",
+        "type_pate": "BRISEE"
+    })
+    assert response.status_code == 200
+    assert response.is_json
+    
+    data = response.get_json()
+    assert isinstance(data, list)
+    assert len(data) == 1  # Un seul établissement correspond
+    assert data[0]["nom"] == "Boulangerie Lyon"
+    assert data[0]["ville"] == "Lyon"
+    
+    # Test avec filtre par type de saveur
+    response = client.post("/api/etablissements", json={
+        "type_saveur": "CHOCOLAT"
+    })
+    assert response.status_code == 200
+    data = response.get_json()
+    assert len(data) == 1
+    assert data[0]["nom"] == "Patisserie Paris"
+    
+    # Nettoyage
+    with client.application.app_context():
+        db.session.delete(flan1)
+        db.session.delete(flan2)
+        db.session.delete(etab1)
+        db.session.delete(etab2)
+        db.session.commit()
+
+
+@pytest.mark.api
+def test_api_etablissements_aucune_correspondance(client):
+    """Test l'API /api/etablissements quand aucun établissement ne correspond"""
+    # Créer un établissement de test
+    user = client.application.config["TEST_USER"]
+    with client.application.app_context():
+        etab1 = Etablissement(
+            nom="Boulangerie Test",
+            ville="Lyon",
+            adresse="123 Rue Test",
+            code_postal="69001",
+            id_user=user.id_user,
+        )
+        db.session.add(etab1)
+        db.session.commit()
+
+    # Appeler l'API avec des filtres qui ne correspondent à rien
+    response = client.post("/api/etablissements", json={
+        "ville": "Marseille",
+        "visite": "oui"
+    })
+    assert response.status_code == 200
+    assert response.is_json
+    
+    data = response.get_json()
+    assert isinstance(data, list)
+    assert len(data) == 0  # Aucune correspondance
+    
+    # Nettoyage
+    with client.application.app_context():
+        db.session.delete(etab1)
+        db.session.commit()
+
     def test_filtrer_par_type_texture(self, client):
         """Test le filtrage par type de texture."""
         # Créer des données de test
