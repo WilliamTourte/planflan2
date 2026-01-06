@@ -13,10 +13,10 @@
 <!-- Boutons retour -->
 <div class="action-buttons">
     <button onclick="goBackOrRedirect('{{ url_for('main.afficher_etablissement_unique', id_etab=flan.etablissement.id_etab) }}')" class="btn btn-danger" title="Retour à la page précédente">
-        <i class="bi bi-arrow-return-left"></i> Retour
+        <i class="bi bi-arrow-return-left me-2"></i> Retour
     </button>
-    <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=flan.etablissement.id_etab) }}" class="btn btn-primary" title="Retour à l'établissement">
-        <i class="bi bi-house"></i> Établissement
-    </a>
+    <button href="{{ url_for('main.afficher_etablissement_unique', id_etab=flan.etablissement.id_etab) }}" class="btn btn-success" title="Retour à l'établissement">
+        <i class="bi bi-house me-2"></i>Établissement
+    </button>
 </div>
 {% endblock %}
