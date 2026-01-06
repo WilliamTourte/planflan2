@@ -738,7 +738,7 @@ def supprimer_evaluation(id_eval):
 
 def afficher_badge_etablissement(etablissement):
     if hasattr(etablissement, "label") and etablissement.label:
-        return '<span class="badge badge-labellise">❤️ Labellisé</span>'
+        return '<span class="badge badge-labellise">❤️</span>'
     return ""
 
 

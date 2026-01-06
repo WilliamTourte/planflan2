@@ -76,13 +76,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-<!-- Bouton "Proposer une adresse" (sous la carte) -->
-<div class="mt-3 mb-3" style="z-index: 1;">
-    <a href="{{ url_for('maps.proposer_etablissement') }}" class="btn btn-success " role="button">
-        Proposer une adresse
-    </a>
 </div>
 
+
+<div class="mt-3 mb-3" style="position: relative; z-index: 100;">
+    <a href="{{ url_for('maps.proposer_etablissement') }}" class="btn btn-success" role="button">
+        Proposer une adresse
+    </a>
 </div>
 
 

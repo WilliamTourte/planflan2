@@ -32,7 +32,7 @@
 
 {% macro afficher_badge_etablissement(etablissement) %}
     {% if etablissement.label %}
-        <span class="badge badge-labellise">❤️ Labellisé</span>
+        <span class="badge badge-labellise">❤️</span>
     {% endif %}
 {% endmacro %}
 
@@ -65,12 +65,11 @@
             </div>
             <div class="infowindow-header">
                 <h3>{{ etablissement.nom | enlever_accents }}</h3>
-            </div>
-            <div class="infowindow-body">
                 <p class="adresse">
                     {{ etablissement.adresse }}, {{ etablissement.ville }}
                 </p>
-            </div>
+            </div>                     
+            
         </a>
         <!-- Partie non cliquable avec la liste des flans -->
         <div class="flans-list">

@@ -100,25 +100,40 @@ function createEtablissementMarker(map, etablissement, baseUrl = window.location
 
     // Ne pas charger le popup immédiatement, mais seulement au clic
     marker.on('click', function() {
-        if (!marker.getPopup()) {
-            marker.bindPopup("Chargement en cours...");
-            marker.openPopup();
-            fetch(`/get_infowindow_content?id_etab=${etablissement.id_etab}`)
-                .then(response => response.text())
-                .then(content => {
-                    marker.setPopupContent(content);
-                })
-                .catch(error => {
-                    console.error('Erreur lors du chargement du popup:', error);
-                    let popupContent = `<div class="infowindow-content"><h4>${etablissement.nom}</h4>`;
-                    popupContent += `<p>${etablissement.adresse}, ${etablissement.ville}</p>`;
-                    popupContent += `<a href="${baseUrl}/etablissement/${etablissement.id_etab}" class="btn btn-success">Voir plus</a></div>`;
-                    marker.setPopupContent(popupContent);
-                });
-        } else {
-            marker.openPopup();
-        }
-    });
+    if (!marker.getPopup()) {
+        // Créer un conteneur avec un z-index très élevé
+        const popupContainer = L.DomUtil.create('div', 'custom-popup-container');
+        popupContainer.style.zIndex = '999999';
+        marker.bindPopup(popupContainer, {
+
+    autoPan: true,
+
+    autoPanPadding: [30,70],
+    keepInView: true,
+    closeButton: true,
+ 
+}).openPopup();
+       
+
+        fetch(`/get_infowindow_content?id_etab=${etablissement.id_etab}`)
+            .then(response => response.text())
+            .then(content => {
+                popupContainer.innerHTML = content;
+                // Forcer le repositionnement du popup
+                marker._popup.update();
+            })
+            .catch(error => {
+                console.error('Erreur lors du chargement du popup:', error);
+                let popupContent = `<div class="infowindow-content"><h4>${etablissement.nom}</h4>`;
+                popupContent += `<p>${etablissement.adresse}, ${etablissement.ville}</p>`;
+                popupContent += `<a href="${baseUrl}/etablissement/${etablissement.id_etab}" class="btn btn-success">Voir plus</a></div>`;
+                popupContainer.innerHTML = popupContent;
+                marker._popup.update();
+            });
+    } else {
+        marker.openPopup();
+    }
+});
 
     marker.options.etablissement = etablissement;
     return marker;
@@ -327,17 +342,8 @@ function initMap() {
 
 div.innerHTML = `
     <div class="legende-container">
-        <div class="legende-item">
-            ❤️
-            <span class="legende-text">Labellisé</span>
-        </div>
-        <div class="legende-item">
-            ✅
-            <span class="legende-text">Visité</span>
-        </div>
-        <div class="legende-item">
-            👋
-            <span class="legende-text">Non visité</span>
+        <div class="legende-text">
+            ❤️ Labellisé ✅ Visité 👋 Non visité
         </div>
     </div>
 `;
