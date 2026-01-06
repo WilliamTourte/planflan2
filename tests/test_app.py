@@ -15,9 +15,3 @@ def client():
         with app.app_context():
             db.create_all()
         yield client
-
-
-@pytest.mark.app
-def test_example(client):
-    response = client.get("/")
-    assert response.status_code == 200

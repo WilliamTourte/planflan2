@@ -17,22 +17,22 @@ import pytest
 
 
 @pytest.mark.main
-def test_example(client):
-    response = client.get("/")
-    assert response.status_code == 200
-
-
-@pytest.mark.main
-def test_liste_etab(client):
-    response = client.get("/liste_etablissements")
-    assert response.status_code == 200
-
-
-@pytest.mark.main
-def test_rechercher(client):
-    response = client.get("/rechercher")
-    assert response.status_code == 200
-    assert b"Rechercher" in response.data
+@pytest.mark.parametrize(
+    "route,expected_status,expected_content",
+    [
+        ("/", 200, None),
+        ("/liste_etablissements", 200, None),
+        ("/rechercher", 200, b"Rechercher"),
+        ("/dashboard", 200, b"Tableau de bord"),
+    ],
+)
+def test_route_status(client, route, expected_status, expected_content):
+    """Test multiple routes with parameterized inputs"""
+    response = client.get(route)
+    assert response.status_code == expected_status
+    
+    if expected_content is not None:
+        assert expected_content in response.data
 
 
 def test_afficher_etablissement_unique(client):
@@ -486,11 +486,7 @@ def test_supprimer_evaluation(client):
         ), "L'évaluation n'a pas été supprimée de la base de données"
 
 
-def test_dashboard_get(client):
-    """Test la route dashboard en GET"""
-    response = client.get("/dashboard")
-    assert response.status_code == 200
-    assert b"Tableau de bord" in response.data
+
 
 
 def test_dashboard_post_update_profile(client):

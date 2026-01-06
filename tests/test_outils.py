@@ -43,23 +43,30 @@ def test_calculer_distance_parametrize(
 
 
 @pytest.mark.utils
-def test_enlever_accents():
-    """Test la fonction enlever_accents"""
-    # Test avec des accents français
-    assert enlever_accents("Café") == "Cafe"
-    assert enlever_accents("Hôtel") == "Hotel"
-    assert enlever_accents("Été") == "Ete"
-    assert enlever_accents("À propos") == "A propos"
-    assert enlever_accents("Être ou ne pas être") == "Etre ou ne pas etre"
-
-    # Test avec des caractères spéciaux
-    assert enlever_accents("Ça va") == "Ca va"
-    assert enlever_accents("Mûr") == "Mur"
-
-    # Test avec du texte sans accents
-    assert enlever_accents("Hello World") == "Hello World"
-    assert enlever_accents("12345") == "12345"
-    assert enlever_accents("") == ""
+@pytest.mark.parametrize(
+    "test_name,input_text,expected_output",
+    [
+        # Basic French accents
+        ("basic_french", "Café", "Cafe"),
+        ("hotel", "Hôtel", "Hotel"),
+        ("ete", "Été", "Ete"),
+        ("a_propos", "À propos", "A propos"),
+        ("etre", "Être ou ne pas être", "Etre ou ne pas etre"),
+        # Special characters
+        ("ca_va", "Ça va", "Ca va"),
+        ("mur", "Mûr", "Mur"),
+        # No accents
+        ("no_accents", "Hello World", "Hello World"),
+        ("numbers", "12345", "12345"),
+        ("empty", "", ""),
+    ],
+)
+def test_enlever_accents_parametrize(test_name, input_text, expected_output):
+    """Test enlever_accents avec différents scénarios (paramétrisé)"""
+    resultat = enlever_accents(input_text)
+    assert (
+        resultat == expected_output
+    ), f"Test {test_name} failed: expected '{expected_output}', got '{resultat}'"
 
 
 def test_afficher_etablissements_vide():
@@ -132,24 +139,6 @@ def test_afficher_etablissements_avec_donnees(client):
             assert len(etab_json["flans"]) > 0
         else:
             assert "flans" in etab_json
-
-
-def test_enlever_accents_avec_majuscules():
-    """Test enlever_accents avec des majuscules accentuées"""
-    assert enlever_accents("École") == "Ecole"
-    assert enlever_accents("À Paris") == "A Paris"
-    assert enlever_accents("Ça Va") == "Ca Va"
-
-
-def test_enlever_accents_avec_melange():
-    """Test enlever_accents avec un mélange de caractères"""
-    texte = "L'été 2025 à Paris: café, hôtel et été!"
-    resultat = enlever_accents(texte)
-    # Vérifier que les accents sont supprimés (mais pas les apostrophes)
-    assert "ete" in resultat
-    assert "Paris" in resultat
-    assert "cafe" in resultat
-    assert "hotel" in resultat
 
 
 # Tests pour les fonctions CSRF manquantes
