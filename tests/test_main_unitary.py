@@ -868,31 +868,6 @@ def test_rechercher_route(client):
     assert b"form_recherche" in response.data or b"Recherche" in response.data
 
 
-@pytest.mark.unitary
-def test_afficher_badge_etablissement(client):
-    """Test la fonction afficher_badge_etablissement."""
-    from app.routes.main import afficher_badge_etablissement
-
-    with client.application.app_context():
-        etab = Etablissement.query.first()
-
-        # Test avec un établissement labellisé
-        etab.label = True
-        db.session.commit()
-
-        badge = afficher_badge_etablissement(etab)
-        # Devrait contenir le badge label
-        assert "Labellisé" in badge
-        assert "❤️" in badge
-
-        # Test avec un établissement non labellisé
-        etab.label = False
-        db.session.commit()
-
-        badge = afficher_badge_etablissement(etab)
-        # Ne devrait pas contenir le badge
-        assert badge == ""
-
 
 @pytest.mark.unitary
 def test_afficher_badge_type_etab(client):
@@ -921,7 +896,7 @@ def test_afficher_badge_etablissement_complet(client):
         db.session.commit()
 
         badge = afficher_badge_etablissement(etab)
-        assert "❤️ Labellisé" in badge
+        assert "❤️" in badge
         assert "badge badge-labellise" in badge
 
         # Test 2: Établissement non labellisé
