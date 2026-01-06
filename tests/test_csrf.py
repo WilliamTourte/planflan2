@@ -117,9 +117,7 @@ def test_upload_route_responds(client):
     # Désactiver temporairement CSRF pour ce test
     client.application.config["WTF_CSRF_ENABLED"] = False
     # Tester sans fichier - devrait rediriger
-    response = client.post(
-        "/upload", data={}, content_type="multipart/form-data"
-    )
+    response = client.post("/upload", data={}, content_type="multipart/form-data")
     # Devrait rediriger
     assert response.status_code == 302
 
@@ -130,9 +128,7 @@ def test_supprimer_compte_route_requires_login(client):
     # Désactiver temporairement CSRF pour ce test
     client.application.config["WTF_CSRF_ENABLED"] = False
     # Tester sans être connecté - devrait rediriger vers la page de login
-    response = client.post(
-        "/supprimer_compte", data={"password": "testpassword"}
-    )
+    response = client.post("/supprimer_compte", data={"password": "testpassword"})
     # Devrait rediriger vers la page de login
     assert response.status_code == 302
 

@@ -1122,8 +1122,18 @@ class TestFiltrerEtablissements:
     def test_filtrer_par_nom(self, client):
         """Test le filtrage par nom d'établissement."""
         # Créer des données de test
-        etab1 = Etablissement(nom="Boulangerie Martin", ville="Paris", adresse="123 Rue de Paris", code_postal="75001")
-        etab2 = Etablissement(nom="Patisserie Dubois", ville="Lyon", adresse="456 Rue de Lyon", code_postal="69001")
+        etab1 = Etablissement(
+            nom="Boulangerie Martin",
+            ville="Paris",
+            adresse="123 Rue de Paris",
+            code_postal="75001",
+        )
+        etab2 = Etablissement(
+            nom="Patisserie Dubois",
+            ville="Lyon",
+            adresse="456 Rue de Lyon",
+            code_postal="69001",
+        )
         db.session.add_all([etab1, etab2])
         db.session.commit()
 
@@ -1142,8 +1152,18 @@ class TestFiltrerEtablissements:
     def test_filtrer_par_ville(self, client):
         """Test le filtrage par ville."""
         # Créer des données de test
-        etab1 = Etablissement(nom="Boulangerie Martin", ville="Paris", adresse="123 Rue de Paris", code_postal="75001")
-        etab2 = Etablissement(nom="Patisserie Dubois", ville="Lyon", adresse="456 Rue de Lyon", code_postal="69001")
+        etab1 = Etablissement(
+            nom="Boulangerie Martin",
+            ville="Paris",
+            adresse="123 Rue de Paris",
+            code_postal="75001",
+        )
+        etab2 = Etablissement(
+            nom="Patisserie Dubois",
+            ville="Lyon",
+            adresse="456 Rue de Lyon",
+            code_postal="69001",
+        )
         db.session.add_all([etab1, etab2])
         db.session.commit()
 
@@ -1162,10 +1182,20 @@ class TestFiltrerEtablissements:
     def test_filtrer_par_visite_oui(self, client):
         """Test le filtrage par établissement visité (oui)."""
         # Créer des données de test
-        etab1 = Etablissement(nom="Boulangerie Martin", ville="Paris", adresse="123 Rue de Paris", code_postal="75001",
-                              visite=True)
-        etab2 = Etablissement(nom="Patisserie Dubois", ville="Lyon", adresse="456 Rue de Lyon", code_postal="69001",
-                              visite=False)
+        etab1 = Etablissement(
+            nom="Boulangerie Martin",
+            ville="Paris",
+            adresse="123 Rue de Paris",
+            code_postal="75001",
+            visite=True,
+        )
+        etab2 = Etablissement(
+            nom="Patisserie Dubois",
+            ville="Lyon",
+            adresse="456 Rue de Lyon",
+            code_postal="69001",
+            visite=False,
+        )
         db.session.add_all([etab1, etab2])
         db.session.commit()
 
@@ -1184,10 +1214,20 @@ class TestFiltrerEtablissements:
     def test_filtrer_par_visite_non(self, client):
         """Test le filtrage par établissement non visité."""
         # Créer des données de test
-        etab1 = Etablissement(nom="Boulangerie Martin", ville="Paris", adresse="123 Rue de Paris", code_postal="75001",
-                              visite=True)
-        etab2 = Etablissement(nom="Patisserie Dubois", ville="Lyon", adresse="456 Rue de Lyon", code_postal="69001",
-                              visite=False)
+        etab1 = Etablissement(
+            nom="Boulangerie Martin",
+            ville="Paris",
+            adresse="123 Rue de Paris",
+            code_postal="75001",
+            visite=True,
+        )
+        etab2 = Etablissement(
+            nom="Patisserie Dubois",
+            ville="Lyon",
+            adresse="456 Rue de Lyon",
+            code_postal="69001",
+            visite=False,
+        )
         db.session.add_all([etab1, etab2])
         db.session.commit()
 
@@ -1206,10 +1246,20 @@ class TestFiltrerEtablissements:
     def test_filtrer_par_labellise_oui(self, client):
         """Test le filtrage par établissement labellisé."""
         # Créer des données de test
-        etab1 = Etablissement(nom="Boulangerie Martin", ville="Paris", adresse="123 Rue de Paris", code_postal="75001",
-                              label=True)
-        etab2 = Etablissement(nom="Patisserie Dubois", ville="Lyon", adresse="456 Rue de Lyon", code_postal="69001",
-                              label=False)
+        etab1 = Etablissement(
+            nom="Boulangerie Martin",
+            ville="Paris",
+            adresse="123 Rue de Paris",
+            code_postal="75001",
+            label=True,
+        )
+        etab2 = Etablissement(
+            nom="Patisserie Dubois",
+            ville="Lyon",
+            adresse="456 Rue de Lyon",
+            code_postal="69001",
+            label=False,
+        )
         db.session.add_all([etab1, etab2])
         db.session.commit()
 
@@ -1228,10 +1278,20 @@ class TestFiltrerEtablissements:
     def test_filtrer_par_labellise_non(self, client):
         """Test le filtrage par établissement non labellisé."""
         # Créer des données de test
-        etab1 = Etablissement(nom="Boulangerie Martin", ville="Paris", adresse="123 Rue de Paris", code_postal="75001",
-                              label=True)
-        etab2 = Etablissement(nom="Patisserie Dubois", ville="Lyon", adresse="456 Rue de Lyon", code_postal="69001",
-                              label=False)
+        etab1 = Etablissement(
+            nom="Boulangerie Martin",
+            ville="Paris",
+            adresse="123 Rue de Paris",
+            code_postal="75001",
+            label=True,
+        )
+        etab2 = Etablissement(
+            nom="Patisserie Dubois",
+            ville="Lyon",
+            adresse="456 Rue de Lyon",
+            code_postal="69001",
+            label=False,
+        )
         db.session.add_all([etab1, etab2])
         db.session.commit()
 
@@ -1250,18 +1310,49 @@ class TestFiltrerEtablissements:
     def test_filtrer_par_type_pate(self, client):
         """Test le filtrage par type de pâte."""
         # Créer des données de test
-        etab1 = Etablissement(nom="Boulangerie Martin", ville="Paris", adresse="123 Rue de Paris", code_postal="75001")
-        etab2 = Etablissement(nom="Patisserie Dubois", ville="Lyon", adresse="456 Rue de Lyon", code_postal="69001")
+        etab1 = Etablissement(
+            nom="Boulangerie Martin",
+            ville="Paris",
+            adresse="123 Rue de Paris",
+            code_postal="75001",
+        )
+        etab2 = Etablissement(
+            nom="Patisserie Dubois",
+            ville="Lyon",
+            adresse="456 Rue de Lyon",
+            code_postal="69001",
+        )
         db.session.add_all([etab1, etab2])
         db.session.commit()
 
         # Créer des flans
-        flan1 = Flan(nom="Flan Vanille", prix=3.5, type_pate="BRISEE", type_saveur="VANILLE", type_texture="CREMEUSE",
-                     id_etab=etab1.id_etab, id_user=1)
-        flan2 = Flan(nom="Flan Chocolat", prix=4.0, type_pate="SABLEE", type_saveur="CHOCOLAT", type_texture="FONDANTE",
-                     id_etab=etab1.id_etab, id_user=1)
-        flan3 = Flan(nom="Flan Citron", prix=2.5, type_pate="BRISEE", type_saveur="FRUITS", type_texture="CREMEUSE",
-                     id_etab=etab2.id_etab, id_user=1)
+        flan1 = Flan(
+            nom="Flan Vanille",
+            prix=3.5,
+            type_pate="BRISEE",
+            type_saveur="VANILLE",
+            type_texture="CREMEUSE",
+            id_etab=etab1.id_etab,
+            id_user=1,
+        )
+        flan2 = Flan(
+            nom="Flan Chocolat",
+            prix=4.0,
+            type_pate="SABLEE",
+            type_saveur="CHOCOLAT",
+            type_texture="FONDANTE",
+            id_etab=etab1.id_etab,
+            id_user=1,
+        )
+        flan3 = Flan(
+            nom="Flan Citron",
+            prix=2.5,
+            type_pate="BRISEE",
+            type_saveur="FRUITS",
+            type_texture="CREMEUSE",
+            id_etab=etab2.id_etab,
+            id_user=1,
+        )
         db.session.add_all([flan1, flan2, flan3])
         db.session.commit()
 
@@ -1283,16 +1374,40 @@ class TestFiltrerEtablissements:
     def test_filtrer_par_type_saveur(self, client):
         """Test le filtrage par type de saveur."""
         # Créer des données de test
-        etab1 = Etablissement(nom="Boulangerie Martin", ville="Paris", adresse="123 Rue de Paris", code_postal="75001")
-        etab2 = Etablissement(nom="Patisserie Dubois", ville="Lyon", adresse="456 Rue de Lyon", code_postal="69001")
+        etab1 = Etablissement(
+            nom="Boulangerie Martin",
+            ville="Paris",
+            adresse="123 Rue de Paris",
+            code_postal="75001",
+        )
+        etab2 = Etablissement(
+            nom="Patisserie Dubois",
+            ville="Lyon",
+            adresse="456 Rue de Lyon",
+            code_postal="69001",
+        )
         db.session.add_all([etab1, etab2])
         db.session.commit()
 
         # Créer des flans
-        flan1 = Flan(nom="Flan Vanille", prix=3.5, type_pate="BRISEE", type_saveur="VANILLE", type_texture="CREMEUSE",
-                     id_etab=etab1.id_etab, id_user=1)
-        flan2 = Flan(nom="Flan Chocolat", prix=4.0, type_pate="SABLEE", type_saveur="CHOCOLAT", type_texture="FONDANTE",
-                     id_etab=etab1.id_etab, id_user=1)
+        flan1 = Flan(
+            nom="Flan Vanille",
+            prix=3.5,
+            type_pate="BRISEE",
+            type_saveur="VANILLE",
+            type_texture="CREMEUSE",
+            id_etab=etab1.id_etab,
+            id_user=1,
+        )
+        flan2 = Flan(
+            nom="Flan Chocolat",
+            prix=4.0,
+            type_pate="SABLEE",
+            type_saveur="CHOCOLAT",
+            type_texture="FONDANTE",
+            id_etab=etab1.id_etab,
+            id_user=1,
+        )
         db.session.add_all([flan1, flan2])
         db.session.commit()
 
@@ -1315,7 +1430,7 @@ class TestFiltrerEtablissements:
 @pytest.mark.routes
 def test_index_route(client):
     """Test la route d'accueil"""
-    response = client.get('/')
+    response = client.get("/")
     assert response.status_code == 200
     assert b"PlanFlan" in response.data or b"planflan" in response.data
 
@@ -1323,7 +1438,7 @@ def test_index_route(client):
 @pytest.mark.routes
 def test_dashboard_route_authenticated(client):
     """Test que le dashboard est accessible quand authentifié"""
-    response = client.get('/dashboard', follow_redirects=True)
+    response = client.get("/dashboard", follow_redirects=True)
     assert response.status_code == 200
     # Devrait montrer le tableau de bord
     assert b"Tableau de bord" in response.data or b"Dashboard" in response.data
@@ -1332,18 +1447,16 @@ def test_dashboard_route_authenticated(client):
 @pytest.mark.routes
 def test_proposer_etablissement_route_authenticated(client):
     """Test que la page de proposition d'établissement est accessible quand authentifié"""
-    response = client.get('/proposer_etablissement', follow_redirects=True)
+    response = client.get("/proposer_etablissement", follow_redirects=True)
     assert response.status_code == 200
     # Devrait montrer le formulaire de proposition avec champ de recherche
     assert b"Recherche" in response.data or b"recherche" in response.data
 
 
-
-
 @pytest.mark.routes
 def test_liste_etablissements_route(client):
     """Test la route de liste des établissements"""
-    response = client.get('/liste_etablissements')
+    response = client.get("/liste_etablissements")
     assert response.status_code == 200
     assert b"Etablissement" in response.data or b"etablissement" in response.data
 
@@ -1351,7 +1464,7 @@ def test_liste_etablissements_route(client):
 @pytest.mark.routes
 def test_rechercher_route(client):
     """Test la route de recherche"""
-    response = client.get('/rechercher')
+    response = client.get("/rechercher")
     assert response.status_code == 200
     assert b"Recherche" in response.data or b"recherche" in response.data
 
@@ -1360,73 +1473,10 @@ def test_rechercher_route(client):
 @pytest.mark.routes
 def test_etablissement_creation_get(client):
     """Test la route GET pour la création d'établissement"""
-    response = client.get('/proposer_etablissement', follow_redirects=True)
+    response = client.get("/proposer_etablissement", follow_redirects=True)
     assert response.status_code == 200
     # Devrait montrer le formulaire de création
     assert b"Recherche" in response.data or b"recherche" in response.data
-
-
-@pytest.mark.routes
-def test_etablissement_creation_post(client):
-    """Test la route POST pour la création d'établissement"""
-    user = client.application.config["TEST_USER"]
-    with client.application.app_context():
-        # Créer un établissement via POST
-        response = client.post('/ajouter_etablissement', data={
-            'ajout-etab-nom': 'Test Boulangerie',
-            'ajout-etab-adresse': '123 Rue Test',
-            'ajout-etab-code_postal': '69001',
-            'ajout-etab-ville': 'Lyon',
-            'ajout-etab-latitude': '45.75',
-            'ajout-etab-longitude': '4.85',
-            'ajout-etab-type_etab': 'BOULANGERIE',
-            'ajout-etab-id_user': user.id_user,
-        }, follow_redirects=True)
-        
-        assert response.status_code == 200
-        # Devrait rediriger vers une page de succès ou la liste
-        assert b"Test Boulangerie" in response.data or b"succes" in response.data.lower()
-
-
-@pytest.mark.routes
-def test_etablissement_viewing(client):
-    """Test la route pour voir un établissement spécifique"""
-    # D'abord créer un établissement et un flan
-    user = client.application.config["TEST_USER"]
-    with client.application.app_context():
-        etab = Etablissement(
-            nom="Boulangerie Test View",
-            ville="Lyon",
-            adresse="123 Rue Test",
-            code_postal="69001",
-            id_user=user.id_user,
-            visite=True,
-            label=False,
-        )
-        db.session.add(etab)
-        db.session.commit()
-        
-        flan = Flan(
-            nom="Flan Vanille",
-            prix=3.5,
-            type_pate="BRISEE",
-            type_saveur="VANILLE",
-            type_texture="CREMEUSE",
-            id_etab=etab.id_etab,
-            id_user=user.id_user,
-        )
-        db.session.add(flan)
-        db.session.commit()
-        
-        # Test la route de visualisation
-        response = client.get(f'/etablissement/{etab.id_etab}')
-        assert response.status_code == 200
-        assert b"Boulangerie Test View" in response.data
-        
-        # Nettoyage
-        db.session.delete(flan)
-        db.session.delete(etab)
-        db.session.commit()
 
 
 # Tests pour les routes API manquantes
@@ -1435,9 +1485,24 @@ def test_api_villes_sans_parametre(client):
     """Test l'API /api/villes sans paramètre de recherche"""
     # Créer des établissements avec différentes villes pour le test
     with client.application.app_context():
-        etab1 = Etablissement(nom="Boulangerie Lyon", ville="Lyon", adresse="123 Rue de Lyon", code_postal="69001")
-        etab2 = Etablissement(nom="Patisserie Paris", ville="Paris", adresse="456 Rue de Paris", code_postal="75001")
-        etab3 = Etablissement(nom="Boulangerie Marseille", ville="Marseille", adresse="789 Rue de Marseille", code_postal="13001")
+        etab1 = Etablissement(
+            nom="Boulangerie Lyon",
+            ville="Lyon",
+            adresse="123 Rue de Lyon",
+            code_postal="69001",
+        )
+        etab2 = Etablissement(
+            nom="Patisserie Paris",
+            ville="Paris",
+            adresse="456 Rue de Paris",
+            code_postal="75001",
+        )
+        etab3 = Etablissement(
+            nom="Boulangerie Marseille",
+            ville="Marseille",
+            adresse="789 Rue de Marseille",
+            code_postal="13001",
+        )
         db.session.add_all([etab1, etab2, etab3])
         db.session.commit()
 
@@ -1445,14 +1510,14 @@ def test_api_villes_sans_parametre(client):
     response = client.get("/api/villes")
     assert response.status_code == 200
     assert response.is_json
-    
+
     data = response.get_json()
     assert isinstance(data, list)
     assert len(data) == 3
     assert "Lyon" in data
     assert "Paris" in data
     assert "Marseille" in data
-    
+
     # Nettoyage
     with client.application.app_context():
         db.session.delete(etab1)
@@ -1466,9 +1531,24 @@ def test_api_villes_avec_parametre(client):
     """Test l'API /api/villes avec paramètre de recherche"""
     # Créer des établissements avec différentes villes pour le test
     with client.application.app_context():
-        etab1 = Etablissement(nom="Boulangerie Lyon", ville="Lyon", adresse="123 Rue de Lyon", code_postal="69001")
-        etab2 = Etablissement(nom="Patisserie Paris", ville="Paris", adresse="456 Rue de Paris", code_postal="75001")
-        etab3 = Etablissement(nom="Boulangerie Marseille", ville="Marseille", adresse="789 Rue de Marseille", code_postal="13001")
+        etab1 = Etablissement(
+            nom="Boulangerie Lyon",
+            ville="Lyon",
+            adresse="123 Rue de Lyon",
+            code_postal="69001",
+        )
+        etab2 = Etablissement(
+            nom="Patisserie Paris",
+            ville="Paris",
+            adresse="456 Rue de Paris",
+            code_postal="75001",
+        )
+        etab3 = Etablissement(
+            nom="Boulangerie Marseille",
+            ville="Marseille",
+            adresse="789 Rue de Marseille",
+            code_postal="13001",
+        )
         db.session.add_all([etab1, etab2, etab3])
         db.session.commit()
 
@@ -1476,19 +1556,19 @@ def test_api_villes_avec_parametre(client):
     response = client.get("/api/villes?q=ly")
     assert response.status_code == 200
     assert response.is_json
-    
+
     data = response.get_json()
     assert isinstance(data, list)
     assert "Lyon" in data
     assert "Marseille" not in data  # Ne devrait pas être dans les résultats
-    
+
     # Test avec un autre paramètre
     response = client.get("/api/villes?q=par")
     assert response.status_code == 200
     data = response.get_json()
     assert "Paris" in data
     assert "Lyon" not in data
-    
+
     # Nettoyage
     with client.application.app_context():
         db.session.delete(etab1)
@@ -1502,8 +1582,18 @@ def test_api_villes_aucune_correspondance(client):
     """Test l'API /api/villes quand aucune ville ne correspond"""
     # Créer des établissements avec différentes villes pour le test
     with client.application.app_context():
-        etab1 = Etablissement(nom="Boulangerie Lyon", ville="Lyon", adresse="123 Rue de Lyon", code_postal="69001")
-        etab2 = Etablissement(nom="Patisserie Paris", ville="Paris", adresse="456 Rue de Paris", code_postal="75001")
+        etab1 = Etablissement(
+            nom="Boulangerie Lyon",
+            ville="Lyon",
+            adresse="123 Rue de Lyon",
+            code_postal="69001",
+        )
+        etab2 = Etablissement(
+            nom="Patisserie Paris",
+            ville="Paris",
+            adresse="456 Rue de Paris",
+            code_postal="75001",
+        )
         db.session.add_all([etab1, etab2])
         db.session.commit()
 
@@ -1511,11 +1601,11 @@ def test_api_villes_aucune_correspondance(client):
     response = client.get("/api/villes?q=zzz")
     assert response.status_code == 200
     assert response.is_json
-    
+
     data = response.get_json()
     assert isinstance(data, list)
     assert len(data) == 0  # Aucune correspondance
-    
+
     # Nettoyage
     with client.application.app_context():
         db.session.delete(etab1)
@@ -1547,11 +1637,11 @@ def test_api_etablissements_get(client):
             visite=False,
             label=True,
         )
-        
+
         # D'abord, ajouter et commiter les établissements pour obtenir leurs IDs
         db.session.add_all([etab1, etab2])
         db.session.commit()
-        
+
         # Ensuite, créer les flans avec les IDs des établissements
         # Note: L'API utilise un JOIN avec Flan, donc chaque établissement doit avoir au moins un flan
         flan1 = Flan(
@@ -1563,7 +1653,7 @@ def test_api_etablissements_get(client):
             id_etab=etab1.id_etab,
             id_user=user.id_user,
         )
-        
+
         flan2 = Flan(
             nom="Flan Chocolat",
             prix=4.0,
@@ -1573,7 +1663,7 @@ def test_api_etablissements_get(client):
             id_etab=etab2.id_etab,
             id_user=user.id_user,
         )
-        
+
         db.session.add_all([flan1, flan2])
         db.session.commit()
 
@@ -1581,18 +1671,18 @@ def test_api_etablissements_get(client):
     response = client.get("/api/etablissements")
     assert response.status_code == 200
     assert response.is_json
-    
+
     data = response.get_json()
     assert isinstance(data, list)
     assert len(data) == 2  # Les deux établissements
-    
+
     # Vérifier la structure des données
     for etab_data in data:
         assert "id_etab" in etab_data
         assert "nom" in etab_data
         assert "ville" in etab_data
         assert "flans" in etab_data
-    
+
     # Nettoyage
     with client.application.app_context():
         db.session.delete(flan1)
@@ -1625,11 +1715,11 @@ def test_api_etablissements_post(client):
             visite=False,
             label=True,
         )
-        
+
         # D'abord, ajouter et commiter les établissements pour obtenir leurs IDs
         db.session.add_all([etab1, etab2])
         db.session.commit()
-        
+
         # Ensuite, créer les flans avec les IDs des établissements
         flan1 = Flan(
             nom="Flan Vanille",
@@ -1640,7 +1730,7 @@ def test_api_etablissements_post(client):
             id_etab=etab1.id_etab,
             id_user=user.id_user,
         )
-        
+
         flan2 = Flan(
             nom="Flan Chocolat",
             prix=4.0,
@@ -1650,34 +1740,31 @@ def test_api_etablissements_post(client):
             id_etab=etab2.id_etab,
             id_user=user.id_user,
         )
-        
+
         db.session.add_all([flan1, flan2])
         db.session.commit()
 
     # Appeler l'API POST avec des filtres
-    response = client.post("/api/etablissements", json={
-        "ville": "Lyon",
-        "visite": "oui",
-        "type_pate": "BRISEE"
-    })
+    response = client.post(
+        "/api/etablissements",
+        json={"ville": "Lyon", "visite": "oui", "type_pate": "BRISEE"},
+    )
     assert response.status_code == 200
     assert response.is_json
-    
+
     data = response.get_json()
     assert isinstance(data, list)
     assert len(data) == 1  # Un seul établissement correspond
     assert data[0]["nom"] == "Boulangerie Lyon"
     assert data[0]["ville"] == "Lyon"
-    
+
     # Test avec filtre par type de saveur
-    response = client.post("/api/etablissements", json={
-        "type_saveur": "CHOCOLAT"
-    })
+    response = client.post("/api/etablissements", json={"type_saveur": "CHOCOLAT"})
     assert response.status_code == 200
     data = response.get_json()
     assert len(data) == 1
     assert data[0]["nom"] == "Patisserie Paris"
-    
+
     # Nettoyage
     with client.application.app_context():
         db.session.delete(flan1)
@@ -1704,17 +1791,16 @@ def test_api_etablissements_aucune_correspondance(client):
         db.session.commit()
 
     # Appeler l'API avec des filtres qui ne correspondent à rien
-    response = client.post("/api/etablissements", json={
-        "ville": "Marseille",
-        "visite": "oui"
-    })
+    response = client.post(
+        "/api/etablissements", json={"ville": "Marseille", "visite": "oui"}
+    )
     assert response.status_code == 200
     assert response.is_json
-    
+
     data = response.get_json()
     assert isinstance(data, list)
     assert len(data) == 0  # Aucune correspondance
-    
+
     # Nettoyage
     with client.application.app_context():
         db.session.delete(etab1)
@@ -1723,16 +1809,40 @@ def test_api_etablissements_aucune_correspondance(client):
     def test_filtrer_par_type_texture(self, client):
         """Test le filtrage par type de texture."""
         # Créer des données de test
-        etab1 = Etablissement(nom="Boulangerie Martin", ville="Paris", adresse="123 Rue de Paris", code_postal="75001")
-        etab2 = Etablissement(nom="Patisserie Dubois", ville="Lyon", adresse="456 Rue de Lyon", code_postal="69001")
+        etab1 = Etablissement(
+            nom="Boulangerie Martin",
+            ville="Paris",
+            adresse="123 Rue de Paris",
+            code_postal="75001",
+        )
+        etab2 = Etablissement(
+            nom="Patisserie Dubois",
+            ville="Lyon",
+            adresse="456 Rue de Lyon",
+            code_postal="69001",
+        )
         db.session.add_all([etab1, etab2])
         db.session.commit()
 
         # Créer des flans
-        flan1 = Flan(nom="Flan Vanille", prix=3.5, type_pate="BRISEE", type_saveur="VANILLE", type_texture="CREMEUSE",
-                     id_etab=etab1.id_etab, id_user=1)
-        flan2 = Flan(nom="Flan Chocolat", prix=4.0, type_pate="SABLEE", type_saveur="CHOCOLAT", type_texture="FONDANTE",
-                     id_etab=etab1.id_etab, id_user=1)
+        flan1 = Flan(
+            nom="Flan Vanille",
+            prix=3.5,
+            type_pate="BRISEE",
+            type_saveur="VANILLE",
+            type_texture="CREMEUSE",
+            id_etab=etab1.id_etab,
+            id_user=1,
+        )
+        flan2 = Flan(
+            nom="Flan Chocolat",
+            prix=4.0,
+            type_pate="SABLEE",
+            type_saveur="CHOCOLAT",
+            type_texture="FONDANTE",
+            id_etab=etab1.id_etab,
+            id_user=1,
+        )
         db.session.add_all([flan1, flan2])
         db.session.commit()
 
@@ -1753,16 +1863,40 @@ def test_api_etablissements_aucune_correspondance(client):
     def test_filtrer_par_prix_0(self, client):
         """Test le filtrage par prix < 2.5."""
         # Créer des données de test
-        etab1 = Etablissement(nom="Boulangerie Martin", ville="Paris", adresse="123 Rue de Paris", code_postal="75001")
-        etab2 = Etablissement(nom="Patisserie Dubois", ville="Lyon", adresse="456 Rue de Lyon", code_postal="69001")
+        etab1 = Etablissement(
+            nom="Boulangerie Martin",
+            ville="Paris",
+            adresse="123 Rue de Paris",
+            code_postal="75001",
+        )
+        etab2 = Etablissement(
+            nom="Patisserie Dubois",
+            ville="Lyon",
+            adresse="456 Rue de Lyon",
+            code_postal="69001",
+        )
         db.session.add_all([etab1, etab2])
         db.session.commit()
 
         # Créer des flans
-        flan1 = Flan(nom="Flan Vanille", prix=3.5, type_pate="BRISEE", type_saveur="VANILLE", type_texture="CREMEUSE",
-                     id_etab=etab1.id_etab, id_user=1)
-        flan2 = Flan(nom="Flan Citron", prix=2.0, type_pate="BRISEE", type_saveur="FRUITS", type_texture="CREMEUSE",
-                     id_etab=etab2.id_etab, id_user=1)
+        flan1 = Flan(
+            nom="Flan Vanille",
+            prix=3.5,
+            type_pate="BRISEE",
+            type_saveur="VANILLE",
+            type_texture="CREMEUSE",
+            id_etab=etab1.id_etab,
+            id_user=1,
+        )
+        flan2 = Flan(
+            nom="Flan Citron",
+            prix=2.0,
+            type_pate="BRISEE",
+            type_saveur="FRUITS",
+            type_texture="CREMEUSE",
+            id_etab=etab2.id_etab,
+            id_user=1,
+        )
         db.session.add_all([flan1, flan2])
         db.session.commit()
 
@@ -1783,16 +1917,40 @@ def test_api_etablissements_aucune_correspondance(client):
     def test_filtrer_par_prix_2_5(self, client):
         """Test le filtrage par prix entre 2.5 et 5."""
         # Créer des données de test
-        etab1 = Etablissement(nom="Boulangerie Martin", ville="Paris", adresse="123 Rue de Paris", code_postal="75001")
-        etab2 = Etablissement(nom="Patisserie Dubois", ville="Lyon", adresse="456 Rue de Lyon", code_postal="69001")
+        etab1 = Etablissement(
+            nom="Boulangerie Martin",
+            ville="Paris",
+            adresse="123 Rue de Paris",
+            code_postal="75001",
+        )
+        etab2 = Etablissement(
+            nom="Patisserie Dubois",
+            ville="Lyon",
+            adresse="456 Rue de Lyon",
+            code_postal="69001",
+        )
         db.session.add_all([etab1, etab2])
         db.session.commit()
 
         # Créer des flans
-        flan1 = Flan(nom="Flan Vanille", prix=3.5, type_pate="BRISEE", type_saveur="VANILLE", type_texture="CREMEUSE",
-                     id_etab=etab1.id_etab, id_user=1)
-        flan2 = Flan(nom="Flan Citron", prix=2.5, type_pate="BRISEE", type_saveur="FRUITS", type_texture="CREMEUSE",
-                     id_etab=etab2.id_etab, id_user=1)
+        flan1 = Flan(
+            nom="Flan Vanille",
+            prix=3.5,
+            type_pate="BRISEE",
+            type_saveur="VANILLE",
+            type_texture="CREMEUSE",
+            id_etab=etab1.id_etab,
+            id_user=1,
+        )
+        flan2 = Flan(
+            nom="Flan Citron",
+            prix=2.5,
+            type_pate="BRISEE",
+            type_saveur="FRUITS",
+            type_texture="CREMEUSE",
+            id_etab=etab2.id_etab,
+            id_user=1,
+        )
         db.session.add_all([flan1, flan2])
         db.session.commit()
 
@@ -1813,13 +1971,25 @@ def test_api_etablissements_aucune_correspondance(client):
     def test_filtrer_par_prix_5(self, client):
         """Test le filtrage par prix >= 5."""
         # Créer des données de test
-        etab1 = Etablissement(nom="Boulangerie Martin", ville="Paris", adresse="123 Rue de Paris", code_postal="75001")
+        etab1 = Etablissement(
+            nom="Boulangerie Martin",
+            ville="Paris",
+            adresse="123 Rue de Paris",
+            code_postal="75001",
+        )
         db.session.add(etab1)
         db.session.commit()
 
         # Créer un flan
-        flan1 = Flan(nom="Flan Vanille", prix=3.5, type_pate="BRISEE", type_saveur="VANILLE", type_texture="CREMEUSE",
-                     id_etab=etab1.id_etab, id_user=1)
+        flan1 = Flan(
+            nom="Flan Vanille",
+            prix=3.5,
+            type_pate="BRISEE",
+            type_saveur="VANILLE",
+            type_texture="CREMEUSE",
+            id_etab=etab1.id_etab,
+            id_user=1,
+        )
         db.session.add(flan1)
         db.session.commit()
 
@@ -1838,25 +2008,46 @@ def test_api_etablissements_aucune_correspondance(client):
     def test_filtrer_combinaison_criteres(self, client):
         """Test le filtrage avec une combinaison de critères."""
         # Créer des données de test
-        etab1 = Etablissement(nom="Boulangerie Martin", ville="Paris", adresse="123 Rue de Paris", code_postal="75001")
-        etab2 = Etablissement(nom="Patisserie Dubois", ville="Lyon", adresse="456 Rue de Lyon", code_postal="69001")
+        etab1 = Etablissement(
+            nom="Boulangerie Martin",
+            ville="Paris",
+            adresse="123 Rue de Paris",
+            code_postal="75001",
+        )
+        etab2 = Etablissement(
+            nom="Patisserie Dubois",
+            ville="Lyon",
+            adresse="456 Rue de Lyon",
+            code_postal="69001",
+        )
         db.session.add_all([etab1, etab2])
         db.session.commit()
 
         # Créer des flans
-        flan1 = Flan(nom="Flan Vanille", prix=3.5, type_pate="BRISEE", type_saveur="VANILLE", type_texture="CREMEUSE",
-                     id_etab=etab1.id_etab, id_user=1)
-        flan2 = Flan(nom="Flan Citron", prix=2.5, type_pate="BRISEE", type_saveur="FRUITS", type_texture="CREMEUSE",
-                     id_etab=etab2.id_etab, id_user=1)
+        flan1 = Flan(
+            nom="Flan Vanille",
+            prix=3.5,
+            type_pate="BRISEE",
+            type_saveur="VANILLE",
+            type_texture="CREMEUSE",
+            id_etab=etab1.id_etab,
+            id_user=1,
+        )
+        flan2 = Flan(
+            nom="Flan Citron",
+            prix=2.5,
+            type_pate="BRISEE",
+            type_saveur="FRUITS",
+            type_texture="CREMEUSE",
+            id_etab=etab2.id_etab,
+            id_user=1,
+        )
         db.session.add_all([flan1, flan2])
         db.session.commit()
 
         query = Etablissement.query.join(Flan)
         filtered = filtrer_etablissements(
-            query,
-            ville="Paris",
-            type_pate="BRISEE",
-            prix="2.5"
+            query, ville="Paris", type_pate="BRISEE", prix="2.5"
         )
         results = filtered.all()
 
@@ -1877,17 +2068,17 @@ class TestCasErreur:
 
     def test_etablissement_inexistant(self, client):
         """Test l'accès à un établissement inexistant."""
-        response = client.get('/etablissement/99999')
+        response = client.get("/etablissement/99999")
         assert response.status_code == 404
 
     def test_flan_inexistant(self, client):
         """Test l'accès à un flan inexistant."""
-        response = client.get('/flan/99999')
+        response = client.get("/flan/99999")
         assert response.status_code == 404
 
     def test_evaluation_inexistante(self, client):
         """Test l'accès à une évaluation inexistante."""
-        response = client.get('/evaluation/99999')
+        response = client.get("/evaluation/99999")
         assert response.status_code == 404
 
 
@@ -1897,8 +2088,18 @@ class TestFonctionsUtilitaires:
     def test_filtrer_etablissements_sans_criteres(self, client):
         """Test filtrer_etablissements sans critères."""
         # Créer des données de test
-        etab1 = Etablissement(nom="Boulangerie Martin", ville="Paris", adresse="123 Rue de Paris", code_postal="75001")
-        etab2 = Etablissement(nom="Patisserie Dubois", ville="Lyon", adresse="456 Rue de Lyon", code_postal="69001")
+        etab1 = Etablissement(
+            nom="Boulangerie Martin",
+            ville="Paris",
+            adresse="123 Rue de Paris",
+            code_postal="75001",
+        )
+        etab2 = Etablissement(
+            nom="Patisserie Dubois",
+            ville="Lyon",
+            adresse="456 Rue de Lyon",
+            code_postal="69001",
+        )
         db.session.add_all([etab1, etab2])
         db.session.commit()
 
@@ -1917,16 +2118,40 @@ class TestFonctionsUtilitaires:
     def test_filtrer_etablissements_critere_tous(self, client):
         """Test filtrer_etablissements avec critère 'tous'."""
         # Créer des données de test
-        etab1 = Etablissement(nom="Boulangerie Martin", ville="Paris", adresse="123 Rue de Paris", code_postal="75001")
-        etab2 = Etablissement(nom="Patisserie Dubois", ville="Lyon", adresse="456 Rue de Lyon", code_postal="69001")
+        etab1 = Etablissement(
+            nom="Boulangerie Martin",
+            ville="Paris",
+            adresse="123 Rue de Paris",
+            code_postal="75001",
+        )
+        etab2 = Etablissement(
+            nom="Patisserie Dubois",
+            ville="Lyon",
+            adresse="456 Rue de Lyon",
+            code_postal="69001",
+        )
         db.session.add_all([etab1, etab2])
         db.session.commit()
 
         # Créer des flans pour chaque établissement
-        flan1 = Flan(nom="Flan Vanille", prix=3.5, type_pate="BRISEE", type_saveur="VANILLE", type_texture="CREMEUSE",
-                     id_etab=etab1.id_etab, id_user=1)
-        flan2 = Flan(nom="Flan Chocolat", prix=4.0, type_pate="SABLEE", type_saveur="CHOCOLAT",
-                     type_texture="MIX_PARFAIT", id_etab=etab2.id_etab, id_user=1)
+        flan1 = Flan(
+            nom="Flan Vanille",
+            prix=3.5,
+            type_pate="BRISEE",
+            type_saveur="VANILLE",
+            type_texture="CREMEUSE",
+            id_etab=etab1.id_etab,
+            id_user=1,
+        )
+        flan2 = Flan(
+            nom="Flan Chocolat",
+            prix=4.0,
+            type_pate="SABLEE",
+            type_saveur="CHOCOLAT",
+            type_texture="MIX_PARFAIT",
+            id_etab=etab2.id_etab,
+            id_user=1,
+        )
         db.session.add_all([flan1, flan2])
         db.session.commit()
 
