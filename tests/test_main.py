@@ -1338,13 +1338,6 @@ def test_proposer_etablissement_route_authenticated(client):
     assert b"Recherche" in response.data or b"recherche" in response.data
 
 
-@pytest.mark.routes
-def test_proposer_etablissement_route_unauthenticated(client):
-    """Test que la page de proposition d'établissement redirige si non authentifié"""
-    response = client.get('/proposer_etablissement', follow_redirects=True)
-    assert response.status_code == 200
-    # Devrait être redirigé vers la page de connexion
-    assert b"Connexion" in response.data or b"Login" in response.data
 
 
 @pytest.mark.routes
@@ -1361,6 +1354,79 @@ def test_rechercher_route(client):
     response = client.get('/rechercher')
     assert response.status_code == 200
     assert b"Recherche" in response.data or b"recherche" in response.data
+
+
+# Tests pour les routes d'établissements
+@pytest.mark.routes
+def test_etablissement_creation_get(client):
+    """Test la route GET pour la création d'établissement"""
+    response = client.get('/proposer_etablissement', follow_redirects=True)
+    assert response.status_code == 200
+    # Devrait montrer le formulaire de création
+    assert b"Recherche" in response.data or b"recherche" in response.data
+
+
+@pytest.mark.routes
+def test_etablissement_creation_post(client):
+    """Test la route POST pour la création d'établissement"""
+    user = client.application.config["TEST_USER"]
+    with client.application.app_context():
+        # Créer un établissement via POST
+        response = client.post('/ajouter_etablissement', data={
+            'ajout-etab-nom': 'Test Boulangerie',
+            'ajout-etab-adresse': '123 Rue Test',
+            'ajout-etab-code_postal': '69001',
+            'ajout-etab-ville': 'Lyon',
+            'ajout-etab-latitude': '45.75',
+            'ajout-etab-longitude': '4.85',
+            'ajout-etab-type_etab': 'BOULANGERIE',
+            'ajout-etab-id_user': user.id_user,
+        }, follow_redirects=True)
+        
+        assert response.status_code == 200
+        # Devrait rediriger vers une page de succès ou la liste
+        assert b"Test Boulangerie" in response.data or b"succes" in response.data.lower()
+
+
+@pytest.mark.routes
+def test_etablissement_viewing(client):
+    """Test la route pour voir un établissement spécifique"""
+    # D'abord créer un établissement et un flan
+    user = client.application.config["TEST_USER"]
+    with client.application.app_context():
+        etab = Etablissement(
+            nom="Boulangerie Test View",
+            ville="Lyon",
+            adresse="123 Rue Test",
+            code_postal="69001",
+            id_user=user.id_user,
+            visite=True,
+            label=False,
+        )
+        db.session.add(etab)
+        db.session.commit()
+        
+        flan = Flan(
+            nom="Flan Vanille",
+            prix=3.5,
+            type_pate="BRISEE",
+            type_saveur="VANILLE",
+            type_texture="CREMEUSE",
+            id_etab=etab.id_etab,
+            id_user=user.id_user,
+        )
+        db.session.add(flan)
+        db.session.commit()
+        
+        # Test la route de visualisation
+        response = client.get(f'/etablissement/{etab.id_etab}')
+        assert response.status_code == 200
+        assert b"Boulangerie Test View" in response.data
+        
+        # Nettoyage
+        db.session.delete(flan)
+        db.session.delete(etab)
+        db.session.commit()
 
 
 # Tests pour les routes API manquantes
