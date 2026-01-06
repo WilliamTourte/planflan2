@@ -94,3 +94,4 @@ watchfiles==1.1.1
 Werkzeug==3.1.3
 wheel==0.45.1
 WTForms==3.2.1
+mysqlclient==2.2.7

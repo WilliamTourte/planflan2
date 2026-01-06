@@ -1,6 +1,7 @@
 # Configuration pour l'environnement de production
 
 import os
+
 from dotenv import load_dotenv
 
 # Charger les variables d'environnement
@@ -18,6 +19,8 @@ class Config:
         os.environ.get("DATABASE_URL")
         or "mysql+pymysql://flask_user:flanflask@localhost/planflan_db"
     )
+    print(f" ConfigProd - database URI : {SQLALCHEMY_DATABASE_URI}")
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Configuration des sessions
@@ -42,7 +45,7 @@ class Config:
     CACHE_DEFAULT_TIMEOUT = 300
 
 
-class ProductionConfig(Config):
+class ConfigProd(Config):
     """Configuration pour l'environnement de production"""
 
     DEBUG = False

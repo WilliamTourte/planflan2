@@ -5,12 +5,16 @@ WORKDIR /python-docker
 RUN apt-get update
 RUN apt-get install -y --no-install-recommends pkg-config python3-dev default-libmysqlclient-dev build-essential default-mysql-client
 
-COPY requirements.txt requirements.txt
+# Copie de la liste de dépendance de production
+COPY requirements_prod.txt requirements.txt
+# Installation des dépendances
 RUN pip install -r requirements.txt
 
 COPY . .
 
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
+COPY entrypoint.sh /python-docker/entrypoint.sh
+RUN chmod +x /python-docker/entrypoint.sh
+
+# ENTRYPOINT ["/python-docker/entrypoint.sh"]
+CMD ["sh", "-c", "/python-docker/entrypoint.sh"]
 # CMD [ "python", "-m" , "flask", "run", "--host=0.0.0.0"]

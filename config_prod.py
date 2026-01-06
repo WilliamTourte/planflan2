@@ -1,6 +1,8 @@
 # Configuration pour l'environnement de production
+# Note de Ludo : à priori non utilisé ? A vérifier
 
 import os
+
 from dotenv import load_dotenv
 
 # Charger les variables d'environnement

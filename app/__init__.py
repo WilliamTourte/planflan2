@@ -4,14 +4,18 @@ Ce module initialise l'application Flask et configure les extensions nécessaire
 Il contient également les fonctions de sécurité et les filtres Jinja personnalisés.
 """
 
+# Import du module os pour récupérer les variables d'environnement
+import os
+
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
+from flask_login import LoginManager
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
+
 from .config import Config  # Import relatif
 from .outils import enlever_accents
-from flask_migrate import Migrate
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -22,8 +26,27 @@ bcrypt = Bcrypt()
 csrf = CSRFProtect()
 
 
-def create_app(config_class=Config):
+def create_app(config_class=None):
+    """
+    Fonction principale de l'application.
+    Deux configurations possibles :
+        - dev
+        - prod
+    Vérification de la variable d'environnement FLASK_CONFIG pour le chargement de l'environnement.
+    """
+
+    if config_class is None:
+        config_name = os.getenv("FLASK_CONFIG", "Config")  # Par défaut : Config (dev)
+        config_class = getattr(
+            __import__("app." + config_name.lower(), fromlist=["Config"]), config_name
+        )
+
+    # Vérification de la configuration utilisée
+    print(f" Configuration utilisée : {config_class}")
+
+    # Création de l'application Flask
     app = Flask(__name__)
+
     app.config.from_object(config_class)
 
     db.init_app(app)
