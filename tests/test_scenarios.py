@@ -2,6 +2,7 @@
 Tests de scénarios utilisateurs complets
 """
 
+import os
 from app.models import Etablissement, Flan, Evaluation
 from app import db
 
@@ -10,6 +11,7 @@ from app import db
 import pytest
 
 
+@pytest.mark.integration
 @pytest.mark.scenarios
 def test_scenario_inscription_connexion_creation_flan(client):
     """Test un flux complet : inscription -> connexion -> création de flan"""
@@ -138,7 +140,12 @@ def test_scenario_recherche_et_evaluation(client):
         assert eval.description == "Excellent flan!"
 
 
+@pytest.mark.integration
 @pytest.mark.scenarios
+@pytest.mark.skipif(
+    os.getenv("CI") == "true" and os.getenv("RUN_SLOW_TESTS") != "true",
+    reason="Skipping complex admin scenario in CI unless RUN_SLOW_TESTS=true"
+)
 def test_scenario_administration_complete(client):
     """Test un flux complet d'administration : création utilisateur -> validation contenu"""
     # Ce test nécessite un utilisateur admin

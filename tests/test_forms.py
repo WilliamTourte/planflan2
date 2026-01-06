@@ -365,6 +365,8 @@ def test_updateprofileform_mots_de_passe_non_correspondants(client):
 # Tests pour RechercheForm
 
 
+@pytest.mark.slow
+@pytest.mark.forms
 def test_rechercheform_donnees_valides(client):
     """Test RechercheForm avec des données valides."""
     with client.application.app_context():
@@ -499,7 +501,8 @@ def test_formulaire_evaluation_avec_evaluation_existante(client):
         assert str(form.gout.data) == str(eval.gout)
         assert form.description.data == eval.description
 
-
+@pytest.mark.slow
+@pytest.mark.forms
 def test_evalform_selectfield_choices(client):
     """Test EvalForm pour vérifier que les SelectField ont les bons choix."""
     with client.application.app_context():

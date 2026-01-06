@@ -716,6 +716,8 @@ def test_liste_etablissements_avec_recherche_simple(client):
     assert b"Boulangerie Test" in response.data
 
 
+@pytest.mark.main
+@pytest.mark.performance
 def test_liste_etablissements_avec_filtres_avances(client):
     """Test la route liste_etablissements avec des filtres avancés"""
     user = client.application.config["TEST_USER"]

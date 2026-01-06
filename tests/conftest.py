@@ -77,7 +77,7 @@ def clean_db():
     # Le nettoyage est géré par la fixture client
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def setup_minimal_data(app):
     """Crée des données de test minimales pour les tests."""
     with app.app_context():
@@ -95,7 +95,7 @@ def setup_minimal_data(app):
         db.session.commit()
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def setup_full_data(app):
     """Crée des données de test complètes pour les tests."""
     with app.app_context():
