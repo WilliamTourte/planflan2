@@ -38,12 +38,12 @@ def create_app(config_class=Config):
         try:
             db.session.execute(text("SELECT 1"))
             print(
-                "✅ Connexion réussie avec l'URL :",
+                "Connexion reussie avec l'URL :",
                 app.config["SQLALCHEMY_DATABASE_URI"],
             )
         except Exception as e:
-            print(f"❌ Erreur de connexion : {e}")
-            print(f"URL utilisée : {app.config['SQLALCHEMY_DATABASE_URI']}")
+            print(f"Erreur de connexion : {e}")
+            print(f"URL utilisee : {app.config['SQLALCHEMY_DATABASE_URI']}")
 
     @login_manager.user_loader
     def load_user(user_id):

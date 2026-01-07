@@ -100,6 +100,7 @@ for etablissement in etablissement_records:
             type_saveur=type_saveur,
             type_texture=type_texture,
             id_user=1,
+            statut="VALIDE"
         )
         result = session.execute(stmt)
         flans_crees.append({
@@ -145,6 +146,7 @@ for etablissement in etablissements_visites:
                 gout=gout,
                 id_flan=flan['id_flan'],
                 id_user=1,  # admin_flan
+                statut="TypVALIDE"
             )
             session.execute(stmt_eval)
             evaluations_crees += 1

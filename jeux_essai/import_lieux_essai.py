@@ -2,9 +2,18 @@ import re
 import json
 import os
 import sys
+import logging
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
+
+# Configuration du logging
+logging.basicConfig(
+    filename='database.log',
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 # Ajouter le chemin du projet pour importer le module app
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -40,8 +49,10 @@ def nettoyer_adresse(adresse):
 
 def importer_lieux(fichier_json):
     print("🚀 Début de l'import...")
+    logger.info("Début de l'import des lieux")
     if not os.path.exists(fichier_json):
         print(f"❌ Fichier introuvable : {fichier_json}")
+        logger.error(f"Fichier introuvable : {fichier_json}")
         return
     with app.app_context():
         try:
@@ -51,6 +62,7 @@ def importer_lieux(fichier_json):
             with open(fichier_json, "r", encoding="utf-8") as f:
                 data = json.load(f)
                 print(f"📊 Nombre de lieux : {len(data.get('features', []))}")
+                logger.info(f"Nombre de lieux à importer : {len(data.get('features', []))}")
                 for feature in data["features"]:
                     try:
                         nom = feature["properties"]["location"]["name"]
@@ -75,21 +87,27 @@ def importer_lieux(fichier_json):
                             )
                             db.session.add(lieu)
                             print(f"✅ Ajout : {nom}")
+                            logger.info(f"Ajout de l'établissement : {nom}")
                         else:
                             print(f"⚠️ Déjà présent : {nom}")
+                            logger.info(f"Établissement déjà présent : {nom}")
                     except Exception as e:
                         print(
                             f"❌ Erreur sur {feature.get('properties', {}).get('location', {}).get('name', 'inconnu')}: {e}"
                         )
+                        logger.error(f"Erreur sur {feature.get('properties', {}).get('location', {}).get('name', 'inconnu')}: {e}")
             db.session.commit()
             print("🎉 Import terminé !")
+            logger.info("Import terminé avec succès")
         except Exception as e:
             db.session.rollback()
             print(f"❌ Erreur globale : {e}")
+            logger.error(f"Erreur globale lors de l'import : {e}")
 
 
 if __name__ == "__main__":
     print("🔧 Exécution en mode complètement standalone...")
+    logger.info("Début de l'exécution en mode standalone")
     
     # Chemin par défaut dans le dossier jeux_essai
     dossier_jeux_essai = os.path.dirname(os.path.abspath(__file__))
@@ -101,20 +119,31 @@ if __name__ == "__main__":
     else:
         fichier_json = chemin_par_defaut
         print(f"📝 Aucun fichier spécifié, recherche dans le dossier jeux_essai : {fichier_json}")
+        logger.info(f"Aucun fichier spécifié, recherche dans le dossier jeux_essai : {fichier_json}")
         print("   Pour spécifier un autre fichier : python import_lieux_essai.py chemin/vers/fichier.json")
+        logger.info("Pour spécifier un autre fichier : python import_lieux_essai.py chemin/vers/fichier.json")
     
     # Vérifications supplémentaires
     print(f"🔍 Vérification du fichier : {fichier_json}")
+    logger.info(f"Vérification du fichier : {fichier_json}")
     print(f"   Existe : {os.path.exists(fichier_json)}")
+    logger.info(f"Fichier existe : {os.path.exists(fichier_json)}")
     if os.path.exists(fichier_json):
         print(f"   Taille : {os.path.getsize(fichier_json)} octets")
+        logger.info(f"Taille du fichier : {os.path.getsize(fichier_json)} octets")
         print("✅ Fichier trouvé, début de l'import...")
+        logger.info("Fichier trouvé, début de l'import")
     else:
         print("   ❌ Fichier introuvable !")
+        logger.error("Fichier introuvable")
         print("   Vérifiez que :")
+        logger.info("Vérifiez que :")
         print(f"   1. Le fichier 'lieux_test.json' existe dans le dossier jeux_essai")
+        logger.info(f"1. Le fichier 'lieux_test.json' existe dans le dossier jeux_essai")
         print(f"   2. Le chemin est : {fichier_json}")
+        logger.info(f"2. Le chemin est : {fichier_json}")
         print(f"   3. Vous pouvez spécifier un autre chemin en argument")
+        logger.info(f"3. Vous pouvez spécifier un autre chemin en argument")
         sys.exit(1)
         
     # Exécuter l'import

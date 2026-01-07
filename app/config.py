@@ -8,6 +8,7 @@ class Config:
     SECRET_KEY = os.getenv("SECRET_KEY")
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_ECHO = True  # Active le logging des requêtes SQL
     SESSION_COOKIE_SECURE = True
     REMEMBER_COOKIE_SECURE = True
     PERMANENT_SESSION_LIFETIME = 3600

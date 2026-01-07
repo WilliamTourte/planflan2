@@ -3,10 +3,19 @@ import json
 import os
 import sys
 import random
+import logging
 from enum import Enum
 from sqlalchemy import create_engine, MetaData, Table, select, insert, delete, update
 from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
+
+# Configuration du logging
+logging.basicConfig(
+    filename='database.log',
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 
 # Charger les variables d'environnement en premier
 load_dotenv()
@@ -43,10 +52,10 @@ DATABASE_URI = os.getenv("DATABASE_URL", "mysql+pymysql://flask_user:flanflask@l
 # Import de l'application Flask après avoir configuré le chemin
 try:
     from app import create_app, db, bcrypt
-    print("✅ Import de l'application Flask réussi")
+    print("Import de l'application Flask reussi")
 except ImportError as e:
-    print(f"❌ Erreur d'import de l'application Flask : {e}")
-    print(f"Chemin du projet ajouté : {project_root}")
+    print(f"Erreur d'import de l'application Flask : {e}")
+    print(f"Chemin du projet ajoute : {project_root}")
     print(f"Contenu du dossier : {os.listdir(project_root)}")
     sys.exit(1)
 
@@ -65,15 +74,15 @@ def nettoyer_adresse(adresse):
     return adresse.split(",")[0].strip()
 
 def importer_lieux(fichier_json):
-    print("🚀 Début de l'import...")
+    print("Debut de l'import...")
     if not os.path.exists(fichier_json):
-        print(f"❌ Fichier introuvable : {fichier_json}")
+        print(f"Fichier introuvable : {fichier_json}")
         return
     
     try:
         with open(fichier_json, "r", encoding="utf-8") as f:
             data = json.load(f)
-            print(f"📊 Nombre de lieux : {len(data.get('features', []))}")
+            print(f"Nombre de lieux : {len(data.get('features', []))}")
             
             with app.app_context():
                 from app.models import Etablissement
@@ -104,20 +113,21 @@ def importer_lieux(fichier_json):
                             db.session.add(lieu)
                             print(f"✅ Ajout : {nom}")
                         else:
-                            print(f"⚠️ Déjà présent : {nom}")
+                            print(f"Deja present : {nom}")
                     except Exception as e:
                         print(
-                            f"❌ Erreur sur {feature.get('properties', {}).get('location', {}).get('name', 'inconnu')}: {e}"
+                            f"Erreur sur {feature.get('properties', {}).get('location', {}).get('name', 'inconnu')}: {e}"
                         )
                 db.session.commit()
-                print("🎉 Import terminé !")
+                print("Import termine !")
     except Exception as e:
         db.session.rollback()
-        print(f"❌ Erreur globale : {e}")
+        print(f"Erreur globale : {e}")
 
 def creer_flans_et_evaluations():
     """Fonction pour créer des flans et des évaluations aléatoires"""
     print("🍮 Création des flans et évaluations...")
+    logger.info("Début de la création des flans et évaluations")
     
     # Créer un engine SQLAlchemy pour les opérations directes
     engine = create_engine(DATABASE_URI)
@@ -131,14 +141,18 @@ def creer_flans_et_evaluations():
     evaluations = Table("evaluations", metadata, autoload_with=engine)
     
     # 1. Supprimer tous les flans existants
+    logger.info("Suppression de tous les flans existants")
     session.execute(delete(flans))
     session.commit()
-    print("✅ Tous les flans existants ont été supprimés.")
+    print("Tous les flans existants ont ete supprimes.")
+    logger.info("Tous les flans existants ont été supprimés")
     
     # 2. Supprimer toutes les évaluations existantes
+    logger.info("Suppression de toutes les évaluations existantes")
     session.execute(delete(evaluations))
     session.commit()
-    print("✅ Toutes les évaluations existantes ont été supprimées.")
+    print("Toutes les evaluations existantes ont ete supprimees.")
+    logger.info("Toutes les évaluations existantes ont été supprimées")
     
     # Récupérer tous les établissements
     query = select(etablissements)
@@ -245,7 +259,8 @@ def creer_flans_et_evaluations():
 
 def mettre_a_jour_visite_label():
     """Fonction pour mettre à jour les champs visite et label des établissements"""
-    print("🏷️  Mise à jour des champs visite et label...")
+    print("Mise a jour des champs visite et label...")
+    logger.info("Début de la mise à jour des champs visite et label")
     
     # Créer un engine SQLAlchemy
     engine = create_engine(DATABASE_URI)
@@ -277,28 +292,26 @@ def mettre_a_jour_visite_label():
     
     # Valider les modifications
     session.commit()
-    print(f"✅ {len(etablissement_records)} établissements mis à jour avec visite/label aléatoires.")
+    print(f"{len(etablissement_records)} etablissements mis a jour avec visite/label aleatoires.")
+    logger.info(f"{len(etablissement_records)} établissements mis à jour avec visite/label aléatoires")
     session.close()
 
 # Fonction principale
 if __name__ == "__main__":
-    print("🚀 Début de la recréation de la base de données...")
+    print("Debut de la recreation de la base de donnees...")
+    logger.info("Début de la recréation de la base de données")
     
 # Crée le contexte d'application
 with app.app_context():
 
     # Crée toutes les tables
+    logger.info("Création de toutes les tables")
     db.create_all()
 
     # Importe les modèles après la création de l'app
     from app.models import (
         Utilisateur,
-        TypeEtab,
-        Etablissement,
-        Flan,
-        Evaluation,
-        Photo,
-        TypeCible,
+        StatutModeration
     )
 
     # Exemple : Création d'un utilisateur admin (uniquement s'il n'existe pas)
@@ -306,13 +319,16 @@ with app.app_context():
         admin = Utilisateur.query.filter_by(pseudo="flan_admin").first()
         if not admin:
             print("👤 Création de l'utilisateur flan_admin...")
+            logger.info("Création de l'utilisateur flan_admin")
             admin = Utilisateur(pseudo="flan_admin", email="admin@example.com", is_admin=True)
             admin.set_password("flan_password", bcrypt)
             db.session.add(admin)
         else:
-            print("👤 Utilisateur flan_admin existe déjà, pas de recréation")
+            print("Utilisateur flan_admin existe deja, pas de recreation")
+            logger.info("Utilisateur flan_admin existe déjà, pas de recréation")
     except Exception as e:
-        print(f"❌ Erreur lors de la vérification/création de l'utilisateur : {e}")
+        print(f"Erreur lors de la verification/creation de l'utilisateur : {e}")
+        logger.error(f"Erreur lors de la vérification/création de l'utilisateur : {e}")
         db.session.rollback()
 
 
@@ -320,8 +336,9 @@ with app.app_context():
     # Valide les changements
     db.session.commit()
 
-    print("✅ Tables recréées avec succès !")
-    print("📋 Tables disponibles :")
+    print("Tables recreees avec succes !")
+    logger.info("Tables recréées avec succès")
+    print("Tables disponibles :")
     for table_name in db.metadata.tables.keys():
         print(f"  - {table_name}")
     
@@ -330,18 +347,22 @@ with app.app_context():
     chemin_lieux_json = os.path.join(dossier_jeux_essai, "lieux_test.json")
     
     if os.path.exists(chemin_lieux_json):
-        print(f"📁 Fichier lieux_test.json trouvé dans jeux_essai : {chemin_lieux_json}")
+        print(f"Fichier lieux_test.json trouve dans jeux_essai : {chemin_lieux_json}")
+        logger.info(f"Fichier lieux_test.json trouvé dans jeux_essai : {chemin_lieux_json}")
         importer_lieux(chemin_lieux_json)
     else:
-        print("📝 Aucun fichier lieux_test.json trouvé dans jeux_essai")
+        print("Aucun fichier lieux_test.json trouve dans jeux_essai")
+        logger.info("Aucun fichier lieux_test.json trouvé dans jeux_essai")
         if len(sys.argv) > 1:
             fichier_json = sys.argv[1]
             if os.path.exists(fichier_json):
                 importer_lieux(fichier_json)
             else:
-                print(f"❌ Fichier spécifié introuvable : {fichier_json}")
+                print(f"Fichier specifie introuvable : {fichier_json}")
+                logger.error(f"Fichier spécifié introuvable : {fichier_json}")
         else:
-            print("   Pour importer des lieux, utilisez : python recrer_db.py chemin/vers/fichier.json")
+            print("Pour importer des lieux, utilisez : python recrer_db.py chemin/vers/fichier.json")
+            logger.info("Pour importer des lieux, utilisez : python recrer_db.py chemin/vers/fichier.json")
     
     # Mise à jour des champs visite et label
     mettre_a_jour_visite_label()
@@ -350,3 +371,4 @@ with app.app_context():
     creer_flans_et_evaluations()
     
     print("🎉 Recréation de la base de données terminée avec succès !")
+    logger.info("Recréation de la base de données terminée avec succès")
