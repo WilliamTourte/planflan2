@@ -104,15 +104,14 @@ function createEtablissementMarker(map, etablissement, baseUrl = window.location
         // Créer un conteneur avec un z-index très élevé
         const popupContainer = L.DomUtil.create('div', 'custom-popup-container');
         popupContainer.style.zIndex = '999999';
-        marker.bindPopup(popupContainer, {
 
-    autoPan: true,
-
-    autoPanPadding: [30,70],
-    keepInView: true,
-    closeButton: true,
- 
-}).openPopup();
+    marker.bindPopup(popupContainer, {
+        autoPan: true,
+        autoPanPadding: [50, 20], // Correspond aux marges demandées
+        keepInView: true,
+        closeButton: true,
+        className: 'custom-popup centered-popup' // Ajout de la classe
+    }).openPopup();
        
 
         fetch(`/get_infowindow_content?id_etab=${etablissement.id_etab}`)
@@ -128,7 +127,7 @@ function createEtablissementMarker(map, etablissement, baseUrl = window.location
                 popupContent += `<p>${etablissement.adresse}, ${etablissement.ville}</p>`;
                 popupContent += `<a href="${baseUrl}/etablissement/${etablissement.id_etab}" class="btn btn-success">Voir plus</a></div>`;
                 popupContainer.innerHTML = popupContent;
-                marker._popup.update();
+                marker.popup.update();
             });
     } else {
         marker.openPopup();

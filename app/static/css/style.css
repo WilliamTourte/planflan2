@@ -690,6 +690,14 @@ input[type="submit"]:active {
     z-index: 999999 !important;
 }
 
+.centered-popup {
+    margin: 50px auto !important;
+    position: relative !important;
+    left: 0 !important;
+    right: 0 !important;
+    transform: none !important;
+    max-width: calc(100% - 40px) !important;
+}
 /* Bouton de géolocalisation */
 .leaflet-control-geolocate {
     width: 50px;
