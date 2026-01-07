@@ -9,6 +9,9 @@ let userLocation = null;
 let proximityRadius = 5;
 let villeSelectionnee = null;
 
+// Désactiver les transformations 3D pour Leaflet
+L_DISABLE_3D = true;
+
 // Variables pour les filtres
 let activeFilters = {
     type_pate: false,
@@ -107,9 +110,10 @@ function createEtablissementMarker(map, etablissement, baseUrl = window.location
             autoPanPadding: [50, 20], // Marge haut/bas: 50px, gauche/droite: 20px
             keepInView: true,
             closeButton: true,
-            className: 'custom-popup centered-popup no-transform3d',
+            className: 'custom-popup centered-popup',
             maxWidth: 250, // Forcer la largeur maximale à 250px
-            zoomAnimation: false // Désactiver l'animation de zoom qui utilise transform3d
+            autoPanPaddingTopLeft: [50, 20],
+            autoPanPaddingBottomRight: [50, 20]
         });
 
         // Créer le conteneur avec un z-index élevé
@@ -121,6 +125,11 @@ function createEtablissementMarker(map, etablissement, baseUrl = window.location
 
         // Attacher le popup au marqueur
         marker.bindPopup(popup).openPopup();
+
+        // Centrer la carte sur le marqueur avec un léger délai
+        setTimeout(() => {
+            map.panTo(marker.getLatLng());
+        }, 100);
        
 
         fetch(`/get_infowindow_content?id_etab=${etablissement.id_etab}`)

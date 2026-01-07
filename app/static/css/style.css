@@ -659,22 +659,21 @@ input[type="submit"]:active {
 .leaflet-popup-content-wrapper {
     width: var(--infowindow-width);
     max-width: var(--infowindow-max-width);
-    max-height: 75vh;
-    overflow-y: auto;
-    overflow-x: none;
     font-size: var(--font-size-md);
-    margin: 0 !important;
     z-index: 999999 !important;
-    position: relative;
+}
+
+.leaflet-popup {
+    z-index: 999999 !important;
 }
 
 .leaflet-popup-content {
     width: var(--infowindow-width);
-    margin: 0;
+    margin: 0 auto;
     padding: var(--padding-md);
     z-index: 999999 !important;
-  
     background: white;
+    text-align: center;
 }
 
 .leaflet-popup-close-button {
@@ -688,25 +687,26 @@ input[type="submit"]:active {
     z-index: 999999 !important;
 }
 
-/* Désactiver transform3d pour les popups Leaflet */
-.leaflet-popup.no-transform3d {
-    transform: none !important;
+
+
+/* Assurer que le contenu est centré */
+.leaflet-popup-content {
+    text-align: center;
 }
 
-/* Réactiver le positionnement absolu mais sans transformation 3D */
-.leaflet-popup.no-transform3d {
-    position: absolute !important;
-    left: 0 !important;
-    top: 0 !important;
+/* Positionnement de la pointe du popup */
+.leaflet-popup-tip {
+    left: 50% !important;
+    margin-left: -10px !important;
 }
 
-/* Forcer Leaflet à utiliser un positionnement standard */
-.leaflet-popup.no-transform3d .leaflet-popup-tip {
-    transform: none !important;
-}
-
+/* Styles pour centrer le popup */
 .centered-popup {
     max-width: calc(100% - 40px) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
 }
 /* Bouton de géolocalisation */
 .leaflet-control-geolocate {
