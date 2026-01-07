@@ -17,12 +17,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Configuration des alertes
-try:
-    from alerts import setup_alerts
-    alert_logger = setup_alerts()
-except ImportError:
-    alert_logger = None
+
 
 # Charger les variables d'environnement en premier
 load_dotenv()
@@ -164,10 +159,6 @@ def creer_flans_et_evaluations():
     # Ajouter un log pour indiquer que les données ont été supprimées
     logger.warning("ATTENTION : Toutes les données des flans et des évaluations ont été supprimées")
     
-    # Envoyer une alerte si les alertes sont configurées
-    if alert_logger:
-        alert_logger.warning("ATTENTION : Toutes les données des flans et des évaluations ont été supprimées")
-    
     # Récupérer tous les établissements
     query = select(etablissements)
     result = session.execute(query)
@@ -216,6 +207,7 @@ def creer_flans_et_evaluations():
                 type_pate=type_pate,
                 type_saveur=type_saveur,
                 type_texture=type_texture,
+                statut="VALIDE",
                 id_user=1,
             )
             result = session.execute(stmt)
@@ -259,6 +251,7 @@ def creer_flans_et_evaluations():
                     pate=pate,
                     gout=gout,
                     id_flan=flan['id_flan'],
+                    statut="VALIDE",
                     id_user=1,  # admin_flan
                 )
                 session.execute(stmt_eval)
@@ -311,10 +304,6 @@ def mettre_a_jour_visite_label():
     
     # Ajouter un log pour indiquer que les données ont été mises à jour
     logger.warning(f"ATTENTION : {len(etablissement_records)} établissements ont été mis à jour avec des valeurs aléatoires")
-    
-    # Envoyer une alerte si les alertes sont configurées
-    if alert_logger:
-        alert_logger.warning(f"ATTENTION : {len(etablissement_records)} établissements ont été mis à jour avec des valeurs aléatoires")
     
     session.close()
 
