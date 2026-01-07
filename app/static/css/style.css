@@ -667,7 +667,7 @@ input[type="submit"]:active {
 .leaflet-popup-content {
     
     margin: 0 auto;
-    padding: var(--padding-sm);
+   
     background: white;
     text-align: center;
     max-height: 50vh;
