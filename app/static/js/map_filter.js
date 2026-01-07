@@ -109,14 +109,14 @@ function createEtablissementMarker(map, etablissement, baseUrl = window.location
             autoPan: true,
             autoPanPadding: [50, 50], // Marge pour éviter que le popup soit collé aux bords
             keepInView: true,
-            closeButton: true,
-            className: 'custom-popup',
+            closeButton: false,
+            
             
         });
 
-        // Créer le conteneur avec un z-index élevé
+        // Créer le conteneur
         const popupContainer = L.DomUtil.create('div', 'custom-popup-container');
-        popupContainer.style.zIndex = '999999';
+        
 
         // Définir le contenu du popup
         popup.setContent(popupContainer);
