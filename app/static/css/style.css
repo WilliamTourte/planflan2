@@ -417,7 +417,7 @@ input[type="submit"]:active {
     padding: var(--padding-xs) var(--padding-sm);
     border-radius: 15px;
     box-shadow: var(--box-shadow);
-    z-index: 20;
+
 }
 
 .badge-type-etab {
@@ -661,19 +661,16 @@ input[type="submit"]:active {
     max-width: var(--infowindow-max-width);
     font-size: var(--font-size-md);
     margin: 0 !important;
-    z-index: 999999 !important;
 }
 
 .leaflet-popup-content {
-    
-    margin: 0 auto;
-   
     background: white;
     text-align: center;
     max-height: 50vh;
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: var(--color-secondary) var(--color-light);
+    padding : 0 !important;
 }
 
 .leaflet-popup-content::-webkit-scrollbar {
@@ -701,19 +698,13 @@ input[type="submit"]:active {
     margin-left: -10px !important;
     top: 5px;
     right: 5px;
-    z-index: 999999 !important;
-}
 
-.leaflet-popup {
-    z-index: 999999 !important;
 }
 
 
 
-/* Assurer que le contenu est centré */
-.leaflet-popup-content {
-    text-align: center;
-}
+
+
 
 /* Positionnement de la pointe du popup */
 .leaflet-popup-tip {
@@ -723,7 +714,7 @@ input[type="submit"]:active {
 
 /* Styles pour centrer le popup */
 .centered-popup {
-    max-width: calc(100% - 40px) !important;
+    max-width: calc(100% - 10px) !important;
     margin-left: auto !important;
     margin-right: auto !important;
     left: 50% !important;
@@ -866,14 +857,14 @@ input[type="submit"]:active {
     box-shadow: var(--box-shadow);
     font-family: var(--font-primary);
     max-width: 300px;
-    z-index: inherit;
+
 }
 
 .legende-container {
     display: left;
     
     gap: var(--gap-sm);
-    z-index: 1;
+
 }
 
 
