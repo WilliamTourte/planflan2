@@ -111,7 +111,7 @@ function createEtablissementMarker(map, etablissement, baseUrl = window.location
             keepInView: true,
             closeButton: true,
             className: 'custom-popup',
-            maxWidth: 250
+            
         });
 
         // Créer le conteneur avec un z-index élevé

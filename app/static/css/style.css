@@ -51,8 +51,8 @@
     --box-shadow-hover: 0 5px 10px rgba(0, 0, 0, 0.15);
 
     /* Largeur des infowindows */
-    --infowindow-width: 250px;
-    --infowindow-max-width: 250px;
+    --infowindow-width: 300px;
+    --infowindow-max-width: 300px;
 }
 
 /* Reset & Base */
@@ -665,15 +665,15 @@ input[type="submit"]:active {
 }
 
 .leaflet-popup-content {
-    width: var(--infowindow-width);
+    
     margin: 0 auto;
-    padding: var(--padding-md);
+    padding: var(--padding-sm);
     background: white;
     text-align: center;
-    max-height: 300px;
+    max-height: 50vh;
     overflow-y: auto;
     scrollbar-width: thin;
-    scrollbar-color: var(--color-primary) var(--color-light);
+    scrollbar-color: var(--color-secondary) var(--color-light);
 }
 
 .leaflet-popup-content::-webkit-scrollbar {
