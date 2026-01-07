@@ -107,13 +107,11 @@ function createEtablissementMarker(map, etablissement, baseUrl = window.location
         // Créer le popup avec les paramètres corrects
         const popup = L.popup({
             autoPan: true,
-            autoPanPadding: [50, 20], // Marge haut/bas: 50px, gauche/droite: 20px
+            autoPanPadding: [50, 50], // Marge pour éviter que le popup soit collé aux bords
             keepInView: true,
             closeButton: true,
-            className: 'custom-popup centered-popup',
-            maxWidth: 250, // Forcer la largeur maximale à 250px
-            autoPanPaddingTopLeft: [50, 20],
-            autoPanPaddingBottomRight: [50, 20]
+            className: 'custom-popup',
+            maxWidth: 250
         });
 
         // Créer le conteneur avec un z-index élevé
