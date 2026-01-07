@@ -100,14 +100,12 @@ for etablissement in etablissement_records:
             type_saveur=type_saveur,
             type_texture=type_texture,
             id_user=1,
-            statut="VALIDE"
+            statut="VALIDE",
         )
         result = session.execute(stmt)
-        flans_crees.append({
-            'id_flan': result.lastrowid,
-            'id_etab': etablissement.id_etab,
-            'nom': nom
-        })
+        flans_crees.append(
+            {"id_flan": result.lastrowid, "id_etab": etablissement.id_etab, "nom": nom}
+        )
 
 # Valider les modifications
 session.commit()
@@ -124,29 +122,29 @@ etablissements_visites = result_visites.fetchall()
 evaluations_crees = 0
 for etablissement in etablissements_visites:
     # Trouver les flans de cet établissement
-    flans_etab = [f for f in flans_crees if f['id_etab'] == etablissement.id_etab]
-    
+    flans_etab = [f for f in flans_crees if f["id_etab"] == etablissement.id_etab]
+
     if flans_etab:
         # Créer des évaluations pour certains flans (entre 1 et le nombre total de flans)
         num_evaluations = random.randint(1, len(flans_etab))
         flans_a_evaluer = random.sample(flans_etab, num_evaluations)
-        
+
         for flan in flans_a_evaluer:
             # Générer des notes aléatoires (entre 1 et 5 avec 1 décimale)
             visuel = round(random.uniform(1.0, 5.0), 1)
             texture = round(random.uniform(1.0, 5.0), 1)
             pate = round(random.uniform(1.0, 5.0), 1)
             gout = round(random.uniform(1.0, 5.0), 1)
-            
+
             # Insérer l'évaluation
             stmt_eval = insert(evaluations).values(
                 visuel=visuel,
                 texture=texture,
                 pate=pate,
                 gout=gout,
-                id_flan=flan['id_flan'],
+                id_flan=flan["id_flan"],
                 id_user=1,  # admin_flan
-                statut="TypVALIDE"
+                statut="TypVALIDE",
             )
             session.execute(stmt_eval)
             evaluations_crees += 1
@@ -154,6 +152,8 @@ for etablissement in etablissements_visites:
 
 # Valider les modifications des évaluations
 session.commit()
-print(f"✅ {evaluations_crees} évaluations aléatoires créées pour les établissements visités.")
+print(
+    f"✅ {evaluations_crees} évaluations aléatoires créées pour les établissements visités."
+)
 
 session.close()

@@ -693,25 +693,14 @@ input[type="submit"]:active {
     right: 5px;
 }
 
-.leaflet-popup-tip {
-    left: 50% !important;
-    margin-left: -10px !important;
-    top: 5px;
-    right: 5px;
-
-}
-
-
-
-
-
 
 /* Positionnement de la pointe du popup */
 .leaflet-popup-tip {
     left: 50% !important;
     margin-left: -10px !important;
+    top: 5px;
+    right: 5px;
 }
-
 
 /* Bouton de géolocalisation */
 .leaflet-control-geolocate {
@@ -754,9 +743,8 @@ input[type="submit"]:active {
     font-family: Arial, sans-serif;
     width: 100%;
     max-width: 100%;
-    padding: 10px;
+   
     margin: 0 auto;
-    box-sizing: border-box;
     overflow-wrap: break-word;
     text-align: center;
 }
@@ -764,10 +752,12 @@ input[type="submit"]:active {
 .infowindow-header {
     position: relative;
     min-height: 30px;
+    padding-top: 40px; /* Espace pour les badges */
+    margin-top: 0; /* S'assurer qu'il n'y a pas de marge supplémentaire */
 }
 
 .infowindow-header h3 {
-    margin: 0 0 10px 0;
+  
     font-size: 1em;
     line-height: 1.2;
     text-align: center;
@@ -776,24 +766,44 @@ input[type="submit"]:active {
 
 .infowindow-badges {
     position: absolute;
-    top: 0;
-    width: 100%;
+    top: 10px; /* Positionner légèrement en dessous du haut */
+    left: 0;
+    right: 0;
     display: flex;
     justify-content: space-between;
     pointer-events: none;
+    z-index: 10; /* S'assurer qu'ils sont au-dessus du contenu mais pas du titre */
+    max-height: 30px; /* Limiter la hauteur */
 }
 
 .infowindow-badges .badge {
     font-size: var(--font-size-xs);
-    padding: 3px 8px;
-    max-width: 80px;
+    padding: 6px 10px;
+    max-width: 110px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    height: 28px; /* Hauteur fixe */
+    line-height: 1; /* Alignement vertical */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Badge labellisé spécifique pour l'infowindow */
+.infowindow-badges .badge-labellise {
+    background-color: #87CEEB;
+    margin-right: 20px;
+}
+
+/* Badge type établissement spécifique pour l'infowindow */
+.infowindow-badges .badge-type-etab {
+    background-color: inherit; /* Conserver la couleur dynamique */
+    padding: 6px 8px; /* Padding légèrement réduit */
 }
 
 .infowindow-body {
-    margin-bottom: 15px;
+    
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -1003,7 +1013,8 @@ input[type="submit"]:active {
 .adresse {
     font-style: italic;
     color: var(--color-text-light);
-    margin-bottom: var(--margin-sm);
+    margin:0 !important;
+  
 }
 
 .description {

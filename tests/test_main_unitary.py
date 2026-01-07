@@ -868,8 +868,6 @@ def test_rechercher_route(client):
     assert b"form_recherche" in response.data or b"Recherche" in response.data
 
 
-
-
 @pytest.mark.unitary
 def test_afficher_badge_type_etab(client):
     """Test la fonction afficher_badge_type_etab."""
