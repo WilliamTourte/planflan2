@@ -712,14 +712,7 @@ input[type="submit"]:active {
     margin-left: -10px !important;
 }
 
-/* Styles pour centrer le popup */
-.centered-popup {
-    max-width: calc(100% - 10px) !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-}
+
 /* Bouton de géolocalisation */
 .leaflet-control-geolocate {
     width: 50px;
