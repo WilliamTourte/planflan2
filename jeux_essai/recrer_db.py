@@ -17,6 +17,13 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Configuration des alertes
+try:
+    from alerts import setup_alerts
+    alert_logger = setup_alerts()
+except ImportError:
+    alert_logger = None
+
 # Charger les variables d'environnement en premier
 load_dotenv()
 
@@ -153,6 +160,13 @@ def creer_flans_et_evaluations():
     session.commit()
     print("Toutes les evaluations existantes ont ete supprimees.")
     logger.info("Toutes les évaluations existantes ont été supprimées")
+    
+    # Ajouter un log pour indiquer que les données ont été supprimées
+    logger.warning("ATTENTION : Toutes les données des flans et des évaluations ont été supprimées")
+    
+    # Envoyer une alerte si les alertes sont configurées
+    if alert_logger:
+        alert_logger.warning("ATTENTION : Toutes les données des flans et des évaluations ont été supprimées")
     
     # Récupérer tous les établissements
     query = select(etablissements)
@@ -294,6 +308,14 @@ def mettre_a_jour_visite_label():
     session.commit()
     print(f"{len(etablissement_records)} etablissements mis a jour avec visite/label aleatoires.")
     logger.info(f"{len(etablissement_records)} établissements mis à jour avec visite/label aléatoires")
+    
+    # Ajouter un log pour indiquer que les données ont été mises à jour
+    logger.warning(f"ATTENTION : {len(etablissement_records)} établissements ont été mis à jour avec des valeurs aléatoires")
+    
+    # Envoyer une alerte si les alertes sont configurées
+    if alert_logger:
+        alert_logger.warning(f"ATTENTION : {len(etablissement_records)} établissements ont été mis à jour avec des valeurs aléatoires")
+    
     session.close()
 
 # Fonction principale
@@ -301,6 +323,13 @@ if __name__ == "__main__":
     print("Debut de la recreation de la base de donnees...")
     logger.info("Début de la recréation de la base de données")
     
+    # Demander confirmation avant de continuer
+    confirmation = input("ATTENTION : Cette operation va supprimer et recreer les donnees. Voulez-vous continuer ? (oui/non) : ")
+    if confirmation.lower() != "oui":
+        print("Operation annulee par l'utilisateur.")
+        logger.info("Operation annulee par l'utilisateur")
+        sys.exit(0)
+
 # Crée le contexte d'application
 with app.app_context():
 
