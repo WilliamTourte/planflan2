@@ -109,17 +109,25 @@ def filtrer_etablissements(query, **kwargs):
 @main_bp.route("/liste_etablissements", methods=["GET", "POST"])
 def liste_etablissements():
     print("DEBUG: Méthode HTTP:", request.method)
-    print("DEBUG: Données reçues:", request.form if request.method == "POST" else request.args)
-    
+    print(
+        "DEBUG: Données reçues:",
+        request.form if request.method == "POST" else request.args,
+    )
+
     # Détecter le mode géolocalisation
-    geolocalisation_mode = request.form.get("geolocalisation") == "true" or request.args.get("geolocalisation") == "true"
+    geolocalisation_mode = (
+        request.form.get("geolocalisation") == "true"
+        or request.args.get("geolocalisation") == "true"
+    )
     print(f"DEBUG: geolocalisation_mode: {geolocalisation_mode}")
-    
+
     # Debug des paramètres GET pour la géolocalisation
     print("DEBUG: Paramètres GET - latitude:", request.args.get("latitude"))
     print("DEBUG: Paramètres GET - longitude:", request.args.get("longitude"))
-    print("DEBUG: Paramètres GET - geolocalisation:", request.args.get("geolocalisation"))
-    
+    print(
+        "DEBUG: Paramètres GET - geolocalisation:", request.args.get("geolocalisation")
+    )
+
     form_ajout = EtabForm(prefix="ajout-etab")
     form_edit = EtabForm(prefix="edit-etab")
 
@@ -167,8 +175,10 @@ def liste_etablissements():
         etablissements = query.distinct().all()
     else:
         # 4. Appliquer les autres filtres (sauf la ville)
-        if request.method == "POST" or form_recherche.validate_on_submit() or (
-            request.method == "GET" and form_recherche.validate()
+        if (
+            request.method == "POST"
+            or form_recherche.validate_on_submit()
+            or (request.method == "GET" and form_recherche.validate())
         ):
             # On ne fait la jointure que si un filtre sur Flan est activé
             need_join = (
@@ -198,14 +208,21 @@ def liste_etablissements():
                 form_recherche.type_saveur.data
                 and form_recherche.type_saveur.data != "tous"
             ):
-                query = query.filter(Flan.type_saveur == form_recherche.type_saveur.data)
-            if form_recherche.type_pate.data and form_recherche.type_pate.data != "tous":
+                query = query.filter(
+                    Flan.type_saveur == form_recherche.type_saveur.data
+                )
+            if (
+                form_recherche.type_pate.data
+                and form_recherche.type_pate.data != "tous"
+            ):
                 query = query.filter(Flan.type_pate == form_recherche.type_pate.data)
             if (
                 form_recherche.type_texture.data
                 and form_recherche.type_texture.data != "tous"
             ):
-                query = query.filter(Flan.type_texture == form_recherche.type_texture.data)
+                query = query.filter(
+                    Flan.type_texture == form_recherche.type_texture.data
+                )
             if form_recherche.prix.data and form_recherche.prix.data != "tous":
                 if form_recherche.prix.data == "0":
                     query = query.filter(Flan.prix < 2.5)
@@ -217,7 +234,10 @@ def liste_etablissements():
                 query = query.filter(
                     Etablissement.visite == (form_recherche.visite.data == "oui")
                 )
-            if form_recherche.labellise.data and form_recherche.labellise.data != "tous":
+            if (
+                form_recherche.labellise.data
+                and form_recherche.labellise.data != "tous"
+            ):
                 query = query.filter(
                     Etablissement.label == (form_recherche.labellise.data == "oui")
                 )
@@ -245,7 +265,12 @@ def liste_etablissements():
     # 6. Préparation pour le template
     etablissements, etablissements_json = afficher_etablissements(etablissements)
 
-    print("DEBUG: Préparation du rendu du template avec user_lat:", user_lat, "user_lon:", user_lon)
+    print(
+        "DEBUG: Préparation du rendu du template avec user_lat:",
+        user_lat,
+        "user_lon:",
+        user_lon,
+    )
     return render_template(
         "liste_etablissements.html",
         etablissements=etablissements,

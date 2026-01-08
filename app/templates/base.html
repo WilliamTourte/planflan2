@@ -30,7 +30,7 @@
             <!-- Formulaire unique avec logique conditionnelle -->
             <form action="{{ url_for('main.liste_etablissements') }}" method="GET" class="d-flex align-items-center flex-grow-1 mx-2">
                 <input type="text" name="recherche_simple" placeholder="Rechercher..." class="form-control" id="search-input">
-                <button type="submit" class="btn btn-icon" id="search-button">
+                <button type="submit" class="btn btn-icon" id="search-button" title="Rechercher">
                     <i class="bi bi-search"></i>
                 </button>
             </form>
