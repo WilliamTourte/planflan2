@@ -72,18 +72,7 @@ const createEmojiIcon = (emoji, className) => {
     });
 };
 
-// Fonction pour calculer la distance entre deux points (en km)
-function calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371; // Rayon de la Terre en km
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-        Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
-}
+
 
 // Fonction pour créer un marqueur avec un popup asynchrone pour un établissement donné
 function createEtablissementMarker(map, etablissement, baseUrl = window.location.origin) {
@@ -241,7 +230,7 @@ function zoomOnVille(ville) {
 }
 
 // Fonction pour créer un marqueur utilisateur
-function createUserMarker() {
+function createUserMarker(forceZoom = false) {
     if (userMarker) map.removeLayer(userMarker);
    
 
@@ -251,8 +240,10 @@ function createUserMarker() {
             
         }).addTo(map);
 
-        // Centrer la carte sur l'utilisateur
-        map.setView([userLocation.lat, userLocation.lon], 13);
+        // Centrer la carte sur l'utilisateur seulement si forceZoom est vrai
+        if (forceZoom) {
+            map.setView([userLocation.lat, userLocation.lon], 13);
+        }
     }
 }
 // Fonction pour ajouter le bouton de géolocalisation comme contrôle Leaflet
@@ -279,7 +270,7 @@ function addGeolocateControl() {
                     (coords) => {
                         userLocation = { lat: coords.latitude, lon: coords.longitude };
                         activeFilters.proximity = true;
-                        createUserMarker();
+                        createUserMarker(true);
 
                         // Met à jour les champs cachés du formulaire (si ils existent)
                         const latitudeInput = document.getElementById('latitude');
@@ -296,7 +287,7 @@ function addGeolocateControl() {
                             }
                         } else {
                             // Si les champs n'existent pas, on recrée juste la carte avec la nouvelle position
-                            createUserMarker();
+                            createUserMarker(true);
                             updateMarkersBasedOnFilters();
                         }
                     },
@@ -351,8 +342,8 @@ function initMap() {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
 
-    // Ajouter le marqueur utilisateur si position disponible
-    createUserMarker();
+    // Ajouter le marqueur utilisateur si position disponible (sans forcer le zoom)
+    createUserMarker(false);
     
     // Ajouter un écouteur d'événement pour le déplacement de la carte
     map.on('moveend', function() {
@@ -444,13 +435,8 @@ function setupGeolocation() {
                 (coords) => {
                     userLocation = { lat: coords.latitude, lon: coords.longitude };
                     
-                    // Créer le marqueur utilisateur
-                    createUserMarker();
-                    
-                    // Zoomer sur la position utilisateur (sans filtrer les établissements)
-                    if (map) {
-                        map.setView([coords.latitude, coords.longitude], 15);
-                    }
+                    // Créer le marqueur utilisateur avec zoom forcé
+                    createUserMarker(true);
                 },
                 (error) => {
                     // Gestion des erreurs
