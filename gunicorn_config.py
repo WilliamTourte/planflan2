@@ -23,4 +23,4 @@ loglevel = "info"
 # reload = True
 
 # Fichier WSGI
-wsgi_app = "app:create_app()"
+wsgi_app = "wsgi:app"
