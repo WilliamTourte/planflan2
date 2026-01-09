@@ -14,7 +14,9 @@ export FLASK_CONFIG="ConfigProd"  # Utilise config_prod.py
 echo "Connexion DB Ok"
 echo "Exéccution de la migration DB"
 # appliquer les migrations
+flask db init
 flask db upgrade
+flask db migrate
 
 # Démarrer l'app Flask
 # exec flask run --host=0.0.0.0
