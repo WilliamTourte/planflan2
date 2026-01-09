@@ -242,8 +242,10 @@ def test_scenario_suppression_contenu(client):
     with client.application.app_context():
         # Vérifier qu'il n'y a plus de flans associés
         remaining_flans = Flan.query.filter_by(id_etab=etab_id).all()
-        assert len(remaining_flans) == 0, "Il reste des flans associés à l'établissement"
-        
+        assert (
+            len(remaining_flans) == 0
+        ), "Il reste des flans associés à l'établissement"
+
         # Supprimer l'établissement directement via la base
         etab_to_delete = Etablissement.query.get(etab_id)
         db.session.delete(etab_to_delete)

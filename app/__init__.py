@@ -23,6 +23,14 @@ csrf = CSRFProtect()
 
 
 def create_app(config_class=Config):
+    """Crée et configure l'application Flask.
+
+    Args:
+        config_class: La classe de configuration à utiliser
+
+    Returns:
+        Flask: L'application Flask configurée
+    """
     app = Flask(__name__)
     app.config.from_object(config_class)
 
@@ -73,10 +81,16 @@ def create_app(config_class=Config):
 
     # Initialiser les en-têtes de sécurité
     from .security_headers import init_security_headers
+
     init_security_headers(app)
-    
+
     # Configurer la journalisation
-    from .logging_config import configure_logging, log_request_info, configure_error_handling
+    from .logging_config import (
+        configure_logging,
+        log_request_info,
+        configure_error_handling,
+    )
+
     configure_logging(app)
     log_request_info(app)
     configure_error_handling(app)

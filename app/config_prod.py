@@ -1,4 +1,9 @@
-# Configuration pour l'environnement de production
+"""Module de configuration pour l'environnement de production.
+
+Ce module contient les classes de configuration spécifiques à l'environnement
+de production, incluant les paramètres de sécurité renforcés, les configurations
+de journalisation et de cache adaptées à un déploiement en production.
+"""
 
 import os
 from dotenv import load_dotenv

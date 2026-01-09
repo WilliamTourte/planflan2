@@ -1,14 +1,14 @@
 <!-- MACROS D'AFFICHAGE -->
-{% macro afficher_image_ou_placeholder(item, classe='carte-image') %}
+{% macro afficher_image_ou_placeholder(item, class='carte-image') %}
     {% if item.photos %}
-        <img src="{{ url_for('static', filename='uploads/' + item.photos[0].path) }}" alt="{{ item.nom }}" class="{{ classe }}">
+        <img src="{{ url_for('static', filename='uploads/' + item.photos[0].path) }}" alt="{{ item.nom }}" class="{{ class }}">
     {% else %}
         {% if item.__class__.__name__ == 'Flan' %}
-            <img src="{{ url_for('static', filename='uploads/flan-vanille.webp') }}" alt="Flan par défaut" class="{{ classe }}">
+            <img src="{{ url_for('static', filename='uploads/flan-vanille.webp') }}" alt="Flan par défaut" class="{{ class }}">
         {% elif item.__class__.__name__ == 'Etablissement' %}
-            <img src="{{ url_for('static', filename='uploads/defaut_etab.jpg') }}" alt="Etablissement par défaut" class="{{ classe }}">
+            <img src="{{ url_for('static', filename='uploads/defaut_etab.jpg') }}" alt="Etablissement par défaut" class="{{ class }}">
         {% else %}
-            <div class="{{ classe }} placeholder"><span>Pas de photo</span></div>
+            <div class="{{ class }} placeholder"><span>Pas de photo</span></div>
         {% endif %}
     {% endif %}
 {% endmacro %}
@@ -285,7 +285,7 @@
                         {% if moyenne_flan is not none %}
                         <div class="flan-moyenne">
                             <span class="moyenne-label">Moyenne :</span>
-                            <span class="criterion-value">{{ moyenne_flan }}/5</span>
+                            <span class="moyenne-value">{{ moyenne_flan }}/5</span>
                         </div>
                         {% endif %}
                     </div>

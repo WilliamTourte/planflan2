@@ -1,3 +1,10 @@
+"""Module de configuration de l'application PlanFlan.
+
+Ce module contient les classes de configuration pour les différents environnements
+de l'application, incluant les paramètres de base de données, les clés secrètes,
+et les configurations spécifiques aux tests.
+"""
+
 import os
 from dotenv import load_dotenv
 
@@ -5,6 +12,13 @@ load_dotenv()
 
 
 class Config:
+    """Configuration de base pour l'application.
+
+    Cette classe définit les paramètres de configuration communs à tous les
+    environnements, tels que les clés secrètes, les URI de base de données,
+    et les paramètres de sécurité.
+    """
+
     SECRET_KEY = os.getenv("SECRET_KEY")
     SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
@@ -17,6 +31,13 @@ class Config:
 
 
 class TestConfig(Config):
+    """Configuration spécifique pour les tests.
+
+    Cette classe hérite de Config et redéfinit certains paramètres pour
+    faciliter les tests, comme l'utilisation d'une base de données en mémoire
+    et la désactivation de la protection CSRF.
+    """
+
     TESTING = True
     WTF_CSRF_ENABLED = False
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
