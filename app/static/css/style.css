@@ -24,7 +24,6 @@
     /* Espacements & Bordures */
     --border-radius: 10px;
     --border-radius-btn: 25px;
-    --border-radius-carte: 10px;
     --max-width: 1200px;
     --padding-xs: 2px;
     --padding-sm: 8px;
@@ -309,7 +308,7 @@ input[type="submit"]:active {
 .carte {
     text-decoration: none;
     color: inherit;
-    border-radius: var(--border-radius-carte);
+    border-radius: var(--border-radius);
     overflow: hidden;
     box-shadow: var(--box-shadow);
     transition: var(--transition);
@@ -330,14 +329,14 @@ input[type="submit"]:active {
     display: block;
     height: 180px;
     overflow: hidden;
-    border-radius: var(--border-radius-carte) var(--border-radius-carte) 0 0;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
 }
 
 .carte-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: var(--border-radius-carte) var(--border-radius-carte) 0 0;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
 }
 
 

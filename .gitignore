@@ -14,6 +14,7 @@ __pycache__/
 # Fichiers de base de données locales
 *.db
 *.sqlite
+jeux_essai/recrer_db.py
 
 # Fichiers de configuration IDE
 .idea/
