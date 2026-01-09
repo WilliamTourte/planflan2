@@ -8,6 +8,7 @@ niveaux de log appropriés et gestion des erreurs améliorée.
 import logging
 import os
 from logging.handlers import RotatingFileHandler, SMTPHandler
+import traceback
 from flask.logging import default_handler
 from flask import request
 
@@ -234,11 +235,12 @@ def configure_error_handling(app):
             app.logger.error(f"Unexpected error: {str(e)}", exc_info=True)
             app.logger.error(f"Logging error: {str(log_error)}")
 
-        # Retourner une réponse d'erreur générique pour ne pas exposer les détails
         return {
-            "error": "Une erreur est survenue. Veuillez réessayer plus tard.",
+            "error": f"Une erreur est survenue: {str(e)}",
             "status": "error",
-        }, 500
+            "type": type(e).__name__,
+            "traceback": traceback.format_exc() if app.debug else None
+        }, 500 
 
     @app.errorhandler(404)
     def handle_404(e):  # pylint: disable=unused-argument

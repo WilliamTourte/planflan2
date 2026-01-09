@@ -12,16 +12,20 @@ from dotenv import load_dotenv
 # Charger les variables d'environnement
 load_dotenv()
 
-
 class Config:
-    """Configuration de base"""
+    """Configuration de base pour l'application.
+
+    Cette classe définit les paramètres de configuration communs à tous les
+    environnements, tels que les clés secrètes, les URI de base de données,
+    et les paramètres de sécurité.
+    """
 
     # Clé secrète pour les sessions
-    SECRET_KEY = os.environ.get("SECRET_KEY") or "votre-cle-secrete-ici"
+    SECRET_KEY = os.getenv("SECRET_KEY") or "votre-cle-secrete-ici"
 
     # Configuration de la base de données
     SQLALCHEMY_DATABASE_URI = (
-        os.environ.get("DATABASE_URL")
+        os.getenv("DATABASE_URL")
         or "mysql+pymysql://flask_user:flanflask@localhost/planflan_db"
     )
     print(f" ConfigProd - database URI : {SQLALCHEMY_DATABASE_URI}")
@@ -43,11 +47,19 @@ class Config:
     # Configuration de la sécurité
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
+    REMEMBER_COOKIE_SECURE = True
     SESSION_COOKIE_SAMESITE = "Lax"
 
     # Configuration du cache
     CACHE_TYPE = "SimpleCache"
     CACHE_DEFAULT_TIMEOUT = 300
+
+    # Pour Google map
+    GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
+    WTF_CSRF_ENABLED = True  # Explicitement activé en production
+    REMEMBER_COOKIE_SECURE = True
+    PERMANENT_SESSION_LIFETIME = 3600
+    SQLALCHEMY_ECHO = False  # Désactivé en production
 
 
 class ConfigProd(Config):
