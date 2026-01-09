@@ -66,7 +66,9 @@ def get_villes():
     # Récupérer les villes qui correspondent à la recherche
     query = db.session.query(Etablissement.ville).distinct()
     if search_term:
-        query = query.filter(Etablissement.ville.ilike(f"%{search_term}%"))
+        # Utilisation de paramètres sécurisés pour éviter les injections SQL
+        search_pattern = f"%{search_term}%"
+        query = query.filter(Etablissement.ville.ilike(search_pattern))
 
     villes = query.all()
     villes = [ville[0] for ville in villes if ville[0]]
@@ -79,9 +81,13 @@ def get_villes():
 def filtrer_etablissements(query, **kwargs):
     """Applique les filtres communs à une requête Etablissement."""
     if kwargs.get("nom"):
-        query = query.filter(Etablissement.nom.ilike(f'%{kwargs["nom"]}%'))
+        # Utilisation de paramètres sécurisés pour éviter les injections SQL
+        nom_pattern = f"%{kwargs['nom']}%"
+        query = query.filter(Etablissement.nom.ilike(nom_pattern))
     if kwargs.get("ville"):
-        query = query.filter(Etablissement.ville.ilike(f'%{kwargs["ville"]}%'))
+        # Utilisation de paramètres sécurisés pour éviter les injections SQL
+        ville_pattern = f"%{kwargs['ville']}%"
+        query = query.filter(Etablissement.ville.ilike(ville_pattern))
     if kwargs.get("visite") == "oui":
         query = query.filter(Etablissement.visite == True)
     elif kwargs.get("visite") == "non":
@@ -315,7 +321,9 @@ def api_etablissements():
         # Applique les filtres
         query = Etablissement.query.join(Flan)
         if nom:
-            query = query.filter(Etablissement.nom.ilike(f"%{nom}%"))
+            # Utilisation de paramètres sécurisés pour éviter les injections SQL
+            nom_pattern = f"%{nom}%"
+            query = query.filter(Etablissement.nom.ilike(nom_pattern))
         if visite == "oui":
             query = query.filter(Etablissement.visite == True)
         elif visite == "non":
@@ -325,7 +333,9 @@ def api_etablissements():
         elif labellise == "non":
             query = query.filter(Etablissement.label == False)
         if ville:
-            query = query.filter(Etablissement.ville.ilike(f"%{ville}%"))
+            # Utilisation de paramètres sécurisés pour éviter les injections SQL
+            ville_pattern = f"%{ville}%"
+            query = query.filter(Etablissement.ville.ilike(ville_pattern))
         if type_pate != "tous":
             query = query.filter(Flan.type_pate == type_pate)
         if type_saveur != "tous":

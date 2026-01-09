@@ -5,6 +5,7 @@ omit =
     app/templates/*
     */__init__.py
     */__pycache__/*
+    app/config.py
 
 [report]
 exclude_lines =
