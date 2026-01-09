@@ -50,8 +50,8 @@
     --box-shadow-hover: 0 5px 10px rgba(0, 0, 0, 0.15);
 
     /* Largeur des infowindows */
-    --infowindow-width: 250px;
-    --infowindow-max-width: 250px;
+    --infowindow-width: 300px;
+    --infowindow-max-width: 300px;
 }
 
 /* Reset & Base */
@@ -416,7 +416,7 @@ input[type="submit"]:active {
     padding: var(--padding-xs) var(--padding-sm);
     border-radius: 15px;
     box-shadow: var(--box-shadow);
-    z-index: 20;
+
 }
 
 .badge-type-etab {
@@ -659,54 +659,48 @@ input[type="submit"]:active {
     width: var(--infowindow-width);
     max-width: var(--infowindow-max-width);
     font-size: var(--font-size-md);
-    z-index: 999999 !important;
-}
-
-.leaflet-popup {
-    z-index: 999999 !important;
+    margin: 0 !important;
 }
 
 .leaflet-popup-content {
-    width: var(--infowindow-width);
-    margin: 0 auto;
-    padding: var(--padding-md);
-    z-index: 999999 !important;
     background: white;
     text-align: center;
+    max-height: 50vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-secondary) var(--color-light);
+    padding : 0 !important;
+}
+
+.leaflet-popup-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.leaflet-popup-content::-webkit-scrollbar-track {
+    background: var(--color-light);
+    border-radius: 4px;
+}
+
+.leaflet-popup-content::-webkit-scrollbar-thumb {
+    background: var(--color-primary);
+    border-radius: 4px;
 }
 
 .leaflet-popup-close-button {
     font-size: 18px;
     top: 5px;
     right: 5px;
-    z-index: 999999 !important;
 }
 
-.leaflet-popup {
-    z-index: 999999 !important;
-}
-
-
-
-/* Assurer que le contenu est centré */
-.leaflet-popup-content {
-    text-align: center;
-}
 
 /* Positionnement de la pointe du popup */
 .leaflet-popup-tip {
     left: 50% !important;
     margin-left: -10px !important;
+    top: 5px;
+    right: 5px;
 }
 
-/* Styles pour centrer le popup */
-.centered-popup {
-    max-width: calc(100% - 40px) !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-}
 /* Bouton de géolocalisation */
 .leaflet-control-geolocate {
     width: 50px;
@@ -748,9 +742,8 @@ input[type="submit"]:active {
     font-family: Arial, sans-serif;
     width: 100%;
     max-width: 100%;
-    padding: 10px;
+   
     margin: 0 auto;
-    box-sizing: border-box;
     overflow-wrap: break-word;
     text-align: center;
 }
@@ -758,10 +751,12 @@ input[type="submit"]:active {
 .infowindow-header {
     position: relative;
     min-height: 30px;
+    padding-top: 40px; /* Espace pour les badges */
+    margin-top: 0; /* S'assurer qu'il n'y a pas de marge supplémentaire */
 }
 
 .infowindow-header h3 {
-    margin: 0 0 10px 0;
+  
     font-size: 1em;
     line-height: 1.2;
     text-align: center;
@@ -770,24 +765,44 @@ input[type="submit"]:active {
 
 .infowindow-badges {
     position: absolute;
-    top: 0;
-    width: 100%;
+    top: 10px; /* Positionner légèrement en dessous du haut */
+    left: 0;
+    right: 0;
     display: flex;
     justify-content: space-between;
     pointer-events: none;
+    z-index: 10; /* S'assurer qu'ils sont au-dessus du contenu mais pas du titre */
+    max-height: 30px; /* Limiter la hauteur */
 }
 
 .infowindow-badges .badge {
     font-size: var(--font-size-xs);
-    padding: 3px 8px;
-    max-width: 80px;
+    padding: 6px 10px;
+    max-width: 110px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    height: 28px; /* Hauteur fixe */
+    line-height: 1; /* Alignement vertical */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Badge labellisé spécifique pour l'infowindow */
+.infowindow-badges .badge-labellise {
+    background-color: #87CEEB;
+    margin-right: 20px;
+}
+
+/* Badge type établissement spécifique pour l'infowindow */
+.infowindow-badges .badge-type-etab {
+    background-color: inherit; /* Conserver la couleur dynamique */
+    padding: 6px 8px; /* Padding légèrement réduit */
 }
 
 .infowindow-body {
-    margin-bottom: 15px;
+    
     text-align: center;
     display: flex;
     flex-direction: column;
@@ -844,14 +859,14 @@ input[type="submit"]:active {
     box-shadow: var(--box-shadow);
     font-family: var(--font-primary);
     max-width: 300px;
-    z-index: inherit;
+
 }
 
 .legende-container {
     display: left;
     
     gap: var(--gap-sm);
-    z-index: 1;
+
 }
 
 
@@ -997,7 +1012,8 @@ input[type="submit"]:active {
 .adresse {
     font-style: italic;
     color: var(--color-text-light);
-    margin-bottom: var(--margin-sm);
+    margin:0 !important;
+  
 }
 
 .description {

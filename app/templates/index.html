@@ -79,6 +79,8 @@
 <form action="{{ url_for('main.liste_etablissements') }}" method="POST" class="form-container">
     {{ form_recherche.hidden_tag() }}
     {{ form_recherche.ville(class="d-none") }}  {# Champ caché pour le formulaire #}
+    {{ form_recherche.latitude(class="d-none") }}  {# Champ caché pour la latitude #}
+    {{ form_recherche.longitude(class="d-none") }}  {# Champ caché pour la longitude #}
     <div class="form-group autocomplete">
         <input type="text" 
                id="ville-autocomplete" 
@@ -87,16 +89,22 @@
                autocomplete="off">
         <div id="autocomplete-results" class="autocomplete-results"></div>
     </div>
-
-    <button type="submit" class="btn btn-success">
-        Rechercher
-    </button>
+    <div class="d-flex gap-2 mt-2">
+        <button type="submit" class="btn btn-success flex-grow-1" title="Rechercher">
+            Rechercher
+        </button>
+        <button type="button" id="geoloc-button" class="btn btn-success" title="Géolocalisation">
+            <i class="bi bi-geo-alt"></i>
+        </button>
+    </div>
 </form>
 
-<a href="{{ url_for('maps.proposer_etablissement') }}" class="btn btn-success" role="button">
+<a href="{{ url_for('maps.proposer_etablissement') }}" class="btn btn-success" role="button" style="margin-top: 20px;">
     Proposer une adresse
 </a>
 </div>
+
+<div> </div>
 {% endblock %}
 
 {% block scripts %}
@@ -266,5 +274,91 @@ if (!initAutocomplete()) {
     console.log("Falling back to DOMContentLoaded...");
     document.addEventListener("DOMContentLoaded", initAutocomplete);
 }
+
+// Fonction pour initialiser le bouton de géolocalisation
+function initGeolocButton() {
+    const geolocButton = document.getElementById('geoloc-button');
+    if (!geolocButton) return;
+
+    console.log('DEBUG: Bouton de géolocalisation initialisé');
+
+    geolocButton.addEventListener('click', function() {
+        console.log('DEBUG: Clic sur bouton de géolocalisation');
+        
+        // Sauvegarder l'état initial du bouton
+        const originalHTML = geolocButton.innerHTML;
+        const originalDisabled = geolocButton.disabled;
+
+        // Désactiver le bouton et montrer un indicateur de chargement
+        geolocButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Localisation...';
+        geolocButton.disabled = true;
+
+        // Utiliser la fonction de géolocalisation existante
+        console.log('DEBUG: Appel à geoloc.getUserLocation()');
+        geoloc.getUserLocation(
+            function(coords) {
+                console.log('DEBUG: Coordonnées reçues:', coords);
+                
+                // Remplir les champs cachés avec les coordonnées
+                const latitudeField = document.querySelector('input[name="latitude"]');
+                const longitudeField = document.querySelector('input[name="longitude"]');
+
+                console.log('DEBUG: Champ latitude trouvé:', latitudeField);
+                console.log('DEBUG: Champ longitude trouvé:', longitudeField);
+
+                if (latitudeField && longitudeField) {
+                    latitudeField.value = coords.latitude;
+                    longitudeField.value = coords.longitude;
+                    
+                    console.log('DEBUG: Champs mis à jour - latitude:', coords.latitude, 'longitude:', coords.longitude);
+                    console.log('DEBUG: Valeur champ latitude après mise à jour:', latitudeField.value);
+                    console.log('DEBUG: Valeur champ longitude après mise à jour:', longitudeField.value);
+
+                    // Construire l'URL avec les coordonnées et le flag de géolocalisation
+                    const url = new URL(window.location.origin + '{{ url_for("main.liste_etablissements") }}');
+                    url.searchParams.append('latitude', coords.latitude);
+                    url.searchParams.append('longitude', coords.longitude);
+                    url.searchParams.append('geolocalisation', 'true');
+
+                    console.log('DEBUG: Redirection vers:', url.toString());
+                    window.location.href = url.toString();
+
+                    return; // Ne pas soumettre le formulaire
+                } else {
+                    console.error('DEBUG: ERREUR - Champs latitude/longitude non trouvés');
+                    restoreButtonState();
+                }
+            },
+            function(error) {
+                // Gérer les erreurs de géolocalisation
+                let errorMessage = 'Erreur de géolocalisation: ';
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        errorMessage += 'Permission refusée';
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        errorMessage += 'Position indisponible';
+                        break;
+                    case error.TIMEOUT:
+                        errorMessage += 'Timeout';
+                        break;
+                    default:
+                        errorMessage += error.message;
+                }
+
+                alert(errorMessage);
+                restoreButtonState();
+            }
+        );
+
+        function restoreButtonState() {
+            geolocButton.innerHTML = originalHTML;
+            geolocButton.disabled = originalDisabled;
+        }
+    });
+}
+
+// Initialiser le bouton de géolocalisation
+initGeolocButton();
 </script>
 {% endblock %}

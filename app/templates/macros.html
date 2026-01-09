@@ -240,8 +240,8 @@
                     <input type="radio" name="edit-visite" value="Non" {% if not etablissement.visite %}checked{% endif %}> Non
                 </div>
             {% endif %}
-            <button type="submit" class="btn btn-success">Valider</button>
-            <button type="button" class="btn btn-canceledit" onclick="cancelEdit({{ etablissement.id_etab }})">Annuler</button>
+            <button type="submit" class="btn btn-success" title="Valider les modifications">Valider</button>
+            <button type="button" class="btn btn-canceledit" onclick="cancelEdit({{ etablissement.id_etab }})" title="Annuler les modifications">Annuler</button>
         </form>
     </div>
     {%  endif %}
@@ -360,8 +360,8 @@
                     {{ form.type_texture(class="form-control", id="edit-flan-type_texture") }}
                 </div>
                 <div class="form-group">
-                    <button type="submit" class="btn btn-success">Enregistrer</button>
-                    <button type="button" class="btn btn-canceledit" onclick="cancelEdit({{ flan.id_flan }})">Annuler</button>
+                    <button type="submit" class="btn btn-success" title="Enregistrer les modifications">Enregistrer</button>
+                    <button type="button" class="btn btn-canceledit" onclick="cancelEdit({{ flan.id_flan }})" title="Annuler les modifications">Annuler</button>
                 </div>
             </form>
         </div>
@@ -442,8 +442,8 @@
                 {{ form.description(class="form-control", id="eval-detail-description") }}
             </div>
             <div class="form-group">
-                <button type="submit" class="btn btn-success">Enregistrer</button>
-                <button type="button" class="btn btn-canceledit" onclick="cancelEdit({{ evaluation.id_eval }})">Annuler</button>
+                <button type="submit" class="btn btn-success" title="Enregistrer les modifications">Enregistrer</button>
+                <button type="button" class="btn btn-canceledit" onclick="cancelEdit({{ evaluation.id_eval }})" title="Annuler les modifications">Annuler</button>
             </div>
         </form>
     </div>
