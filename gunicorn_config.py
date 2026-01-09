@@ -1,7 +1,7 @@
 # Configuration pour Gunicorn
 
 # Adresse et port de liaison
-bind = "0.0.0.0:8000"
+bind = "0.0.0.0:5000"
 
 # Nombre de workers (2 * nombre de cœurs + 1)
 workers = 5

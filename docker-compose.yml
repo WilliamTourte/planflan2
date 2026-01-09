@@ -44,8 +44,8 @@ services:
     restart: always
     # Redirection de port à utiliser pour test en local
     # ATTENTION : ne pas garder en production
-    # ports:
-    #   - "5000:5000"
+    ports:
+      - "5000:5000"
     depends_on:
       planflan-service-db:
         condition: service_healthy

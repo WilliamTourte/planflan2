@@ -12,15 +12,20 @@ echo "Export de la variable FLASK_CONFIG"
 export FLASK_CONFIG="ConfigProd"  # Utilise config_prod.py
 
 echo "Connexion DB Ok"
-echo "Exéccution de la migration DB"
+echo "Exécution de la migration DB"
 # appliquer les migrations
 flask db init
-flask db upgrade
+
+echo "DB migrate"
 flask db migrate
+
+echo "DB Upgrade"
+flask db upgrade
 
 # Démarrer l'app Flask
 # exec flask run --host=0.0.0.0
 echo "Démarrage de Gunicorn..."
+# python -m wsgi à tester
 gunicorn --config gunicorn_config.py wsgi:app
 
 echo "Application démarrée avec succès !"

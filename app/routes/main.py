@@ -47,6 +47,8 @@ def index():
     form_recherche = RechercheForm()
     etablissements = Etablissement.query.all()
 
+    print(etablissements)
+    
     return render_template(
         "index.html",
         etablissements=etablissements,
