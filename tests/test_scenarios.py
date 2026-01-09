@@ -561,13 +561,4 @@ def test_scenario_geolocalisation(client):
     assert b"data-lat" in response.data
     assert b"data-lon" in response.data
 
-    # Étape 7 : Tester avec un rayon de recherche spécifique
-    # Tester avec un petit rayon qui devrait exclure l'établissement proche
-    response = client.get(
-        f"/liste_etablissements?latitude={test_latitude}&longitude={test_longitude}&geolocalisation=true&rayon=0.1"
-    )
-    assert response.status_code == 200
 
-    # Avec un très petit rayon, aucun établissement ne devrait être trouvé
-    # (sauf si un établissement est exactement à ces coordonnées)
-    # Cette vérification dépend de l'implémentation du filtre de proximité

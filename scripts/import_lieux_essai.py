@@ -113,9 +113,9 @@ if __name__ == "__main__":
     print("🔧 Exécution en mode complètement standalone...")
     logger.info("Début de l'exécution en mode standalone")
 
-    # Chemin par défaut dans le dossier jeux_essai
-    dossier_jeux_essai = os.path.dirname(os.path.abspath(__file__))
-    chemin_par_defaut = os.path.join(dossier_jeux_essai, "lieux_test.json")
+    # Chemin par défaut dans le dossier scripts
+    dossier_scripts = os.path.dirname(os.path.abspath(__file__))
+    chemin_par_defaut = os.path.join(dossier_scripts, "lieux_test.json")
 
     # Vérifier si un chemin de fichier est fourni en argument
     if len(sys.argv) > 1:
@@ -123,10 +123,10 @@ if __name__ == "__main__":
     else:
         fichier_json = chemin_par_defaut
         print(
-            f"📝 Aucun fichier spécifié, recherche dans le dossier jeux_essai : {fichier_json}"
+            f"📝 Aucun fichier spécifié, recherche dans le dossier scripts : {fichier_json}"
         )
         logger.info(
-            f"Aucun fichier spécifié, recherche dans le dossier jeux_essai : {fichier_json}"
+            f"Aucun fichier spécifié, recherche dans le dossier scripts : {fichier_json}"
         )
         print(
             "   Pour spécifier un autre fichier : python import_lieux_essai.py chemin/vers/fichier.json"
@@ -150,9 +150,9 @@ if __name__ == "__main__":
         logger.error("Fichier introuvable")
         print("   Vérifiez que :")
         logger.info("Vérifiez que :")
-        print(f"   1. Le fichier 'lieux_test.json' existe dans le dossier jeux_essai")
+        print(f"   1. Le fichier 'lieux_test.json' existe dans le dossier scripts")
         logger.info(
-            f"1. Le fichier 'lieux_test.json' existe dans le dossier jeux_essai"
+            f"1. Le fichier 'lieux_test.json' existe dans le dossier scripts"
         )
         print(f"   2. Le chemin est : {fichier_json}")
         logger.info(f"2. Le chemin est : {fichier_json}")

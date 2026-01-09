@@ -25,7 +25,7 @@ repos:
     hooks:
       - id: pytest-smoke
         name: Exécution des tests smoke
-        entry: python -m pytest tests/ -m "smoke" -v --tb=short -p no:xdist
+        entry: python -m pytest tests/ -m "smoke" -v --tb=short -o addopts=""
         language: system
         pass_filenames: false
         always_run: true

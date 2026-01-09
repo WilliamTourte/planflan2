@@ -303,16 +303,12 @@ function initGeolocButton() {
                 const latitudeField = document.querySelector('input[name="latitude"]');
                 const longitudeField = document.querySelector('input[name="longitude"]');
 
-                console.log('DEBUG: Champ latitude trouvé:', latitudeField);
-                console.log('DEBUG: Champ longitude trouvé:', longitudeField);
 
                 if (latitudeField && longitudeField) {
                     latitudeField.value = coords.latitude;
                     longitudeField.value = coords.longitude;
                     
-                    console.log('DEBUG: Champs mis à jour - latitude:', coords.latitude, 'longitude:', coords.longitude);
-                    console.log('DEBUG: Valeur champ latitude après mise à jour:', latitudeField.value);
-                    console.log('DEBUG: Valeur champ longitude après mise à jour:', longitudeField.value);
+   
 
                     // Construire l'URL avec les coordonnées et le flag de géolocalisation
                     const url = new URL(window.location.origin + '{{ url_for("main.liste_etablissements") }}');
@@ -320,7 +316,7 @@ function initGeolocButton() {
                     url.searchParams.append('longitude', coords.longitude);
                     url.searchParams.append('geolocalisation', 'true');
 
-                    console.log('DEBUG: Redirection vers:', url.toString());
+    
                     window.location.href = url.toString();
 
                     return; // Ne pas soumettre le formulaire

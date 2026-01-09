@@ -125,23 +125,16 @@ def liste_etablissements():
         request.form.get("geolocalisation") == "true"
         or request.args.get("geolocalisation") == "true"
     )
-    print(f"DEBUG: geolocalisation_mode: {geolocalisation_mode}")
+ 
 
-    # Debug des paramètres GET pour la géolocalisation
-    print("DEBUG: Paramètres GET - latitude:", request.args.get("latitude"))
-    print("DEBUG: Paramètres GET - longitude:", request.args.get("longitude"))
-    print(
-        "DEBUG: Paramètres GET - geolocalisation:", request.args.get("geolocalisation")
-    )
 
     form_ajout = EtabForm(prefix="ajout-etab")
     form_edit = EtabForm(prefix="edit-etab")
 
     if request.method == "POST":
-        print("DEBUG: Création du formulaire avec données POST")
+     
         form_recherche = RechercheForm(request.form)
-        print("DEBUG: Latitude reçue:", request.form.get("latitude"))
-        print("DEBUG: Longitude reçue:", request.form.get("longitude"))
+
     else:
         print("DEBUG: Création du formulaire avec données GET")
         form_recherche = RechercheForm(request.args)
@@ -250,25 +243,9 @@ def liste_etablissements():
 
         etablissements = query.distinct().all()
 
-    # 5. Filtre par proximité si coordonnées disponibles
-    if user_lat and user_lon:
-        print("DEBUG: Application du filtre de proximité avec rayon")
-        rayon = form_recherche.rayon.data or 5.0
-        etablissements = [
-            etab
-            for etab in etablissements
-            if etab.latitude
-            and etab.longitude
-            and calculer_distance(
-                float(user_lat),
-                float(user_lon),
-                float(etab.latitude),
-                float(etab.longitude),
-            )
-            <= float(rayon)
-        ]
 
-    # 6. Préparation pour le template
+
+    # 5. Préparation pour le template
     etablissements, etablissements_json = afficher_etablissements(etablissements)
 
     print(
