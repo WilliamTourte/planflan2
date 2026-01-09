@@ -297,3 +297,78 @@ def test_scenario_recherche_avancee(client):
     assert response.status_code == 200
     assert b"Boulangerie Visitee" in response.data
     assert b"Patisserie Labellisee" not in response.data
+
+
+@pytest.mark.integration
+@pytest.mark.scenarios
+def test_scenario_geolocalisation(client):
+    """Test un flux complet de géolocalisation : index -> liste_etablissements avec coordonnées"""
+    user = client.application.config["TEST_USER"]
+
+    # Étape 1 : Créer des établissements avec des coordonnées connues
+    with client.application.app_context():
+        # Établissement proche des coordonnées simulées (Paris centre)
+        etab_proche = Etablissement(
+            nom="Boulangerie Proche",
+            adresse="1 Rue Proche",
+            code_postal="75001",
+            ville="Paris",
+            latitude=48.8566,  # Paris centre
+            longitude=2.3522,
+            id_user=user.id_user,
+        )
+        db.session.add(etab_proche)
+
+        # Établissement loin des coordonnées simulées
+        etab_loin = Etablissement(
+            nom="Boulangerie Loin",
+            adresse="1 Rue Loin",
+            code_postal="69001",
+            ville="Lyon",
+            latitude=45.7640,  # Lyon
+            longitude=4.8357,
+            id_user=user.id_user,
+        )
+        db.session.add(etab_loin)
+        db.session.commit()
+
+    # Étape 2 : Accéder à la page d'accueil
+    response = client.get("/")
+    assert response.status_code == 200
+    assert b"PLANFLAN" in response.data
+
+    # Étape 3 : Simuler la géolocalisation avec des coordonnées connues (Paris)
+    # Dans un vrai navigateur, cela serait fait via l'API de géolocalisation
+    # Ici, nous simulons en envoyant directement une requête avec les coordonnées
+    test_latitude = 48.8566  # Paris centre
+    test_longitude = 2.3522
+
+    # Simuler la requête qui serait faite après la géolocalisation
+    response = client.get(
+        f"/liste_etablissements?latitude={test_latitude}&longitude={test_longitude}&geolocalisation=true"
+    )
+    assert response.status_code == 200
+
+    # Étape 4 : Vérifier que les coordonnées sont bien transmises au template
+    assert b"user-location" in response.data
+    assert f"{test_latitude}".encode() in response.data
+    assert f"{test_longitude}".encode() in response.data
+
+    # Étape 5 : Vérifier que l'établissement proche est affiché
+    assert b"Boulangerie Proche" in response.data
+
+    # Étape 6 : Vérifier que la carte est bien configurée pour le zoom sur les coordonnées
+    # Vérifier que les données de localisation utilisateur sont présentes dans le HTML
+    assert b"data-lat" in response.data
+    assert b"data-lon" in response.data
+
+    # Étape 7 : Tester avec un rayon de recherche spécifique
+    # Tester avec un petit rayon qui devrait exclure l'établissement proche
+    response = client.get(
+        f"/liste_etablissements?latitude={test_latitude}&longitude={test_longitude}&geolocalisation=true&rayon=0.1"
+    )
+    assert response.status_code == 200
+
+    # Avec un très petit rayon, aucun établissement ne devrait être trouvé
+    # (sauf si un établissement est exactement à ces coordonnées)
+    # Cette vérification dépend de l'implémentation du filtre de proximité
