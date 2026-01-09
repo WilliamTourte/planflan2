@@ -1,3 +1,10 @@
+"""Module contenant les formulaires de l'application PlanFlan.
+
+Ce module définit tous les formulaires utilisés dans l'application Flask,
+incluant les formulaires d'authentification, de création/modification
+d'établissements, de flans, d'évaluations, et de recherche.
+"""
+
 import math
 from flask_login import current_user
 from flask_wtf import FlaskForm
@@ -26,6 +33,12 @@ from app.models import TypeEtab, TypePate, TypeSaveur, TypeTexture, Utilisateur
 
 # Formulaire pour créer un compte
 class RegistrationForm(FlaskForm):
+    """Formulaire d'inscription pour les nouveaux utilisateurs.
+
+    Ce formulaire permet aux nouveaux utilisateurs de créer un compte
+    en fournissant un pseudo, un email, un mot de passe et sa confirmation.
+    """
+
     pseudo = StringField("Pseudo", validators=[DataRequired(), Length(min=4, max=50)])
     email = StringField("Email", validators=[DataRequired(), Email()])
     password = PasswordField("Mot de passe", validators=[DataRequired(), Length(min=6)])
@@ -36,6 +49,14 @@ class RegistrationForm(FlaskForm):
     submit = SubmitField("S'inscrire")
 
     def validate_pseudo(self, pseudo):
+        """Valide que le pseudo n'est pas déjà utilisé.
+
+        Args:
+            pseudo: Le champ pseudo à valider
+
+        Raises:
+            ValidationError: Si le pseudo est déjà pris
+        """
         user = Utilisateur.query.filter_by(pseudo=pseudo.data).first()
         if user:
             raise ValidationError(
@@ -43,6 +64,14 @@ class RegistrationForm(FlaskForm):
             )
 
     def validate_email(self, email):
+        """Valide que l'email n'est pas déjà utilisé.
+
+        Args:
+            email: Le champ email à valider
+
+        Raises:
+            ValidationError: Si l'email est déjà utilisé
+        """
         email = Utilisateur.query.filter_by(email=email.data).first()
         if email:
             raise ValidationError(
@@ -52,6 +81,12 @@ class RegistrationForm(FlaskForm):
 
 # Formulaire pour se connecter
 class LoginForm(FlaskForm):
+    """Formulaire de connexion pour les utilisateurs existants.
+
+    Ce formulaire permet aux utilisateurs de se connecter à leur compte
+    en fournissant leur pseudo et leur mot de passe.
+    """
+
     pseudo = StringField("Pseudo", validators=[DataRequired(), Length(min=4, max=50)])
     password = PasswordField("Mot de passe", validators=[DataRequired(), Length(min=6)])
     next = HiddenField()  # Champ caché pour stocker l'URL de redirection
@@ -60,6 +95,14 @@ class LoginForm(FlaskForm):
 
 # Custom coerce function for TypeEtab
 def coerce_type_etab(value):
+    """Convertit une valeur en chaîne pour TypeEtab.
+
+    Args:
+        value: La valeur à convertir
+
+    Returns:
+        str: La valeur convertie en chaîne
+    """
     if isinstance(value, str):
         return value
     if hasattr(value, "name"):
@@ -69,6 +112,14 @@ def coerce_type_etab(value):
 
 # Custom coerce function for TypePate
 def coerce_type_pate(value):
+    """Convertit une valeur en chaîne pour TypePate.
+
+    Args:
+        value: La valeur à convertir
+
+    Returns:
+        str: La valeur convertie en chaîne
+    """
     if isinstance(value, str):
         return value
     if hasattr(value, "name"):
@@ -78,6 +129,14 @@ def coerce_type_pate(value):
 
 # Custom coerce function for TypeSaveur
 def coerce_type_saveur(value):
+    """Convertit une valeur en chaîne pour TypeSaveur.
+
+    Args:
+        value: La valeur à convertir
+
+    Returns:
+        str: La valeur convertie en chaîne
+    """
     if isinstance(value, str):
         return value
     if hasattr(value, "name"):
@@ -87,6 +146,14 @@ def coerce_type_saveur(value):
 
 # Custom coerce function for TypeTexture
 def coerce_type_texture(value):
+    """Convertit une valeur en chaîne pour TypeTexture.
+
+    Args:
+        value: La valeur à convertir
+
+    Returns:
+        str: La valeur convertie en chaîne
+    """
     if isinstance(value, str):
         return value
     if hasattr(value, "name"):
@@ -96,6 +163,12 @@ def coerce_type_texture(value):
 
 # Formulaire proposer/modifier un établissement
 class EtabForm(FlaskForm):
+    """Formulaire pour proposer ou modifier un établissement.
+
+    Ce formulaire permet de saisir les informations d'un établissement
+    incluant son type, son nom, son adresse, et d'autres détails.
+    """
+
     type_etab = SelectField(
         "Type d'établissement",
         choices=[(choice.name, choice.value) for choice in TypeEtab],
@@ -162,7 +235,17 @@ class EtabForm(FlaskForm):
 
 
 # Custom validator for prix field
+# pylint: disable=unused-argument
 def validate_prix(form, field):
+    """Valide que le prix est dans une plage valide.
+
+    Args:
+        form: Le formulaire (requis par l'API Flask-WTF mais non utilisé)
+        field: Le champ à valider
+
+    Raises:
+        ValidationError: Si le prix n'est pas valide
+    """
     if field.data is None:
         return  # Let DataRequired handle this
 
@@ -179,6 +262,12 @@ def validate_prix(form, field):
 
 # Formulaire proposer/modifier un flan
 class NewFlanForm(FlaskForm):
+    """Formulaire pour proposer ou modifier un flan.
+
+    Ce formulaire permet de saisir les informations d'un flan
+    incluant son nom, sa saveur, sa pâte, sa texture, et son prix.
+    """
+
     id_etab = HiddenField("ID Établissement")  # Champ caché pour l'id_etab
     nom = StringField(
         "Nom",
@@ -224,7 +313,17 @@ class NewFlanForm(FlaskForm):
 
 
 # Formulaire pour proposer/modifier une évaluation
+# pylint: disable=unused-argument
 def validate_note(form, field):
+    """Valide qu'une note est dans une plage valide.
+
+    Args:
+        form: Le formulaire (requis par l'API Flask-WTF mais non utilisé)
+        field: Le champ à valider
+
+    Raises:
+        ValidationError: Si la note n'est pas valide
+    """
     # First check if the data is a valid number
     if field.data is None:
         return  # Let DataRequired handle this
@@ -251,6 +350,12 @@ def validate_note(form, field):
 
 
 class EvalForm(FlaskForm):
+    """Formulaire pour proposer ou modifier une évaluation.
+
+    Ce formulaire permet de noter un flan selon différents critères
+    (visuel, texture, pâte, goût) et d'ajouter une description.
+    """
+
     # Choix valides pour les notes (0 à 5 par incréments de 0.5)
     # Utiliser des chaînes directement pour éviter les problèmes de conversion
     note_choices = [
@@ -301,7 +406,20 @@ class EvalForm(FlaskForm):
 
 
 # Custom validator for optional numeric fields
+# pylint: disable=unused-argument
 def validate_optional_number(form, field, min_val, max_val, message):
+    """Valide qu'un nombre optionnel est dans une plage valide.
+
+    Args:
+        form: Le formulaire (requis par l'API Flask-WTF mais non utilisé)
+        field: Le champ à valider
+        min_val: La valeur minimale autorisée
+        max_val: La valeur maximale autorisée
+        message: Le message d'erreur à afficher
+
+    Raises:
+        ValidationError: Si le nombre n'est pas valide
+    """
     if field.data is None or field.data == "":
         return  # Skip validation if empty
 
@@ -320,7 +438,17 @@ def validate_optional_number(form, field, min_val, max_val, message):
 
 
 # Custom validator for optional numeric fields that handles empty strings properly
+# pylint: disable=unused-argument
 def validate_optional_number_field(form, field):
+    """Valide qu'un nombre optionnel est valide.
+
+    Args:
+        form: Le formulaire (requis par l'API Flask-WTF mais non utilisé)
+        field: Le champ à valider
+
+    Raises:
+        ValidationError: Si le nombre n'est pas valide
+    """
     if field.data is None or field.data == "" or field.data is False:
         return  # Skip validation if empty or False
 
@@ -342,6 +470,13 @@ def validate_optional_number_field(form, field):
 
 # Formulaire de recherche
 class RechercheForm(FlaskForm):
+    """Formulaire pour rechercher des établissements et des flans.
+
+    Ce formulaire permet de rechercher des établissements et des flans
+    selon différents critères comme la localisation, le nom, la ville,
+    la saveur, la pâte, la texture, le prix, etc.
+    """
+
     latitude = (
         HiddenField()
     )  # Champ caché pour la latitude (sans validateur par défaut)
@@ -410,21 +545,51 @@ class RechercheForm(FlaskForm):
     )
 
     def validate_latitude(self, field):
+        """Valide que la latitude est dans une plage valide.
+
+        Args:
+            field: Le champ latitude à valider
+
+        Raises:
+            ValidationError: Si la latitude n'est pas valide
+        """
         validate_optional_number(
             self, field, -90, 90, "Doit être compris entre -90 et 90."
         )
 
     def validate_longitude(self, field):
+        """Valide que la longitude est dans une plage valide.
+
+        Args:
+            field: Le champ longitude à valider
+
+        Raises:
+            ValidationError: Si la longitude n'est pas valide
+        """
         validate_optional_number(
             self, field, -180, 180, "Doit être compris entre -180 et 180."
         )
 
     def validate_rayon(self, field):
+        """Valide que le rayon est un nombre valide.
+
+        Args:
+            field: Le champ rayon à valider
+
+        Raises:
+            ValidationError: Si le rayon n'est pas valide
+        """
         validate_optional_number_field(self, field)
 
 
 # Formulaire pour modifier le profil de l'utilisateur
 class UpdateProfileForm(FlaskForm):
+    """Formulaire pour modifier le profil de l'utilisateur.
+
+    Ce formulaire permet aux utilisateurs de mettre à jour leurs
+    informations de profil, y compris le pseudo, l'email et le mot de passe.
+    """
+
     pseudo = StringField(
         "Pseudo",
         validators=[
@@ -463,6 +628,14 @@ class UpdateProfileForm(FlaskForm):
     submit = SubmitField("Mettre à jour le profil")
 
     def validate_current_password(self, current_password):
+        """Valide que le mot de passe actuel est correct.
+
+        Args:
+            current_password: Le champ mot de passe actuel à valider
+
+        Raises:
+            ValidationError: Si le mot de passe actuel est incorrect
+        """
         # Skip validation if no current user or current_user is not authenticated
         # (for testing purposes)
         if current_user is None or not hasattr(current_user, "password"):
@@ -473,8 +646,18 @@ class UpdateProfileForm(FlaskForm):
 
 
 class DeleteForm(FlaskForm):
+    """Formulaire pour supprimer un élément.
+
+    Ce formulaire simple contient uniquement un bouton de suppression.
+    """
+
     submit = SubmitField("Supprimer")
 
 
 class ValidateForm(FlaskForm):
+    """Formulaire pour valider un élément.
+
+    Ce formulaire simple contient uniquement un bouton de validation.
+    """
+
     submit = SubmitField("Valider")

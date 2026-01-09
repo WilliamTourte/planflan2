@@ -1,5 +1,3 @@
-// geoloc.js
-
 // Fonction principale pour obtenir la position
 function getUserLocation(callbackSuccess, callbackError) {
     if (navigator.geolocation) {
@@ -12,7 +10,7 @@ function getUserLocation(callbackSuccess, callbackError) {
     }
 }
 
-// Fonction pour envoyer la position au serveur (optionnel)
+// Fonction pour envoyer la position au serveur
 function sendToServer(latitude, longitude, callback) {
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     fetch('/etablissements_proches', {

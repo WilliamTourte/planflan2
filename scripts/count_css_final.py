@@ -4,6 +4,8 @@ import os
 import re
 from collections import defaultdict
 
+os.chdir("..")
+
 
 def extract_css_classes():
     """Extraire toutes les classes CSS du fichier style.css"""
@@ -27,35 +29,36 @@ def extract_css_classes():
 
 
 def count_class_usage_simple():
-    """Compter l'utilisation des classes CSS dans les fichiers HTML"""
+    """Compter l'utilisation des classes CSS dans les fichiers HTML et JS"""
     css_classes = extract_css_classes()
     class_usage = defaultdict(int)
 
-    # Parcourir tous les fichiers HTML
-    html_dir = "app/templates"
+    # Parcourir tous les fichiers HTML et JS dans app/templates et app/static/js
+    search_dirs = ["app/templates", "app/static/js"]
 
-    for root, dirs, files in os.walk(html_dir):
-        for file in files:
-            if file.endswith(".html"):
-                file_path = os.path.join(root, file)
+    for search_dir in search_dirs:
+        if os.path.exists(search_dir):
+            for root, dirs, files in os.walk(search_dir):
+                for file in files:
+                    if file.endswith(".html") or file.endswith(".js"):
+                        file_path = os.path.join(root, file)
 
-                try:
-                    with open(file_path, "r", encoding="utf-8") as f:
-                        content = f.read()
+                        try:
+                            with open(file_path, "r", encoding="utf-8") as f:
+                                content = f.read()
 
-                        # Trouver tous les attributs class
-                        pattern = r'class="([^"]*)"'
-                        matches = re.findall(pattern, content)
+                                # Rechercher tous les noms de classes CSS dans le contenu
+                                # Cela inclut les classes dans les attributs class="..." et aussi les références directes
+                                for class_name in css_classes:
+                                    # Rechercher le nom de classe comme mot entier (pour éviter les faux positifs)
+                                    # Utiliser une regex pour trouver le nom de classe comme mot séparé
+                                    pattern = r"\b" + re.escape(class_name) + r"\b"
+                                    matches = re.findall(pattern, content)
+                                    if matches:
+                                        class_usage[class_name] += len(matches)
 
-                        for match in matches:
-                            # Diviser les classes et compter chacune
-                            classes_in_match = match.split()
-                            for class_name in classes_in_match:
-                                if class_name in css_classes:
-                                    class_usage[class_name] += 1
-
-                except (UnicodeDecodeError, PermissionError):
-                    continue
+                        except (UnicodeDecodeError, PermissionError):
+                            continue
 
     return class_usage
 

@@ -24,7 +24,6 @@
     /* Espacements & Bordures */
     --border-radius: 10px;
     --border-radius-btn: 25px;
-    --border-radius-carte: 10px;
     --max-width: 1200px;
     --padding-xs: 2px;
     --padding-sm: 8px;
@@ -51,8 +50,8 @@
     --box-shadow-hover: 0 5px 10px rgba(0, 0, 0, 0.15);
 
     /* Largeur des infowindows */
-    --infowindow-width: 350px;
-    --infowindow-max-width: 400px;
+    --infowindow-width: 300px;
+    --infowindow-max-width: 300px;
 }
 
 /* Reset & Base */
@@ -309,7 +308,7 @@ input[type="submit"]:active {
 .carte {
     text-decoration: none;
     color: inherit;
-    border-radius: var(--border-radius-carte);
+    border-radius: var(--border-radius);
     overflow: hidden;
     box-shadow: var(--box-shadow);
     transition: var(--transition);
@@ -328,16 +327,17 @@ input[type="submit"]:active {
 .carte-image-container {
     position: relative;
     display: block;
-    height: 180px;
+    height: 200px;
     overflow: hidden;
-    border-radius: var(--border-radius-carte) var(--border-radius-carte) 0 0;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    background-color: #f5f5f5;
 }
 
 .carte-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: var(--border-radius-carte) var(--border-radius-carte) 0 0;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
 }
 
 
@@ -417,7 +417,7 @@ input[type="submit"]:active {
     padding: var(--padding-xs) var(--padding-sm);
     border-radius: 15px;
     box-shadow: var(--box-shadow);
-    z-index: 20;
+
 }
 
 .badge-type-etab {
@@ -659,20 +659,48 @@ input[type="submit"]:active {
 .leaflet-popup-content-wrapper {
     width: var(--infowindow-width);
     max-width: var(--infowindow-max-width);
-    max-height: 600px;
-    overflow-y: auto;
     font-size: var(--font-size-md);
-    margin: 80px 0 20px 0;
+    margin: 0 !important;
+    overflow-y: auto;
+    max-height: 60vh;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-secondary) var(--color-light);
 }
 
 .leaflet-popup-content {
-    width: var(--infowindow-width);
-    margin: 0;
-    padding: var(--padding-md);
+    background: white;
+    text-align: center;
+    
+
+ 
+    padding : 0 !important;
+}
+
+.leaflet-popup-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.leaflet-popup-content::-webkit-scrollbar-track {
+    background: var(--color-light);
+    border-radius: 4px;
+}
+
+.leaflet-popup-content::-webkit-scrollbar-thumb {
+    background: var(--color-primary);
+    border-radius: 4px;
 }
 
 .leaflet-popup-close-button {
     font-size: 18px;
+    top: 5px;
+    right: 5px;
+}
+
+
+/* Positionnement de la pointe du popup */
+.leaflet-popup-tip {
+    left: 50% !important;
+    margin-left: -10px !important;
     top: 5px;
     right: 5px;
 }
@@ -689,8 +717,8 @@ input[type="submit"]:active {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 10px;
-    margin-right: 10px;
+    margin-bottom: 5px;
+    margin-right: 5px;
     transition: transform 0.3s ease, background-color 0.3s ease;
 }
 
@@ -716,51 +744,67 @@ input[type="submit"]:active {
 
 .infowindow-content {
     font-family: Arial, sans-serif;
-    min-width: 300px;
     width: 100%;
-    padding: 10px;
-    margin: 0;
+    max-width: 100%;
+   
+    margin: 0 auto;
+    overflow-wrap: break-word;
+    text-align: center;
 }
 
 .infowindow-header {
     position: relative;
     min-height: 30px;
+    padding-top: 40px; /* Espace pour les badges */
+    margin-top: 0; /* S'assurer qu'il n'y a pas de marge supplémentaire */
 }
 
 .infowindow-header h3 {
-    margin: 0 0 10px 0;
-    font-size: 1.2em;
-    line-height: 1.3;
+  
+    font-size: 1em;
+    line-height: 1.2;
     text-align: center;
+    word-wrap: break-word;
 }
 
 .infowindow-badges {
     position: absolute;
-    top: 0;
-    width: 100%;
+    top: 10px; /* Positionner légèrement en dessous du haut */
+    left: 0;
+    right: 0;
     display: flex;
     justify-content: space-between;
     pointer-events: none;
+    z-index: 10; /* S'assurer qu'ils sont au-dessus du contenu mais pas du titre */
+    max-height: 30px; /* Limiter la hauteur */
 }
 
 .infowindow-badges .badge {
     font-size: var(--font-size-xs);
-    padding: 3px 8px;
-    max-width: 80px;
+    padding: 6px 10px;
+    max-width: 110px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    height: 28px; /* Hauteur fixe */
+    line-height: 1; /* Alignement vertical */
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.infowindow-body {
-    margin-bottom: 15px;
-    text-align: center;
+/* Badge labellisé spécifique pour l'infowindow */
+.infowindow-badges .badge-labellise {
+    background-color: #87CEEB;
+    margin-right: 20px;
 }
 
-.infowindow-body p {
-    margin: 5px 0;
-    line-height: 1.4;
+/* Badge type établissement spécifique pour l'infowindow */
+.infowindow-badges .badge-type-etab {
+    background-color: inherit; /* Conserver la couleur dynamique */
+    padding: 6px 8px; /* Padding légèrement réduit */
 }
+
 
 .infowindow-link {
     text-decoration: none;
@@ -805,24 +849,25 @@ input[type="submit"]:active {
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
     font-family: var(--font-primary);
-    max-width: 200px;
+    max-width: 300px;
+
 }
 
 .legende-container {
-    display: flex;
-    flex-direction: column;
+    display: left;
+    
     gap: var(--gap-sm);
+
 }
 
-.legende-item {
-    display: flex;
-    align-items: center;
-    gap: var(--gap-sm);
-}
+
 
 .legende-text {
     color: var(--color-text);
-    font-size: var(--font-size-md);
+    font-size: var(--font-size-sm);
+
+    align-items: left;
+    gap: var(--gap-sm);
 }
 
 
@@ -831,8 +876,8 @@ input[type="submit"]:active {
     min-width: 30px;
     height: 24px;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    align-items: left;
+    justify-content: left;
     font-size: var(--font-size-sm);
 }
 
@@ -958,7 +1003,8 @@ input[type="submit"]:active {
 .adresse {
     font-style: italic;
     color: var(--color-text-light);
-    margin-bottom: var(--margin-sm);
+    margin:0 !important;
+  
 }
 
 .description {
@@ -998,12 +1044,7 @@ input[type="submit"]:active {
         font-size: 1.5rem;
     }
 
-    .leaflet-popup-content-wrapper {
-        max-width: 100vw;
-        max-height: 70vh;
-        width: 90vw;
-        margin: 80px 0 20px 0;
-    }
+
 
     #map {
         height: 60vh;

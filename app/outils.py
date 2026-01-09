@@ -76,6 +76,14 @@ def verifier_csrf_ou_renvoyer_erreur():
 
 
 def afficher_etablissements(resultats):
+    """Convertit les résultats de recherche en listes d'établissements et JSON.
+
+    Args:
+        resultats: Les résultats de recherche contenant des établissements
+
+    Returns:
+        tuple: (list, list) - Une liste d'objets établissement et une liste de dictionnaires JSON
+    """
     etablissements = []
     etablissements_json = []
     for etab in resultats:
@@ -85,6 +93,20 @@ def afficher_etablissements(resultats):
 
 
 def calculer_distance(lat1, lon1, lat2, lon2):
+    """Calcule la distance entre deux points géographiques en kilomètres.
+
+    Cette fonction utilise la formule de Haversine pour calculer la distance
+    entre deux points définis par leurs coordonnées latitude/longitude.
+
+    Args:
+        lat1 (float): Latitude du premier point
+        lon1 (float): Longitude du premier point
+        lat2 (float): Latitude du deuxième point
+        lon2 (float): Longitude du deuxième point
+
+    Returns:
+        float: La distance en kilomètres entre les deux points
+    """
     R = 6371.0
     # Convertir toutes les valeurs en float avant de les convertir en radians
     lat1, lon1, lat2, lon2 = map(float, [lat1, lon1, lat2, lon2])

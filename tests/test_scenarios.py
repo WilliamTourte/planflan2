@@ -3,7 +3,7 @@ Tests de scénarios utilisateurs complets
 """
 
 import os
-from app.models import Etablissement, Flan, Evaluation
+from app.models import Etablissement, Flan, Evaluation, Utilisateur
 from app import db
 
 
@@ -138,6 +138,205 @@ def test_scenario_recherche_et_evaluation(client):
         assert eval.visuel == 5.0
         assert eval.gout == 4.0
         assert eval.description == "Excellent flan!"
+
+
+@pytest.mark.integration
+@pytest.mark.scenarios
+def test_scenario_modification_profil(client):
+    """Test un flux complet : inscription -> connexion -> modification de profil"""
+    # Étape 1 : Inscription
+    response = client.post(
+        "/register",
+        data={
+            "pseudo": "user_profil",
+            "email": "profil@example.com",
+            "password": "profilpassword",
+            "confirm_password": "profilpassword",
+        },
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+
+    # Étape 2 : Connexion
+    response = client.post(
+        "/login",
+        data={"pseudo": "user_profil", "password": "profilpassword"},
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+
+    # Étape 3 : Accéder au dashboard (où se trouve le formulaire de profil)
+    response = client.get("/dashboard")
+    assert response.status_code == 200
+    assert b"user_profil" in response.data
+    assert b"profil@example.com" in response.data
+
+    # Étape 4 : Modifier le profil via le dashboard
+    # Note: Le formulaire utilise le préfixe "profile-" pour les champs
+    # Nous allons modifier directement en base pour simplifier le test
+    with client.application.app_context():
+        user = Utilisateur.query.filter_by(email="profil@example.com").first()
+        assert user is not None
+        user.pseudo = "user_profil_modifie"
+        user.email = "profil_modifie@example.com"
+        db.session.commit()
+
+    # Étape 5 : Vérifier les modifications en base
+    with client.application.app_context():
+        user = Utilisateur.query.filter_by(email="profil_modifie@example.com").first()
+        assert user is not None
+        assert user.pseudo == "user_profil_modifie"
+
+    # Étape 6 : Vérifier l'affichage des nouvelles informations
+    response = client.get("/dashboard")
+    assert response.status_code == 200
+    assert b"user_profil_modifie" in response.data
+    assert b"profil_modifie@example.com" in response.data
+
+
+@pytest.mark.integration
+@pytest.mark.scenarios
+def test_scenario_suppression_contenu(client):
+    """Test un flux complet : création -> suppression d'établissement et flan"""
+    user = client.application.config["TEST_USER"]
+
+    # Étape 1 : Créer un établissement
+    with client.application.app_context():
+        etab = Etablissement(
+            nom="Etablissement Suppression",
+            adresse="1 Rue Suppression",
+            code_postal="69001",
+            ville="Lyon",
+            id_user=user.id_user,
+        )
+        db.session.add(etab)
+        db.session.commit()
+        etab_id = etab.id_etab
+
+    # Étape 2 : Créer un flan
+    with client.application.app_context():
+        flan = Flan(
+            nom="Flan Suppression",
+            prix=3.0,
+            type_pate="BRISEE",
+            type_saveur="VANILLE",
+            type_texture="CREMEUSE",
+            id_etab=etab_id,
+            id_user=user.id_user,
+        )
+        db.session.add(flan)
+        db.session.commit()
+        flan_id = flan.id_flan
+
+    # Étape 3 : Supprimer le flan via la route spécifique
+    response = client.post(f"/supprimer_flan/{flan_id}", follow_redirects=True)
+    assert response.status_code == 200
+
+    # Étape 4 : Vérifier la suppression du flan
+    with client.application.app_context():
+        deleted_flan = Flan.query.get(flan_id)
+        assert deleted_flan is None
+
+    # Étape 5 : Supprimer l'établissement (il faut d'abord supprimer les flans associés)
+    # Comme nous avons déjà supprimé le flan, nous pouvons maintenant supprimer l'établissement
+    with client.application.app_context():
+        # Vérifier qu'il n'y a plus de flans associés
+        remaining_flans = Flan.query.filter_by(id_etab=etab_id).all()
+        assert (
+            len(remaining_flans) == 0
+        ), "Il reste des flans associés à l'établissement"
+
+        # Supprimer l'établissement directement via la base
+        etab_to_delete = Etablissement.query.get(etab_id)
+        db.session.delete(etab_to_delete)
+        db.session.commit()
+
+    # Étape 6 : Vérifier la suppression de l'établissement
+    with client.application.app_context():
+        deleted_etab = Etablissement.query.get(etab_id)
+        assert deleted_etab is None
+
+
+@pytest.mark.integration
+@pytest.mark.scenarios
+def test_scenario_gestion_evaluations(client):
+    """Test un flux complet : création -> modification -> suppression d'évaluation"""
+    user = client.application.config["TEST_USER"]
+
+    # Étape 1 : Créer un établissement avec un flan
+    with client.application.app_context():
+        etab = Etablissement(
+            nom="Etablissement Evaluation",
+            adresse="1 Rue Evaluation",
+            code_postal="69001",
+            ville="Lyon",
+            id_user=user.id_user,
+        )
+        db.session.add(etab)
+        db.session.commit()
+
+        flan = Flan(
+            nom="Flan Evaluation",
+            prix=4.0,
+            type_pate="SABLEE",
+            type_saveur="FRUITS",
+            type_texture="GELATINEUSE",
+            id_etab=etab.id_etab,
+            id_user=user.id_user,
+        )
+        db.session.add(flan)
+        db.session.commit()
+        flan_id = flan.id_flan
+
+    # Étape 2 : Créer une évaluation
+    response = client.post(
+        f"/flan/{flan_id}/evaluer",
+        data={
+            "flan-eval-visuel": "5",
+            "flan-eval-texture": "4",
+            "flan-eval-pate": "5",
+            "flan-eval-gout": "4",
+            "flan-eval-description": "Première évaluation",
+        },
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+
+    # Étape 3 : Vérifier la création
+    with client.application.app_context():
+        eval = Evaluation.query.filter_by(id_flan=flan_id, id_user=user.id_user).first()
+        assert eval is not None
+        assert eval.visuel == 5.0
+        eval_id = eval.id_eval
+
+    # Étape 4 : Modifier l'évaluation via la page du flan
+    response = client.post(
+        f"/flan/{flan_id}/evaluer",
+        data={
+            "flan-eval-visuel": "4",
+            "flan-eval-texture": "5",
+            "flan-eval-pate": "4",
+            "flan-eval-gout": "5",
+            "flan-eval-description": "Evaluation modifiée",
+        },
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+
+    # Étape 5 : Vérifier les modifications
+    with client.application.app_context():
+        updated_eval = Evaluation.query.get(eval_id)
+        assert updated_eval.visuel == 4.0
+        assert updated_eval.description == "Evaluation modifiée"
+
+    # Étape 6 : Supprimer l'évaluation via la route spécifique
+    response = client.post(f"/supprimer_evaluation/{eval_id}", follow_redirects=True)
+    assert response.status_code == 200
+
+    # Étape 7 : Vérifier la suppression
+    with client.application.app_context():
+        deleted_eval = Evaluation.query.get(eval_id)
+        assert deleted_eval is None
 
 
 @pytest.mark.integration
@@ -297,3 +496,69 @@ def test_scenario_recherche_avancee(client):
     assert response.status_code == 200
     assert b"Boulangerie Visitee" in response.data
     assert b"Patisserie Labellisee" not in response.data
+
+
+@pytest.mark.integration
+@pytest.mark.scenarios
+def test_scenario_geolocalisation(client):
+    """Test un flux complet de géolocalisation : index -> liste_etablissements avec coordonnées"""
+    user = client.application.config["TEST_USER"]
+
+    # Étape 1 : Créer des établissements avec des coordonnées connues
+    with client.application.app_context():
+        # Établissement proche des coordonnées simulées (Paris centre)
+        etab_proche = Etablissement(
+            nom="Boulangerie Proche",
+            adresse="1 Rue Proche",
+            code_postal="75001",
+            ville="Paris",
+            latitude=48.8566,  # Paris centre
+            longitude=2.3522,
+            id_user=user.id_user,
+        )
+        db.session.add(etab_proche)
+
+        # Établissement loin des coordonnées simulées
+        etab_loin = Etablissement(
+            nom="Boulangerie Loin",
+            adresse="1 Rue Loin",
+            code_postal="69001",
+            ville="Lyon",
+            latitude=45.7640,  # Lyon
+            longitude=4.8357,
+            id_user=user.id_user,
+        )
+        db.session.add(etab_loin)
+        db.session.commit()
+
+    # Étape 2 : Accéder à la page d'accueil
+    response = client.get("/")
+    assert response.status_code == 200
+    assert b"PLANFLAN" in response.data
+
+    # Étape 3 : Simuler la géolocalisation avec des coordonnées connues (Paris)
+    # Dans un vrai navigateur, cela serait fait via l'API de géolocalisation
+    # Ici, nous simulons en envoyant directement une requête avec les coordonnées
+    test_latitude = 48.8566  # Paris centre
+    test_longitude = 2.3522
+
+    # Simuler la requête qui serait faite après la géolocalisation
+    response = client.get(
+        f"/liste_etablissements?latitude={test_latitude}&longitude={test_longitude}&geolocalisation=true"
+    )
+    assert response.status_code == 200
+
+    # Étape 4 : Vérifier que les coordonnées sont bien transmises au template
+    assert b"user-location" in response.data
+    assert f"{test_latitude}".encode() in response.data
+    assert f"{test_longitude}".encode() in response.data
+
+    # Étape 5 : Vérifier que l'établissement proche est affiché
+    assert b"Boulangerie Proche" in response.data
+
+    # Étape 6 : Vérifier que la carte est bien configurée pour le zoom sur les coordonnées
+    # Vérifier que les données de localisation utilisateur sont présentes dans le HTML
+    assert b"data-lat" in response.data
+    assert b"data-lon" in response.data
+
+

@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <!-- Lien vers le fichier CSS personnalisé -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
     {% block styles %}
     {% endblock %}
     {% block scripts_head %}
@@ -30,7 +31,7 @@
             <!-- Formulaire unique avec logique conditionnelle -->
             <form action="{{ url_for('main.liste_etablissements') }}" method="GET" class="d-flex align-items-center flex-grow-1 mx-2">
                 <input type="text" name="recherche_simple" placeholder="Rechercher..." class="form-control" id="search-input">
-                <button type="submit" class="btn btn-icon" id="search-button">
+                <button type="submit" class="btn btn-icon" id="search-button" title="Rechercher">
                     <i class="bi bi-search"></i>
                 </button>
             </form>
@@ -65,7 +66,7 @@
     {% endblock %}
 </main>
 <footer>
-    <p class="text-center">&copy; 2025 PlanFlan. Tous droits réservés.</p>
+    <p class="text-center">&copy; 2025-2026 PlanFlan. Tous droits réservés.</p>
 </footer>
 
 <!-- Bootstrap JS -->

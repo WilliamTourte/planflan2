@@ -8,7 +8,7 @@
     <p><strong>Pseudo:</strong> {{ current_user.pseudo }}</p>
     <p><strong>Email:</strong> {{ current_user.email }}</p>
     <div class="action-buttons">
-        <button id="edit-profile-btn" class="btn btn-success">
+        <button id="edit-profile-btn" class="btn btn-success" title="Modifier mon profil">
             <i class="bi bi-pencil"></i>
         </button>
         <!-- Formulaire de suppression de compte (masqué par défaut) -->
@@ -27,13 +27,13 @@
                     {% endif %}
                 </div>
                 <div class="form-group">
-                    <button type="submit" class="btn btn-danger">Confirmer la suppression</button>
-                    <button type="button" class="btn btn-success" onclick="cancelDeleteAccount()">Annuler</button>
+                    <button type="submit" class="btn btn-danger" title="Confirmer la suppression du compte">Confirmer la suppression</button>
+                    <button type="button" class="btn btn-success" onclick="cancelDeleteAccount()" title="Annuler la suppression du compte">Annuler</button>
                 </div>
             </form>
         </div>
         
-        <button type="button" class="btn btn-danger" onclick="showDeleteAccountForm()">
+        <button type="button" class="btn btn-danger" onclick="showDeleteAccountForm()" title="Supprimer mon compte">
             <i class="bi bi-trash-fill"></i>
         </button>
         
@@ -102,7 +102,7 @@
         </div>
         <div class="form-group">
             {{ profile_form.submit(class="btn btn-success") }}
-            <button id="cancel-edit-btn" type="button" class="btn btn-canceledit" style="margin-left: 10px;">Annuler</button>
+            <button id="cancel-edit-btn" type="button" class="btn btn-canceledit" style="margin-left: 10px;" title="Annuler les modifications">Annuler</button>
         </div>
     </form>
 </div>

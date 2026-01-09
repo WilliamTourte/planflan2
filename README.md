@@ -13,15 +13,27 @@ source env/bin/activate  # ou env\Scripts\activate sur Windows
 
 ## Gestion des dépendances
 
-1. Installation des dépendances à partir d'un fichier `requirements.txt` existant :
+Installation des dépendances à partir d'un fichier `requirements.txt` existant :
 ```sh
 pip install -r requirements.txt
 ```
 
+
 Il est possible de mettre à jour le fichier `requirements.txt` :
 ```sh
 pip freeze > requirements.txt
+
 ```
+Pour le développement, installer les dépendances à partir de 
+```sh
+pip install -r requirements-dev.txt
+```
+Ca permet d'utiliser les outils de nettoyage de code (pylint, black)
+
+
+## Gestion des commits
+pre-commit permet de lancer un hook pour s'assurer que le commit ne casse rien, et lance pylint et black au passage. Détails dans .pre-commit-config.yaml
+
 
 ## Mise en place BDD conteneurisée
 

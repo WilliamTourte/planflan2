@@ -78,6 +78,12 @@ class TypeSaveur(Enum):
 
 
 class TypeTexture(Enum):
+    """Types de texture pour les flans.
+
+    Cette énumération définit les différentes textures
+    que peuvent avoir les flans.
+    """
+
     GELATINEUSE = "Gélatineuse"
     CREMEUSE = "Crémeuse"
     FONDANTE = "Fondante"
@@ -107,15 +113,40 @@ class Utilisateur(db.Model, UserMixin):
     evaluations = db.relationship("Evaluation", back_populates="utilisateur")
 
     def get_id(self):
+        """Retourne l'identifiant de l'utilisateur sous forme de chaîne.
+
+        Returns:
+            str: L'identifiant de l'utilisateur
+        """
         return str(self.id_user)
 
     def set_password(self, password, bcrypt):
+        """Définit le mot de passe de l'utilisateur après hachage.
+
+        Args:
+            password (str): Le mot de passe en clair
+            bcrypt: L'instance Bcrypt pour le hachage
+        """
         self.password = bcrypt.generate_password_hash(password).decode("utf-8")
 
     def check_password(self, password, bcrypt):
+        """Vérifie si un mot de passe correspond au mot de passe haché.
+
+        Args:
+            password (str): Le mot de passe en clair à vérifier
+            bcrypt: L'instance Bcrypt pour la vérification
+
+        Returns:
+            bool: True si le mot de passe correspond, False sinon
+        """
         return bcrypt.check_password_hash(self.password, password)
 
     def to_dict(self):
+        """Convertit l'utilisateur en dictionnaire pour la sérialisation.
+
+        Returns:
+            dict: Les données de l'utilisateur sous forme de dictionnaire
+        """
         return {
             "id_user": self.id_user,
             "pseudo": self.pseudo,
@@ -127,6 +158,13 @@ class Utilisateur(db.Model, UserMixin):
 
 
 class Etablissement(db.Model):
+    """Modèle représentant un établissement.
+
+    Ce modèle stocke les informations des établissements où l'on peut
+    trouver des flans, y compris leur localisation, leurs coordonnées
+    et leur statut de modération.
+    """
+
     __tablename__ = "etablissements"
     id_etab = db.Column(db.Integer, primary_key=True)
     type_etab = db.Column(
@@ -166,6 +204,15 @@ class Etablissement(db.Model):
     utilisateur = db.relationship("Utilisateur", back_populates="etablissements")
 
     def to_dict(self, include_flans=True, include_photos=False):
+        """Convertit l'établissement en dictionnaire pour la sérialisation.
+
+        Args:
+            include_flans (bool): Si True, inclut les flans associés
+            include_photos (bool): Si True, inclut les photos associées
+
+        Returns:
+            dict: Les données de l'établissement sous forme de dictionnaire
+        """
         data = {
             "id_etab": self.id_etab,
             "type_etab": self.type_etab.value if self.type_etab else None,
@@ -197,6 +244,13 @@ class Etablissement(db.Model):
 
 
 class Flan(db.Model):
+    """Modèle représentant un flan.
+
+    Ce modèle stocke les informations des flans proposés par les
+    établissements, y compris leurs caractéristiques, leur prix
+    et leur statut de modération.
+    """
+
     __tablename__ = "flans"
     id_flan = db.Column(db.Integer, primary_key=True)
     id_etab = db.Column(
@@ -255,6 +309,16 @@ class Flan(db.Model):
     def to_dict(
         self, include_etablissement=True, include_evaluations=True, include_photos=False
     ):
+        """Convertit le flan en dictionnaire pour la sérialisation.
+
+        Args:
+            include_etablissement (bool): Si True, inclut l'établissement associé
+            include_evaluations (bool): Si True, inclut les évaluations associées
+            include_photos (bool): Si True, inclut les photos associées
+
+        Returns:
+            dict: Les données du flan sous forme de dictionnaire
+        """
         data = {
             "id_flan": self.id_flan,
             "id_etab": self.id_etab,
@@ -283,6 +347,13 @@ class Flan(db.Model):
 
 
 class Evaluation(db.Model):
+    """Modèle représentant une évaluation.
+
+    Ce modèle stocke les évaluations des flans faites par les
+    utilisateurs, y compris les notes selon différents critères
+    et les commentaires associés.
+    """
+
     __tablename__ = "evaluations"
     id_eval = db.Column(db.Integer, primary_key=True)
     id_user = db.Column(
@@ -308,6 +379,15 @@ class Evaluation(db.Model):
     flan = db.relationship("Flan", back_populates="evaluations")
 
     def to_dict(self, include_flan=False, include_utilisateur=False):
+        """Convertit l'évaluation en dictionnaire pour la sérialisation.
+
+        Args:
+            include_flan (bool): Si True, inclut le flan associé
+            include_utilisateur (bool): Si True, inclut l'utilisateur associé
+
+        Returns:
+            dict: Les données de l'évaluation sous forme de dictionnaire
+        """
         data = {
             "id_eval": self.id_eval,
             "id_user": self.id_user,
@@ -335,6 +415,13 @@ class Evaluation(db.Model):
 
 
 class Photo(db.Model):
+    """Modèle représentant une photo.
+
+    Ce modèle stocke les informations des photos associées aux
+    flans ou aux établissements, y compris leur chemin,
+    leurs dimensions et leur type de cible.
+    """
+
     __tablename__ = "photos"
     id_photo = db.Column(db.Integer, primary_key=True)
     id_flan = db.Column(db.Integer, db.ForeignKey("flans.id_flan"), nullable=True)
@@ -351,6 +438,11 @@ class Photo(db.Model):
     flan = db.relationship("Flan", back_populates="photos")
 
     def to_dict(self):
+        """Convertit la photo en dictionnaire pour la sérialisation.
+
+        Returns:
+            dict: Les données de la photo sous forme de dictionnaire
+        """
         return {
             "id_photo": self.id_photo,
             "id_flan": self.id_flan,

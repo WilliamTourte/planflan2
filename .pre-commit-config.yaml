@@ -1,0 +1,31 @@
+# .pre-commit-config.yaml pour PlanFlan
+# Ce fichier définit les hooks Git à exécuter avant chaque commit
+
+repos:
+  - repo: https://github.com/psf/black
+    rev: 23.12.1
+    hooks:
+      - id: black
+        name: Formatage avec Black
+        language_version: python3
+        files: ^app/forms.py$
+        args: [--check]  # Vérifie sans modifier les fichiers
+
+  - repo: https://github.com/PyCQA/pylint
+    rev: v3.0.3
+    hooks:
+      - id: pylint
+        name: Vérification avec Pylint
+        entry: pylint
+        args: ["--rcfile=.pylintrc", "--disable=C0114,C0115,C0116,W0613"]
+        language: system
+        files: ^app/forms.py$
+
+  - repo: local
+    hooks:
+      - id: pytest-smoke
+        name: Exécution des tests smoke
+        entry: python -m pytest tests/ -m "smoke" -v --tb=short -o addopts=""
+        language: system
+        pass_filenames: false
+        always_run: true

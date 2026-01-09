@@ -10,11 +10,11 @@
 
 <div class="action-buttons">
     <button onclick="goBackOrRedirect('{{ url_for('main.afficher_flan_unique', id_flan=evaluation.flan.id_flan) }}')" class="btn btn-danger" title="Retour à la page précédente">
-        <i class="bi bi-arrow-return-left me-2"></i> Retour
+        <i class="bi bi-arrow-return-left"></i> Retour
     </button>
-    <button href="{{ url_for('main.afficher_flan_unique', id_flan=evaluation.flan.id_flan) }}" class="btn btn-success" title="Retour au flan">
-        <i class="bi bi-cake2 me-2"></i> Flan
-    </button>
+    <a href="{{ url_for('main.afficher_flan_unique', id_flan=evaluation.flan.id_flan) }}" class="btn btn-primary" title="Retour au flan">
+        <i class="bi bi-cake2"></i> Flan
+    </a>
 </div>
 {% endblock %}
 

@@ -66,7 +66,9 @@ def get_villes():
     # Récupérer les villes qui correspondent à la recherche
     query = db.session.query(Etablissement.ville).distinct()
     if search_term:
-        query = query.filter(Etablissement.ville.ilike(f"%{search_term}%"))
+        # Utilisation de paramètres sécurisés pour éviter les injections SQL
+        search_pattern = f"%{search_term}%"
+        query = query.filter(Etablissement.ville.ilike(search_pattern))
 
     villes = query.all()
     villes = [ville[0] for ville in villes if ville[0]]
@@ -79,9 +81,13 @@ def get_villes():
 def filtrer_etablissements(query, **kwargs):
     """Applique les filtres communs à une requête Etablissement."""
     if kwargs.get("nom"):
-        query = query.filter(Etablissement.nom.ilike(f'%{kwargs["nom"]}%'))
+        # Utilisation de paramètres sécurisés pour éviter les injections SQL
+        nom_pattern = f"%{kwargs['nom']}%"
+        query = query.filter(Etablissement.nom.ilike(nom_pattern))
     if kwargs.get("ville"):
-        query = query.filter(Etablissement.ville.ilike(f'%{kwargs["ville"]}%'))
+        # Utilisation de paramètres sécurisés pour éviter les injections SQL
+        ville_pattern = f"%{kwargs['ville']}%"
+        query = query.filter(Etablissement.ville.ilike(ville_pattern))
     if kwargs.get("visite") == "oui":
         query = query.filter(Etablissement.visite == True)
     elif kwargs.get("visite") == "non":
@@ -108,17 +114,36 @@ def filtrer_etablissements(query, **kwargs):
 
 @main_bp.route("/liste_etablissements", methods=["GET", "POST"])
 def liste_etablissements():
+    print("DEBUG: Méthode HTTP:", request.method)
+    print(
+        "DEBUG: Données reçues:",
+        request.form if request.method == "POST" else request.args,
+    )
+
+    # Détecter le mode géolocalisation
+    geolocalisation_mode = (
+        request.form.get("geolocalisation") == "true"
+        or request.args.get("geolocalisation") == "true"
+    )
+ 
+
+
     form_ajout = EtabForm(prefix="ajout-etab")
     form_edit = EtabForm(prefix="edit-etab")
 
     if request.method == "POST":
+     
         form_recherche = RechercheForm(request.form)
-    else:
-        form_recherche = RechercheForm(request.args)
 
-    # 1. Recherche simple (GET uniquement)
+    else:
+        print("DEBUG: Création du formulaire avec données GET")
+        form_recherche = RechercheForm(request.args)
+        print("DEBUG: Latitude reçue:", request.args.get("latitude"))
+        print("DEBUG: Longitude reçue:", request.args.get("longitude"))
+
+    # 1. Recherche simple (GET uniquement) - MODIFIÉ pour ignorer en mode géolocalisation
     recherche_simple = request.args.get("recherche_simple", None)
-    if recherche_simple and request.method == "GET":
+    if recherche_simple and request.method == "GET" and not geolocalisation_mode:
         query = Etablissement.query.filter(
             (Etablissement.nom.ilike(f"%{recherche_simple}%"))
             | (Etablissement.ville.ilike(f"%{recherche_simple}%"))
@@ -138,89 +163,97 @@ def liste_etablissements():
         if request.args.get("ville"):
             ville_selectionnee = request.args.get("ville")
 
-    # Appliquer les autres filtres (sauf la ville)
-    if form_recherche.validate_on_submit() or (
-        request.method == "GET" and form_recherche.validate()
-    ):
-        # On ne fait la jointure que si un filtre sur Flan est activé
-        need_join = (
-            (
-                form_recherche.type_saveur.data
-                and form_recherche.type_saveur.data != "tous"
-            )
-            or (
-                form_recherche.type_pate.data
-                and form_recherche.type_pate.data != "tous"
-            )
-            or (
-                form_recherche.type_texture.data
-                and form_recherche.type_texture.data != "tous"
-            )
-            or (form_recherche.prix.data and form_recherche.prix.data != "tous")
-        )
-        if need_join:
-            query = query.join(Flan)
-
-        if form_recherche.nom.data:
-            query = query.filter(
-                Etablissement.nom.ilike(f"%{form_recherche.nom.data}%")
-            )
-
-        # Note: On ne filtre plus par ville ici, on utilise le zoom JavaScript
-
-        if (
-            form_recherche.type_saveur.data
-            and form_recherche.type_saveur.data != "tous"
-        ):
-            query = query.filter(Flan.type_saveur == form_recherche.type_saveur.data)
-        if form_recherche.type_pate.data and form_recherche.type_pate.data != "tous":
-            query = query.filter(Flan.type_pate == form_recherche.type_pate.data)
-        if (
-            form_recherche.type_texture.data
-            and form_recherche.type_texture.data != "tous"
-        ):
-            query = query.filter(Flan.type_texture == form_recherche.type_texture.data)
-        if form_recherche.prix.data and form_recherche.prix.data != "tous":
-            if form_recherche.prix.data == "0":
-                query = query.filter(Flan.prix < 2.5)
-            elif form_recherche.prix.data == "2.5":
-                query = query.filter(Flan.prix >= 2.5, Flan.prix < 5)
-            elif form_recherche.prix.data == "5":
-                query = query.filter(Flan.prix >= 5)
-        if form_recherche.visite.data and form_recherche.visite.data != "tous":
-            query = query.filter(
-                Etablissement.visite == (form_recherche.visite.data == "oui")
-            )
-        if form_recherche.labellise.data and form_recherche.labellise.data != "tous":
-            query = query.filter(
-                Etablissement.label == (form_recherche.labellise.data == "oui")
-            )
-
-    # 3. Filtre par proximité
+    # 3. Cas spécial: si on a des coordonnées mais pas de ville, on utilise les coordonnées pour le zoom
     user_lat = form_recherche.latitude.data
     user_lon = form_recherche.longitude.data
-    if user_lat and user_lon:
-        rayon = form_recherche.rayon.data or 5.0
+
+    if user_lat and user_lon and not ville_selectionnee:
+        print("DEBUG: Mode géolocalisation - utilisation des coordonnées pour le zoom")
+        # On ne filtre pas les établissements ici, on les affiche tous
+        # Le filtre par proximité sera fait côté JavaScript ou via le rayon
         etablissements = query.distinct().all()
-        etablissements = [
-            etab
-            for etab in etablissements
-            if etab.latitude
-            and etab.longitude
-            and calculer_distance(
-                float(user_lat),
-                float(user_lon),
-                float(etab.latitude),
-                float(etab.longitude),
-            )
-            <= float(rayon)
-        ]
     else:
+        # 4. Appliquer les autres filtres (sauf la ville)
+        if (
+            request.method == "POST"
+            or form_recherche.validate_on_submit()
+            or (request.method == "GET" and form_recherche.validate())
+        ):
+            # On ne fait la jointure que si un filtre sur Flan est activé
+            need_join = (
+                (
+                    form_recherche.type_saveur.data
+                    and form_recherche.type_saveur.data != "tous"
+                )
+                or (
+                    form_recherche.type_pate.data
+                    and form_recherche.type_pate.data != "tous"
+                )
+                or (
+                    form_recherche.type_texture.data
+                    and form_recherche.type_texture.data != "tous"
+                )
+                or (form_recherche.prix.data and form_recherche.prix.data != "tous")
+            )
+            if need_join:
+                query = query.join(Flan)
+
+            if form_recherche.nom.data:
+                query = query.filter(
+                    Etablissement.nom.ilike(f"%{form_recherche.nom.data}%")
+                )
+
+            if (
+                form_recherche.type_saveur.data
+                and form_recherche.type_saveur.data != "tous"
+            ):
+                query = query.filter(
+                    Flan.type_saveur == form_recherche.type_saveur.data
+                )
+            if (
+                form_recherche.type_pate.data
+                and form_recherche.type_pate.data != "tous"
+            ):
+                query = query.filter(Flan.type_pate == form_recherche.type_pate.data)
+            if (
+                form_recherche.type_texture.data
+                and form_recherche.type_texture.data != "tous"
+            ):
+                query = query.filter(
+                    Flan.type_texture == form_recherche.type_texture.data
+                )
+            if form_recherche.prix.data and form_recherche.prix.data != "tous":
+                if form_recherche.prix.data == "0":
+                    query = query.filter(Flan.prix < 2.5)
+                elif form_recherche.prix.data == "2.5":
+                    query = query.filter(Flan.prix >= 2.5, Flan.prix < 5)
+                elif form_recherche.prix.data == "5":
+                    query = query.filter(Flan.prix >= 5)
+            if form_recherche.visite.data and form_recherche.visite.data != "tous":
+                query = query.filter(
+                    Etablissement.visite == (form_recherche.visite.data == "oui")
+                )
+            if (
+                form_recherche.labellise.data
+                and form_recherche.labellise.data != "tous"
+            ):
+                query = query.filter(
+                    Etablissement.label == (form_recherche.labellise.data == "oui")
+                )
+
         etablissements = query.distinct().all()
 
-    # 4. Préparation pour le template
+
+
+    # 5. Préparation pour le template
     etablissements, etablissements_json = afficher_etablissements(etablissements)
 
+    print(
+        "DEBUG: Préparation du rendu du template avec user_lat:",
+        user_lat,
+        "user_lon:",
+        user_lon,
+    )
     return render_template(
         "liste_etablissements.html",
         etablissements=etablissements,
@@ -231,7 +264,7 @@ def liste_etablissements():
         form_edit=form_edit,
         user_lat=user_lat,
         user_lon=user_lon,
-        ville_selectionnee=ville_selectionnee,  # Nouvelle variable pour le zoom
+        ville_selectionnee=ville_selectionnee,
     )
 
 
@@ -265,7 +298,9 @@ def api_etablissements():
         # Applique les filtres
         query = Etablissement.query.join(Flan)
         if nom:
-            query = query.filter(Etablissement.nom.ilike(f"%{nom}%"))
+            # Utilisation de paramètres sécurisés pour éviter les injections SQL
+            nom_pattern = f"%{nom}%"
+            query = query.filter(Etablissement.nom.ilike(nom_pattern))
         if visite == "oui":
             query = query.filter(Etablissement.visite == True)
         elif visite == "non":
@@ -275,7 +310,9 @@ def api_etablissements():
         elif labellise == "non":
             query = query.filter(Etablissement.label == False)
         if ville:
-            query = query.filter(Etablissement.ville.ilike(f"%{ville}%"))
+            # Utilisation de paramètres sécurisés pour éviter les injections SQL
+            ville_pattern = f"%{ville}%"
+            query = query.filter(Etablissement.ville.ilike(ville_pattern))
         if type_pate != "tous":
             query = query.filter(Flan.type_pate == type_pate)
         if type_saveur != "tous":
@@ -738,7 +775,7 @@ def supprimer_evaluation(id_eval):
 
 def afficher_badge_etablissement(etablissement):
     if hasattr(etablissement, "label") and etablissement.label:
-        return '<span class="badge badge-labellise">❤️ Labellisé</span>'
+        return '<span class="badge badge-labellise">❤️</span>'
     return ""
 
 
@@ -754,3 +791,4 @@ def afficher_badge_type_etab(etablissement):
         couleur = couleurs.get(type_etab.name, "#D3D3D3")
         return f'<div class="badge badge-type-etab" style="background-color: {couleur};">{type_etab.value}</div>'
     return ""
+

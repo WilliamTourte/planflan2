@@ -9,6 +9,9 @@ let userLocation = null;
 let proximityRadius = 5;
 let villeSelectionnee = null;
 
+// Désactiver les transformations 3D pour Leaflet
+L_DISABLE_3D = true;
+
 // Variables pour les filtres
 let activeFilters = {
     type_pate: false,
@@ -69,18 +72,7 @@ const createEmojiIcon = (emoji, className) => {
     });
 };
 
-// Fonction pour calculer la distance entre deux points (en km)
-function calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371; // Rayon de la Terre en km
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-        Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
-}
+
 
 // Fonction pour créer un marqueur avec un popup asynchrone pour un établissement donné
 function createEtablissementMarker(map, etablissement, baseUrl = window.location.origin) {
@@ -100,25 +92,65 @@ function createEtablissementMarker(map, etablissement, baseUrl = window.location
 
     // Ne pas charger le popup immédiatement, mais seulement au clic
     marker.on('click', function() {
-        if (!marker.getPopup()) {
-            marker.bindPopup("Chargement en cours...");
-            marker.openPopup();
-            fetch(`/get_infowindow_content?id_etab=${etablissement.id_etab}`)
-                .then(response => response.text())
-                .then(content => {
-                    marker.setPopupContent(content);
-                })
-                .catch(error => {
-                    console.error('Erreur lors du chargement du popup:', error);
-                    let popupContent = `<div class="infowindow-content"><h4>${etablissement.nom}</h4>`;
-                    popupContent += `<p>${etablissement.adresse}, ${etablissement.ville}</p>`;
-                    popupContent += `<a href="${baseUrl}/etablissement/${etablissement.id_etab}" class="btn btn-success">Voir plus</a></div>`;
-                    marker.setPopupContent(popupContent);
-                });
-        } else {
-            marker.openPopup();
-        }
-    });
+    if (!marker.getPopup()) {
+        // Créer le popup avec les paramètres corrects
+        const popup = L.popup({
+            autoPan: true,
+            autoPanPadding: [50, 50], // Marge pour éviter que le popup soit collé aux bords
+            keepInView: true,
+            closeButton: false,
+            
+            
+        });
+
+        // Créer le conteneur
+        const popupContainer = L.DomUtil.create('div', 'custom-popup-container');
+        
+
+        // Définir le contenu du popup
+        popup.setContent(popupContainer);
+
+        // Attacher le popup au marqueur
+        marker.bindPopup(popup).openPopup();
+
+        // Centrer la carte sur le marqueur avec un léger délai
+        setTimeout(() => {
+            map.panTo(marker.getLatLng());
+        }, 100);
+       
+
+        fetch(`/get_infowindow_content?id_etab=${etablissement.id_etab}`)
+            .then(response => response.text())
+            .then(content => {
+                popupContainer.innerHTML = content;
+                marker._popup.update();
+                // Forcer le recalcul de position après chargement du contenu
+                setTimeout(() => {
+                    if (marker._popup) {
+                        marker._popup.update();
+                        map.panTo(marker.getLatLng());
+                    }
+                }, 50);
+            })
+            .catch(error => {
+                console.error('Erreur lors du chargement du popup:', error);
+                let popupContent = `<div class="infowindow-content"><h4>${etablissement.nom}</h4>`;
+                popupContent += `<p>${etablissement.adresse}, ${etablissement.ville}</p>`;
+                popupContent += `<a href="${baseUrl}/etablissement/${etablissement.id_etab}" class="btn btn-success">Voir plus</a></div>`;
+                popupContainer.innerHTML = popupContent;
+                marker._popup.update();
+                // Forcer le recalcul de position même en cas d'erreur
+                setTimeout(() => {
+                    if (marker._popup) {
+                        marker._popup.update();
+                        map.panTo(marker.getLatLng());
+                    }
+                }, 50);
+            });
+    } else {
+        marker.openPopup();
+    }
+});
 
     marker.options.etablissement = etablissement;
     return marker;
@@ -198,7 +230,7 @@ function zoomOnVille(ville) {
 }
 
 // Fonction pour créer un marqueur utilisateur
-function createUserMarker() {
+function createUserMarker(forceZoom = false) {
     if (userMarker) map.removeLayer(userMarker);
    
 
@@ -208,8 +240,10 @@ function createUserMarker() {
             
         }).addTo(map);
 
-        // Centrer la carte sur l'utilisateur
-        map.setView([userLocation.lat, userLocation.lon], 13);
+        // Centrer la carte sur l'utilisateur seulement si forceZoom est vrai
+        if (forceZoom) {
+            map.setView([userLocation.lat, userLocation.lon], 13);
+        }
     }
 }
 // Fonction pour ajouter le bouton de géolocalisation comme contrôle Leaflet
@@ -236,7 +270,7 @@ function addGeolocateControl() {
                     (coords) => {
                         userLocation = { lat: coords.latitude, lon: coords.longitude };
                         activeFilters.proximity = true;
-                        createUserMarker();
+                        createUserMarker(true);
 
                         // Met à jour les champs cachés du formulaire (si ils existent)
                         const latitudeInput = document.getElementById('latitude');
@@ -253,7 +287,7 @@ function addGeolocateControl() {
                             }
                         } else {
                             // Si les champs n'existent pas, on recrée juste la carte avec la nouvelle position
-                            createUserMarker();
+                            createUserMarker(true);
                             updateMarkersBasedOnFilters();
                         }
                     },
@@ -308,8 +342,8 @@ function initMap() {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
 
-    // Ajouter le marqueur utilisateur si position disponible
-    createUserMarker();
+    // Ajouter le marqueur utilisateur si position disponible (sans forcer le zoom)
+    createUserMarker(false);
     
     // Ajouter un écouteur d'événement pour le déplacement de la carte
     map.on('moveend', function() {
@@ -327,17 +361,8 @@ function initMap() {
 
 div.innerHTML = `
     <div class="legende-container">
-        <div class="legende-item">
-            ❤️
-            <span class="legende-text">Labellisé</span>
-        </div>
-        <div class="legende-item">
-            ✅
-            <span class="legende-text">Visité</span>
-        </div>
-        <div class="legende-item">
-            👋
-            <span class="legende-text">Non visité</span>
+        <div class="legende-text">
+            ❤️ Labellisé ✅ Visité 👋 Non visité
         </div>
     </div>
 `;
@@ -410,13 +435,8 @@ function setupGeolocation() {
                 (coords) => {
                     userLocation = { lat: coords.latitude, lon: coords.longitude };
                     
-                    // Créer le marqueur utilisateur
-                    createUserMarker();
-                    
-                    // Zoomer sur la position utilisateur (sans filtrer les établissements)
-                    if (map) {
-                        map.setView([coords.latitude, coords.longitude], 15);
-                    }
+                    // Créer le marqueur utilisateur avec zoom forcé
+                    createUserMarker(true);
                 },
                 (error) => {
                     // Gestion des erreurs
