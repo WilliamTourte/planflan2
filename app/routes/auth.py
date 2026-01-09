@@ -102,13 +102,21 @@ def supprimer_compte():
     # Vérifier le token CSRF en utilisant la fonction utilitaire
     csrf_valide, message = verifier_csrf_token()
     if not csrf_valide:
-        return redirect(url_for("main.dashboard", error="csrf"))
+        flash("Token CSRF invalide. Veuillez réessayer.", "danger")
+        return redirect(url_for("main.dashboard"))
 
-    # Vérifier le mot de passe pour les actions sensibles
+    # Vérifier la présence du mot de passe
     password = request.form.get("password")
-    if not password or not bcrypt.check_password_hash(current_user.password, password):
-        return redirect(url_for("main.dashboard", error="password"))
+    if not password:
+        flash("Le mot de passe est requis pour supprimer le compte.", "danger")
+        return redirect(url_for("main.dashboard"))
 
+    # Vérifier le mot de passe
+    if not bcrypt.check_password_hash(current_user.password, password):
+        flash("Mot de passe incorrect.", "danger")
+        return redirect(url_for("main.dashboard"))
+
+    # Suppression du compte
     user = Utilisateur.query.get(current_user.id_user)
     db.session.delete(user)
     db.session.commit()
