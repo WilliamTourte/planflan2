@@ -4,8 +4,6 @@ import os
 import re
 from collections import defaultdict
 
-import os
-
 os.chdir("..")
 
 
