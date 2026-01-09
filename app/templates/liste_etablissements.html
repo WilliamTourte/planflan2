@@ -37,14 +37,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Ajout des coordonnées utilisateur si disponibles
     {% if user_lat and user_lon %}
-    console.log('DEBUG: Coordonnées utilisateur reçues dans template - lat: {{ user_lat }}, lon: {{ user_lon }}');
     const userLocationElement = document.createElement('div');
     userLocationElement.id = 'user-location';
     userLocationElement.setAttribute('data-lat', {{ user_lat }});
     userLocationElement.setAttribute('data-lon', {{ user_lon }});
     document.body.appendChild(userLocationElement);
-    {% else %}
-    console.log('DEBUG: Aucune coordonnée utilisateur reçue dans template');
     {% endif %}
     
     // Ajout de la ville sélectionnée si disponible

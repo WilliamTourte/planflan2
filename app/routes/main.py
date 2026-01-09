@@ -791,3 +791,4 @@ def afficher_badge_type_etab(etablissement):
         couleur = couleurs.get(type_etab.name, "#D3D3D3")
         return f'<div class="badge badge-type-etab" style="background-color: {couleur};">{type_etab.value}</div>'
     return ""
+

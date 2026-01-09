@@ -661,15 +661,18 @@ input[type="submit"]:active {
     max-width: var(--infowindow-max-width);
     font-size: var(--font-size-md);
     margin: 0 !important;
+    overflow-y: auto;
+    max-height: 60vh;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-secondary) var(--color-light);
 }
 
 .leaflet-popup-content {
     background: white;
     text-align: center;
-    max-height: 50vh;
-    overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-secondary) var(--color-light);
+    
+
+ 
     padding : 0 !important;
 }
 

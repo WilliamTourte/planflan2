@@ -31,7 +31,7 @@ def add_security_headers(response):
         "style-src 'self' 'unsafe-inline' "
         "https://fonts.googleapis.com cdn.jsdelivr.net unpkg.com "
         "http://localhost; "
-        "img-src 'self' data: blob: https://maps.googleapis.com "
+        "img-src 'self' data: blob: http://localhost https://maps.googleapis.com "
         "https://maps.gstatic.com cdn.jsdelivr.net unpkg.com "
         "a.tile.openstreetmap.org b.tile.openstreetmap.org "
         "c.tile.openstreetmap.org; "
@@ -43,8 +43,7 @@ def add_security_headers(response):
         "object-src 'none'; "
         "base-uri 'self'; "
         "form-action 'self' http://localhost; "
-        "frame-ancestors 'none'; "
-        "block-all-mixed-content"
+        "frame-ancestors 'none'"
     )
     response.headers["Content-Security-Policy"] = csp
 

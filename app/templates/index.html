@@ -280,10 +280,7 @@ function initGeolocButton() {
     const geolocButton = document.getElementById('geoloc-button');
     if (!geolocButton) return;
 
-    console.log('DEBUG: Bouton de géolocalisation initialisé');
-
     geolocButton.addEventListener('click', function() {
-        console.log('DEBUG: Clic sur bouton de géolocalisation');
         
         // Sauvegarder l'état initial du bouton
         const originalHTML = geolocButton.innerHTML;
@@ -294,10 +291,8 @@ function initGeolocButton() {
         geolocButton.disabled = true;
 
         // Utiliser la fonction de géolocalisation existante
-        console.log('DEBUG: Appel à geoloc.getUserLocation()');
         geoloc.getUserLocation(
             function(coords) {
-                console.log('DEBUG: Coordonnées reçues:', coords);
                 
                 // Remplir les champs cachés avec les coordonnées
                 const latitudeField = document.querySelector('input[name="latitude"]');
