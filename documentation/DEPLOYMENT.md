@@ -252,5 +252,8 @@ sudo tail -f /var/log/nginx/error.log
 5. **Sécurité** : Mettez à jour régulièrement le système et les dépendances
 
 
+# Suite à changement dans l'application
+docker compose up -d --no-deps --build planflan-backend 
 
+# Pour recréer la base de données
 docker exec -it planflan-container-backend python scripts/recrer_db.py
