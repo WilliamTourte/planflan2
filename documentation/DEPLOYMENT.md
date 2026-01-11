@@ -251,9 +251,6 @@ sudo tail -f /var/log/nginx/error.log
 4. **Logs** : Configurez une rotation des logs pour éviter de remplir le disque
 5. **Sécurité** : Mettez à jour régulièrement le système et les dépendances
 
-## Support
 
-Pour toute question ou problème, consulter la documentation officielle :
-- [Flask Documentation](https://flask.palletsprojects.com/)
-- [Gunicorn Documentation](https://docs.gunicorn.org/)
-- [Nginx Documentation](https://nginx.org/en/docs/)
+
+docker exec -it planflan-container-backend python scripts/recrer_db.py
