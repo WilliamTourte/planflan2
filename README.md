@@ -38,7 +38,12 @@ pre-commit permet de lancer un hook pour s'assurer que le commit ne casse rien, 
 ## Mise en place BDD conteneurisée
 
 Dans le dossier `db` est contenu un fichier de configuration `docker-compose.yml` permettant de mettre en place une base de données MariadDB.
-
+Les infos suivantes pour la BDD sont à rentrer dans le .env à la racine du projet, pas celui dans docker-db/.env :
+# Pour Docker
+MYSQL_ROOT_PASSWORD=
+MYSQL_DATABASE=
+MYSQL_USER=
+MYSQL_PASSWORD=
 Procédure :
 1. Installer Docker
 2. Dans un terminal, se positionner dans le dossier `db` 
