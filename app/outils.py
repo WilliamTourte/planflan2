@@ -152,12 +152,13 @@ def get_place_details(place_id, api_key):
     return None
 
 
-def fetch_place_photos(etablissement_id, api_key, max_width=400):
+def fetch_place_photos(etablissement_id, place_id, api_key, max_width=400):
     """
     Récupère les photos pour un établissement depuis l'API Google Places et les sauvegarde localement.
 
     Args:
-        etablissement_id (int): Identifiant de l'établissement
+        etablissement_id (int): Identifiant de l'établissement dans la base de données
+        place_id (str): Identifiant Google Places du lieu
         api_key (str): Clé API Google Places
         max_width (int): Largeur maximale des photos (par défaut 400)
 
@@ -174,10 +175,12 @@ def fetch_place_photos(etablissement_id, api_key, max_width=400):
         return [photo.path for photo in existing_photos]
 
     # Récupérer les détails de l'établissement pour obtenir les photoreferences
-    # Note: Dans cette implémentation, nous utilisons l'id_etab comme place_id
-    # Cela suppose que l'id_etab correspond à un place_id Google Places
-    # Si ce n'est pas le cas, il faudra adapter cette partie
-    place_details = get_place_details(str(etablissement_id), api_key)
+    # Utiliser le place_id Google Places pour récupérer les photos
+    if not place_id:
+        current_app.logger.warning(f"Aucun place_id fourni pour l'établissement {etablissement_id}")
+        return []
+
+    place_details = get_place_details(place_id, api_key)
     if not place_details or 'photos' not in place_details:
         return []
 

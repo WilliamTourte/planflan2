@@ -449,7 +449,7 @@ def afficher_etablissement_unique(id_etab):
     form_flan = NewFlanForm(prefix="ajout-flan")
 
     # Récupérer ou télécharger les photos pour l'établissement
-    photo_paths = fetch_place_photos(id_etab, current_app.config['GOOGLE_MAPS_API_KEY'])
+    photo_paths = fetch_place_photos(id_etab, etablissement.google_place_id, current_app.config['GOOGLE_MAPS_API_KEY'])
 
     if form_etab.validate_on_submit():
         etablissement.nom = form_etab.nom.data

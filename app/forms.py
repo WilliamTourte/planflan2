@@ -230,6 +230,7 @@ class EtabForm(FlaskForm):
     visite = BooleanField("Visité")
     latitude = HiddenField("Latitude")
     longitude = HiddenField("Longitude")
+    google_place_id = HiddenField("Google Place ID", default="")
     id_user = HiddenField("id_user", default=1)
     submit = SubmitField("Proposer un établissement")
 

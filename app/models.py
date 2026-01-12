@@ -181,6 +181,7 @@ class Etablissement(db.Model):
     description = db.Column(db.Text, nullable=True)
     label = db.Column(db.Boolean, nullable=True, default=False)
     visite = db.Column(db.Boolean, nullable=True, default=False)
+    google_place_id = db.Column(db.String(255), nullable=True)
     statut = db.Column(
         db.Enum(StatutModeration), nullable=False, server_default="EN_ATTENTE"
     )
@@ -227,6 +228,7 @@ class Etablissement(db.Model):
             "description": self.description,
             "label": self.label,
             "visite": self.visite,
+            "google_place_id": self.google_place_id,
             "statut": self.statut.value if self.statut else None,
             "id_user": self.id_user,
             "url": url_for("main.afficher_etablissement_unique", id_etab=self.id_etab),

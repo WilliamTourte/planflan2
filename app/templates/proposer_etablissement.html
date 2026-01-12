@@ -27,15 +27,37 @@
 
         
         autocomplete.addListener('place_changed', function() {
+            console.log("=== DEBUT place_changed ===");
             const place = autocomplete.getPlace();
+            console.log("Place object:", place);
+            
             if (!place.geometry) {
-                console.error("Aucune information de géolocalisation disponible pour ce lieu.");
+                console.error("❌ Aucune information de géolocalisation disponible pour ce lieu.");
                 return;
             }
+            
+            console.log("✓ Géométrie disponible");
+            console.log("Place ID:", place.place_id);
+            console.log("Place name:", place.name);
+            
+            // Remplir les champs
             document.getElementById('ajout-etab-nom').value = place.name || '';
             document.getElementById('ajout-etab-adresse').value = place.formatted_address || '';
             document.getElementById('ajout-etab-latitude').value = place.geometry.location.lat();
             document.getElementById('ajout-etab-longitude').value = place.geometry.location.lng();
+            document.getElementById('ajout-etab-google_place_id').value = place.place_id || '';
+            
+            // Vérification des champs après remplissage
+            console.log("Valeur du champ google_place_id après remplissage:", document.getElementById('ajout-etab-google_place_id').value);
+            console.log("Longueur du google_place_id:", document.getElementById('ajout-etab-google_place_id').value.length);
+            
+            // Vérification de tous les champs cachés
+            console.log("Valeurs des champs cachés:");
+            console.log("  nom:", document.getElementById('ajout-etab-nom').value);
+            console.log("  google_place_id:", document.getElementById('ajout-etab-google_place_id').value);
+            console.log("  latitude:", document.getElementById('ajout-etab-latitude').value);
+            console.log("  longitude:", document.getElementById('ajout-etab-longitude').value);
+            console.log("=== FIN place_changed ===");
 
             // Vérifier si le lieu est déjà dans la liste
             fetch('/verifier_etablissement', {
@@ -177,12 +199,14 @@
                     <label for="search" class="form-check-label">Recherche d'établissement</label>
                     <input type="text" id="search" class="form-control" placeholder="Rechercher un établissement">
                 </div>
-                <!-- Champs cachés pour les coordonnées et l'adresse -->
+                <!-- Champs cachés pour les coordonnées, l'adresse et le place_id -->
                 <div class="etablissement-hidden-fields">
                     {{ form.nom(id="ajout-etab-nom") }}
                     {{ form.adresse(id="ajout-etab-adresse") }}
                     {{ form.latitude(id="ajout-etab-latitude") }}
                     {{ form.longitude(id="ajout-etab-longitude") }}
+                    {{ form.google_place_id(id="ajout-etab-google_place_id") }}
+                    <input type="hidden" name="ajout-etab-google_place_id" id="ajout-etab-google_place_id" value="{{ form.google_place_id.data or '' }}">
                     {{ form.code_postal(id="ajout-etab-code_postal") }}
                     {{ form.ville(id="ajout-etab-ville") }}
                 </div>
@@ -209,6 +233,26 @@
                     </button>
        
             </form>
+            <script>
+            // Ajout d'un écouteur pour la soumission du formulaire
+            document.addEventListener('DOMContentLoaded', function() {
+                const form = document.querySelector('form');
+                if (form) {
+                    form.addEventListener('submit', function(e) {
+                        console.log("=== SOUMISSION DU FORMULAIRE ===");
+                        console.log("Valeur de google_place_id avant soumission:", document.getElementById('ajout-etab-google_place_id').value);
+                        
+                        // Vérifier tous les champs cachés
+                        const hiddenFields = document.querySelectorAll('.etablissement-hidden-fields input');
+                        console.log("Champs cachés dans le formulaire:");
+                        hiddenFields.forEach(field => {
+                            console.log(`  ${field.name}: ${field.value} (type: ${field.type})`);
+                        });
+                        console.log("=== FIN SOUMISSION ===");
+                    });
+                }
+            });
+            </script>
 </div>
         <!-- Conteneur pour la carte -->
             <div id="map" class="map"></div>
