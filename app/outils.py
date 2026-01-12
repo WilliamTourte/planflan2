@@ -186,7 +186,7 @@ def fetch_place_photos(etablissement_id, place_id, api_key, max_width=400):
 
     # Récupérer les photos depuis l'API
     photo_paths = []
-    for idx, photo in enumerate(place_details['photos'][:3]):  # Limiter à 3 photos
+    for idx, photo in enumerate(place_details['photos'][:1]):  # Limiter à une photo
         photo_reference = photo['photo_reference']
         url = "https://maps.googleapis.com/maps/api/place/photo"
         params = {

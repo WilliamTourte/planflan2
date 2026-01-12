@@ -1,21 +1,16 @@
 <!-- MACROS D'AFFICHAGE -->
-{% macro afficher_image_ou_placeholder(item, class='carte-image', photo_paths=None) %}
-    {% if photo_paths %}
-        <!-- Afficher les photos depuis photo_paths si fourni -->
-        {% if photo_paths|length > 0 %}
-            <img src="{{ url_for('static', filename=photo_paths[0].replace('app/static/', '')) }}" alt="{{ item.nom }}" class="{{ class }}">
-        {% else %}
-            {% if item.__class__.__name__ == 'Flan' %}
-                <img src="{{ url_for('static', filename='uploads/flan-vanille.webp') }}" alt="Flan par défaut" class="{{ class }}">
-            {% elif item.__class__.__name__ == 'Etablissement' %}
-                <img src="{{ url_for('static', filename='uploads/defaut_etab.jpg') }}" alt="Etablissement par défaut" class="{{ class }}">
-            {% else %}
-                <div class="{{ class }} placeholder"><span>Pas de photo</span></div>
+{% macro afficher_image_ou_placeholder(item, class='carte-image', photo_paths=None, is_google_photo=False) %}
+    {% if photo_paths or item.photos %}
+        <div class="google-image-container">
+            {% if photo_paths and photo_paths|length > 0 %}
+                <img src="{{ url_for('static', filename=photo_paths[0].replace('app/static/', '')) }}" alt="{{ item.nom }}" class="{{ class }}">
+            {% elif item.photos %}
+                <img src="{{ url_for('static', filename='uploads/' + item.photos[0].path) }}" alt="{{ item.nom }}" class="{{ class }}">
             {% endif %}
-        {% endif %}
-    {% elif item.photos %}
-        <!-- Afficher la première photo de l'établissement si disponible -->
-        <img src="{{ url_for('static', filename='uploads/' + item.photos[0].path) }}" alt="{{ item.nom }}" class="{{ class }}">
+            {% if is_google_photo %}
+                <div class="google-photo-attribution">Photo © Google Maps</div>
+            {% endif %}
+        </div>
     {% else %}
         <!-- Afficher l'image par défaut -->
         {% if item.__class__.__name__ == 'Flan' %}
@@ -167,7 +162,7 @@
 {% macro afficher_etablissement(etablissement, current_user, form_edit, current_page, delete_form, validate_form, photo_paths=None) %}
     <div class="carte">
         <div class="carte-image-container">
-            {{ afficher_image_ou_placeholder(etablissement, 'carte-image', photo_paths) }}
+            {{ afficher_image_ou_placeholder(etablissement, 'carte-image', photo_paths, is_google_photo=(photo_paths is not none)) }}
             {{ afficher_badge_type_etab(etablissement) }}
             {{ afficher_badge_etablissement(etablissement) }}
         </div>

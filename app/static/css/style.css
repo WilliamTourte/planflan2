@@ -1080,3 +1080,24 @@ input[type="submit"]:active {
         margin-bottom: var(--margin-md);
     }
 }
+
+/* =============================================
+   ATTRIBUTION GOOGLE PHOTOS
+   ============================================= */
+/* Conteneur pour les photos Google avec attribution */
+.google-photo-container {
+    position: relative;
+    display: inline-block;
+}
+
+.google-photo-attribution {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 3px 8px;
+    font-size: var(--font-size-xs);
+    border-radius: 3px;
+    font-family: var(--font-primary);
+}
