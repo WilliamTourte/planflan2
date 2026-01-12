@@ -317,7 +317,7 @@ def modifier_etablissement(id_etab):
             etablissement.description = form_edit.description.data
             db.session.commit()
             flash("Établissement mis à jour avec succès !", "success")
-            return redirect(url_for("main.index"))
+            return redirect(url_for("main.afficher_etablissement_unique", id_etab=id_etab))
 
     # Récupération de tous les établissements pour l'affichage
     etablissements = Etablissement.query.all()

@@ -35,7 +35,6 @@ from app.outils import afficher_etablissements, calculer_distance
 
 main_bp = Blueprint("main", __name__)
 
-
 ## ROUTES PRINCIPALES
 @main_bp.route("/")
 def index():
@@ -57,7 +56,6 @@ def index():
         form_recherche=form_recherche,
     )
 
-
 @main_bp.route("/api/villes")
 def get_villes():
     """Route API pour récupérer les villes pour l'autocomplete"""
@@ -78,7 +76,6 @@ def get_villes():
     print(f"Found {len(villes)} villes: {villes[:5]}{'...' if len(villes) > 5 else ''}")
 
     return jsonify(sorted(villes))
-
 
 def filtrer_etablissements(query, **kwargs):
     """Applique les filtres communs à une requête Etablissement."""
@@ -112,7 +109,6 @@ def filtrer_etablissements(query, **kwargs):
         elif kwargs["prix"] == "5":
             query = query.filter(Flan.prix >= 5)
     return query
-
 
 @main_bp.route("/liste_etablissements", methods=["GET", "POST"])
 def liste_etablissements():
@@ -269,7 +265,6 @@ def liste_etablissements():
         ville_selectionnee=ville_selectionnee,
     )
 
-
 @main_bp.route("/api/etablissements", methods=["GET", "POST"])
 def api_etablissements():
     try:
@@ -350,7 +345,6 @@ def api_etablissements():
         # En cas d'erreur, renvoie toujours du JSON avec un message d'erreur
         return jsonify({"error": str(e)}), 500
 
-
 ### INFOWINDOW
 @main_bp.route("/get_infowindow_content")
 def get_infowindow_content():
@@ -366,13 +360,11 @@ def get_infowindow_content():
         "infowindow_template.html", etablissement=etablissement, details_url=details_url
     )
 
-
 ### PAGE RECHERCHE
 @main_bp.route("/rechercher", methods=["GET"])
 def rechercher():
     form_recherche = RechercheForm()
     return render_template("rechercher.html", form_recherche=form_recherche)
-
 
 ### DASHBOARD
 @main_bp.route("/dashboard", methods=["GET", "POST"])
@@ -446,10 +438,7 @@ def dashboard():
         pending_etablissements=pending_etablissements,
     )
 
-
 ### Routes établissement, flan, évaluation
-
-
 @main_bp.route("/etablissement/<int:id_etab>", methods=["GET", "POST"])
 def afficher_etablissement_unique(id_etab):
     etablissement = Etablissement.query.get_or_404(id_etab)
@@ -484,7 +473,6 @@ def afficher_etablissement_unique(id_etab):
         validate_form=validate_form,
     )
 
-
 @main_bp.route("/flan/<int:id_flan>", methods=["GET", "POST"])
 def afficher_flan_unique(id_flan):
     flan_unique = Flan.query.get_or_404(id_flan)
@@ -515,7 +503,6 @@ def afficher_flan_unique(id_flan):
         validate_form=validate_form,
     )
 
-
 @main_bp.route("/etablissement/<int:id_etab>/proposer_flan", methods=["GET", "POST"])
 @login_required
 def proposer_flan(id_etab):
@@ -541,7 +528,6 @@ def proposer_flan(id_etab):
         "page_etablissement.html", form=form, etablissement=etablissement
     )
 
-
 @main_bp.route("/valider_flan/<int:id_flan>", methods=["POST"])
 @login_required
 def valider_flan(id_flan):
@@ -557,7 +543,6 @@ def valider_flan(id_flan):
         db.session.rollback()
         flash("Une erreur est survenue lors de la validation du flan.", "danger")
     return redirect(url_for("main.afficher_flan_unique", id_flan=id_flan))
-
 
 @main_bp.route("/modifier_flan/<int:id_flan>", methods=["POST"])
 @login_required
@@ -582,7 +567,6 @@ def modifier_flan(id_flan):
         )
     return redirect(url_for("main.afficher_flan_unique", id_flan=id_flan))
 
-
 @main_bp.route("/supprimer_flan/<int:id_flan>", methods=["POST"])
 @login_required
 def supprimer_flan(id_flan):
@@ -598,7 +582,6 @@ def supprimer_flan(id_flan):
         db.session.rollback()
         flash("Une erreur est survenue lors de la suppression du flan.", "danger")
     return redirect(url_for("main.dashboard"))
-
 
 @main_bp.route("/flan/<int:id_flan>/evaluer", methods=["GET", "POST"])
 @login_required
@@ -636,7 +619,6 @@ def evaluer_flan(id_flan):
             )
     return redirect(url_for("main.afficher_flan_unique", id_flan=id_flan))
 
-
 @main_bp.route("/evaluation/<int:id_eval>", methods=["GET", "POST"])
 @login_required
 def afficher_evaluation_unique(id_eval):
@@ -669,7 +651,6 @@ def afficher_evaluation_unique(id_eval):
         validate_form=validate_form,
         current_page="page_evaluation",
     )
-
 
 def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
     print("Form data received:", form.data)
@@ -733,7 +714,6 @@ def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
     db.session.commit()
     return evaluation
 
-
 @main_bp.route("/valider_evaluation/<int:id_eval>", methods=["POST"])
 @login_required
 def valider_evaluation(id_eval):
@@ -751,7 +731,6 @@ def valider_evaluation(id_eval):
             "Une erreur est survenue lors de la validation de l'évaluation.", "danger"
         )
     return redirect(url_for("main.dashboard"))
-
 
 @main_bp.route("/supprimer_evaluation/<int:id_eval>", methods=["POST"])
 @login_required
@@ -771,15 +750,11 @@ def supprimer_evaluation(id_eval):
         )
     return redirect(url_for("main.dashboard"))
 
-
 ### BADGES
-
-
 def afficher_badge_etablissement(etablissement):
     if hasattr(etablissement, "label") and etablissement.label:
         return '<span class="badge badge-labellise">❤️</span>'
     return ""
-
 
 def afficher_badge_type_etab(etablissement):
     couleurs = {
