@@ -16,7 +16,8 @@
           "address": "72 Av. Pierre Mendès-France, 33700 Mérignac, France",
           "country_code": "FR",
           "name": "The Bakehouse From Luchey"
-        }
+        },
+        "google_place_id": "ChIJea1WEkvYVA0Re_G3Y716Xx8"
       },
       "type": "Feature"
     },
@@ -35,14 +36,15 @@
           "address": "51 Cr de la Marne, 33800 Bordeaux, France",
           "country_code": "FR",
           "name": "Goûtu par Oven Heaven"
-        }
+        },
+        "google_place_id": "ChIJMXuHIrYnVQ0RG5qFqnrtu6M"
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          -0.5794710,
+          -0.579471,
           44.8402459
         ],
         "type": "Point"
@@ -54,7 +56,8 @@
           "address": "12 Rue des Remparts, 33000 Bordeaux, France",
           "country_code": "FR",
           "name": "Land&Monkeys Remparts"
-        }
+        },
+        "google_place_id": "ChIJvbqc2DsnVQ0RNojXqOdrXH0"
       },
       "type": "Feature"
     },
@@ -73,14 +76,15 @@
           "address": "105 Quai des Chartrons, 33300 Bordeaux, France",
           "country_code": "FR",
           "name": "Lune Pâtisserie & Vins"
-        }
+        },
+        "google_place_id": "ChIJyWQETcwpVQ0Rc926Qa4ITWc"
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          4.8281480,
+          4.828148,
           45.7526646
         ],
         "type": "Point"
@@ -92,7 +96,8 @@
           "address": "24 Rue Franklin, 69002 Lyon, France",
           "country_code": "FR",
           "name": "Boulangerie Pauline et Steve"
-        }
+        },
+        "google_place_id": "ChIJnRc9L03q9EcRzE-x5dglPPA"
       },
       "type": "Feature"
     },
@@ -111,7 +116,8 @@
           "address": "5 Rue de la Mairie, 92320 Châtillon, France",
           "country_code": "FR",
           "name": "Etincelle de Gourmandise"
-        }
+        },
+        "google_place_id": "ChIJt8WKm5Zw5kcRiL03hP2xD7Y"
       },
       "type": "Feature"
     },
@@ -130,7 +136,8 @@
           "address": "54 Rue Custine, 75018 Paris, France",
           "country_code": "FR",
           "name": "Chamboule"
-        }
+        },
+        "google_place_id": "ChIJx5iwMwBv5kcRWJnKo-ReXrI"
       },
       "type": "Feature"
     },
@@ -138,7 +145,7 @@
       "geometry": {
         "coordinates": [
           4.8328496,
-          45.7639090
+          45.763909
         ],
         "type": "Point"
       },
@@ -149,7 +156,8 @@
           "address": "5 Rue Dubois, 69002 Lyon, France",
           "country_code": "FR",
           "name": "Boulangerie Banneton"
-        }
+        },
+        "google_place_id": "ChIJmbStTIzr9EcRsuc9dpiSOIs"
       },
       "type": "Feature"
     },
@@ -157,7 +165,7 @@
       "geometry": {
         "coordinates": [
           6.1271352,
-          45.9002950
+          45.900295
         ],
         "type": "Point"
       },
@@ -168,7 +176,8 @@
           "address": "3 Rue du Lac, 74000 Annecy, France",
           "country_code": "FR",
           "name": "Boulangerie Rouge"
-        }
+        },
+        "google_place_id": "ChIJqdBRP_qPi0cRJu8g2LHUFs0"
       },
       "type": "Feature"
     },
@@ -187,7 +196,8 @@
           "address": "21 Rue Simone de Beauvoir, 69007 Lyon, France",
           "country_code": "FR",
           "name": "NOON - Café Noon"
-        }
+        },
+        "google_place_id": "ChIJE9dOTBfr9EcRHAmKdtuCxk8"
       },
       "type": "Feature"
     },
@@ -206,7 +216,8 @@
           "address": "85 Bd Voltaire, 75011 Paris, France",
           "country_code": "FR",
           "name": "LE BON Patisserie"
-        }
+        },
+        "google_place_id": "ChIJhaugpN1t5kcR6tH1smiTTuc"
       },
       "type": "Feature"
     },
@@ -225,7 +236,8 @@
           "address": "2 Rue de Gadagne, 69005 Lyon, France",
           "country_code": "FR",
           "name": "Notre Maison"
-        }
+        },
+        "google_place_id": "ChIJKUuJcADr9EcRwTAwuzmDZYc"
       },
       "type": "Feature"
     },
@@ -244,7 +256,8 @@
           "address": "84 Rue Bechevelin, 69007 Lyon, France",
           "country_code": "FR",
           "name": "Cyril Nitard, traiteur - cuisine à emporter"
-        }
+        },
+        "google_place_id": "ChIJwZqHmarr9EcR6c0FvV68v8Y"
       },
       "type": "Feature"
     },
@@ -252,7 +265,7 @@
       "geometry": {
         "coordinates": [
           2.3091871,
-          48.8527810
+          48.852781
         ],
         "type": "Point"
       },
@@ -263,7 +276,8 @@
           "address": "5 Av. de Lowendal, 75007 Paris, France",
           "country_code": "FR",
           "name": "Maison Mam par Stephanie Lequellec"
-        }
+        },
+        "google_place_id": "ChIJVUXdlTZx5kcRcBpaEjnlVoo"
       },
       "type": "Feature"
     },
@@ -271,7 +285,7 @@
       "geometry": {
         "coordinates": [
           2.3593093,
-          48.8766010
+          48.876601
         ],
         "type": "Point"
       },
@@ -282,7 +296,8 @@
           "address": "Rue du 8 Mai 1945, 75010 Paris, France",
           "country_code": "FR",
           "name": "Dalloyau"
-        }
+        },
+        "google_place_id": "ChIJd_3l-j9v5kcRbSnBv8RdlWc"
       },
       "type": "Feature"
     },
@@ -290,7 +305,7 @@
       "geometry": {
         "coordinates": [
           1.0994203,
-          49.4410800
+          49.44108
         ],
         "type": "Point"
       },
@@ -301,7 +316,8 @@
           "address": "85 Rue d'Amiens, 76000 Rouen, France",
           "country_code": "FR",
           "name": "La Maison d'Emma"
-        }
+        },
+        "google_place_id": "ChIJ92yGrUXf4EcRkK2OdW9keUM"
       },
       "type": "Feature"
     },
@@ -320,7 +336,8 @@
           "address": "78 Rue des Carmes, 76000 Rouen, France",
           "country_code": "FR",
           "name": "Maison Vatelier - Pâtisserie Rouen"
-        }
+        },
+        "google_place_id": "ChIJTaTW1dfd4EcR4oxu-aCeIlo"
       },
       "type": "Feature"
     },
@@ -339,7 +356,8 @@
           "address": "5 Rue de Québec, 76000 Rouen, France",
           "country_code": "FR",
           "name": "Masako Pâtisserie"
-        }
+        },
+        "google_place_id": "ChIJheGOSXne4EcRL4WC6Y9Ehmo"
       },
       "type": "Feature"
     },
@@ -347,7 +365,7 @@
       "geometry": {
         "coordinates": [
           1.0995438,
-          49.4398410
+          49.439841
         ],
         "type": "Point"
       },
@@ -358,7 +376,8 @@
           "address": "178 Rue Martainville, 76000 Rouen, France",
           "country_code": "FR",
           "name": "Les Pâtisseries de Gill"
-        }
+        },
+        "google_place_id": "ChIJcczvNa3f4EcRjZ6lY-qx2DU"
       },
       "type": "Feature"
     },
@@ -376,14 +395,15 @@
         "location": {
           "address": "163 Rue du Gros Horloge, 76000 Rouen, France",
           "name": "Chocolaterie AUZOU Gros Horloge"
-        }
+        },
+        "google_place_id": "ChIJzctbLdbd4EcR8owtRzSHnwk"
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          4.8159730,
+          4.815973,
           45.7570947
         ],
         "type": "Point"
@@ -394,7 +414,8 @@
         "location": {
           "address": "48 Rue de Trion, 69005 Lyon, France",
           "name": "Mamie Kocotte - Moments & Cuisine à Partager"
-        }
+        },
+        "google_place_id": "ChIJC_1hMj_r9EcRL7ySyhYWh_A"
       },
       "type": "Feature"
     },
@@ -413,7 +434,8 @@
           "address": "4 Pl. du Change, 69005 Lyon, France",
           "country_code": "FR",
           "name": "Paul Basta - Cuisine Gourmande"
-        }
+        },
+        "google_place_id": "ChIJg_sF39_r9EcRXt2Qj1TduMM"
       },
       "type": "Feature"
     },
@@ -432,7 +454,8 @@
           "address": "Printemps du goût, 2 Rue du Havre 8e étage, 75008 Paris, France",
           "country_code": "FR",
           "name": "Délicatisserie par Nina Métayer - Printemps du Goût"
-        }
+        },
+        "google_place_id": "ChIJn5DgMu1x5kcRsV5JLLxRUko"
       },
       "type": "Feature"
     },
@@ -451,7 +474,8 @@
           "address": "66 Av. Des XVI Jeux Olympiques Hiver, 73200 Albertville, France",
           "country_code": "FR",
           "name": "Boulangerie Raphael"
-        }
+        },
+        "google_place_id": "ChIJJ8RYhpzDi0cRWck1Q3VbxtM"
       },
       "type": "Feature"
     },
@@ -470,7 +494,8 @@
           "address": "22 Av. Général de Gaulle, 13630 Eyragues, France",
           "country_code": "FR",
           "name": "Pâtisserie Annabelle Maine"
-        }
+        },
+        "google_place_id": "ChIJna-qlEPltRIRba2vwlvQx7g"
       },
       "type": "Feature"
     },
@@ -489,7 +514,8 @@
           "address": "35 Av. de l'Opéra, 75002 Paris, France",
           "country_code": "FR",
           "name": "Cedric Grolet Opéra"
-        }
+        },
+        "google_place_id": "ChIJhwfsMQxv5kcRZRcJvU--cOw"
       },
       "type": "Feature"
     },
@@ -508,7 +534,8 @@
           "address": "23 Rue Sergent Blandan, 69001 Lyon, France",
           "country_code": "FR",
           "name": "The Zenith"
-        }
+        },
+        "google_place_id": "ChIJn7jAEQDr9EcRbviyubJd8FA"
       },
       "type": "Feature"
     },
@@ -527,7 +554,8 @@
           "address": "5 Rue Saint-Merri, 75004 Paris, France",
           "country_code": "FR",
           "name": "Café Bogato"
-        }
+        },
+        "google_place_id": "ChIJa6DC7Ytv5kcRQl9AB1t1ZDE"
       },
       "type": "Feature"
     },
@@ -546,7 +574,8 @@
           "address": "1 Rue Meynadier, 75019 Paris, France",
           "country_code": "FR",
           "name": "Bulle Boulangerie"
-        }
+        },
+        "google_place_id": "ChIJYQhXxElt5kcRJBDHjismTxM"
       },
       "type": "Feature"
     },
@@ -565,7 +594,8 @@
           "address": "7 Rue Mouton-Duvernet, 75014 Paris, France",
           "country_code": "FR",
           "name": "Le temps et le pain"
-        }
+        },
+        "google_place_id": "ChIJAQBcLLdx5kcRkhMFJ1g986I"
       },
       "type": "Feature"
     },
@@ -584,7 +614,8 @@
           "address": "195 Bd Voltaire, 75011 Paris, France",
           "country_code": "FR",
           "name": "Pépite boulangerie"
-        }
+        },
+        "google_place_id": "ChIJ5a9x3Apy5kcRb0fBwk9knpw"
       },
       "type": "Feature"
     },
@@ -602,7 +633,8 @@
         "location": {
           "address": "188 Rue de Grenelle, 75007 Paris, France",
           "name": "Lastre Sans Apostrophe"
-        }
+        },
+        "google_place_id": "ChIJPQYosthv5kcR9sW60K020Ow"
       },
       "type": "Feature"
     },
@@ -621,7 +653,8 @@
           "address": "Pl. du Champ de Mars, 26540 Mours-Saint-Eusèbe, France",
           "country_code": "FR",
           "name": "Boulangerie Pâtisserie Vincent"
-        }
+        },
+        "google_place_id": "ChIJM2MROAdN9UcRfCClhw0oyQ8"
       },
       "type": "Feature"
     },
@@ -640,7 +673,8 @@
           "address": "51 Rue Censier, 75005 Paris, France",
           "country_code": "FR",
           "name": "Pâtisserie Carl Marletti"
-        }
+        },
+        "google_place_id": "ChIJh8D8Q-xx5kcRt97yExVJAcM"
       },
       "type": "Feature"
     },
@@ -659,7 +693,8 @@
           "address": "139 RUE PARIS, 2 Rue de la République, 93260 Les Lilas, France",
           "country_code": "FR",
           "name": "L"
-        }
+        },
+        "google_place_id": "ChIJtWj9tUht5kcRM9iSQzOiaRE"
       },
       "type": "Feature"
     },
@@ -667,7 +702,7 @@
       "geometry": {
         "coordinates": [
           4.7540603,
-          45.6732380
+          45.673238
         ],
         "type": "Point"
       },
@@ -678,15 +713,16 @@
           "address": "2 Bis Rue du Colonel Robert Guillaud, 69530 Brignais, France",
           "country_code": "FR",
           "name": "Boulangerie Balthazar"
-        }
+        },
+        "google_place_id": "ChIJNbdupKTv9EcRuX2-7TDWtBs"
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          -0.5712980,
-          44.8360540
+          -0.571298,
+          44.836054
         ],
         "type": "Point"
       },
@@ -697,15 +733,16 @@
           "address": "26 Rue Saint-James, 33000 Bordeaux, France",
           "country_code": "FR",
           "name": "Books & Coffee"
-        }
+        },
+        "google_place_id": "ChIJP9LyPM8nVQ0RWqy5WikYXXc"
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          2.3005420,
-          48.8359410
+          2.300542,
+          48.835941
         ],
         "type": "Point"
       },
@@ -716,7 +753,8 @@
           "address": "238 Rue de la Convention, 75015 Paris, France",
           "country_code": "FR",
           "name": "Laurent Duchêne"
-        }
+        },
+        "google_place_id": "ChIJswrXYUBw5kcR_dw9w36OyG8"
       },
       "type": "Feature"
     },
@@ -735,7 +773,8 @@
           "address": "1 Rue Ernest Deloison, 92200 Neuilly-sur-Seine, France",
           "country_code": "FR",
           "name": "Boulangerie Zest"
-        }
+        },
+        "google_place_id": "ChIJcW3ULvxl5kcRsVuxLhfwFB4"
       },
       "type": "Feature"
     },
@@ -754,7 +793,8 @@
           "address": "22 Rue Edgar Quinet, 92120 Montrouge, France",
           "country_code": "FR",
           "name": "La Boulangerie Méditerranéenne - Coffee Shop"
-        }
+        },
+        "google_place_id": "ChIJ29OWvhdx5kcRuAsn55zf9vY"
       },
       "type": "Feature"
     },
@@ -773,7 +813,8 @@
           "address": "108 Rue Blomet, 75015 Paris, France",
           "country_code": "FR",
           "name": "Boulangerie Pâtisserie L'Equilibre"
-        }
+        },
+        "google_place_id": "ChIJI7PoURRx5kcRmA3595bxec8"
       },
       "type": "Feature"
     },
@@ -792,7 +833,8 @@
           "address": "180 Rue du Faubourg Saint-Honoré, 75008 Paris, France",
           "country_code": "FR",
           "name": "Maison Mathieu Pacaud"
-        }
+        },
+        "google_place_id": "ChIJTWZbIbZv5kcRIfvlS3zYsDs"
       },
       "type": "Feature"
     },
@@ -811,7 +853,8 @@
           "address": "102 Rue Montmartre, 75002 Paris, France",
           "country_code": "FR",
           "name": "Tartelettes"
-        }
+        },
+        "google_place_id": "ChIJF_Sp7atv5kcRKbH6IVFtUPY"
       },
       "type": "Feature"
     },
@@ -830,7 +873,8 @@
           "address": "45 Rue Raymond Losserand, 75014 Paris, France",
           "country_code": "FR",
           "name": "La Petite Alsacienne"
-        }
+        },
+        "google_place_id": "ChIJwxD7tOhx5kcR08m7z4ZMFPw"
       },
       "type": "Feature"
     },
@@ -849,7 +893,8 @@
           "address": "50 Rue de la Réunion, 75020 Paris, France",
           "country_code": "FR",
           "name": "Pâtisserie Mélilot"
-        }
+        },
+        "google_place_id": "ChIJp2U5Z7pz5kcReKV-UJT8Pjg"
       },
       "type": "Feature"
     },
@@ -868,7 +913,8 @@
           "address": "14 Rue du Faubourg de la Saunerie, 34000 Montpellier, France",
           "country_code": "FR",
           "name": "MAISON L'ŒUF"
-        }
+        },
+        "google_place_id": "ChIJub3GkfuvthIRQrGXTPRWn-8"
       },
       "type": "Feature"
     },
@@ -887,7 +933,8 @@
           "address": "Etal, Halles Laissac, 10 Pl. Alexandre Laissac n°4, 34000 Montpellier, France",
           "country_code": "FR",
           "name": "Boulangerie - Pâtisserie Julien Michel"
-        }
+        },
+        "google_place_id": "ChIJZflLMKSvthIR14xQarspEMs"
       },
       "type": "Feature"
     },
@@ -906,15 +953,16 @@
           "address": "1 Rue Scribe, 75009 Paris, France",
           "country_code": "FR",
           "name": "Sofitel Le Scribe Paris Opéra"
-        }
+        },
+        "google_place_id": "ChIJz7k5yzZu5kcRRdYVAr48Zv8"
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          4.8379150,
-          45.7409950
+          4.837915,
+          45.740995
         ],
         "type": "Point"
       },
@@ -925,7 +973,8 @@
           "address": "1 Rue Simone Iff, 69007 Lyon, France",
           "country_code": "FR",
           "name": "L'Atelier - Institut Lyfe"
-        }
+        },
+        "google_place_id": "ChIJg4rMR17r9EcR9Cm-iyr6n5o"
       },
       "type": "Feature"
     },
@@ -944,7 +993,8 @@
           "address": "32 Rue de Lancry, 75010 Paris, France",
           "country_code": "FR",
           "name": "Maison Marie"
-        }
+        },
+        "google_place_id": "ChIJrfkUpw5u5kcRDKCFfA_OPZo"
       },
       "type": "Feature"
     },
@@ -963,7 +1013,8 @@
           "address": "62 Av. Antoine de Saint-Exupéry, 31400 Toulouse, France",
           "country_code": "FR",
           "name": "Pâtisserie Georgette"
-        }
+        },
+        "google_place_id": "ChIJ_QRea3y9rhIRHKsot3PAW8s"
       },
       "type": "Feature"
     },
@@ -982,7 +1033,8 @@
           "address": "86 Av. Antoine de Saint-Exupéry, 31400 Toulouse, France",
           "country_code": "FR",
           "name": "Boulangerie Pâtisserie MAGDA"
-        }
+        },
+        "google_place_id": "ChIJ88tDKH-9rhIR8z1sjL9Mz0I"
       },
       "type": "Feature"
     },
@@ -1001,7 +1053,8 @@
           "address": "37 Rue du Languedoc, 31000 Toulouse, France",
           "country_code": "FR",
           "name": "Péché Mignon"
-        }
+        },
+        "google_place_id": "ChIJHzSr3oK8rhIROcM4MlwrHuw"
       },
       "type": "Feature"
     },
@@ -1020,7 +1073,8 @@
           "address": "37 Rue Croix Baragnon, 31000 Toulouse, France",
           "country_code": "FR",
           "name": "Pâtisserie Conté"
-        }
+        },
+        "google_place_id": "ChIJp1BRqpy8rhIRBtoCRvElvt4"
       },
       "type": "Feature"
     },
@@ -1039,14 +1093,15 @@
           "address": "7 Pl. Dupuy, 31000 Toulouse, France",
           "country_code": "FR",
           "name": "La Halle Aux Pains"
-        }
+        },
+        "google_place_id": "ChIJ3X0JF5C8rhIRNoDzxtynWXk"
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          -0.5921890,
+          -0.592189,
           44.8485942
         ],
         "type": "Point"
@@ -1058,14 +1113,15 @@
           "address": "210 Rue Turenne, 33000 Bordeaux, France",
           "country_code": "FR",
           "name": "Boulangerie Paul MERRY"
-        }
+        },
+        "google_place_id": "ChIJT3NJUv0nVQ0Rbd5UT1PGCMk"
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          -0.5697660,
+          -0.569766,
           44.8388101
         ],
         "type": "Point"
@@ -1077,7 +1133,8 @@
           "address": "33 Rue des Argentiers, 33000 Bordeaux, France",
           "country_code": "FR",
           "name": "MiAM"
-        }
+        },
+        "google_place_id": "ChIJafHlp6knVQ0Rjg1GSwaP_f0"
       },
       "type": "Feature"
     },
@@ -1096,7 +1153,8 @@
           "address": "38 Rue du Loup, 33000 Bordeaux, France",
           "country_code": "FR",
           "name": "elle&lu"
-        }
+        },
+        "google_place_id": "ChIJjU_XvrQnVQ0RGb-AYIPAcLY"
       },
       "type": "Feature"
     },
@@ -1104,7 +1162,7 @@
       "geometry": {
         "coordinates": [
           -0.6684264,
-          44.7953270
+          44.795327
         ],
         "type": "Point"
       },
@@ -1115,7 +1173,8 @@
           "address": "44bis Av. du Général Leclerc, 33600 Pessac, France",
           "country_code": "FR",
           "name": "Boulangerie Martin Ricard"
-        }
+        },
+        "google_place_id": "ChIJ944sHQHZVA0Rw-k-EDU06MM"
       },
       "type": "Feature"
     },
@@ -1134,7 +1193,8 @@
           "address": "18 Quai Saint-Antoine, 69002 Lyon, France",
           "country_code": "FR",
           "name": "Pralus La Boulangerie, Quai Saint-Antoine"
-        }
+        },
+        "google_place_id": "ChIJ20ePfm_r9EcR0LHNoDrxV0Y"
       },
       "type": "Feature"
     },
@@ -1152,14 +1212,15 @@
         "location": {
           "address": "1 Rue Tarbé, 75017 Paris, France",
           "name": "Maison Dimanche"
-        }
+        },
+        "google_place_id": "ChIJsST5D7Bv5kcRyYNGms7CY9E"
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          4.7931660,
+          4.793166,
           45.6952609
         ],
         "type": "Point"
@@ -1171,7 +1232,8 @@
           "address": "12 Pl. Mathieu Jaboulay, 69230 Saint-Genis-Laval, France",
           "country_code": "FR",
           "name": "ÉPILOGUE"
-        }
+        },
+        "google_place_id": "ChIJwbQvFjLp9EcRHQrW44CzS70"
       },
       "type": "Feature"
     },
@@ -1190,7 +1252,8 @@
           "address": "21 Rue Marc Bloch, 69007 Lyon, France",
           "country_code": "FR",
           "name": "Fournil & Fourneaux"
-        }
+        },
+        "google_place_id": "ChIJ7TB459Pr9EcRy9-K1j78p6A"
       },
       "type": "Feature"
     },
@@ -1209,7 +1272,8 @@
           "address": "5 Rue Bonivard, 73000 Chambéry, France",
           "country_code": "FR",
           "name": "Boulangerie Hexagone"
-        }
+        },
+        "google_place_id": "ChIJwT8iY5Spi0cRmY6l6hkEyZ0"
       },
       "type": "Feature"
     },
@@ -1217,7 +1281,7 @@
       "geometry": {
         "coordinates": [
           4.8257968,
-          45.7761310
+          45.776131
         ],
         "type": "Point"
       },
@@ -1228,7 +1292,8 @@
           "address": "42 Rue Jacquard, 69004 Lyon, France",
           "country_code": "FR",
           "name": "Boulangerie Biologique Pain des Paumes"
-        }
+        },
+        "google_place_id": "ChIJicXe6hzr9EcRCrdJW44GEPk"
       },
       "type": "Feature"
     },
@@ -1247,7 +1312,8 @@
           "address": "13 Pl. Jean Jaurès, 42000 Saint-Étienne, France",
           "country_code": "FR",
           "name": "DUSSAP"
-        }
+        },
+        "google_place_id": "ChIJjXVj8iCt9UcRdllqVqjpC3k"
       },
       "type": "Feature"
     },
@@ -1266,7 +1332,8 @@
           "address": "191 Rue du Faubourg Saint-Antoine, 75011 Paris, France",
           "country_code": "FR",
           "name": "Maison Ounissi - Paris 11"
-        }
+        },
+        "google_place_id": "ChIJIUdysNpz5kcRpIzV7Ip-UzE"
       },
       "type": "Feature"
     },
@@ -1285,7 +1352,8 @@
           "address": "5 Pl. Saint-Germain, 35000 Rennes, France",
           "country_code": "FR",
           "name": "Mordus, Pâtisserie de la Place"
-        }
+        },
+        "google_place_id": "ChIJXWN0QCLfDkgRPRVycaN-ixU"
       },
       "type": "Feature"
     },
@@ -1304,7 +1372,8 @@
           "address": "9 Rue de Nemours, 35000 Rennes, France",
           "country_code": "FR",
           "name": "Yvan Chevalier / Chocolaterie Pâtisserie Centre Ville"
-        }
+        },
+        "google_place_id": "ChIJH7rDvkbfDkgRyPfXOZ3bFOo"
       },
       "type": "Feature"
     },
@@ -1323,7 +1392,8 @@
           "address": "3 Rue de Coëtquen, 35000 Rennes, France",
           "country_code": "FR",
           "name": "La tête enfarinée"
-        }
+        },
+        "google_place_id": "ChIJfzkaOX_fDkgRLxGrEuZoJBc"
       },
       "type": "Feature"
     },
@@ -1341,7 +1411,8 @@
         "location": {
           "address": "28 Rue de Nemours, 35000 Rennes, France",
           "name": "Maison Dumont Rennes"
-        }
+        },
+        "google_place_id": "ChIJWc6lrMzfDkgRJvpkFu4FTck"
       },
       "type": "Feature"
     },
@@ -1360,7 +1431,8 @@
           "address": "Centre Commercial Grand Quartier, 35760 Saint-Grégoire, France",
           "country_code": "FR",
           "name": "Bruno Le Derf"
-        }
+        },
+        "google_place_id": "ChIJr6wF0gLeDkgRnDvi4PO5emQ"
       },
       "type": "Feature"
     },
@@ -1379,7 +1451,8 @@
           "address": "18 Rue de la Madeleine, 69007 Lyon, France",
           "country_code": "FR",
           "name": "MOKA"
-        }
+        },
+        "google_place_id": "ChIJa4qk61Tr9EcRvmSr-e4bjMY"
       },
       "type": "Feature"
     },
@@ -1398,14 +1471,15 @@
           "address": "29 Av. Sainte-Cécile, 59130 Lambersart, France",
           "country_code": "FR",
           "name": "Boulangerie-Pâtisserie Maison Pitman"
-        }
+        },
+        "google_place_id": "ChIJ09TrpF_VwkcRBJf-grk2zH8"
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          4.8361000,
+          4.8361,
           45.7588223
         ],
         "type": "Point"
@@ -1417,7 +1491,8 @@
           "address": "7 Rue Bellecordière, 69002 Lyon, France",
           "country_code": "FR",
           "name": "Nicolas Hennemann Chocolaterie pâtisserie"
-        }
+        },
+        "google_place_id": "ChIJva1I_Rfr9EcR9Bk4w6myNak"
       },
       "type": "Feature"
     },
@@ -1436,14 +1511,15 @@
           "address": "24 Pl. de la Nation, 75012 Paris, France",
           "country_code": "FR",
           "name": "Boulangerie B&S Nation"
-        }
+        },
+        "google_place_id": "ChIJO0N52N5z5kcRCVPDQso-z_U"
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          2.3517180,
+          2.351718,
           48.8529516
         ],
         "type": "Point"
@@ -1455,7 +1531,8 @@
           "address": "4 Rue du Cloitre Notre Dame, 75004 Paris, France",
           "country_code": "FR",
           "name": "La Flânerie Notre-Dame"
-        }
+        },
+        "google_place_id": "ChIJKdtBBIJx5kcRK9mobK7EadE"
       },
       "type": "Feature"
     },
@@ -1474,7 +1551,8 @@
           "address": "69 Rue Georges Bonnac, 33000 Bordeaux, France",
           "country_code": "FR",
           "name": "Vanille Lina"
-        }
+        },
+        "google_place_id": "ChIJWy7N-E4pVQ0RNI6Dn3dFskQ"
       },
       "type": "Feature"
     },
@@ -1493,14 +1571,15 @@
           "address": "6 Rue du Parc, 29000 Quimper, France",
           "country_code": "FR",
           "name": "La Belle Givrée"
-        }
+        },
+        "google_place_id": "ChIJLfGNYdjVEEgRYZQzlMuudSI"
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          6.5831190,
+          6.583119,
           44.8537517
         ],
         "type": "Point"
@@ -1512,7 +1591,8 @@
           "address": "N94, 05120 Saint-Martin-de-Queyrières, France",
           "country_code": "FR",
           "name": "Boulangerie Pâtisserie Écrins de Douceur"
-        }
+        },
+        "google_place_id": "ChIJsZp83tP8iUcRl5CDRCEavAQ"
       },
       "type": "Feature"
     },
@@ -1531,7 +1611,8 @@
           "address": "60 Rue du Général de Gaulle, 85160 Saint-Jean-de-Monts, France",
           "country_code": "FR",
           "name": "Boulangerie Pâtisserie Thomas Corand"
-        }
+        },
+        "google_place_id": "ChIJr1EZBWz9BEgRTybk1Di0CMI"
       },
       "type": "Feature"
     },
@@ -1550,7 +1631,8 @@
           "address": "198 Boulevard de St Raphaël, 83420 La Croix-Valmer, France",
           "country_code": "FR",
           "name": "La Pâtisserie d'Octave"
-        }
+        },
+        "google_place_id": "ChIJl3ADrQTPzhIRLrhfKps5jbw"
       },
       "type": "Feature"
     },
@@ -1569,7 +1651,8 @@
           "address": "91 Av. Louison Bobet, 06130 Grasse, France",
           "country_code": "FR",
           "name": "Jérôme De Oliveira Grasse - Pâtisserie - Chocolaterie"
-        }
+        },
+        "google_place_id": "ChIJ_WUMiK0pzBIRy3Nd1-CucJw"
       },
       "type": "Feature"
     },
@@ -1577,7 +1660,7 @@
       "geometry": {
         "coordinates": [
           2.7055188,
-          49.4371820
+          49.437182
         ],
         "type": "Point"
       },
@@ -1588,7 +1671,8 @@
           "address": "473 Rue de Noyon, 60190 Remy, France",
           "country_code": "FR",
           "name": "Capliez Loïc"
-        }
+        },
+        "google_place_id": "ChIJrfJz6cLR50cRLbt2Ll65rl8"
       },
       "type": "Feature"
     },
@@ -1607,7 +1691,8 @@
           "address": "68 Rue des Merciers, 17000 La Rochelle, France",
           "country_code": "FR",
           "name": "Amaury Lafonta Pâtisserie"
-        }
+        },
+        "google_place_id": "ChIJr05HmWlTAUgRDrOAZ3CkBKw"
       },
       "type": "Feature"
     },
@@ -1615,7 +1700,7 @@
       "geometry": {
         "coordinates": [
           -1.1497841,
-          46.1625260
+          46.162526
         ],
         "type": "Point"
       },
@@ -1626,7 +1711,8 @@
           "address": "7 Rue du Minage, 17000 La Rochelle, France",
           "country_code": "FR",
           "name": "Théo Chereau"
-        }
+        },
+        "google_place_id": "ChIJDbfV9K1TAUgRQXv-1fZZln0"
       },
       "type": "Feature"
     },
@@ -1645,7 +1731,8 @@
           "address": "11 Rue Alfred de Vigny, 64400 Oloron-Sainte-Marie, France",
           "country_code": "FR",
           "name": "Chez Jeanne"
-        }
+        },
+        "google_place_id": "ChIJzYOuWe3_Vg0R_sOij7bQh5s"
       },
       "type": "Feature"
     },
@@ -1664,7 +1751,8 @@
           "address": "1 La Croix Blanche Lieu dit, 33710 Bourg, France",
           "country_code": "FR",
           "name": "Boulangerie Pâtisserie Grandjean"
-        }
+        },
+        "google_place_id": "ChIJBYvQ360rAEgRcUJRu-XVxdM"
       },
       "type": "Feature"
     },
@@ -1683,7 +1771,8 @@
           "address": "54 Bd Mestrezat, 33120 Arcachon, France",
           "country_code": "FR",
           "name": "La Boulangerie des Pirelons"
-        }
+        },
+        "google_place_id": "ChIJn76tWmGfVA0RVsFa2syXofU"
       },
       "type": "Feature"
     },
@@ -1702,7 +1791,8 @@
           "address": "19 Rue Barla, 06300 Nice, France",
           "country_code": "FR",
           "name": "Bakery Jean Marc Bordonnat"
-        }
+        },
+        "google_place_id": "ChIJW-Sl27nazRIRkTTYD7yVLdg"
       },
       "type": "Feature"
     },
@@ -1721,7 +1811,8 @@
           "address": "3 Bd Carlone, 06200 Nice, France",
           "country_code": "FR",
           "name": "Le Passage"
-        }
+        },
+        "google_place_id": "ChIJHaBvx97RzRIRmG1tUPuYJdA"
       },
       "type": "Feature"
     },
@@ -1740,7 +1831,8 @@
           "address": "15 Rue du Maréchal Joffre, 06000 Nice, France",
           "country_code": "FR",
           "name": "Philippe Tayac Pâtisserie"
-        }
+        },
+        "google_place_id": "ChIJC8S5hXDbzRIRVG2sju1j2So"
       },
       "type": "Feature"
     },
@@ -1759,7 +1851,8 @@
           "address": "9 Pl. Garibaldi 7 et, 06300 Nice, France",
           "country_code": "FR",
           "name": "Pâtisserie Cappa Mariette"
-        }
+        },
+        "google_place_id": "ChIJKR8Dg8zbzRIRUtXOzfWt_PI"
       },
       "type": "Feature"
     },
@@ -1778,7 +1871,8 @@
           "address": "19 Bd Raimbaldi, 06000 Nice, France",
           "country_code": "FR",
           "name": "Bakery By Michel Fiori"
-        }
+        },
+        "google_place_id": "ChIJ0Tp7u6nazRIRCVfeA8qapUI"
       },
       "type": "Feature"
     },
@@ -1797,7 +1891,8 @@
           "address": "71 Rue Judaïque, 33000 Bordeaux, France",
           "country_code": "FR",
           "name": "Chouette Pâtisserie"
-        }
+        },
+        "google_place_id": "ChIJffKwPFEnVQ0RiSN7QYxyDAo"
       },
       "type": "Feature"
     },
@@ -1816,7 +1911,8 @@
           "address": "6 Rue des Écoles, 40130 Capbreton, France",
           "country_code": "FR",
           "name": "Sable Chaud - Pâtisserie Créative"
-        }
+        },
+        "google_place_id": "ChIJE7uFbrhbUQ0R0WZ-V5XSRX8"
       },
       "type": "Feature"
     },
@@ -1835,7 +1931,8 @@
           "address": "8 Rue Sommeiller, 74000 Annecy, France",
           "country_code": "FR",
           "name": "Chez El"
-        }
+        },
+        "google_place_id": "ChIJ9VK601qPi0cR8gWk4oW7KoE"
       },
       "type": "Feature"
     },
@@ -1854,7 +1951,8 @@
           "address": "120 Av. de la Plage, 06190 Roquebrune-Cap-Martin, France",
           "country_code": "FR",
           "name": "Alexandre Boulanger Boutique"
-        }
+        },
+        "google_place_id": "ChIJxSHZGB_pzRIRQr92SdmF4CE"
       },
       "type": "Feature"
     },
@@ -1873,7 +1971,8 @@
           "address": "59 Av. de Lanessan, 69410 Champagne-au-Mont-d'Or, France",
           "country_code": "FR",
           "name": "Nuances Chocolaterie"
-        }
+        },
+        "google_place_id": "ChIJmVQKcQDr9EcR4cICzStbvDk"
       },
       "type": "Feature"
     },
@@ -1892,7 +1991,8 @@
           "address": "6 Rue Edmond Rostand, 13006 Marseille, France",
           "country_code": "FR",
           "name": "Oh Faon !"
-        }
+        },
+        "google_place_id": "ChIJ8V1fK97ByRIRRgUVU8YJHks"
       },
       "type": "Feature"
     },
@@ -1911,7 +2011,8 @@
           "address": "44bis Rue de Meaux, 75019 Paris, France",
           "country_code": "FR",
           "name": "Pompette!"
-        }
+        },
+        "google_place_id": "ChIJb9-IIABt5kcRHalB0bGhJ4k"
       },
       "type": "Feature"
     },
@@ -1919,7 +2020,7 @@
       "geometry": {
         "coordinates": [
           5.9138219,
-          45.6893870
+          45.689387
         ],
         "type": "Point"
       },
@@ -1930,7 +2031,8 @@
           "address": "21 Rue des Bains, 73100 Aix-les-Bains, France",
           "country_code": "FR",
           "name": "L'étape sucrée - Pâtisserie Fine | Salon de thé"
-        }
+        },
+        "google_place_id": "ChIJoap-gLugi0cRCaq_fFXdGo0"
       },
       "type": "Feature"
     },
@@ -1949,7 +2051,8 @@
           "address": "4 Rue Catherine Segurane, 06300 Nice, France",
           "country_code": "FR",
           "name": "Patisserie Julien Dugourd"
-        }
+        },
+        "google_place_id": "ChIJ804Ky13bzRIRRtAgjBY1x1A"
       },
       "type": "Feature"
     },
@@ -1968,7 +2071,8 @@
           "address": "63 bis Bd Charles Péguy, 28000 Chartres, France",
           "country_code": "FR",
           "name": "La Patisserie de Chartres"
-        }
+        },
+        "google_place_id": "ChIJK3qFCTQN5EcRcb_5RvN7Qig"
       },
       "type": "Feature"
     },
@@ -1987,7 +2091,8 @@
           "address": "2 Pl. du Prado, 69007 Lyon, France",
           "country_code": "FR",
           "name": "Siprès restaurant"
-        }
+        },
+        "google_place_id": "ChIJR8aYg5Dr9EcRqYzxVsCfntI"
       },
       "type": "Feature"
     },
@@ -1995,7 +2100,7 @@
       "geometry": {
         "coordinates": [
           4.8658994,
-          45.7572040
+          45.757204
         ],
         "type": "Point"
       },
@@ -2006,7 +2111,8 @@
           "address": "Pl. Sainte-Anne, 83 Rue Etienne Richerand, 69003 Lyon, France",
           "country_code": "FR",
           "name": "Festin"
-        }
+        },
+        "google_place_id": "ChIJaR3jMgvr9EcRKxN-gv_nzRg"
       },
       "type": "Feature"
     },
@@ -2025,7 +2131,8 @@
           "address": "17 Rue Edouard Vaillant, 93100 Montreuil, France",
           "country_code": "FR",
           "name": "Les Jours Sucrés"
-        }
+        },
+        "google_place_id": "ChIJn5N0u3pt5kcR7a_MZ5znnvY"
       },
       "type": "Feature"
     },
@@ -2044,15 +2151,16 @@
           "address": "6 Rue du Pas de la Mule, 75003 Paris, France",
           "country_code": "FR",
           "name": "Brigat'"
-        }
+        },
+        "google_place_id": "ChIJtcc54wht5kcR_KzUj-RgS44"
       },
       "type": "Feature"
     },
     {
       "geometry": {
         "coordinates": [
-          2.2272560,
-          48.8693600
+          2.227256,
+          48.86936
         ],
         "type": "Point"
       },
@@ -2063,7 +2171,8 @@
           "address": "8 Pl. du Général Leclerc, 92150 Suresnes, France",
           "country_code": "FR",
           "name": "À Deux Mains by Elio & Franck"
-        }
+        },
+        "google_place_id": "ChIJ72DN34Bl5kcRQiybnH_T3Qo"
       },
       "type": "Feature"
     },
@@ -2082,7 +2191,8 @@
           "address": "53 Bd du Cabot, 13009 Marseille, France",
           "country_code": "FR",
           "name": "Bricoleurs de douceurs"
-        }
+        },
+        "google_place_id": "ChIJh1-Sase5yRIRtuRTjhuHX9Y"
       },
       "type": "Feature"
     },
@@ -2101,7 +2211,8 @@
           "address": "2 Rue Saint-Etienne, 59000 Lille, France",
           "country_code": "FR",
           "name": "La Wilderie"
-        }
+        },
+        "google_place_id": "ChIJCXQ77gnVwkcR1NgwwKbR_CQ"
       },
       "type": "Feature"
     },
@@ -2120,7 +2231,8 @@
           "address": "65 Rue de Charonne, 75011 Paris, France",
           "country_code": "FR",
           "name": "Tapisserie - Charonne"
-        }
+        },
+        "google_place_id": "ChIJE9Axxg9z5kcRzsIjvp-FpPQ"
       },
       "type": "Feature"
     },
@@ -2139,7 +2251,8 @@
           "address": "21 Rue Gubernatis, 06000 Nice, France",
           "country_code": "FR",
           "name": "Boulangerie La Niçoise"
-        }
+        },
+        "google_place_id": "ChIJhWStt6XazRIRS-OMMj7vrd4"
       },
       "type": "Feature"
     },
@@ -2158,7 +2271,8 @@
           "address": "20 Bd des Filles du Calvaire, 75011 Paris, France",
           "country_code": "FR",
           "name": "Dupain"
-        }
+        },
+        "google_place_id": "ChIJGyS3Xwdu5kcRbG65Rnt246M"
       },
       "type": "Feature"
     },
@@ -2166,7 +2280,7 @@
       "geometry": {
         "coordinates": [
           2.2690408,
-          48.9064250
+          48.906425
         ],
         "type": "Point"
       },
@@ -2177,7 +2291,8 @@
           "address": "60 Rue de la Sablière, 92600 Asnières-sur-Seine, France",
           "country_code": "FR",
           "name": "Aurélien Cohen"
-        }
+        },
+        "google_place_id": "ChIJ3Wqe1BNl5kcRK55obKe2ncY"
       },
       "type": "Feature"
     },
@@ -2196,7 +2311,8 @@
           "address": "21 Rue d'Avron, 75020 Paris, France",
           "country_code": "FR",
           "name": "Boulangerie Idoia"
-        }
+        },
+        "google_place_id": "ChIJuS8EbMNz5kcROJw0UjQX4j8"
       },
       "type": "Feature"
     },
@@ -2215,7 +2331,8 @@
           "address": "19 rue Alphonse Burdot, 69840 Juliénas, France",
           "country_code": "FR",
           "name": "Boulangerie Maison Braillon"
-        }
+        },
+        "google_place_id": "ChIJ3zc0NTZ680cRt74m_TQgwkE"
       },
       "type": "Feature"
     },
@@ -2234,7 +2351,8 @@
           "address": "49 Rue Chardon Lagache, 75016 Paris, France",
           "country_code": "FR",
           "name": "Giovanni"
-        }
+        },
+        "google_place_id": "ChIJk8CHEhp75kcR2olCF_vjDv4"
       },
       "type": "Feature"
     },
@@ -2253,7 +2371,8 @@
           "address": "11 Rue de Châteaudun, 75009 Paris, France",
           "country_code": "FR",
           "name": "Maison Louvard"
-        }
+        },
+        "google_place_id": "ChIJXUJjHI9v5kcRaVQmBJ0E8nc"
       },
       "type": "Feature"
     }
