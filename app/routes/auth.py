@@ -15,17 +15,16 @@ from app.outils import verifier_csrf_token
 
 auth_bp = Blueprint("auth", __name__)
 
-
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
     """Gère l'inscription des nouveaux utilisateurs.
 
     Cette route permet aux nouveaux utilisateurs de créer un compte.
     Elle valide les données du formulaire, hache le mot de passe,
-    et crée un nouvel utilisateur dans la base de données.
+    crée un nouvel utilisateur dans la base de données et le connecte automatiquement.
 
     Returns:
-        Response: Page de création de compte (GET) ou redirection vers la page de connexion (POST)
+        Response: Page de création de compte (GET) ou redirection vers la page d'accueil (POST)
     """
     form = RegistrationForm()
     if form.validate_on_submit():
@@ -43,11 +42,13 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
-        flash("Compte créé avec succès !", "success")
-        return redirect(url_for("auth.login"))
+        # Connecter l'utilisateur automatiquement
+        login_user(new_user)
+
+        flash("Compte créé avec succès ! Vous êtes maintenant connecté.", "success")
+        return redirect(url_for("main.index"))
 
     return render_template("creation_utilisateur.html", form=form)
-
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():

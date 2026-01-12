@@ -109,6 +109,11 @@ def test_register_post_parametrize(
             assert new_user.pseudo == user_data["pseudo"]
             assert new_user.email == user_data["email"]
             assert new_user.is_admin == user_data["is_admin"]
+
+            # Vérifier que l'utilisateur est connecté
+            with client.session_transaction() as sess:
+                assert "_user_id" in sess
+                assert sess["_user_id"] == str(new_user.id_user)
         else:
             # Pour les échecs, vérifier que l'utilisateur n'a pas été créé
             user_count = Utilisateur.query.filter_by(
