@@ -30,8 +30,9 @@ from app.forms import (
     ValidateForm,
 )
 from app.models import Etablissement, Flan, Evaluation, Utilisateur
+from app.models import Photo, TypeCible
 from app import db, bcrypt
-from app.outils import afficher_etablissements, calculer_distance
+from app.outils import afficher_etablissements, calculer_distance, fetch_place_photos
 
 main_bp = Blueprint("main", __name__)
 
@@ -447,6 +448,9 @@ def afficher_etablissement_unique(id_etab):
     validate_form = ValidateForm()
     form_flan = NewFlanForm(prefix="ajout-flan")
 
+    # Récupérer ou télécharger les photos pour l'établissement
+    photo_paths = fetch_place_photos(id_etab, current_app.config['GOOGLE_MAPS_API_KEY'])
+
     if form_etab.validate_on_submit():
         etablissement.nom = form_etab.nom.data
         etablissement.description = form_etab.description.data
@@ -471,6 +475,7 @@ def afficher_etablissement_unique(id_etab):
         current_user=current_user,
         delete_form=delete_form,
         validate_form=validate_form,
+        photo_paths=photo_paths,
     )
 
 @main_bp.route("/flan/<int:id_flan>", methods=["GET", "POST"])

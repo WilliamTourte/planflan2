@@ -5,9 +5,13 @@ de l'application, notamment pour le traitement de texte, la vérification CSRF,
 et le calcul de distances géographiques.
 """
 
+import requests
+import os
 from math import radians, sin, cos, sqrt, atan2
 from flask import request, current_app
 from flask_wtf.csrf import validate_csrf
+
+
 
 
 def enlever_accents(
@@ -116,3 +120,102 @@ def calculer_distance(lat1, lon1, lat2, lon2):
     a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
     c = 2 * atan2(sqrt(a), sqrt(1 - a))
     return R * c
+
+
+def get_place_details(place_id, api_key):
+    """
+    Récupère les détails d'un lieu depuis l'API Google Places.
+
+    Args:
+        place_id (str): Identifiant du lieu dans Google Places
+        api_key (str): Clé API Google Places
+
+    Returns:
+        dict: Les détails du lieu, ou None en cas d'erreur
+    """
+    url = "https://maps.googleapis.com/maps/api/place/details/json"
+    params = {
+        'place_id': place_id,
+        'fields': 'photos',
+        'key': api_key
+    }
+
+    try:
+        response = requests.get(url, params=params)
+        if response.status_code == 200:
+            data = response.json()
+            if data.get('result'):
+                return data['result']
+    except Exception as e:
+        current_app.logger.error(f"Erreur lors de la récupération des détails: {e}")
+
+    return None
+
+
+def fetch_place_photos(etablissement_id, api_key, max_width=400):
+    """
+    Récupère les photos pour un établissement depuis l'API Google Places et les sauvegarde localement.
+
+    Args:
+        etablissement_id (int): Identifiant de l'établissement
+        api_key (str): Clé API Google Places
+        max_width (int): Largeur maximale des photos (par défaut 400)
+
+    Returns:
+        list: Liste des chemins des photos sauvegardées localement
+    """
+    # Importer les modules nécessaires localement pour éviter les imports circulaires
+    from app.models import Photo, TypeCible
+    from app import db
+
+    # Vérifier si des photos existent déjà pour cet établissement
+    existing_photos = Photo.query.filter_by(id_etab=etablissement_id).all()
+    if existing_photos:
+        return [photo.path for photo in existing_photos]
+
+    # Récupérer les détails de l'établissement pour obtenir les photoreferences
+    # Note: Dans cette implémentation, nous utilisons l'id_etab comme place_id
+    # Cela suppose que l'id_etab correspond à un place_id Google Places
+    # Si ce n'est pas le cas, il faudra adapter cette partie
+    place_details = get_place_details(str(etablissement_id), api_key)
+    if not place_details or 'photos' not in place_details:
+        return []
+
+    # Récupérer les photos depuis l'API
+    photo_paths = []
+    for idx, photo in enumerate(place_details['photos'][:3]):  # Limiter à 3 photos
+        photo_reference = photo['photo_reference']
+        url = "https://maps.googleapis.com/maps/api/place/photo"
+        params = {
+            'maxwidth': max_width,
+            'photoreference': photo_reference,
+            'key': api_key
+        }
+
+        try:
+            response = requests.get(url, params=params, stream=True)
+            if response.status_code == 200:
+                # Générer un nom de fichier unique
+                filename = f"etab_{etablissement_id}_photo_{idx}.jpg"
+                filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+
+                # Sauvegarder la photo localement
+                with open(filepath, 'wb') as f:
+                    for chunk in response.iter_content(1024):
+                        f.write(chunk)
+
+                # Enregistrer la photo dans la base de données
+                new_photo = Photo(
+                    id_etab=etablissement_id,
+                    type_cible=TypeCible.ETABLISSEMENT,
+                    path=filepath,
+                    largeur=max_width,
+                    hauteur=max_width  # Supposons des photos carrées pour simplifier
+                )
+                db.session.add(new_photo)
+                photo_paths.append(filepath)
+        except Exception as e:
+            current_app.logger.error(f"Erreur lors de la récupération de la photo: {e}")
+
+    db.session.commit()
+    return photo_paths

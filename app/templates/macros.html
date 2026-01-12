@@ -1,8 +1,23 @@
 <!-- MACROS D'AFFICHAGE -->
-{% macro afficher_image_ou_placeholder(item, class='carte-image') %}
-    {% if item.photos %}
+{% macro afficher_image_ou_placeholder(item, class='carte-image', photo_paths=None) %}
+    {% if photo_paths %}
+        <!-- Afficher les photos depuis photo_paths si fourni -->
+        {% if photo_paths|length > 0 %}
+            <img src="{{ url_for('static', filename=photo_paths[0].replace('app/static/', '')) }}" alt="{{ item.nom }}" class="{{ class }}">
+        {% else %}
+            {% if item.__class__.__name__ == 'Flan' %}
+                <img src="{{ url_for('static', filename='uploads/flan-vanille.webp') }}" alt="Flan par défaut" class="{{ class }}">
+            {% elif item.__class__.__name__ == 'Etablissement' %}
+                <img src="{{ url_for('static', filename='uploads/defaut_etab.jpg') }}" alt="Etablissement par défaut" class="{{ class }}">
+            {% else %}
+                <div class="{{ class }} placeholder"><span>Pas de photo</span></div>
+            {% endif %}
+        {% endif %}
+    {% elif item.photos %}
+        <!-- Afficher la première photo de l'établissement si disponible -->
         <img src="{{ url_for('static', filename='uploads/' + item.photos[0].path) }}" alt="{{ item.nom }}" class="{{ class }}">
     {% else %}
+        <!-- Afficher l'image par défaut -->
         {% if item.__class__.__name__ == 'Flan' %}
             <img src="{{ url_for('static', filename='uploads/flan-vanille.webp') }}" alt="Flan par défaut" class="{{ class }}">
         {% elif item.__class__.__name__ == 'Etablissement' %}
@@ -149,10 +164,10 @@
 
 
 <!-- ETABLISSEMENT -->
-{% macro afficher_etablissement(etablissement, current_user, form_edit, current_page, delete_form, validate_form) %}
+{% macro afficher_etablissement(etablissement, current_user, form_edit, current_page, delete_form, validate_form, photo_paths=None) %}
     <div class="carte">
         <div class="carte-image-container">
-            {{ afficher_image_ou_placeholder(etablissement) }}
+            {{ afficher_image_ou_placeholder(etablissement, 'carte-image', photo_paths) }}
             {{ afficher_badge_type_etab(etablissement) }}
             {{ afficher_badge_etablissement(etablissement) }}
         </div>
@@ -505,9 +520,9 @@
 
 
 
-{% macro afficher_objet(objet_type, objet, current_user=None, form_edit=None, current_page='', delete_form=None, validate_form=None) %}
+{% macro afficher_objet(objet_type, objet, current_user=None, form_edit=None, current_page='', delete_form=None, validate_form=None, photo_paths=None) %}
     {% if objet_type == 'etablissement' %}
-        {{ afficher_etablissement(objet, current_user, form_edit, current_page, delete_form, validate_form) }}
+        {{ afficher_etablissement(objet, current_user, form_edit, current_page, delete_form, validate_form, photo_paths) }}
     {% elif objet_type == 'flan' %}
         {{ afficher_flan(objet, current_user, form_edit, current_page, delete_form, validate_form) }}
     {% elif objet_type == 'evaluation' %}
