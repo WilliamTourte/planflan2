@@ -1,7 +1,7 @@
 <!-- MACROS D'AFFICHAGE -->
 {% macro afficher_image_ou_placeholder(item, class='carte-image', photo_paths=None, is_google_photo=False) %}
     {% if photo_paths or item.photos %}
-        <div class="google-image-container">
+      
             {% if photo_paths and photo_paths|length > 0 %}
                 <img src="{{ url_for('static', filename=photo_paths[0].replace('app/static/', '')) }}" alt="{{ item.nom }}" class="{{ class }}">
             {% elif item.photos %}
@@ -10,7 +10,7 @@
             {% if is_google_photo %}
                 <div class="google-photo-attribution">Photo © Google Maps</div>
             {% endif %}
-        </div>
+ 
     {% else %}
         <!-- Afficher l'image par défaut -->
         {% if item.__class__.__name__ == 'Flan' %}
