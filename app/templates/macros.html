@@ -486,10 +486,7 @@
 {% macro afficher_grille(objet_type, objets, current_user=None, form_edit=None, form_ajout=None, etablissement=None, flan=None, delete_form=None, validate_form=None, current_page='') %}
     <div class="grille">
         {% if not objets %}
-        <div class="carte">
-            C'est vide ici, contribuez !
- 
-        </div>
+        Vide
         {% endif %}
         {% for objet in objets %}
             <div class="carte">
