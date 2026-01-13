@@ -253,7 +253,7 @@ def configure_error_handling(app):
                 "remote_addr": request.remote_addr,
             },
         )
-        return render_template('404.html'), 404
+        return render_template("404.html"), 404
 
     @app.errorhandler(403)
     def handle_403(e):  # pylint: disable=unused-argument

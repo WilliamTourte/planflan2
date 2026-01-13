@@ -599,10 +599,16 @@ def test_formulaire_evaluation_avec_evaluation_existante(client):
         # car les SelectField attendent des chaînes, pas des floats
         # Les choix du formulaire utilisent "4", "5", etc., pas "4.0", "5.0", etc.
         form = EvalForm()
-        form.visuel.data = "4"  # Convertir explicitement en chaîne avec le format attendu
-        form.texture.data = "5"  # Convertir explicitement en chaîne avec le format attendu
+        form.visuel.data = (
+            "4"  # Convertir explicitement en chaîne avec le format attendu
+        )
+        form.texture.data = (
+            "5"  # Convertir explicitement en chaîne avec le format attendu
+        )
         form.pate.data = "3"  # Convertir explicitement en chaîne avec le format attendu
-        form.gout.data = "4.5"  # Convertir explicitement en chaîne avec le format attendu
+        form.gout.data = (
+            "4.5"  # Convertir explicitement en chaîne avec le format attendu
+        )
         form.description.data = eval.description
 
         # Debug: print form errors if validation fails
@@ -610,7 +616,9 @@ def test_formulaire_evaluation_avec_evaluation_existante(client):
             print("Form validation failed with errors:")
             for field, errors in form.errors.items():
                 print(f"Field '{field}': {errors}")
-            print(f"Form data: visuel={form.visuel.data}, texture={form.texture.data}, pate={form.pate.data}, gout={form.gout.data}")
+            print(
+                f"Form data: visuel={form.visuel.data}, texture={form.texture.data}, pate={form.pate.data}, gout={form.gout.data}"
+            )
 
         # Le formulaire devrait être valide avec les données existantes
         assert form.validate()

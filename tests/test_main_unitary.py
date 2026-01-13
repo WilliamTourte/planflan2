@@ -813,7 +813,9 @@ def test_api_etablissements_format_html(client):
     # Devrait contenir du HTML avec les établissements
     assert b"<div" in response.data or b"<table" in response.data
     # Vérifier que le HTML contient bien nos établissements
-    assert b"Boulangerie Martin" in response.data or b"Patisserie Dubois" in response.data
+    assert (
+        b"Boulangerie Martin" in response.data or b"Patisserie Dubois" in response.data
+    )
 
 
 @pytest.mark.unitary

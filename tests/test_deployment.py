@@ -22,8 +22,8 @@ def should_skip_deployment_tests():
 
 @pytest.mark.deployment
 @pytest.mark.skipif(
-    should_skip_deployment_tests(), 
-    reason="Deployment tests are disabled by default. Set RUN_DEPLOYMENT_TESTS=true to enable."
+    should_skip_deployment_tests(),
+    reason="Deployment tests are disabled by default. Set RUN_DEPLOYMENT_TESTS=true to enable.",
 )
 class TestDeployment:
     """Tests to verify that the production site is properly deployed and accessible"""
@@ -75,7 +75,7 @@ class TestDeployment:
             # Either redirect to HTTPS (301/302) or already serve HTTPS (200)
             assert response.status_code in [200, 301, 302]
             if response.status_code in [301, 302]:
-                assert response.headers.get('Location', '').startswith('https://')
+                assert response.headers.get("Location", "").startswith("https://")
         except requests.RequestException as e:
             pytest.fail(f"HTTPS redirect test failed: {str(e)}")
 
@@ -83,8 +83,12 @@ class TestDeployment:
         """Test that www subdomain is properly handled"""
         try:
             # Test both directions - this depends on your DNS/configuration
-            response1 = requests.get("https://planflan.fr", timeout=TIMEOUT, allow_redirects=False)
-            response2 = requests.get("https://www.planflan.fr", timeout=TIMEOUT, allow_redirects=False)
+            response1 = requests.get(
+                "https://planflan.fr", timeout=TIMEOUT, allow_redirects=False
+            )
+            response2 = requests.get(
+                "https://www.planflan.fr", timeout=TIMEOUT, allow_redirects=False
+            )
 
             # At least one should work, and they should serve the same content
             assert response1.status_code == 200 or response2.status_code == 200

@@ -35,7 +35,7 @@ def upload_file():
     # Pour les requêtes GET, rediriger vers la page d'upload
     if request.method == "GET":
         return redirect(url_for("photos.show_uploads"))
-    
+
     # Vérifier le token CSRF pour les requêtes POST
     csrf_valide, message = verifier_csrf_token()
     if not csrf_valide:
