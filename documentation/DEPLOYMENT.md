@@ -267,3 +267,6 @@ docker compose up -d --no-deps --build planflan-backend
 
 # Pour recréer la base de données
 docker exec -it planflan-container-backend python scripts/recrer_db.py
+
+# Pour restaurer une sauvegarde sur le Docker
+docker exec -i planflan-container-db mysql -u root -p < /home/enkyl/planflan2/docker-db/db/backups/planflan_db-XXXXXXXXX.sql
