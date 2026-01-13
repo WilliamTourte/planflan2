@@ -1,83 +1,114 @@
-{% extends "base.html" %}
-
-{% block scripts_head %}
-<meta name="csrf-token" content="{{ csrf_token() }}">
+{% extends "base.html" %} {% block scripts_head %}
+<meta name="csrf-token" content="{{ csrf_token() }}" />
 <!-- Leaflet CSS & JS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-      crossorigin=""/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-        crossorigin=""></script>
-
-
-
-
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+  crossorigin=""
+/>
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+  crossorigin=""
+></script>
 
 <!-- Inclure le fichier JavaScript externe -->
-<script src="{{ url_for('static', filename='js/map_filter.js') }}" defer></script>
+<script
+  src="{{ url_for('static', filename='js/map_filter.js') }}"
+  defer
+></script>
 <script src="{{ url_for('static', filename='js/geoloc.js') }}" defer></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const etablissementsData = {{ etablissements_json|tojson|safe }};
-    const etablissementsDataElement = document.createElement('div');
-    etablissementsDataElement.id = 'etablissements-data';
-    etablissementsDataElement.setAttribute('data-etablissements', JSON.stringify(etablissementsData));
-    document.body.appendChild(etablissementsDataElement);
+  document.addEventListener('DOMContentLoaded', function() {
+      const etablissementsData = {{ etablissements_json|tojson|safe }};
+      const etablissementsDataElement = document.createElement('div');
+      etablissementsDataElement.id = 'etablissements-data';
+      etablissementsDataElement.setAttribute('data-etablissements', JSON.stringify(etablissementsData));
+      document.body.appendChild(etablissementsDataElement);
 
-    const isAdminElement = document.createElement('div');
-    isAdminElement.id = 'is-admin';
-    isAdminElement.setAttribute('data-is-admin', {{ current_user.is_admin|tojson|safe if current_user.is_authenticated else 'false' }});
-    document.body.appendChild(isAdminElement);
+      const isAdminElement = document.createElement('div');
+      isAdminElement.id = 'is-admin';
+      isAdminElement.setAttribute('data-is-admin', {{ current_user.is_admin|tojson|safe if current_user.is_authenticated else 'false' }});
+      document.body.appendChild(isAdminElement);
 
-    const googleMapsApiKeyElement = document.createElement('div');
-    googleMapsApiKeyElement.id = 'google-maps-api-key';
-    googleMapsApiKeyElement.setAttribute('data-api-key', '{{ google_maps_api_key }}');
-    document.body.appendChild(googleMapsApiKeyElement);
+      const googleMapsApiKeyElement = document.createElement('div');
+      googleMapsApiKeyElement.id = 'google-maps-api-key';
+      googleMapsApiKeyElement.setAttribute('data-api-key', '{{ google_maps_api_key }}');
+      document.body.appendChild(googleMapsApiKeyElement);
 
-    // Ajout des coordonnées utilisateur si disponibles
-    {% if user_lat and user_lon %}
-    const userLocationElement = document.createElement('div');
-    userLocationElement.id = 'user-location';
-    userLocationElement.setAttribute('data-lat', {{ user_lat }});
-    userLocationElement.setAttribute('data-lon', {{ user_lon }});
-    document.body.appendChild(userLocationElement);
-    {% endif %}
-    
-    // Ajout de la ville sélectionnée si disponible
-    {% if ville_selectionnee %}
-    const villeSelectionneeElement = document.createElement('div');
-    villeSelectionneeElement.id = 'ville-selectionnee';
-    villeSelectionneeElement.setAttribute('data-ville', '{{ ville_selectionnee }}');
-    document.body.appendChild(villeSelectionneeElement);
-    {% endif %}
-});
+      // Ajout des coordonnées utilisateur si disponibles
+      {% if user_lat and user_lon %}
+      const userLocationElement = document.createElement('div');
+      userLocationElement.id = 'user-location';
+      userLocationElement.setAttribute('data-lat', {{ user_lat }});
+      userLocationElement.setAttribute('data-lon', {{ user_lon }});
+      document.body.appendChild(userLocationElement);
+      {% endif %}
+
+      // Ajout de la ville sélectionnée si disponible
+      {% if ville_selectionnee %}
+      const villeSelectionneeElement = document.createElement('div');
+      villeSelectionneeElement.id = 'ville-selectionnee';
+      villeSelectionneeElement.setAttribute('data-ville', '{{ ville_selectionnee }}');
+      document.body.appendChild(villeSelectionneeElement);
+      {% endif %}
+  });
 </script>
-{% endblock %}
+{% endblock %} {% block content %}
+<div
+  id="map-container"
+  class="d-flex flex-column align-items-center"
+  style="position: relative; height: 80vh; width: 100%"
+>
+  <!-- Carte -->
+  <div id="map" style="width: 100%; height: 100%"></div>
 
-{% block content %}
-<div id="map-container" class="d-flex flex-column align-items-center" style="position: relative; height: 80vh; width: 100%;">
-    <!-- Carte -->
-    <div id="map" style="width: 100%; height: 100%;"></div>
-
-    <!-- Filtres pour établissements (dans la carte) -->
-    <div id="filter-controls">
-        <div class="main-filters">
-            <button id="filter-all" class="btn btn-success" title="Afficher tous les établissements">Tous</button>
-            <button id="filter-pate-btn" class="btn btn-success" title="Filtrer par type de pâte">Pâte</button>
-            <button id="filter-saveur-btn" class="btn btn-success" title="Filtrer par saveur">Saveur</button>
-            <button id="filter-statut-btn" class="btn btn-success" title="Filtrer par statut">Statut</button>
-        </div>
-        <!-- Sous-filtres pour affiner selon les critères choisis -->
-        <div id="sub-filters" class="sub-filters"></div>
+  <!-- Filtres pour établissements (dans la carte) -->
+  <div id="filter-controls">
+    <div class="main-filters">
+      <button
+        id="filter-all"
+        class="btn btn-success"
+        title="Afficher tous les établissements"
+      >
+        Tous
+      </button>
+      <button
+        id="filter-pate-btn"
+        class="btn btn-success"
+        title="Filtrer par type de pâte"
+      >
+        Pâte
+      </button>
+      <button
+        id="filter-saveur-btn"
+        class="btn btn-success"
+        title="Filtrer par saveur"
+      >
+        Saveur
+      </button>
+      <button
+        id="filter-statut-btn"
+        class="btn btn-success"
+        title="Filtrer par statut"
+      >
+        Statut
+      </button>
     </div>
+    <!-- Sous-filtres pour affiner selon les critères choisis -->
+    <div id="sub-filters" class="sub-filters"></div>
+  </div>
 </div>
 
 <div class="mt-3 mb-3 d-flex flex-column align-items-center">
-    <a href="{{ url_for('maps.proposer_etablissement') }}" class="btn btn-success" role="button">
-        Proposer une adresse
-    </a>
+  <a
+    href="{{ url_for('maps.proposer_etablissement') }}"
+    class="btn btn-success"
+    role="button"
+  >
+    Proposer une adresse
+  </a>
 </div>
-
 
 {% endblock %}

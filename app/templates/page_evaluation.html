@@ -1,20 +1,25 @@
 {% extends "base.html" %}
 {% from "macros.html" import afficher_objet %}
-
-{% block content %}
+{%block content %} 
 {% set current_page = 'page_evaluation' %}
-
-{{ afficher_objet('evaluation', evaluation, current_user, form, current_page) }}
+{{afficher_objet('evaluation', evaluation, current_user, form, current_page) }}
 
 <!-- Boutons retour -->
 
 <div class="action-buttons">
-    <button onclick="goBackOrRedirect('{{ url_for('main.afficher_flan_unique', id_flan=evaluation.flan.id_flan) }}')" class="btn btn-danger" title="Retour à la page précédente">
-        <i class="bi bi-arrow-return-left"></i> Retour
-    </button>
-    <a href="{{ url_for('main.afficher_flan_unique', id_flan=evaluation.flan.id_flan) }}" class="btn btn-primary" title="Retour au flan">
-        <i class="bi bi-cake2"></i> Flan
-    </a>
+  <button
+    onclick="goBackOrRedirect('{{ url_for('main.afficher_flan_unique', id_flan=evaluation.flan.id_flan) }}')"
+    class="btn btn-danger"
+    title="Retour à la page précédente"
+  >
+    <i class="bi bi-arrow-return-left"></i> Retour
+  </button>
+  <a
+    href="{{ url_for('main.afficher_flan_unique', id_flan=evaluation.flan.id_flan) }}"
+    class="btn btn-primary"
+    title="Retour au flan"
+  >
+    <i class="bi bi-cake2"></i> Flan
+  </a>
 </div>
 {% endblock %}
-

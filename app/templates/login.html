@@ -1,50 +1,43 @@
-{% extends "base.html" %}
-{% block content %}
+{% extends "base.html" %} {% block content %}
 <div class="container py-5">
-    <div class="row justify-content-center">
-<div class="carte">
-                    <h2 class="text-center mb-4 fw-bold">Connexion</h2>
-                    <form method="POST" action="{{ url_for('auth.login') }}">
-                        {{ form.hidden_tag() }}
-                        <div class="mb-3">
-                            {{ form.pseudo.label(class="form-label fw-medium") }}
-                            {{ form.pseudo(
-                                class="form-control form-control-lg",
-                                placeholder="Votre pseudo",
-                                autofocus=true
-                            ) }}
-                            {% if form.pseudo.errors %}
-                                <div class="text-danger small mt-1">
-                                    {{ form.pseudo.errors[0] }}
-                                </div>
-                            {% endif %}
-                        </div>
-                        <div class="mb-4">
-                            {{ form.password.label(class="form-label fw-medium") }}
-                            {{ form.password(
-                                class="form-control form-control-lg",
-                                placeholder="Votre mot de passe"
-                            ) }}
-                            {% if form.password.errors %}
-                                <div class="text-danger small mt-1">
-                                    {{ form.password.errors[0] }}
-                                </div>
-                            {% endif %}
-                        </div>
-                        <div class="d-grid mb-3">
-                            {{ form.submit(class="btn btn-success") }}
-                        </div>
-                        {{ form.next() }}  {# Champ caché pour la redirection #}
-                        <div class="text-center mt-3">
-                            <p class="mb-0">Pas encore de compte ?
-                                <a href="{{ url_for('auth.register') }}" class="text-decoration-none fw-medium">
-                                    S'inscrire
-                                </a>
-                            </p>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
+  <div class="row justify-content-center">
+    <div class="carte">
+      <h2 class="text-center mb-4 fw-bold">Connexion</h2>
+      <form method="POST" action="{{ url_for('auth.login') }}">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+          {{ form.pseudo.label(class="form-label fw-medium") }} {{ form.pseudo(
+          class="form-control form-control-lg", placeholder="Votre pseudo",
+          autofocus=true ) }} {% if form.pseudo.errors %}
+          <div class="text-danger small mt-1">{{ form.pseudo.errors[0] }}</div>
+          {% endif %}
+        </div>
+        <div class="mb-4">
+          {{ form.password.label(class="form-label fw-medium") }} {{
+          form.password( class="form-control form-control-lg",
+          placeholder="Votre mot de passe" ) }} {% if form.password.errors %}
+          <div class="text-danger small mt-1">
+            {{ form.password.errors[0] }}
+          </div>
+          {% endif %}
+        </div>
+        <div class="d-grid mb-3">
+          {{ form.submit(class="btn btn-success") }}
+        </div>
+        {{ form.next() }} {# Champ caché pour la redirection #}
+        <div class="text-center mt-3">
+          <p class="mb-0">
+            Pas encore de compte ?
+            <a
+              href="{{ url_for('auth.register') }}"
+              class="text-decoration-none fw-medium"
+            >
+              S'inscrire
+            </a>
+          </p>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 {% endblock %}

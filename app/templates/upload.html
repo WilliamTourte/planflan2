@@ -1,23 +1,30 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+  <head>
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
     <title>Photos téléversées</title>
-</head>
-<body>
+  </head>
+  <body>
     <h1>Images téléversées</h1>
-    <form method="POST" action="{{ url_for('photos.upload_file') }}" enctype="multipart/form-data">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <input type="file" name="file" accept="image/*">
-        <input type="submit" value="Téléverser">
+    <form
+      method="POST"
+      action="{{ url_for('photos.upload_file') }}"
+      enctype="multipart/form-data"
+    >
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <input type="file" name="file" accept="image/*" />
+      <input type="submit" value="Téléverser" />
     </form>
     <div class="uploads">
-        {% for upload in uploads %}
-        <div class="upload">
-            <img src="{{ url_for('static', filename='uploads/' + upload) }}" alt="{{ upload }}">
-            <p>{{ upload }}</p>
-        </div>
-        {% endfor %}
+      {% for upload in uploads %}
+      <div class="upload">
+        <img
+          src="{{ url_for('static', filename='uploads/' + upload) }}"
+          alt="{{ upload }}"
+        />
+        <p>{{ upload }}</p>
+      </div>
+      {% endfor %}
     </div>
-</body>
+  </body>
 </html>
