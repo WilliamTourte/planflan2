@@ -81,7 +81,7 @@ PyMySQL==1.1.2
 pyperclip==1.11.0
 pytest==9.0.2
 pytest-cov==7.0.0
-pytest-xdist==3.6.1
+
 pytest-xdist==3.8.0
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
@@ -96,10 +96,10 @@ six==1.17.0
 snowballstemmer==3.0.1
 soupsieve==2.8.1
 SQLAlchemy==2.0.44
-sse-starlette==3.1.1
+
 sse-starlette==3.1.2
 starlette==0.50.0
-textual==6.11.0
+
 textual==6.12.0
 textual-speedups==0.2.1
 tomli_w==1.2.0
