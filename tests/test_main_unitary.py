@@ -265,7 +265,7 @@ def setup_data(app):
         db.session.add_all([etab1, etab2, etab3])
         db.session.commit()  # Commit establishments first to get their IDs
 
-        # Créer des flans
+        # Créer des flans - chaque établissement doit avoir au moins un flan pour les tests API
         flan1 = Flan(
             nom="Flan vanille",
             description="Flan classique a la vanille",
@@ -299,7 +299,19 @@ def setup_data(app):
             id_user=admin.id_user,
         )
 
-        db.session.add_all([flan1, flan2, flan3])
+        # Ajouter un flan pour le Cafe des Amis (établissement 3)
+        flan4 = Flan(
+            nom="Flan café",
+            description="Flan au café",
+            type_pate="BRISEE",
+            type_saveur="NATURE",
+            type_texture="CREMEUSE",
+            prix=3.00,
+            id_etab=etab3.id_etab,
+            id_user=admin.id_user,
+        )
+
+        db.session.add_all([flan1, flan2, flan3, flan4])
         db.session.commit()
 
 
@@ -762,9 +774,8 @@ def test_liste_etablissements_filtre_prix(client, setup_data):
     assert b"vanille" in response.data
 
 
-@pytest.mark.skip(reason="API tests require more complex setup, skipping for now")
 @pytest.mark.unitary
-def test_api_etablissements_get(client, setup_data):
+def test_api_etablissements_get(client):
     """Test l'API etablissements avec une requête GET."""
     response = client.get("/api/etablissements?format=json")
     assert response.status_code == 200
@@ -772,7 +783,8 @@ def test_api_etablissements_get(client, setup_data):
 
     data = response.get_json()
     assert isinstance(data, list)
-    assert len(data) == 3  # Tous les établissements
+    # Tous les établissements qui ont des flans (3 établissements avec flans dans la fixture app)
+    assert len(data) == 3
 
     # Vérifier la structure des données
     assert "nom" in data[0]
@@ -780,33 +792,32 @@ def test_api_etablissements_get(client, setup_data):
     assert "id_etab" in data[0]
 
 
-@pytest.mark.skip(reason="API tests require more complex setup, skipping for now")
 @pytest.mark.unitary
-def test_api_etablissements_filtres(client, setup_data):
+def test_api_etablissements_filtres(client):
     """Test l'API etablissements avec des filtres."""
     response = client.get("/api/etablissements?ville=Paris&format=json")
     assert response.status_code == 200
 
     data = response.get_json()
     assert isinstance(data, list)
-    assert len(data) == 1  # Un seul établissement à Paris
+    assert len(data) == 1  # Un seul établissement à Paris avec des flans
     assert data[0]["nom"] == "Boulangerie Martin"
 
 
-@pytest.mark.skip(reason="API tests require more complex setup, skipping for now")
 @pytest.mark.unitary
-def test_api_etablissements_format_html(client, setup_data):
+def test_api_etablissements_format_html(client):
     """Test l'API etablissements avec format HTML."""
     response = client.get("/api/etablissements?format=html")
     assert response.status_code == 200
     assert response.content_type == "text/html; charset=utf-8"
-    # Devrait contenir du HTML
+    # Devrait contenir du HTML avec les établissements
     assert b"<div" in response.data or b"<table" in response.data
+    # Vérifier que le HTML contient bien nos établissements
+    assert b"Boulangerie Martin" in response.data or b"Patisserie Dubois" in response.data
 
 
-@pytest.mark.skip(reason="API tests require more complex setup, skipping for now")
 @pytest.mark.unitary
-def test_api_etablissements_post(client, setup_data):
+def test_api_etablissements_post(client):
     """Test l'API etablissements avec une requête POST."""
     response = client.post(
         "/api/etablissements", json={"ville": "Paris", "format": "json"}
@@ -815,13 +826,12 @@ def test_api_etablissements_post(client, setup_data):
 
     data = response.get_json()
     assert isinstance(data, list)
-    assert len(data) == 1
+    assert len(data) == 1  # Un seul établissement à Paris avec des flans
     assert data[0]["nom"] == "Boulangerie Martin"
 
 
-@pytest.mark.skip(reason="API tests require more complex setup, skipping for now")
 @pytest.mark.unitary
-def test_api_etablissements_erreur(client, setup_data):
+def test_api_etablissements_erreur(client):
     """Test l'API etablissements avec une erreur."""
     # Envoyer une requête POST avec des données invalides
     response = client.post("/api/etablissements", json={"format": "json"})
@@ -831,7 +841,7 @@ def test_api_etablissements_erreur(client, setup_data):
 
     data = response.get_json()
     assert isinstance(data, list)
-    # Devrait retourner tous les établissements
+    # Devrait retourner tous les établissements qui ont des flans (3 dans la fixture app)
     assert len(data) == 3
 
 

@@ -21,7 +21,7 @@ from app.outils import verifier_csrf_token
 photos_bp = Blueprint("photos", __name__)
 
 
-@photos_bp.route("/upload", methods=["POST"])
+@photos_bp.route("/upload", methods=["GET", "POST"])
 def upload_file():
     """Gère le téléchargement de fichiers image.
 
@@ -32,6 +32,10 @@ def upload_file():
     Returns:
         Response: Redirection vers la page d'upload avec confirmation ou erreur
     """
+    # Pour les requêtes GET, rediriger vers la page d'upload
+    if request.method == "GET":
+        return redirect(url_for("photos.show_uploads"))
+    
     # Vérifier le token CSRF pour les requêtes POST
     csrf_valide, message = verifier_csrf_token()
     if not csrf_valide:

@@ -332,11 +332,13 @@ def api_etablissements():
                 etablissements.append(etab)
         # Renvoie HTML ou JSON
         if format == "html":
-            html = render_template(
-                "macros/grille_etablissements.html",
-                etablissements=etablissements,
-                current_user=current_user,
-            )
+            from flask import render_template_string
+            # Utiliser une macro existante pour générer le HTML
+            html_content = """
+            {% from 'macros.html' import afficher_grille %}
+            {{ afficher_grille('etablissement', etablissements, current_user=current_user) }}
+            """
+            html = render_template_string(html_content, etablissements=etablissements, current_user=current_user)
             response = make_response(html)
             response.headers["Content-Type"] = "text/html; charset=utf-8"
             return response

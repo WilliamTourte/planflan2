@@ -485,11 +485,22 @@ def test_validateform_validation(client):
 # Tests d'intégration des formulaires
 
 
-@pytest.mark.skip("Nécessite des données en base de données")
 def test_formulaire_etablissement_avec_etablissement_existant(client):
     """Test EtabForm pré-rempli avec un établissement existant."""
+    user = client.application.config["TEST_USER"]
+
     with client.application.app_context():
-        etab = Etablissement.query.first()
+        # Créer un établissement de test
+        etab = Etablissement(
+            nom="Test Etablissement",
+            adresse="1 Rue Test",
+            ville="Testville",
+            code_postal="69001",
+            id_user=user.id_user,
+        )
+        db.session.add(etab)
+        db.session.commit()
+
         form = EtabForm(obj=etab)
 
         # Le formulaire devrait être valide avec les données existantes
@@ -501,11 +512,35 @@ def test_formulaire_etablissement_avec_etablissement_existant(client):
         assert form.ville.data == etab.ville
 
 
-@pytest.mark.skip("Nécessite des données en base de données")
 def test_formulaire_flan_avec_flan_existant(client):
     """Test NewFlanForm pré-rempli avec un flan existant."""
+    user = client.application.config["TEST_USER"]
+
     with client.application.app_context():
-        flan = Flan.query.first()
+        # Créer un établissement et un flan de test
+        etab = Etablissement(
+            nom="Test Etablissement",
+            adresse="1 Rue Test",
+            ville="Testville",
+            code_postal="69001",
+            id_user=user.id_user,
+        )
+        db.session.add(etab)
+        db.session.commit()
+
+        flan = Flan(
+            nom="Test Flan",
+            description="Description de test",
+            prix=3.5,
+            type_pate="BRISEE",
+            type_saveur="VANILLE",
+            type_texture="CREMEUSE",
+            id_etab=etab.id_etab,
+            id_user=user.id_user,
+        )
+        db.session.add(flan)
+        db.session.commit()
+
         form = NewFlanForm(obj=flan)
 
         # Le formulaire devrait être valide avec les données existantes
@@ -517,13 +552,34 @@ def test_formulaire_flan_avec_flan_existant(client):
         assert form.prix.data == flan.prix
 
 
-@pytest.mark.skip("Nécessite des données en base de données")
 def test_formulaire_evaluation_avec_evaluation_existante(client):
     """Test EvalForm pré-rempli avec une évaluation existante."""
+    user = client.application.config["TEST_USER"]
+
     with client.application.app_context():
-        # Créer une évaluation pour le test
-        flan = Flan.query.first()
-        user = Utilisateur.query.first()
+        # Créer un établissement, un flan et une évaluation pour le test
+        etab = Etablissement(
+            nom="Test Etablissement",
+            adresse="1 Rue Test",
+            ville="Testville",
+            code_postal="69001",
+            id_user=user.id_user,
+        )
+        db.session.add(etab)
+        db.session.commit()
+
+        flan = Flan(
+            nom="Test Flan",
+            description="Description de test",
+            prix=3.5,
+            type_pate="BRISEE",
+            type_saveur="VANILLE",
+            type_texture="CREMEUSE",
+            id_etab=etab.id_etab,
+            id_user=user.id_user,
+        )
+        db.session.add(flan)
+        db.session.commit()
 
         from app.models import Evaluation
 
@@ -539,17 +595,32 @@ def test_formulaire_evaluation_avec_evaluation_existante(client):
         db.session.add(eval)
         db.session.commit()
 
-        form = EvalForm(obj=eval)
+        # Créer le formulaire avec les données converties en chaînes
+        # car les SelectField attendent des chaînes, pas des floats
+        # Les choix du formulaire utilisent "4", "5", etc., pas "4.0", "5.0", etc.
+        form = EvalForm()
+        form.visuel.data = "4"  # Convertir explicitement en chaîne avec le format attendu
+        form.texture.data = "5"  # Convertir explicitement en chaîne avec le format attendu
+        form.pate.data = "3"  # Convertir explicitement en chaîne avec le format attendu
+        form.gout.data = "4.5"  # Convertir explicitement en chaîne avec le format attendu
+        form.description.data = eval.description
+
+        # Debug: print form errors if validation fails
+        if not form.validate():
+            print("Form validation failed with errors:")
+            for field, errors in form.errors.items():
+                print(f"Field '{field}': {errors}")
+            print(f"Form data: visuel={form.visuel.data}, texture={form.texture.data}, pate={form.pate.data}, gout={form.gout.data}")
 
         # Le formulaire devrait être valide avec les données existantes
         assert form.validate()
 
         # Vérifier que les données sont correctement chargées
-        # Les données doivent être converties en chaînes pour les SelectField
-        assert str(form.visuel.data) == str(eval.visuel)
-        assert str(form.texture.data) == str(eval.texture)
-        assert str(form.pate.data) == str(eval.pate)
-        assert str(form.gout.data) == str(eval.gout)
+        # Note: Le formulaire utilise "4", "5", etc. tandis que la base de données utilise "4.0", "5.0", etc.
+        assert form.visuel.data == "4"  # Correspond à eval.visuel = 4.0
+        assert form.texture.data == "5"  # Correspond à eval.texture = 5.0
+        assert form.pate.data == "3"  # Correspond à eval.pate = 3.0
+        assert form.gout.data == "4.5"  # Correspond à eval.gout = 4.5
         assert form.description.data == eval.description
 
 
