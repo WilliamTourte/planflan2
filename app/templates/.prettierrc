@@ -8,9 +8,9 @@
   "bracketSpacing": true,
   "jsxBracketSameLine": false,
   "arrowParens": "always",
-  "htmlWhitespaceSensitivity": "strict"
-}
-{
+  "htmlWhitespaceSensitivity": "strict",
+
+
   "overrides": [
     {
       "files": ["*.html"],
