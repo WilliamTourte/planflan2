@@ -219,27 +219,33 @@ def ajouter_etablissement():
     if request.method == "POST":
         current_app.logger.info(f"Méthode POST reçue")
         current_app.logger.info(f"Tous les champs de la requête: {dict(request.form)}")
-        
+
         # Vérification spécifique du google_place_id
-        if 'ajout-etab-google_place_id' in request.form:
-            google_place_id_from_request = request.form['ajout-etab-google_place_id']
-            current_app.logger.info(f"✓ google_place_id trouvé dans la requête: '{google_place_id_from_request}' (longueur: {len(google_place_id_from_request)})")
+        if "ajout-etab-google_place_id" in request.form:
+            google_place_id_from_request = request.form["ajout-etab-google_place_id"]
+            current_app.logger.info(
+                f"✓ google_place_id trouvé dans la requête: '{google_place_id_from_request}' (longueur: {len(google_place_id_from_request)})"
+            )
         else:
             current_app.logger.error("✗ google_place_id NON TROUVÉ dans la requête")
             current_app.logger.info(f"Champs disponibles: {list(request.form.keys())}")
-            
+
         form_ajout = EtabForm(prefix="ajout-etab", formdata=MultiDict(request.form))
-        
-        current_app.logger.info(f"Formulaire créé, google_place_id.data: '{form_ajout.google_place_id.data}' (type: {type(form_ajout.google_place_id.data)})")
-        
+
+        current_app.logger.info(
+            f"Formulaire créé, google_place_id.data: '{form_ajout.google_place_id.data}' (type: {type(form_ajout.google_place_id.data)})"
+        )
+
         # Vérification de la validation du formulaire
         if form_ajout.validate():
             current_app.logger.info("✓ Formulaire validé avec succès")
             current_app.logger.info("=== CRÉATION DE L'ÉTABLISSEMENT ===")
             current_app.logger.info(f"Valeurs utilisées pour la création:")
             current_app.logger.info(f"  nom: {form_ajout.nom.data}")
-            current_app.logger.info(f"  google_place_id: '{form_ajout.google_place_id.data}' (type: {type(form_ajout.google_place_id.data)})")
-            
+            current_app.logger.info(
+                f"  google_place_id: '{form_ajout.google_place_id.data}' (type: {type(form_ajout.google_place_id.data)})"
+            )
+
             nouvel_etablissement = Etablissement(
                 nom=form_ajout.nom.data,
                 adresse=form_ajout.adresse.data,
@@ -254,12 +260,14 @@ def ajouter_etablissement():
                 visite=form_ajout.visite.data,
                 google_place_id=form_ajout.google_place_id.data,
             )
-            
-            current_app.logger.info(f"Établissement créé en mémoire, google_place_id: '{nouvel_etablissement.google_place_id}'")
-            
+
+            current_app.logger.info(
+                f"Établissement créé en mémoire, google_place_id: '{nouvel_etablissement.google_place_id}'"
+            )
+
             db.session.add(nouvel_etablissement)
             current_app.logger.info("Établissement ajouté à la session")
-            
+
             db.session.commit()
             current_app.logger.info("Transaction commitée")
 
@@ -269,25 +277,44 @@ def ajouter_etablissement():
 
             # Vérification en base de données
             etablissement_verif = Etablissement.query.get(id_etab)
-            current_app.logger.info(f"Vérification en base - google_place_id: '{etablissement_verif.google_place_id}'")
+            current_app.logger.info(
+                f"Vérification en base - google_place_id: '{etablissement_verif.google_place_id}'"
+            )
 
             # Télécharger les photos depuis Google Places si un place_id est disponible
-            current_app.logger.info(f"Google Place ID de l'établissement créé: '{nouvel_etablissement.google_place_id}' (type: {type(nouvel_etablissement.google_place_id)})")
+            current_app.logger.info(
+                f"Google Place ID de l'établissement créé: '{nouvel_etablissement.google_place_id}' (type: {type(nouvel_etablissement.google_place_id)})"
+            )
             if nouvel_etablissement.google_place_id:
                 try:
                     from app.outils import fetch_place_photos
-                    current_app.logger.info(f"Appel de fetch_place_photos avec id_etab={id_etab}, place_id='{nouvel_etablissement.google_place_id}'")
-                    fetch_place_photos(id_etab, nouvel_etablissement.google_place_id, current_app.config['GOOGLE_MAPS_API_KEY'])
-                    current_app.logger.info("Téléchargement des photos Google Places terminé")
+
+                    current_app.logger.info(
+                        f"Appel de fetch_place_photos avec id_etab={id_etab}, place_id='{nouvel_etablissement.google_place_id}'"
+                    )
+                    fetch_place_photos(
+                        id_etab,
+                        nouvel_etablissement.google_place_id,
+                        current_app.config["GOOGLE_MAPS_API_KEY"],
+                    )
+                    current_app.logger.info(
+                        "Téléchargement des photos Google Places terminé"
+                    )
                 except Exception as e:
-                    current_app.logger.error(f"Erreur lors du téléchargement des photos Google Places: {str(e)}")
+                    current_app.logger.error(
+                        f"Erreur lors du téléchargement des photos Google Places: {str(e)}"
+                    )
                     current_app.logger.error(traceback.format_exc())
                     # Ne pas échouer la création de l'établissement si les photos ne peuvent pas être téléchargées
             else:
-                current_app.logger.warning("⚠️  Aucun Google Place ID disponible, pas de téléchargement de photos")
+                current_app.logger.warning(
+                    "⚠️  Aucun Google Place ID disponible, pas de téléchargement de photos"
+                )
 
             flash("Établissement ajouté avec succès !", "success")
-            current_app.logger.info(f"=== FIN ajouter_etablissement - Redirection vers id_etab={id_etab} ===")
+            current_app.logger.info(
+                f"=== FIN ajouter_etablissement - Redirection vers id_etab={id_etab} ==="
+            )
             # Redirige vers la page de l'établissement
             return redirect(
                 url_for("main.afficher_etablissement_unique", id_etab=id_etab)
@@ -367,7 +394,9 @@ def modifier_etablissement(id_etab):
             etablissement.description = form_edit.description.data
             db.session.commit()
             flash("Établissement mis à jour avec succès !", "success")
-            return redirect(url_for("main.afficher_etablissement_unique", id_etab=id_etab))
+            return redirect(
+                url_for("main.afficher_etablissement_unique", id_etab=id_etab)
+            )
 
     # Récupération de tous les établissements pour l'affichage
     etablissements = Etablissement.query.all()

@@ -12,8 +12,6 @@ from flask import request, current_app
 from flask_wtf.csrf import validate_csrf
 
 
-
-
 def enlever_accents(
     text,
 ):  # Enlève les accents parce que la police ne les gère pas bien
@@ -134,18 +132,14 @@ def get_place_details(place_id, api_key):
         dict: Les détails du lieu, ou None en cas d'erreur
     """
     url = "https://maps.googleapis.com/maps/api/place/details/json"
-    params = {
-        'place_id': place_id,
-        'fields': 'photos',
-        'key': api_key
-    }
+    params = {"place_id": place_id, "fields": "photos", "key": api_key}
 
     try:
         response = requests.get(url, params=params)
         if response.status_code == 200:
             data = response.json()
-            if data.get('result'):
-                return data['result']
+            if data.get("result"):
+                return data["result"]
     except Exception as e:
         current_app.logger.error(f"Erreur lors de la récupération des détails: {e}")
 
@@ -177,22 +171,24 @@ def fetch_place_photos(etablissement_id, place_id, api_key, max_width=400):
     # Récupérer les détails de l'établissement pour obtenir les photoreferences
     # Utiliser le place_id Google Places pour récupérer les photos
     if not place_id:
-        current_app.logger.warning(f"Aucun place_id fourni pour l'établissement {etablissement_id}")
+        current_app.logger.warning(
+            f"Aucun place_id fourni pour l'établissement {etablissement_id}"
+        )
         return []
 
     place_details = get_place_details(place_id, api_key)
-    if not place_details or 'photos' not in place_details:
+    if not place_details or "photos" not in place_details:
         return []
 
     # Récupérer les photos depuis l'API
     photo_paths = []
-    for idx, photo in enumerate(place_details['photos'][:1]):  # Limiter à une photo
-        photo_reference = photo['photo_reference']
+    for idx, photo in enumerate(place_details["photos"][:1]):  # Limiter à une photo
+        photo_reference = photo["photo_reference"]
         url = "https://maps.googleapis.com/maps/api/place/photo"
         params = {
-            'maxwidth': max_width,
-            'photoreference': photo_reference,
-            'key': api_key
+            "maxwidth": max_width,
+            "photoreference": photo_reference,
+            "key": api_key,
         }
 
         try:
@@ -200,10 +196,10 @@ def fetch_place_photos(etablissement_id, place_id, api_key, max_width=400):
             if response.status_code == 200:
                 # Générer un nom de fichier unique
                 filename = f"etab_{etablissement_id}_photo_{idx}.jpg"
-                filepath = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+                filepath = os.path.join(current_app.config["UPLOAD_FOLDER"], filename)
 
                 # Sauvegarder la photo localement
-                with open(filepath, 'wb') as f:
+                with open(filepath, "wb") as f:
                     for chunk in response.iter_content(1024):
                         f.write(chunk)
 
@@ -213,7 +209,7 @@ def fetch_place_photos(etablissement_id, place_id, api_key, max_width=400):
                     type_cible=TypeCible.ETABLISSEMENT,
                     path=filepath,
                     largeur=max_width,
-                    hauteur=max_width  # Supposons des photos carrées pour simplifier
+                    hauteur=max_width,  # Supposons des photos carrées pour simplifier
                 )
                 db.session.add(new_photo)
                 photo_paths.append(filepath)

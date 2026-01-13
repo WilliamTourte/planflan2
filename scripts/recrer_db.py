@@ -53,7 +53,8 @@ class TypeTexture(Enum):
 
 # Configuration pour SQLAlchemy direct (pour les fonctions d'import)
 DATABASE_URI = os.getenv(
-    "DATABASE_URL", "mysql+pymysql://planflan:supersecuredpassword@localhost/planflan_db"
+    "DATABASE_URL",
+    "mysql+pymysql://planflan:supersecuredpassword@localhost/planflan_db",
 )
 
 # Import de l'application Flask après avoir configuré le chemin

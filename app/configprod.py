@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 # Charger les variables d'environnement
 load_dotenv()
 
+
 class Config:
     """Configuration de base pour l'application.
 

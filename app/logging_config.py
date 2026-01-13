@@ -239,8 +239,8 @@ def configure_error_handling(app):
             "error": f"Une erreur est survenue: {str(e)}",
             "status": "error",
             "type": type(e).__name__,
-            "traceback": traceback.format_exc() if app.debug else None
-        }, 500 
+            "traceback": traceback.format_exc() if app.debug else None,
+        }, 500
 
     @app.errorhandler(404)
     def handle_404(e):  # pylint: disable=unused-argument

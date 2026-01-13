@@ -36,6 +36,7 @@ from app.outils import afficher_etablissements, calculer_distance, fetch_place_p
 
 main_bp = Blueprint("main", __name__)
 
+
 ## ROUTES PRINCIPALES
 @main_bp.route("/")
 def index():
@@ -48,7 +49,7 @@ def index():
     etablissements = Etablissement.query.all()
 
     print(etablissements)
-    
+
     return render_template(
         "index.html",
         etablissements=etablissements,
@@ -56,6 +57,7 @@ def index():
         google_maps_api_key=current_app.config["GOOGLE_MAPS_API_KEY"],
         form_recherche=form_recherche,
     )
+
 
 @main_bp.route("/api/villes")
 def get_villes():
@@ -77,6 +79,7 @@ def get_villes():
     print(f"Found {len(villes)} villes: {villes[:5]}{'...' if len(villes) > 5 else ''}")
 
     return jsonify(sorted(villes))
+
 
 def filtrer_etablissements(query, **kwargs):
     """Applique les filtres communs à une requête Etablissement."""
@@ -111,6 +114,7 @@ def filtrer_etablissements(query, **kwargs):
             query = query.filter(Flan.prix >= 5)
     return query
 
+
 @main_bp.route("/liste_etablissements", methods=["GET", "POST"])
 def liste_etablissements():
     print("DEBUG: Méthode HTTP:", request.method)
@@ -124,14 +128,12 @@ def liste_etablissements():
         request.form.get("geolocalisation") == "true"
         or request.args.get("geolocalisation") == "true"
     )
- 
-
 
     form_ajout = EtabForm(prefix="ajout-etab")
     form_edit = EtabForm(prefix="edit-etab")
 
     if request.method == "POST":
-     
+
         form_recherche = RechercheForm(request.form)
 
     else:
@@ -242,8 +244,6 @@ def liste_etablissements():
 
         etablissements = query.distinct().all()
 
-
-
     # 5. Préparation pour le template
     etablissements, etablissements_json = afficher_etablissements(etablissements)
 
@@ -265,6 +265,7 @@ def liste_etablissements():
         user_lon=user_lon,
         ville_selectionnee=ville_selectionnee,
     )
+
 
 @main_bp.route("/api/etablissements", methods=["GET", "POST"])
 def api_etablissements():
@@ -346,6 +347,7 @@ def api_etablissements():
         # En cas d'erreur, renvoie toujours du JSON avec un message d'erreur
         return jsonify({"error": str(e)}), 500
 
+
 ### INFOWINDOW
 @main_bp.route("/get_infowindow_content")
 def get_infowindow_content():
@@ -361,11 +363,13 @@ def get_infowindow_content():
         "infowindow_template.html", etablissement=etablissement, details_url=details_url
     )
 
+
 ### PAGE RECHERCHE
 @main_bp.route("/rechercher", methods=["GET"])
 def rechercher():
     form_recherche = RechercheForm()
     return render_template("rechercher.html", form_recherche=form_recherche)
+
 
 ### DASHBOARD
 @main_bp.route("/dashboard", methods=["GET", "POST"])
@@ -439,6 +443,7 @@ def dashboard():
         pending_etablissements=pending_etablissements,
     )
 
+
 ### Routes établissement, flan, évaluation
 @main_bp.route("/etablissement/<int:id_etab>", methods=["GET", "POST"])
 def afficher_etablissement_unique(id_etab):
@@ -449,7 +454,11 @@ def afficher_etablissement_unique(id_etab):
     form_flan = NewFlanForm(prefix="ajout-flan")
 
     # Récupérer ou télécharger les photos pour l'établissement
-    photo_paths = fetch_place_photos(id_etab, etablissement.google_place_id, current_app.config['GOOGLE_MAPS_API_KEY'])
+    photo_paths = fetch_place_photos(
+        id_etab,
+        etablissement.google_place_id,
+        current_app.config["GOOGLE_MAPS_API_KEY"],
+    )
 
     if form_etab.validate_on_submit():
         etablissement.nom = form_etab.nom.data
@@ -477,6 +486,7 @@ def afficher_etablissement_unique(id_etab):
         validate_form=validate_form,
         photo_paths=photo_paths,
     )
+
 
 @main_bp.route("/flan/<int:id_flan>", methods=["GET", "POST"])
 def afficher_flan_unique(id_flan):
@@ -508,6 +518,7 @@ def afficher_flan_unique(id_flan):
         validate_form=validate_form,
     )
 
+
 @main_bp.route("/etablissement/<int:id_etab>/proposer_flan", methods=["GET", "POST"])
 @login_required
 def proposer_flan(id_etab):
@@ -533,6 +544,7 @@ def proposer_flan(id_etab):
         "page_etablissement.html", form=form, etablissement=etablissement
     )
 
+
 @main_bp.route("/valider_flan/<int:id_flan>", methods=["POST"])
 @login_required
 def valider_flan(id_flan):
@@ -548,6 +560,7 @@ def valider_flan(id_flan):
         db.session.rollback()
         flash("Une erreur est survenue lors de la validation du flan.", "danger")
     return redirect(url_for("main.afficher_flan_unique", id_flan=id_flan))
+
 
 @main_bp.route("/modifier_flan/<int:id_flan>", methods=["POST"])
 @login_required
@@ -572,6 +585,7 @@ def modifier_flan(id_flan):
         )
     return redirect(url_for("main.afficher_flan_unique", id_flan=id_flan))
 
+
 @main_bp.route("/supprimer_flan/<int:id_flan>", methods=["POST"])
 @login_required
 def supprimer_flan(id_flan):
@@ -587,6 +601,7 @@ def supprimer_flan(id_flan):
         db.session.rollback()
         flash("Une erreur est survenue lors de la suppression du flan.", "danger")
     return redirect(url_for("main.dashboard"))
+
 
 @main_bp.route("/flan/<int:id_flan>/evaluer", methods=["GET", "POST"])
 @login_required
@@ -624,6 +639,7 @@ def evaluer_flan(id_flan):
             )
     return redirect(url_for("main.afficher_flan_unique", id_flan=id_flan))
 
+
 @main_bp.route("/evaluation/<int:id_eval>", methods=["GET", "POST"])
 @login_required
 def afficher_evaluation_unique(id_eval):
@@ -656,6 +672,7 @@ def afficher_evaluation_unique(id_eval):
         validate_form=validate_form,
         current_page="page_evaluation",
     )
+
 
 def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
     print("Form data received:", form.data)
@@ -719,6 +736,7 @@ def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
     db.session.commit()
     return evaluation
 
+
 @main_bp.route("/valider_evaluation/<int:id_eval>", methods=["POST"])
 @login_required
 def valider_evaluation(id_eval):
@@ -736,6 +754,7 @@ def valider_evaluation(id_eval):
             "Une erreur est survenue lors de la validation de l'évaluation.", "danger"
         )
     return redirect(url_for("main.dashboard"))
+
 
 @main_bp.route("/supprimer_evaluation/<int:id_eval>", methods=["POST"])
 @login_required
@@ -755,11 +774,13 @@ def supprimer_evaluation(id_eval):
         )
     return redirect(url_for("main.dashboard"))
 
+
 ### BADGES
 def afficher_badge_etablissement(etablissement):
     if hasattr(etablissement, "label") and etablissement.label:
         return '<span class="badge badge-labellise">❤️</span>'
     return ""
+
 
 def afficher_badge_type_etab(etablissement):
     couleurs = {
@@ -773,4 +794,3 @@ def afficher_badge_type_etab(etablissement):
         couleur = couleurs.get(type_etab.name, "#D3D3D3")
         return f'<div class="badge badge-type-etab" style="background-color: {couleur};">{type_etab.value}</div>'
     return ""
-

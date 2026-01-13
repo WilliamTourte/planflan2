@@ -151,9 +151,7 @@ if __name__ == "__main__":
         print("   Vérifiez que :")
         logger.info("Vérifiez que :")
         print(f"   1. Le fichier 'lieux_test.json' existe dans le dossier scripts")
-        logger.info(
-            f"1. Le fichier 'lieux_test.json' existe dans le dossier scripts"
-        )
+        logger.info(f"1. Le fichier 'lieux_test.json' existe dans le dossier scripts")
         print(f"   2. Le chemin est : {fichier_json}")
         logger.info(f"2. Le chemin est : {fichier_json}")
         print(f"   3. Vous pouvez spécifier un autre chemin en argument")

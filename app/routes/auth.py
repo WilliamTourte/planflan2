@@ -15,6 +15,7 @@ from app.outils import verifier_csrf_token
 
 auth_bp = Blueprint("auth", __name__)
 
+
 @auth_bp.route("/register", methods=["GET", "POST"])
 def register():
     """Gère l'inscription des nouveaux utilisateurs.
@@ -49,6 +50,7 @@ def register():
         return redirect(url_for("main.index"))
 
     return render_template("creation_utilisateur.html", form=form)
+
 
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():

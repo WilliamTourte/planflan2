@@ -560,5 +560,3 @@ def test_scenario_geolocalisation(client):
     # Vérifier que les données de localisation utilisateur sont présentes dans le HTML
     assert b"data-lat" in response.data
     assert b"data-lon" in response.data
-
-
