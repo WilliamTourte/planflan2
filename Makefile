@@ -99,6 +99,10 @@ test-e2e:
 test-api:
 	python -m pytest tests/ -m "api" -v --tb=short
 
+# Exécuter les tests de déploiement (nécessite l'accès au site en production)
+test-deployment:
+	RUN_DEPLOYMENT_TESTS=true python -m pytest tests/test_deployment.py -v --tb=short
+
 # Exécuter les tests de base de données seulement
 test-database:
 	python -m pytest tests/ -m "database" -v --tb=short

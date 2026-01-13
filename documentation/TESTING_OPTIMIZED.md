@@ -117,6 +117,20 @@ make test-without-slow
 make test-slow
 ```
 
+### 6. Deployment Tests (`@pytest.mark.deployment`)
+- **Purpose**: Verify production deployment status
+- **Execution Time**: Varies (network dependent)
+- **Use Case**: Manual verification, monitoring
+- **Example**: Site accessibility, HTTPS redirects, static assets
+
+```bash
+# Run deployment tests (requires RUN_DEPLOYMENT_TESTS environment variable)
+RUN_DEPLOYMENT_TESTS=true pytest tests/test_deployment.py -v
+
+# Or use the Makefile command
+make test-deployment
+```
+
 ## 🔧 Test Optimization Techniques
 
 ### 1. Parameterized Testing
@@ -154,6 +168,7 @@ def test_routes(route, expected): ...
 @pytest.mark.slow           # Resource-intensive tests
 @pytest.mark.api           # API endpoint tests
 @pytest.mark.database       # Database operation tests
+@pytest.mark.deployment    # Production deployment tests
 ```
 
 ### 3. Parallel Execution
@@ -363,6 +378,9 @@ def test_complex_query(): ...
 @pytest.mark.api
 @pytest.mark.network
 def test_external_service(): ...
+
+@pytest.mark.deployment
+def test_production_site(): ...
 ```
 
 ## 📋 Test Maintenance Checklist
