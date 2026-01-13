@@ -5,10 +5,10 @@ WORKDIR /python-docker
 RUN apt-get update
 RUN apt-get install -y --no-install-recommends pkg-config python3-dev default-libmysqlclient-dev build-essential default-mysql-client
 
-# Copie de la liste de dépendance de production
-COPY requirements_prod.txt requirements.txt
+# Copie de la liste de dépendances
+COPY requirements.txt .
 # Installation des dépendances
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 

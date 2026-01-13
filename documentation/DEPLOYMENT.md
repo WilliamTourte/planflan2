@@ -252,6 +252,16 @@ sudo tail -f /var/log/nginx/error.log
 5. **Sécurité** : Mettez à jour régulièrement le système et les dépendances
 
 
+2. Reconstruire l'image Docker :
+Exécutez les commandes suivantes pour reconstruire l'image Docker :
+docker compose down
+docker compose build --no-cache
+docker compose up -d
+
+3. Vérifier que l'application fonctionne :
+Après avoir reconstruit l'image Docker, vérifier que l'application fonctionne correctement :
+docker logs planflan-container-backend
+
 # Suite à changement dans l'application
 docker compose up -d --no-deps --build planflan-backend 
 
