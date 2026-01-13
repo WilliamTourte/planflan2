@@ -1038,7 +1038,18 @@ input[type="submit"]:active {
         border-radius: var(--border-radius);
     }
 
+    .etablissement-detail {
+        flex-direction: column;
+    }
 
+    .detail-left-column {
+        min-width: 100%;
+        margin-bottom: var(--margin-lg);
+    }
+
+    .detail-right-column {
+        min-width: 100%;
+    }
 
     header h1 {
         font-size: 1.5rem;
@@ -1076,12 +1087,76 @@ input[type="submit"]:active {
         padding: var(--padding-md);
     }
 
+   ATTRIBUTION GOOGLE PHOTOS
+   ============================================= */
+=======
     .form-group {
         margin-bottom: var(--margin-md);
     }
 }
 
 /* =============================================
+   17.5. ETABLISSEMENT DETAIL (NOUVEAU)
+   ============================================= */
+.etablissement-detail {
+    display: flex;
+    gap: var(--gap-lg);
+    margin-bottom: var(--margin-lg);
+    background: white;
+    padding: var(--padding-lg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+.detail-left-column {
+    flex: 1;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.detail-right-column {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.detail-left-column .carte-image-container {
+    height: 250px;
+    width: 100%;
+    margin-bottom: var(--margin-md);
+}
+
+.detail-left-column .carte-header {
+    text-align: center;
+    padding: 0;
+}
+
+.detail-left-column .carte-header h2 {
+    margin: 0;
+    font-size: var(--font-size-lg);
+}
+
+.detail-right-column .adresse {
+    font-size: var(--font-size-md);
+    margin-bottom: var(--margin-sm);
+}
+
+.detail-right-column .flans-count {
+    font-weight: bold;
+    color: var(--color-primary);
+    margin-bottom: var(--margin-md);
+}
+
+.detail-right-column .description {
+    margin-bottom: var(--margin-lg);
+}
+
+/* =============================================
+   ATTRIBUTION GOOGLE PHOTOS
+   ============================================= */=============================================
    ATTRIBUTION GOOGLE PHOTOS
    ============================================= */
 /* Conteneur pour les photos Google avec attribution */

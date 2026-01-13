@@ -159,33 +159,71 @@
 
 
 <!-- ETABLISSEMENT -->
-{% macro afficher_etablissement(etablissement, current_user, form_edit, current_page, delete_form, validate_form, photo_paths=None) %}
-    <div class="carte">
-        <div class="carte-image-container">
-            {{ afficher_image_ou_placeholder(etablissement, 'carte-image', photo_paths, is_google_photo=(photo_paths is not none)) }}
-            {{ afficher_badge_type_etab(etablissement) }}
-            {{ afficher_badge_etablissement(etablissement) }}
-        </div>
-        <div >
-            <div class="carte-header">
-                <h2 id="etablissement-{{ etablissement.id_etab }}-nom">{{ etablissement.nom | enlever_accents }}</h2>
+{% macro afficher_etablissement(etablissement, current_user, form_edit, current_page, delete_form, validate_form, photo_paths=None, layout='grid') %}
+    {% if layout == 'detail' %}
+        <!-- Layout pour la page d'établissement - 2 colonnes -->
+        <div class="etablissement-detail">
+            <div class="detail-left-column">
+                <div class="carte-image-container">
+                    {{ afficher_image_ou_placeholder(etablissement, 'carte-image', photo_paths, is_google_photo=(photo_paths is not none)) }}
+                    {{ afficher_badge_type_etab(etablissement) }}
+                    {{ afficher_badge_etablissement(etablissement) }}
+                </div>
+                <div class="carte-header">
+                    <h2 id="etablissement-{{ etablissement.id_etab }}-nom">{{ etablissement.nom | enlever_accents }}</h2>
+                </div>
             </div>
-            <div id="etablissement-{{ etablissement.id_etab }}-display">
-                <p class="adresse" id="etablissement-{{ etablissement.id_etab }}-adresse">{{ etablissement.adresse }}, {{ etablissement.ville }}</p>
-                {% if etablissement.flans %}
-                    <p class="flans-count">
-                        {{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}
+            <div class="detail-right-column">
+                <div id="etablissement-{{ etablissement.id_etab }}-display">
+                    <p class="adresse" id="etablissement-{{ etablissement.id_etab }}-adresse">
+                        {{ etablissement.adresse }}, {{ etablissement.ville }}
                     </p>
-                {% endif %}
-                <p class="description" id="etablissement-{{ etablissement.id_etab }}-description">Description : {{ etablissement.description }}</p>
-                {{ afficher_boutons_actions(etablissement, current_user, 'id_etab',
-                'maps.modifier_etablissement', 'maps.supprimer_etablissement', 'maps.valider_etablissement', 'etablissement', current_page,
-                        delete_form, validate_form) }}
+                    {% if etablissement.flans %}
+                        <p class="flans-count">
+                            {{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}
+                        </p>
+                    {% endif %}
+                    <p class="description" id="etablissement-{{ etablissement.id_etab }}-description">
+                        Description : {{ etablissement.description }}
+                    </p>
+                    {{ afficher_boutons_actions(etablissement, current_user, 'id_etab',
+                    'maps.modifier_etablissement', 'maps.supprimer_etablissement', 'maps.valider_etablissement', 'etablissement', current_page,
+                            delete_form, validate_form) }}
+                </div>
+                {{ afficher_formulaire_edition_etablissement(etablissement, form_edit, current_user) }}
             </div>
-            {{ afficher_formulaire_edition_etablissement(etablissement, form_edit, current_user) }}
-            <!--<a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}" class="btn btn-success">Voir plus</a>-->
         </div>
-    </div>
+
+    {% else %}
+        <!-- Layout existant pour la grille -->
+        <div class="carte">
+            <div class="carte-image-container">
+                {{ afficher_image_ou_placeholder(etablissement, 'carte-image', photo_paths, is_google_photo=(photo_paths is not none)) }}
+                {{ afficher_badge_type_etab(etablissement) }}
+                {{ afficher_badge_etablissement(etablissement) }}
+            </div>
+            <div >
+                <div class="carte-header">
+                    <h2 id="etablissement-{{ etablissement.id_etab }}-nom">{{ etablissement.nom | enlever_accents }}</h2>
+                </div>
+                <div id="etablissement-{{ etablissement.id_etab }}-display">
+                    <p class="adresse" id="etablissement-{{ etablissement.id_etab }}-adresse">{{ etablissement.adresse }}, {{ etablissement.ville }}</p>
+                    {% if etablissement.flans %}
+                        <p class="flans-count">
+                            {{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}
+                        </p>
+                    {% endif %}
+                    <p class="description" id="etablissement-{{ etablissement.id_etab }}-description">Description : {{ etablissement.description }}</p>
+                    {{ afficher_boutons_actions(etablissement, current_user, 'id_etab',
+                    'maps.modifier_etablissement', 'maps.supprimer_etablissement', 'maps.valider_etablissement', 'etablissement', current_page,
+                            delete_form, validate_form) }}
+                </div>
+                {{ afficher_formulaire_edition_etablissement(etablissement, form_edit, current_user) }}
+                <!--<a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}" class="btn btn-success">Voir plus</a>-->
+            </div>
+        </div>
+    {% endif %}
+
     <script>
         function cancelEdit(idEtab) {
             document.getElementById('etablissement-' + idEtab + '-display').style.display = 'block';
@@ -515,9 +553,9 @@
 
 
 
-{% macro afficher_objet(objet_type, objet, current_user=None, form_edit=None, current_page='', delete_form=None, validate_form=None, photo_paths=None) %}
+{% macro afficher_objet(objet_type, objet, current_user=None, form_edit=None, current_page='', delete_form=None, validate_form=None, photo_paths=None, layout='grid') %}
     {% if objet_type == 'etablissement' %}
-        {{ afficher_etablissement(objet, current_user, form_edit, current_page, delete_form, validate_form, photo_paths) }}
+        {{ afficher_etablissement(objet, current_user, form_edit, current_page, delete_form, validate_form, photo_paths, layout) }}
     {% elif objet_type == 'flan' %}
         {{ afficher_flan(objet, current_user, form_edit, current_page, delete_form, validate_form) }}
     {% elif objet_type == 'evaluation' %}
