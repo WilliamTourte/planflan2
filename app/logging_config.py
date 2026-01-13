@@ -10,7 +10,7 @@ import os
 from logging.handlers import RotatingFileHandler, SMTPHandler
 import traceback
 from flask.logging import default_handler
-from flask import request
+from flask import request, render_template
 
 
 def configure_logging(app):
@@ -253,7 +253,7 @@ def configure_error_handling(app):
                 "remote_addr": request.remote_addr,
             },
         )
-        return {"error": "Page non trouvée", "status": "error"}, 404
+        return render_template('404.html'), 404
 
     @app.errorhandler(403)
     def handle_403(e):  # pylint: disable=unused-argument
