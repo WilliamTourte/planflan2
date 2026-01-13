@@ -2,11 +2,11 @@
 
 # Charger les variables d'environnement depuis le fichier .env à la racine
 set -a
-source /home/damien/PlanFlan/planflan2/.env
+source /home/enkyl/planflan2/.env
 set +a
 
 # Nom du conteneur Docker de la base de données
-CONTAINER_NAME="mysql-db"
+CONTAINER_NAME="planflan-container-db"
 
 # Nom de la base de données
 DB_NAME="$MYSQL_DATABASE"
