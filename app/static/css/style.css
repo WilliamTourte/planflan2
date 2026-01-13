@@ -1051,6 +1051,19 @@ input[type="submit"]:active {
         min-width: 100%;
     }
 
+    .flan-detail {
+        flex-direction: column;
+    }
+
+    .flan-detail .detail-left-column {
+        min-width: 100%;
+        margin-bottom: var(--margin-lg);
+    }
+
+    .flan-detail .detail-right-column {
+        min-width: 100%;
+    }
+
     header h1 {
         font-size: 1.5rem;
     }
@@ -1126,17 +1139,18 @@ input[type="submit"]:active {
 .detail-left-column .carte-image-container {
     height: 250px;
     width: 100%;
+}
+
+.detail-right-column .carte-header {
+    text-align: left;
+    padding: 0;
     margin-bottom: var(--margin-md);
 }
 
-.detail-left-column .carte-header {
-    text-align: center;
-    padding: 0;
-}
-
-.detail-left-column .carte-header h2 {
+.detail-right-column .carte-header h2 {
     margin: 0;
     font-size: var(--font-size-lg);
+    color: var(--color-text);
 }
 
 .detail-right-column .adresse {
@@ -1150,11 +1164,69 @@ input[type="submit"]:active {
     margin-bottom: var(--margin-md);
 }
 
+   ATTRIBUTION GOOGLE PHOTOS
+   ============================================= */
+=======
 .detail-right-column .description {
     margin-bottom: var(--margin-lg);
 }
 
 /* =============================================
+   8.5. FLAN DETAIL (NOUVEAU)
+   ============================================= */
+.flan-detail {
+    display: flex;
+    gap: var(--gap-lg);
+    margin-bottom: var(--margin-lg);
+    background: white;
+    padding: var(--padding-lg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+.flan-detail .detail-left-column {
+    flex: 1;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.flan-detail .detail-right-column {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.flan-detail .detail-left-column .carte-image-container {
+    height: 250px;
+    width: 100%;
+}
+
+.flan-detail .detail-right-column .carte-header {
+    text-align: left;
+    padding: 0;
+    margin-bottom: var(--margin-md);
+}
+
+.flan-detail .detail-right-column .carte-header h2 {
+    margin: 0;
+    font-size: var(--font-size-lg);
+    color: var(--color-text);
+}
+
+.flan-detail .detail-right-column .flan-details {
+    width: 100%;
+}
+
+.flan-detail .detail-right-column .flan-price-tag {
+    margin-bottom: var(--margin-md);
+}
+
+/* =============================================
+   ATTRIBUTION GOOGLE PHOTOS
+   ============================================= */=============================================
    ATTRIBUTION GOOGLE PHOTOS
    ============================================= */=============================================
    ATTRIBUTION GOOGLE PHOTOS

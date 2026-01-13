@@ -183,13 +183,12 @@
                     {{ afficher_badge_type_etab(etablissement) }}
                     {{ afficher_badge_etablissement(etablissement) }}
                 </div>
-                <div class="carte-header">
-
-                </div>
             </div>
             <div class="detail-right-column">
+                <div class="carte-header">
+                    <h2 id="etablissement-{{ etablissement.id_etab }}-nom">{{ etablissement.nom | enlever_accents }}</h2>
+                </div>
                 <div id="etablissement-{{ etablissement.id_etab }}-display">
-                <h2 id="etablissement-{{ etablissement.id_etab }}-nom">{{ etablissement.nom | enlever_accents }}</h2>
                     <p class="adresse" id="etablissement-{{ etablissement.id_etab }}-adresse">
                         {{ etablissement.adresse }}, {{ etablissement.ville }}
                     </p>
@@ -321,8 +320,62 @@
 
 
 <!-- FLAN -->
-{% macro afficher_flan(flan, current_user, form, current_page, delete_form, validate_form) %}
-    <div class="carte">
+{% macro afficher_flan(flan, current_user, form, current_page, delete_form, validate_form, layout='grid') %}
+    {% if layout == 'detail' %}
+        <!-- Nouveau layout pour la page de détail du flan - 2 colonnes -->
+        <div class="flan-detail">
+            <div class="detail-left-column">
+                <div class="carte-image-container">
+                    {{ afficher_image_ou_placeholder(flan) }}
+                    {{ afficher_badge_flan(flan) }}
+                </div>
+            </div>
+            <div class="detail-right-column">
+                <div class="carte-header">
+                    <h2 id="flan-{{ flan.id_flan }}-nom">{{ flan.nom | enlever_accents }}</h2>
+                </div>
+                <div id="flan-{{ flan.id_flan }}-display">
+                    <div class="flan-details">
+                        <div class="flan-attribute">
+                            <span class="attribute-label">Saveur</span>
+                            <span class="attribute-value">{{ flan.type_saveur.value | default("Inconnue") }}</span>
+                        </div>
+                        <div class="flan-attribute">
+                            <span class="attribute-label">Pâte</span>
+                            <span class="attribute-value">{{ flan.type_pate.value | default("Inconnue") }}</span>
+                        </div>
+                        <div class="flan-attribute">
+                            <span class="attribute-label">Texture</span>
+                            <span class="attribute-value">{{ flan.type_texture.value | default("Inconnue") }}</span>
+                        </div>
+                        <div class="flan-attribute">
+                            <span class="attribute-label">Prix</span>
+                            <span class="attribute-value">{{ "%.2f"|format(flan.prix) }} €</span>
+                        </div>
+                        <div class="flan-description">
+                            <span class="attribute-value" id="flan-{{ flan.id_flan }}-description">
+                                {{ flan.description | default("Un flan à découvrir absolument !") }}
+                            </span>
+                        </div>
+                        <!-- Affichage de la moyenne des évaluations -->
+                        {% set moyenne_flan = flan.get_moyenne_evaluations() %}
+                        {% if moyenne_flan is not none %}
+                            <div class="flan-moyenne">
+                                <span class="moyenne-label">Moyenne :</span>
+                                <span class="moyenne-value">{{ moyenne_flan }}/5</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    {{ afficher_boutons_actions(flan, current_user, 'id_flan',
+                        'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan', 'flan', current_page,
+                        delete_form, validate_form) }}
+                    {{ afficher_formulaire_edition_flan(flan, form) }}
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <!-- Layout existant pour la grille -->
+        <div class="carte">
         <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}" class="carte-link">
             <div class="carte-image-container">
                 {{ afficher_image_ou_placeholder(flan) }}
@@ -370,6 +423,7 @@
         {{ afficher_formulaire_edition_flan(flan, form) }}
     </div>
     </div>
+    {% endif %}
 
     <script>
         function editFlan(idFlan) {
@@ -590,7 +644,7 @@
     {% if objet_type == 'etablissement' %}
         {{ afficher_etablissement(objet, current_user, form_edit, current_page, delete_form, validate_form, photo_paths, layout) }}
     {% elif objet_type == 'flan' %}
-        {{ afficher_flan(objet, current_user, form_edit, current_page, delete_form, validate_form) }}
+        {{ afficher_flan(objet, current_user, form_edit, current_page, delete_form, validate_form, layout) }}
     {% elif objet_type == 'evaluation' %}
         {{ afficher_evaluation(objet, current_user, form_edit, current_page, delete_form, validate_form) }}
     {% endif %}
