@@ -24,11 +24,7 @@ Il est possible de mettre à jour le fichier `requirements.txt` :
 pip freeze > requirements.txt
 
 ```
-Pour le développement, installer les dépendances à partir de 
-```sh
-pip install -r requirements-dev.txt
-```
-Ca permet d'utiliser les outils de nettoyage de code (pylint, black)
+
 
 
 ## Gestion des commits
