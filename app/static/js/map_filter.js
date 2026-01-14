@@ -153,6 +153,8 @@ function createEtablissementMarker(map, etablissement, baseUrl = window.location
     return marker;
 }
 
+// Fonction pour mettre à jour les marqueurs en fonction des filtres actifs
+function updateMarkersBasedOnFilters() {
     markers.forEach(marker => {
         const etablissement = marker.options.etablissement;
         let showMarker = true;
@@ -366,8 +368,6 @@ return div;
     };
     legend.addTo(map);
 }
-
-        icon = createEmojiIcon('', 'unvisited-icon');//
 
 // Chargement des établissements
 function loadEtablissements() {
