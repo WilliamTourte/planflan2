@@ -34,7 +34,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-
     - name: Check Python syntax
       run: |
         find app/ -name "*.py" -exec python -m py_compile {} \;
@@ -66,7 +65,6 @@ jobs:
         import re
         with open('requirements.txt', 'r') as f:
             reqs = f.readlines()
-
         
         # Check for duplicate packages
         packages = [re.split('==|>=|<=|~=', line.strip())[0].lower() for line in reqs if line.strip() and not line.startswith('#')]
