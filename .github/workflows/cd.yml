@@ -62,8 +62,11 @@ jobs:
         # Pull latest images for services that use external images
         docker compose pull nginx certbot || true
         
-        # Build and start containers (--build ensures backend is rebuilt)
-        docker compose up -d --build
+        # Force a complete rebuild without cache to ensure all changes are included
+        docker compose build --no-cache planflan-backend
+        
+        # Start containers
+        docker compose up -d
         
         # Clean up old images
         docker image prune -f

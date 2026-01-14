@@ -11,6 +11,8 @@ services:
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
       - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
     healthcheck:
       test: ["CMD-SHELL", "mysql -u${MYSQL_USER} -p${MYSQL_PASSWORD} -e 'SELECT 1;' || exit 1"]
       timeout: 30s
@@ -70,6 +72,7 @@ services:
       - frontend-network
 
 volumes:
+  mysql_data:
   letsencrypt:
   certbot-www:
 
