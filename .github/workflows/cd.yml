@@ -1,0 +1,135 @@
+name: CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+    paths-ignore:
+      - '**.md'
+      - 'documentation/**'
+      - '.gitignore'
+      - '.pre-commit-config.yaml'
+
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    branches: ["main"]
+    types:
+      - completed
+
+env:
+  DOCKER_IMAGE_NAME: 'planflan.backend'
+  PRODUCTION_SERVER: '${{ secrets.PRODUCTION_SERVER }}'
+  PRODUCTION_USER: '${{ secrets.PRODUCTION_USER }}'
+  PRODUCTION_PORT: 22
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.5.4
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Add server to known hosts
+      run: |
+        mkdir -p ~/.ssh
+        ssh-keyscan -H ${{ env.PRODUCTION_SERVER }} >> ~/.ssh/known_hosts
+
+    - name: Pull latest changes on server
+      run: |
+        ssh -p ${{ env.PRODUCTION_PORT }} ${{ env.PRODUCTION_USER }}@${{ env.PRODUCTION_SERVER }} << 'EOF'
+        cd /path/to/planflan3
+        git fetch origin
+        git checkout main
+        git pull origin main
+        echo "Code pulled successfully"
+        EOF
+
+    - name: Build and restart Docker containers
+      run: |
+        ssh -p ${{ env.PRODUCTION_PORT }} ${{ env.PRODUCTION_USER }}@${{ env.PRODUCTION_SERVER }} << 'EOF'
+        cd /path/to/planflan3
+        
+        # Stop existing containers
+        docker-compose down || true
+        
+        # Pull latest images
+        docker-compose pull
+        
+        # Build and start containers
+        docker-compose up -d --build
+        
+        # Clean up old images
+        docker image prune -f
+        
+        echo "Docker containers updated successfully"
+        EOF
+
+    - name: Verify deployment
+      run: |
+        ssh -p ${{ env.PRODUCTION_PORT }} ${{ env.PRODUCTION_USER }}@${{ env.PRODUCTION_SERVER }} << 'EOF'
+        cd /path/to/planflan3
+        
+        # Check container status
+        docker ps -a
+        
+        # Check logs for errors
+        docker-compose logs --tail=50
+        
+        echo "Deployment verification completed"
+        EOF
+
+    - name: Run post-deployment tests
+      env:
+        RUN_DEPLOYMENT_TESTS: "true"
+      run: |
+        python -m pytest tests/test_deployment.py -v --tb=short
+
+    - name: Notify deployment status
+      if: always()
+      run: |
+        echo "Deployment status: ${{ job.status }}"
+        # Here you could add Slack/Email notification
+        # curl -X POST -H 'Content-type: application/json' --data '{"text":"Deployment ${{ job.status }}: ${{ github.repository }}"}' ${{ secrets.SLACK_WEBHOOK }}
+
+  rollback:
+    name: Rollback on Failure
+    runs-on: ubuntu-latest
+    if: failure() && github.ref == 'refs/heads/main'
+    needs: deploy
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.5.4
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Rollback to previous version
+      run: |
+        ssh -p ${{ env.PRODUCTION_PORT }} ${{ env.PRODUCTION_USER }}@${{ env.PRODUCTION_SERVER }} << 'EOF'
+        cd /path/to/planflan3
+        
+        # Get previous commit
+        PREV_COMMIT=$(git log --oneline -2 | tail -1 | awk '{print $1}')
+        
+        # Rollback
+        git checkout $PREV_COMMIT
+        docker-compose down
+        docker-compose up -d --build
+        
+        echo "Rolled back to commit: $PREV_COMMIT"
+        EOF
+
+    - name: Notify rollback
+      run: |
+        echo "Rollback completed"
+        # curl -X POST -H 'Content-type: application/json' --data '{"text":"ROLLBACK: ${{ github.repository }} rolled back to previous version"}' ${{ secrets.SLACK_WEBHOOK }}
