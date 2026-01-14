@@ -25,8 +25,8 @@
       return;
     }
     autocomplete = new google.maps.places.Autocomplete(input, {
-      types: ["bakery", "cafe", "restaurant", "dessert", "bar"],
-      componentRestrictions: { country: "fr" },
+    types: ["bakery", "cafe", "restaurant", "bar", "ice_cream_shop", "food", "store"],
+    componentRestrictions: { country: "fr" },
     });
 
     autocomplete.addListener("place_changed", function () {
