@@ -1,9 +1,9 @@
-# .pre-commit-config.yaml pour PlanFlan
+
 # Ce fichier définit les hooks Git à exécuter avant chaque commit
 
 repos:
   - repo: https://github.com/psf/black
-    rev: 23.12.1
+    rev: 25.12.0
     hooks:
       - id: black
         name: Formatage avec Black
@@ -23,13 +23,6 @@ repos:
 
   - repo: local
     hooks:
-      - id: ci-cd-warning
-        name: Avertissement CI/CD
-        entry: echo "⚠️  ATTENTION: Pylint est désactivé dans pre-commit mais sera exécuté en CI/CD !"
-        language: system
-        pass_filenames: false
-        always_run: true
-
       - id: pytest-smoke
         name: Exécution des tests smoke
         entry: python -m pytest tests/ -m "smoke" -v --tb=short
