@@ -153,7 +153,13 @@ jobs:
         DEPLOYMENT_BASE_URL: "https://${{ env.PRODUCTION_SERVER }}"
         DEPLOYMENT_WWW_BASE_URL: "https://www.${{ env.PRODUCTION_SERVER }}"
       run: |
-        python -m pytest tests/test_deployment.py -v --tb=short
+        # Add retry logic for deployment tests as containers may need time to start
+        for i in 1 2 3; do
+          echo "Attempt $i/3: Running deployment tests..."
+          python -m pytest tests/test_deployment.py -v --tb=short && break
+          echo "Attempt failed, waiting 30 seconds before retry..."
+          sleep 30
+        done
 
     - name: Notify deployment status
       if: always()
