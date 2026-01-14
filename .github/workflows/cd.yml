@@ -85,6 +85,17 @@ jobs:
         echo "Deployment verification completed"
         EOF
 
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest
+
     - name: Run post-deployment tests
       env:
         RUN_DEPLOYMENT_TESTS: "true"
