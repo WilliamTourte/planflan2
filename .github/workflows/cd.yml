@@ -56,6 +56,12 @@ jobs:
         ssh -p ${{ env.PRODUCTION_PORT }} ${{ env.PRODUCTION_USER }}@${{ env.PRODUCTION_SERVER }} << 'EOF'
         cd /home/enkyl/planflan2
         
+        # Sauvegarder la base de données avant l'arrêt des containers
+        echo "Sauvegarde de la base de données..."
+        cd docker-db
+        ./backup_db.sh
+        cd ..
+        
         # Stop existing containers
         docker compose down || true
         
@@ -67,6 +73,20 @@ jobs:
         
         # Start containers
         docker compose up -d
+        
+        # Attendre que la base de données soit prête
+        echo "Attente que la base de données soit prête..."
+        sleep 10
+        
+        # Restaurer la base de données après le démarrage des containers
+        echo "Restauration de la base de données..."
+        LATEST_BACKUP=$(ls -t docker-db/db/backups/*.sql | head -n 1)
+        if [ -n "$LATEST_BACKUP" ]; then
+          cat "$LATEST_BACKUP" | docker exec -i planflan-container-db mysql -u planflan -psupersecuredpassword planflan_db
+          echo "Restauration réussie depuis : $LATEST_BACKUP"
+        else
+          echo "Aucun fichier de sauvegarde trouvé"
+        fi
         
         # Clean up old images
         docker image prune -f
