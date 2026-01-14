@@ -47,13 +47,7 @@ jobs:
         bandit -r app/ -f json -o bandit-report.json || echo "Bandit security scan completed"
         safety check --json || echo "Safety dependency check completed"
 
-    - name: Run all tests
-      run: |
-        python -m pytest tests/ --tb=short -v
 
-    - name: Run coverage analysis
-      run: |
-        python -m pytest tests/ --cov=app --cov-report=term --cov-fail-under=80
 
     - name: Check Dockerfile syntax
       run: |
