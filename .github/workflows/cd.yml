@@ -99,6 +99,8 @@ jobs:
     - name: Run post-deployment tests
       env:
         RUN_DEPLOYMENT_TESTS: "true"
+        DEPLOYMENT_BASE_URL: "https://${{ env.PRODUCTION_SERVER }}"
+        DEPLOYMENT_WWW_BASE_URL: "https://www.${{ env.PRODUCTION_SERVER }}"
       run: |
         python -m pytest tests/test_deployment.py -v --tb=short
 

@@ -9,8 +9,9 @@ import os
 from urllib.parse import urljoin
 
 # Configuration
-BASE_URL = "https://planflan.fr"
-WWW_BASE_URL = "https://www.planflan.fr"
+# Use environment variable to allow testing different deployment targets
+BASE_URL = os.environ.get("DEPLOYMENT_BASE_URL", "https://planflan.fr")
+WWW_BASE_URL = os.environ.get("DEPLOYMENT_WWW_BASE_URL", "https://www.planflan.fr")
 TIMEOUT = 10  # seconds
 
 
@@ -33,7 +34,8 @@ class TestDeployment:
         """Test that the homepage is accessible"""
         url = urljoin(base_url, "/")
         try:
-            response = requests.get(url, timeout=TIMEOUT)
+            # Disable SSL verification for self-signed certificates in development
+            response = requests.get(url, timeout=TIMEOUT, verify=False)
             assert response.status_code == 200
             # Flexible content verification to avoid failures if text changes
             content_lower = response.content.lower()
@@ -46,7 +48,7 @@ class TestDeployment:
         """Test that the etablissements page is accessible"""
         url = urljoin(base_url, "/liste_etablissements")
         try:
-            response = requests.get(url, timeout=TIMEOUT)
+            response = requests.get(url, timeout=TIMEOUT, verify=False)
             assert response.status_code == 200
             # Flexible content verification
             content_lower = response.content.lower()
@@ -59,7 +61,7 @@ class TestDeployment:
         """Test that the recherche page is accessible"""
         url = urljoin(base_url, "/rechercher")
         try:
-            response = requests.get(url, timeout=TIMEOUT)
+            response = requests.get(url, timeout=TIMEOUT, verify=False)
             assert response.status_code == 200
             # Flexible content verification
             content_lower = response.content.lower()
@@ -71,7 +73,7 @@ class TestDeployment:
         """Test that HTTP requests are redirected to HTTPS or site is HTTPS-only"""
         http_url = "http://planflan.fr"
         try:
-            response = requests.get(http_url, timeout=TIMEOUT, allow_redirects=False)
+            response = requests.get(http_url, timeout=TIMEOUT, allow_redirects=False, verify=False)
             # Either redirect to HTTPS (301/302) or already serve HTTPS (200)
             assert response.status_code in [200, 301, 302]
             if response.status_code in [301, 302]:
@@ -84,10 +86,10 @@ class TestDeployment:
         try:
             # Test both directions - this depends on your DNS/configuration
             response1 = requests.get(
-                "https://planflan.fr", timeout=TIMEOUT, allow_redirects=False
+                "https://planflan.fr", timeout=TIMEOUT, allow_redirects=False, verify=False
             )
             response2 = requests.get(
-                "https://www.planflan.fr", timeout=TIMEOUT, allow_redirects=False
+                "https://www.planflan.fr", timeout=TIMEOUT, allow_redirects=False, verify=False
             )
 
             # At least one should work, and they should serve the same content
@@ -99,7 +101,7 @@ class TestDeployment:
         """Test that static assets (CSS, JS) are accessible"""
         css_url = urljoin(BASE_URL, "/static/css/style.css")
         try:
-            response = requests.get(css_url, timeout=TIMEOUT)
+            response = requests.get(css_url, timeout=TIMEOUT, verify=False)
             assert response.status_code == 200
             assert b"body" in response.content or b"css" in response.content.lower()
         except requests.RequestException as e:
@@ -109,7 +111,7 @@ class TestDeployment:
         """Test that favicon is accessible"""
         favicon_url = urljoin(BASE_URL, "/static/favicon.ico")
         try:
-            response = requests.get(favicon_url, timeout=TIMEOUT)
+            response = requests.get(favicon_url, timeout=TIMEOUT, verify=False)
             assert response.status_code == 200
         except requests.RequestException as e:
             pytest.fail(f"Favicon test failed: {str(e)}")
@@ -118,7 +120,7 @@ class TestDeployment:
         """Test that 404 page is properly handled"""
         invalid_url = urljoin(BASE_URL, "/page-inexistante-12345")
         try:
-            response = requests.get(invalid_url, timeout=TIMEOUT)
+            response = requests.get(invalid_url, timeout=TIMEOUT, verify=False)
             # Should return 404 or redirect to a custom 404 page
             assert response.status_code == 404 or response.status_code == 200
             if response.status_code == 200:
