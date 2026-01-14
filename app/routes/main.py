@@ -129,18 +129,23 @@ def liste_etablissements():
         or request.args.get("geolocalisation") == "true"
     )
 
-    form_ajout = EtabForm(prefix="ajout-etab")
-    form_edit = EtabForm(prefix="edit-etab")
+    try:
+        form_ajout = EtabForm(prefix="ajout-etab")
+        form_edit = EtabForm(prefix="edit-etab")
 
-    if request.method == "POST":
-
-        form_recherche = RechercheForm(request.form)
-
-    else:
-        print("DEBUG: Création du formulaire avec données GET")
-        form_recherche = RechercheForm(request.args)
-        print("DEBUG: Latitude reçue:", request.args.get("latitude"))
-        print("DEBUG: Longitude reçue:", request.args.get("longitude"))
+        if request.method == "POST":
+            form_recherche = RechercheForm(request.form)
+        else:
+            print("DEBUG: Création du formulaire avec données GET")
+            form_recherche = RechercheForm(request.args)
+            print("DEBUG: Latitude reçue:", request.args.get("latitude"))
+            print("DEBUG: Longitude reçue:", request.args.get("longitude"))
+    except Exception as e:
+        # En cas d'erreur avec les formulaires, créer des formulaires vides
+        print(f"ERREUR FORMULAIRE: {str(e)}")
+        form_ajout = EtabForm(prefix="ajout-etab")
+        form_edit = EtabForm(prefix="edit-etab")
+        form_recherche = RechercheForm()
 
     # 1. Recherche simple (GET uniquement) - MODIFIÉ pour ignorer en mode géolocalisation
     recherche_simple = request.args.get("recherche_simple", None)
@@ -372,7 +377,11 @@ def get_infowindow_content():
 ### PAGE RECHERCHE
 @main_bp.route("/rechercher", methods=["GET"])
 def rechercher():
-    form_recherche = RechercheForm()
+    try:
+        form_recherche = RechercheForm()
+    except Exception as e:
+        print(f"ERREUR FORMULAIRE RECHERCHE: {str(e)}")
+        form_recherche = RechercheForm()
     return render_template("rechercher.html", form_recherche=form_recherche)
 
 
