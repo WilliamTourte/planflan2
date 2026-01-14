@@ -176,7 +176,7 @@ stages:
 test_job:
   stage: test
   script:
-    - pip install -r requirements-dev.txt
+    - pip install -r requirements.txt
     - make test-ci
   artifacts:
     paths:
@@ -240,7 +240,7 @@ jobs:
       - checkout
       - run:
           name: Install dependencies
-          command: pip install -r requirements-dev.txt
+          command: pip install -r requirements.txt
       - run:
           name: Run tests with coverage
           command: make test-ci

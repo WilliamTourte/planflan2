@@ -8,6 +8,7 @@ coverage
 pylint
 black
 pre-commit
+mistral-vibe
 
 # flake8==7.0.0
 
