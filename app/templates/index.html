@@ -133,11 +133,9 @@
   </a>
 </div>
 
-<div></div>
-{% endblock %} {% block scripts %}
+{% endblock %}
+{% block scripts %}
 <script>
-  // Debug: Check if this script is loaded
-  console.log("Autocomplete script block loaded");
 
   // More robust approach: try immediately and fallback to DOMContentLoaded
   function initAutocomplete() {

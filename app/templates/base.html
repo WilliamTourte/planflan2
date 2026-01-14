@@ -67,7 +67,7 @@
 </main>
 <footer>
     <p class="text-center"> Ceci est une version de test - les données sont fictives</p>
-    <p class="text-center">&copy; 2025-2026 PlanFlan. Tous droits réservés.</p>
+    <p class="text-center">&copy; 2025-2026 PlanFlan - Tous droits réservés</p>
 </footer>
 
 <!-- Bootstrap JS -->
@@ -106,9 +106,8 @@ if (searchInput.value.trim() === '') {
     event.preventDefault(); // Empêche la soumission du formulaire
     window.location.href = "{{ url_for('main.rechercher') }}";
 }
-// Sinon, laisse le formulaire faire une recherche simple
-});
 
+});
 
 </script>
 </body>
