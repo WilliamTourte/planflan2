@@ -2,7 +2,9 @@
 # Attendre que MySQL soit joignable
 echo "Connection avec root"
 echo "Password ${MYSQL_ROOT_PASSWORD}"
-until mysql --skip_ssl=true -h planflan-container-db -uroot -p${MYSQL_ROOT_PASSWORD} -e "SELECT 1;" 2>/dev/null; do
+# Utiliser MYSQL_HOST si défini, sinon utiliser planflan-container-db
+MYSQL_HOST=${MYSQL_HOST:-planflan-container-db}
+until mysql --skip_ssl=true -h ${MYSQL_HOST} -uroot -p${MYSQL_ROOT_PASSWORD} -e "SELECT 1;" 2>/dev/null; do
   echo "En attente de MySQL..."
   sleep 2
 done
