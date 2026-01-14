@@ -57,13 +57,13 @@ jobs:
         cd /home/enkyl/planflan2
         
         # Stop existing containers
-        docker-compose down || true
+        docker compose down || true
         
-        # Pull latest images
-        docker-compose pull
+        # Pull latest images for services that use external images
+        docker compose pull nginx certbot || true
         
-        # Build and start containers
-        docker-compose up -d --build
+        # Build and start containers (--build ensures backend is rebuilt)
+        docker compose up -d --build
         
         # Clean up old images
         docker image prune -f
@@ -77,10 +77,23 @@ jobs:
         cd /home/enkyl/planflan2
         
         # Check container status
+        echo "=== Container Status ==="
         docker ps -a
         
-        # Check logs for errors
-        docker-compose logs --tail=50
+        # Check specific container logs
+        echo "=== Backend Logs ==="
+        docker compose logs --tail=100 planflan-backend
+        
+        echo "=== Nginx Logs ==="
+        docker compose logs --tail=50 nginx
+        
+        # Test backend connectivity
+        echo "=== Testing Backend Connectivity ==="
+        docker compose exec planflan-backend curl -I http://localhost:5000 || echo "Backend not responding"
+        
+        # Test Nginx connectivity
+        echo "=== Testing Nginx Connectivity ==="
+        curl -I http://localhost || echo "Nginx not responding"
         
         echo "Deployment verification completed"
         EOF
@@ -136,8 +149,8 @@ jobs:
         
         # Rollback
         git checkout $PREV_COMMIT
-        docker-compose down
-        docker-compose up -d --build
+        docker compose down
+        docker compose up -d --build
         
         echo "Rolled back to commit: $PREV_COMMIT"
         EOF
