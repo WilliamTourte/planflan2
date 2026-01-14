@@ -44,7 +44,7 @@ jobs:
     - name: Pull latest changes on server
       run: |
         ssh -p ${{ env.PRODUCTION_PORT }} ${{ env.PRODUCTION_USER }}@${{ env.PRODUCTION_SERVER }} << 'EOF'
-        cd /path/to/planflan3
+        cd /home/enkyl/planflan2
         git fetch origin
         git checkout main
         git pull origin main
@@ -54,7 +54,7 @@ jobs:
     - name: Build and restart Docker containers
       run: |
         ssh -p ${{ env.PRODUCTION_PORT }} ${{ env.PRODUCTION_USER }}@${{ env.PRODUCTION_SERVER }} << 'EOF'
-        cd /path/to/planflan3
+        cd /home/enkyl/planflan2
         
         # Stop existing containers
         docker-compose down || true
@@ -74,7 +74,7 @@ jobs:
     - name: Verify deployment
       run: |
         ssh -p ${{ env.PRODUCTION_PORT }} ${{ env.PRODUCTION_USER }}@${{ env.PRODUCTION_SERVER }} << 'EOF'
-        cd /path/to/planflan3
+        cd /home/enkyl/planflan2
         
         # Check container status
         docker ps -a
@@ -129,7 +129,7 @@ jobs:
     - name: Rollback to previous version
       run: |
         ssh -p ${{ env.PRODUCTION_PORT }} ${{ env.PRODUCTION_USER }}@${{ env.PRODUCTION_SERVER }} << 'EOF'
-        cd /path/to/planflan3
+        cd /home/enkyl/planflan2
         
         # Get previous commit
         PREV_COMMIT=$(git log --oneline -2 | tail -1 | awk '{print $1}')
