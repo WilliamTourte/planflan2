@@ -92,73 +92,67 @@ function createEtablissementMarker(map, etablissement, baseUrl = window.location
 
     // Ne pas charger le popup immédiatement, mais seulement au clic
     marker.on('click', function() {
-    if (!marker.getPopup()) {
-        // Créer le popup avec les paramètres corrects
-        const popup = L.popup({
-            autoPan: true,
-            autoPanPadding: [50, 50], // Marge pour éviter que le popup soit collé aux bords
-            keepInView: true,
-            closeButton: false,
-            
-            
-        });
-
-        // Créer le conteneur
-        const popupContainer = L.DomUtil.create('div', 'custom-popup-container');
-        
-
-        // Définir le contenu du popup
-        popup.setContent(popupContainer);
-
-        // Attacher le popup au marqueur
-        marker.bindPopup(popup).openPopup();
-
-        // Centrer la carte sur le marqueur avec un léger délai
-        setTimeout(() => {
-            map.panTo(marker.getLatLng());
-        }, 100);
-       
-
-        fetch(`/get_infowindow_content?id_etab=${etablissement.id_etab}`)
-            .then(response => response.text())
-            .then(content => {
-                popupContainer.innerHTML = content;
-                marker._popup.update();
-                // Forcer le recalcul de position après chargement du contenu
-                setTimeout(() => {
-                    if (marker._popup) {
-                        marker._popup.update();
-                        map.panTo(marker.getLatLng());
-                    }
-                }, 50);
-            })
-            .catch(error => {
-                console.error('Erreur lors du chargement du popup:', error);
-                let popupContent = `<div class="infowindow-content"><h4>${etablissement.nom}</h4>`;
-                popupContent += `<p>${etablissement.adresse}, ${etablissement.ville}</p>`;
-                popupContent += `<a href="${baseUrl}/etablissement/${etablissement.id_etab}" class="btn btn-success">Voir plus</a></div>`;
-                popupContainer.innerHTML = popupContent;
-                marker._popup.update();
-                // Forcer le recalcul de position même en cas d'erreur
-                setTimeout(() => {
-                    if (marker._popup) {
-                        marker._popup.update();
-                        map.panTo(marker.getLatLng());
-                    }
-                }, 50);
-            });
-    } else {
-        marker.openPopup();
+    // Vérifier si le popup existe et est ouvert
+    if (marker.getPopup() && marker._popup.isOpen()) {
+        // Le popup est déjà ouvert, ne rien faire
+        return;
     }
+
+    // Si le popup existe mais est fermé, le supprimer
+    if (marker.getPopup()) {
+        marker.unbindPopup();
+    }
+
+    // Créer un nouveau popup
+    const popup = L.popup({
+        autoPan: true,
+        autoPanPadding: [50, 50], // Marge pour éviter que le popup soit collé aux bords
+        keepInView: true,
+        closeButton: false,
+    });
+
+    const popupContainer = L.DomUtil.create('div', 'custom-popup-container');
+    popup.setContent(popupContainer);
+    marker.bindPopup(popup).openPopup();
+
+    setTimeout(() => {
+        map.panTo(marker.getLatLng());
+    }, 100);
+
+    fetch(`/get_infowindow_content?id_etab=${etablissement.id_etab}`)
+        .then(response => response.text())
+        .then(content => {
+            popupContainer.innerHTML = content;
+            marker._popup.update();
+            // Forcer le recalcul de position après chargement du contenu
+            setTimeout(() => {
+                if (marker._popup) {
+                    marker._popup.update();
+                    map.panTo(marker.getLatLng());
+                }
+            }, 50);
+        })
+        .catch(error => {
+            console.error('Erreur lors du chargement du popup:', error);
+            let popupContent = `<div class="infowindow-content"><h4>${etablissement.nom}</h4>`;
+            popupContent += `<p>${etablissement.adresse}, ${etablissement.ville}</p>`;
+            popupContent += `<a href="${baseUrl}/etablissement/${etablissement.id_etab}" class="btn btn-success">Voir plus</a></div>`;
+            popupContainer.innerHTML = popupContent;
+            marker._popup.update();
+            // Forcer le recalcul de position même en cas d'erreur
+            setTimeout(() => {
+                if (marker._popup) {
+                    marker._popup.update();
+                    map.panTo(marker.getLatLng());
+                }
+            }, 50);
+        });
 });
 
     marker.options.etablissement = etablissement;
     return marker;
 }
 
-
-// Fonction pour mettre à jour l'affichage des marqueurs en fonction des filtres
-function updateMarkersBasedOnFilters() {
     markers.forEach(marker => {
         const etablissement = marker.options.etablissement;
         let showMarker = true;
