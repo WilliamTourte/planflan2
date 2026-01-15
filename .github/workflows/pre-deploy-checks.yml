@@ -2,11 +2,11 @@ name: Pre-Deploy Checks
 
 on:
   pull_request:
-    branches: [ "main", "dev" ]
+    branches: [ "main" ]
     types: [opened, synchronize, reopened, ready_for_review]
 
   push:
-    branches: [ "dev" ]
+    branches: [ "main" ]
 
 concurrency:
   group: pre-deploy-checks-${{ github.ref }}
