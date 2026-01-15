@@ -1496,3 +1496,68 @@ input[type="submit"]:active {
         margin-bottom: 1rem !important;
     }
 }
+
+
+  .autocomplete {
+    position: relative;
+    width: 100%;
+  }
+
+  .autocomplete-input {
+    width: 100%;
+    padding: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: var(--border-radius-btn);
+    border: 1px solid #ddd;
+  }
+
+  .autocomplete-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-top: none;
+    border-radius: 0 0 var(--border-radius-btn) var(--border-radius-btn);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+  }
+
+  .autocomplete-results.show {
+    display: block;
+  }
+
+  .autocomplete-item {
+    padding: 0.5rem;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+  }
+
+  .autocomplete-item:hover {
+    background-color: #f0f0f0;
+  }
+
+  .autocomplete-item:last-child {
+    border-bottom: none;
+  }
+
+  .autocomplete-loading {
+    padding: 0.5rem;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+  }
+
+  .autocomplete-no-results {
+    padding: 0.5rem;
+    text-align: center;
+    color: #999;
+    font-style: italic;
+  }
+
+  .autocomplete-item.active {
+    background-color: #e3f2fd;
+  }
