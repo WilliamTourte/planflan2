@@ -1,6 +1,215 @@
+
+
+@media (max-width: 768px) {
+
+
+    /* Adapter les filtres pour mobile */
+    #filter-controls {
+        top: 5px !important;
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+    }
+
+    #filter-controls .main-filters {
+        gap: 4px !important;
+    }
+
+    #filter-controls .btn {
+        font-size: 12px !important;
+        padding: 4px 8px !important;
+        min-width: auto !important;
+    }
+
+    /* Bouton proposer adresse en plein largeur sur mobile */
+    .btn-success.w-100 {
+        max-width: 100% !important;
+    }
+}
+
+@media (max-width: 480px) {
+
+
+    /* Adapter les filtres pour très petits écrans */
+    #filter-controls .btn {
+        font-size: 11px !important;
+        padding: 3px 6px !important;
+    }
+
+    /* Bouton proposer adresse avec marge réduite */
+    .row.mt-3.mb-3 {
+        margin-top: 1rem !important;
+        margin-bottom: 1rem !important;
+    }
+}
+
+/* Style pour que le contenu principal + bouton tienne dans l'écran */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main.container {
+    flex: 1;
+}
+=======
 /* =============================================
-   1. VARIABLES GLOBALES & RESET
+   19. RESPONSIVE SPECIFIQUE POUR LISTE_ETABLISSEMENTS
    ============================================= */
+@media (max-width: 768px) {
+    /* Adapter les filtres pour mobile */
+    #filter-controls {
+        top: 5px !important;
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+    }
+
+    #filter-controls .main-filters {
+        gap: 4px !important;
+    }
+
+    #filter-controls .btn {
+        font-size: 12px !important;
+        padding: 4px 8px !important;
+        min-width: auto !important;
+    }
+
+    /* Bouton proposer adresse en plein largeur sur mobile */
+    .btn-success.w-100 {
+        max-width: 100% !important;
+    }
+
+    /* Conteneur principal pour mobile */
+    .container-fluid.p-0.d-flex.flex-column {
+        height: calc(100vh - 140px) !important;
+    }
+
+    /* Bouton avec hauteur minimale sur mobile */
+    .d-flex.align-items-center.justify-content-center {
+        min-height: 50px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Adapter les filtres pour très petits écrans */
+    #filter-controls .btn {
+        font-size: 11px !important;
+        padding: 3px 6px !important;
+    }
+
+    /* Bouton proposer adresse avec marge réduite */
+    .row.mt-3.mb-3 {
+        margin-top: 1rem !important;
+        margin-bottom: 1rem !important;
+    }
+}
+
+/* Style pour que le contenu principal + bouton tienne dans l'écran */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main.container {
+    flex: 1;
+}
+
+    /* Adapter les filtres pour mobile */
+    #filter-controls {
+        top: 5px !important;
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+    }
+
+    #filter-controls .main-filters {
+        gap: 4px !important;
+    }
+
+    #filter-controls .btn {
+        font-size: 12px !important;
+        padding: 4px 8px !important;
+        min-width: auto !important;
+    }
+
+    /* Bouton proposer adresse en plein largeur sur mobile */
+    .btn-success.w-100 {
+        max-width: 100% !important;
+    }
+}
+
+@media (max-width: 480px) {
+
+
+    /* Adapter les filtres pour très petits écrans */
+    #filter-controls .btn {
+        font-size: 11px !important;
+        padding: 3px 6px !important;
+    }
+
+    /* Bouton proposer adresse avec marge réduite */
+    .row.mt-3.mb-3 {
+        margin-top: 1rem !important;
+        margin-bottom: 1rem !important;
+    }
+}
+
+/* =============================================
+   19. RESPONSIVE SPECIFIQUE POUR LISTE_ETABLISSEMENTS
+   ============================================= */
+@media (max-width: 768px) {
+
+    /* Adapter les filtres pour mobile */
+    #filter-controls {
+        top: 5px !important;
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+    }
+
+    #filter-controls .main-filters {
+        gap: 4px !important;
+    }
+
+    #filter-controls .btn {
+        font-size: 12px !important;
+        padding: 4px 8px !important;
+        min-width: auto !important;
+    }
+
+    /* Bouton proposer adresse en plein largeur sur mobile */
+    .btn-success.w-100 {
+        max-width: 100% !important;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Réduire encore la hauteur de la carte sur très petits écrans */
+
+
+    /* Adapter les filtres pour très petits écrans */
+    #filter-controls .btn {
+        font-size: 11px !important;
+        padding: 3px 6px !important;
+    }
+
+    /* Bouton proposer adresse avec marge réduite */
+    .row.mt-3.mb-3 {
+        margin-top: 1rem !important;
+        margin-bottom: 1rem !important;
+    }
+}
+
+/* Style pour que le contenu principal + bouton tienne dans l'écran */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main.container {
+    flex: 1;
+}
+
 :root {
     /* Polices */
     --font-primary: 'Verdana', sans-serif;
@@ -848,7 +1057,7 @@ input[type="submit"]:active {
     padding: var(--padding-sm);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
-    font-family: var(--font-primary);
+    font-family: var(--font-primary), sans-serif;
     max-width: 300px;
 
 }
@@ -1100,9 +1309,8 @@ input[type="submit"]:active {
         padding: var(--padding-md);
     }
 
-   ATTRIBUTION GOOGLE PHOTOS
-   ============================================= */
-=======
+
+
     .form-group {
         margin-bottom: var(--margin-md);
     }
@@ -1164,9 +1372,7 @@ input[type="submit"]:active {
     margin-bottom: var(--margin-md);
 }
 
-   ATTRIBUTION GOOGLE PHOTOS
-   ============================================= */
-=======
+
 .detail-right-column .description {
     margin-bottom: var(--margin-lg);
 }
@@ -1226,11 +1432,7 @@ input[type="submit"]:active {
 
 /* =============================================
    ATTRIBUTION GOOGLE PHOTOS
-   ============================================= */=============================================
-   ATTRIBUTION GOOGLE PHOTOS
-   ============================================= */=============================================
-   ATTRIBUTION GOOGLE PHOTOS
-   ============================================= */
+   =============================================
 /* Conteneur pour les photos Google avec attribution */
 .google-photo-container {
     position: relative;
@@ -1247,4 +1449,50 @@ input[type="submit"]:active {
     font-size: var(--font-size-xs);
     border-radius: 3px;
     font-family: var(--font-primary);
+}
+
+/* =============================================
+   19. RESPONSIVE SPECIFIQUE POUR LISTE_ETABLISSEMENTS
+   ============================================= */
+@media (max-width: 768px) {
+
+
+
+    /* Adapter les filtres pour mobile */
+    #filter-controls {
+        top: 5px !important;
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+    }
+
+    #filter-controls .main-filters {
+        gap: 4px !important;
+    }
+
+    #filter-controls .btn {
+        font-size: 12px !important;
+        padding: 4px 8px !important;
+        min-width: auto !important;
+    }
+
+    /* Bouton proposer adresse en plein largeur sur mobile */
+    .btn-success.w-100 {
+        max-width: 100% !important;
+    }
+}
+
+@media (max-width: 480px) {
+
+
+    /* Adapter les filtres pour très petits écrans */
+    #filter-controls .btn {
+        font-size: 11px !important;
+        padding: 3px 6px !important;
+    }
+
+    /* Bouton proposer adresse avec marge réduite */
+    .row.mt-3.mb-3 {
+        margin-top: 1rem !important;
+        margin-bottom: 1rem !important;
+    }
 }
