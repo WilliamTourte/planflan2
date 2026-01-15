@@ -22,44 +22,39 @@
     PLANFLAN
   </h1>
 
-  <form
-    action="{{ url_for('main.liste_etablissements') }}"
-    method="POST"
-    class="form-container"
-  >
-    {{ form_recherche.hidden_tag() }} {{ form_recherche.ville(class="d-none") }}
-    {# Champ caché pour le formulaire #} {{
-    form_recherche.latitude(class="d-none") }} {# Champ caché pour la latitude
-    #} {{ form_recherche.longitude(class="d-none") }} {# Champ caché pour la
-    longitude #}
-    <div class="form-group autocomplete">
+<form
+  action="{{ url_for('main.liste_etablissements') }}"
+  method="POST"
+  class="form-container"
+>
+  {{ form_recherche.hidden_tag() }} {{ form_recherche.ville(class="d-none") }}
+  {# Champ caché pour le formulaire #} {{
+  form_recherche.latitude(class="d-none") }} {# Champ caché pour la latitude
+  #} {{ form_recherche.longitude(class="d-none") }} {# Champ caché pour la
+  longitude #}
+  <div class="d-flex gap-2">
+    <div class="form-group autocomplete flex-grow-1">
       <input
         type="text"
         id="ville-autocomplete"
         class="autocomplete-input py-2"
         placeholder="Ville"
         autocomplete="off"
+        style="height: 38px;"
       />
       <div id="autocomplete-results" class="autocomplete-results"></div>
     </div>
-    <div class="d-flex gap-2 mt-2">
-      <button
-        type="submit"
-        class="btn btn-success flex-grow-1"
-        title="Rechercher"
-      >
-        Rechercher
-      </button>
-      <button
-        type="button"
-        id="geoloc-button"
-        class="btn btn-success"
-        title="Géolocalisation"
-      >
-        <i class="bi bi-geo-alt"></i>
-      </button>
-    </div>
-  </form>
+    <button
+      type="button"
+      id="geoloc-button"
+      class="btn btn-success"
+      title="Géolocalisation"
+      style="height: 38px;"
+    >
+      <i class="bi bi-geo-alt"></i>
+    </button>
+  </div>
+</form>
 
   <a
     href="{{ url_for('maps.proposer_etablissement') }}"
