@@ -197,9 +197,7 @@
                             {{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}
                         </p>
                     {% endif %}
-                    <p class="description" id="etablissement-{{ etablissement.id_etab }}-description">
-                        Description : {{ etablissement.description }}
-                    </p>
+
                     {{ afficher_boutons_actions(etablissement, current_user, 'id_etab',
                     'maps.modifier_etablissement', 'maps.supprimer_etablissement', 'maps.valider_etablissement', 'etablissement', current_page,
                             delete_form, validate_form) }}
@@ -228,8 +226,6 @@
                             {{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}
                         </p>
                     {% endif %}
-                    <p class="description" id="etablissement-{{ etablissement.id_etab }}-description">Description
-                        : {{ etablissement.description }}</p>
                     {{ afficher_boutons_actions(etablissement, current_user, 'id_etab',
                     'maps.modifier_etablissement', 'maps.supprimer_etablissement', 'maps.valider_etablissement', 'etablissement', current_page,
                             delete_form, validate_form) }}
