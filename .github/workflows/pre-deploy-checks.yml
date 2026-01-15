@@ -3,10 +3,21 @@ name: Pre-Deploy Checks
 on:
   pull_request:
     branches: [ "main" ]
-    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - 'Dockerfile'
+      - 'docker-compose.yml'
+      - 'entrypoint.sh'
+      - 'app/**'
+      - 'tests/**'
 
   push:
     branches: [ "main" ]
+    paths:
+      - 'Dockerfile'
+      - 'docker-compose.yml'
+      - 'entrypoint.sh'
+      - 'app/**'
+      - 'tests/**'
 
 concurrency:
   group: pre-deploy-checks-${{ github.ref }}
