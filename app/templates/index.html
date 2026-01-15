@@ -75,9 +75,9 @@
 {% block scripts %}
 <script>
 
-  // More robust approach: try immediately and fallback to DOMContentLoaded
+  
   function initAutocomplete() {
-    console.log("Trying to initialize autocomplete...");
+    
 
     const input = document.getElementById("ville-autocomplete");
     const resultsContainer = document.getElementById("autocomplete-results");
@@ -131,10 +131,9 @@
       if (villes.length === 0) {
         const noResults = document.createElement("div");
         noResults.className = "autocomplete-no-results";
-        noResults.textContent = "Aucune ville trouvée";
+        noResults.textContent = "Aucun flan pour cette ville. \nProposer une adresse ?";
         resultsContainer.appendChild(noResults);
         resultsContainer.classList.add("show");
-        console.log("No results found, showing no results message");
         return;
       }
 
@@ -145,8 +144,26 @@
         div.textContent = ville;
         div.addEventListener("click", function () {
           input.value = ville;
-          syncWithHiddenField();
+          const hiddenField = document.querySelector('input[name="ville"]');
+          if (hiddenField) {
+            hiddenField.value = ville;
+            console.log("Champ caché ville mis à jour avec :", hiddenField.value);
+          } else {
+            console.error("Champ caché ville non trouvé !");
+          }
           resultsContainer.classList.remove("show");
+          
+          // Soumettre le formulaire après avoir mis à jour le champ caché
+          setTimeout(() => {
+            const form = document.querySelector('form');
+            if (form) {
+              console.log("Soumission du formulaire avec ville :", hiddenField.value);
+              console.log("Méthode du formulaire :", form.method);
+              form.submit();
+            } else {
+              console.error("Formulaire non trouvé !");
+            }
+          }, 100);
         });
         resultsContainer.appendChild(div);
       });

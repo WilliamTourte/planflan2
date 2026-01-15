@@ -163,11 +163,15 @@ def liste_etablissements():
 
     # Récupérer la ville sélectionnée depuis les paramètres (GET ou POST)
     if request.method == "POST":
+        print("DEBUG: Données POST reçues:", request.form)
         if request.form.get("ville"):
             ville_selectionnee = request.form.get("ville")
+            print("DEBUG: Ville sélectionnée depuis POST:", ville_selectionnee)
     elif request.method == "GET":
+        print("DEBUG: Données GET reçues:", request.args)
         if request.args.get("ville"):
             ville_selectionnee = request.args.get("ville")
+            print("DEBUG: Ville sélectionnée depuis GET:", ville_selectionnee)
 
     # 3. Cas spécial: si on a des coordonnées mais pas de ville, on utilise les coordonnées pour le zoom
     user_lat = form_recherche.latitude.data
