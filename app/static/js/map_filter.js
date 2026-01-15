@@ -242,7 +242,7 @@ function createUserMarker(forceZoom = false) {
         }
     }
 }
-// Fonction pour ajouter le bouton de géolocalisation comme contrôle Leaflet
+// Fonction pour ajouter le bouton de géolocalisation comme contrôle Leaflet -
 function addGeolocateControl() {
     const geolocateControl = L.control({ position: 'bottomright' });
 
