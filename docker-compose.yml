@@ -37,6 +37,7 @@ services:
       - "5000:5000"
     volumes:
       - photos_volume:/app/static/uploads
+      - ./scripts:/scripts
     depends_on:
       - planflan-service-db  # Syntax simplifiée
     networks:
