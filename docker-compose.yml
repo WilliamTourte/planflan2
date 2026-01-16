@@ -35,6 +35,8 @@ services:
     restart: always
     ports:
       - "5000:5000"
+    volumes:
+      - photos_volume:/app/static/uploads
     depends_on:
       - planflan-service-db  # Syntax simplifiée
     networks:
@@ -75,6 +77,7 @@ volumes:
   mysql_data:
   letsencrypt:
   certbot-www:
+  photos_volume:
 
 networks:
   backend-network:
