@@ -19,7 +19,7 @@
   defer
 ></script>
 <script src="{{ url_for('static', filename='js/geoloc.js') }}" defer></script>
-<script>
+<script nonce="{{ csp_nonce }}">
   document.addEventListener('DOMContentLoaded', function() {
       const etablissementsData = {{ etablissements_json|tojson|safe }};
       const etablissementsDataElement = document.createElement('div');

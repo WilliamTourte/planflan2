@@ -5,7 +5,8 @@ Ce module ajoute des en-têtes de sécurité essentiels à toutes les réponses 
 pour protéger l'application contre diverses attaques web.
 """
 
-from flask import request, current_app
+import secrets
+from flask import request, current_app, g
 
 
 def add_security_headers(response):
@@ -23,12 +24,24 @@ def add_security_headers(response):
     """
     # 1. Content Security Policy (CSP) - Protection contre XSS
     # Configuration CSP pour Flask avec Google Maps, Leaflet et ressources locales
+    # Utilisation de nonces pour les scripts inline au lieu de 'unsafe-inline'
+    csp_nonce = g.get("csp_nonce", "")
+    # Format correct pour le nonce dans CSP : 'nonce-{valeur}' avec guillemets simples
+    # Le nonce devrait toujours être disponible car généré dans before_request
+    if csp_nonce:
+        nonce_directive = f"'nonce-{csp_nonce}'"
+        script_src = f"script-src 'self' {nonce_directive} "
+    else:
+        # Si pas de nonce (ne devrait pas arriver), ne pas autoriser les scripts inline
+        nonce_directive = ""
+        script_src = "script-src 'self' "
+
     csp = (
         "default-src 'self' http://localhost; "
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' "
+        f"{script_src}"
         "https://maps.googleapis.com https://www.googletagmanager.com "
         "cdn.jsdelivr.net unpkg.com http://localhost; "
-        "style-src 'self' 'unsafe-inline' "
+        "style-src 'self' 'unsafe-inline' "  # 'unsafe-inline' nécessaire pour les styles inline de Bootstrap/Leaflet
         "https://fonts.googleapis.com cdn.jsdelivr.net unpkg.com "
         "http://localhost; "
         "img-src 'self' data: blob: http://localhost https://maps.googleapis.com "
@@ -93,10 +106,22 @@ def init_security_headers(app):
         app: L'application Flask
     """
 
+    # Générer un nonce unique pour chaque requête (pour CSP)
+    @app.before_request
+    def generate_csp_nonce():
+        """Génère un nonce unique pour chaque requête pour le CSP."""
+        g.csp_nonce = secrets.token_urlsafe(16)
+
     # Ajouter le middleware pour les en-têtes de sécurité
     @app.after_request
     def apply_security_headers(response):
         return add_security_headers(response)
+
+    # Exposer le nonce aux templates
+    @app.context_processor
+    def inject_csp_nonce():
+        """Injecte le nonce CSP dans tous les templates."""
+        return {"csp_nonce": g.get("csp_nonce", "")}
 
     # Configurer les options de sécurité par défaut
     app.config.setdefault("SESSION_COOKIE_SECURE", True)

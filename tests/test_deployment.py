@@ -73,7 +73,9 @@ class TestDeployment:
         """Test that HTTP requests are redirected to HTTPS or site is HTTPS-only"""
         http_url = "http://planflan.fr"
         try:
-            response = requests.get(http_url, timeout=TIMEOUT, allow_redirects=False, verify=False)
+            response = requests.get(
+                http_url, timeout=TIMEOUT, allow_redirects=False, verify=False
+            )
             # Either redirect to HTTPS (301/302) or already serve HTTPS (200)
             assert response.status_code in [200, 301, 302]
             if response.status_code in [301, 302]:

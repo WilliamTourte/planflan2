@@ -236,7 +236,7 @@
         </div>
     {% endif %}
 
-    <script>
+    <script nonce="{{ csp_nonce }}">
         function cancelEdit(idEtab) {
             document.getElementById('etablissement-' + idEtab + '-display').style.display = 'block';
             document.getElementById('etablissement-' + idEtab + '-edit').style.display = 'none';
@@ -421,7 +421,7 @@
     </div>
     {% endif %}
 
-    <script>
+    <script nonce="{{ csp_nonce }}">
         function editFlan(idFlan) {
             const displayElement = document.getElementById('flan-' + idFlan + '-display');
             const editElement = document.getElementById('flan-' + idFlan + '-edit');
@@ -524,11 +524,11 @@
                     {{ afficher_criteres_evaluation(evaluation) }}
                 {% endif %}
 
-            </div>
-        </a>
+    </div>
+    </a>
     </div>
 
-    <script>
+    <script nonce="{{ csp_nonce }}">
         function editEvaluation(idEval) {
             document.getElementById('evaluation-' + idEval + '-display').style.display = 'none';
             document.getElementById('evaluation-' + idEval + '-edit').style.display = 'block';
