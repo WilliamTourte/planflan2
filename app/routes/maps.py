@@ -89,7 +89,7 @@ def geoloc():
         )
     except Exception as e:
         print(f"Erreur: {e}")
-        return jsonify({"status": "error", "message": str(e)}), 400
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 
 @maps_bp.route("/etablissements_proches", methods=["POST"])
@@ -101,8 +101,15 @@ def etablissements_proches():
 
     try:
         data = request.get_json()
-        user_lat = data["latitude"]
-        user_lon = data["longitude"]
+        if not data:
+            return jsonify({"error": "Données manquantes"}), 400
+
+        user_lat = data.get("latitude")
+        user_lon = data.get("longitude")
+
+        if user_lat is None or user_lon is None:
+            return jsonify({"error": "Latitude et longitude requises"}), 400
+
         rayon_km = 5  # Rayon en kilomètres
 
         # Récupère tous les établissements depuis la base
@@ -111,22 +118,23 @@ def etablissements_proches():
         # Filtre les établissements dans le rayon de 5 km
         etablissements_proches_liste = []
         for etab in etablissements:
-            distance = calculer_distance(
-                user_lat, user_lon, etab.latitude, etab.longitude
-            )
-            if distance <= rayon_km:
-                etablissements_proches_liste.append(
-                    {
-                        "id_etab": etab.id_etab,
-                        "nom": etab.nom,
-                        "adresse": etab.adresse,
-                        "latitude": etab.latitude,
-                        "longitude": etab.longitude,
-                        "distance": round(distance, 2),  # Arrondi à 2 décimales
-                        "visite": etab.visite,
-                        "label": etab.label,
-                    }
+            if hasattr(etab, "latitude") and hasattr(etab, "longitude"):
+                distance = calculer_distance(
+                    user_lat, user_lon, etab.latitude, etab.longitude
                 )
+                if distance <= rayon_km:
+                    etablissements_proches_liste.append(
+                        {
+                            "id_etab": etab.id_etab,
+                            "nom": etab.nom,
+                            "adresse": etab.adresse,
+                            "latitude": etab.latitude,
+                            "longitude": etab.longitude,
+                            "distance": round(distance, 2),  # Arrondi à 2 décimales
+                            "visite": etab.visite,
+                            "label": etab.label,
+                        }
+                    )
 
         return jsonify({"etablissements": etablissements_proches_liste})
 
@@ -158,7 +166,7 @@ def extraire_infos_adresse():
             }
         )
     except Exception as e:
-        return jsonify({"error": str(e)}), 400
+        return jsonify({"error": str(e)}), 500
 
 
 @maps_bp.route("/proposer_etablissement", methods=["GET", "POST"])
@@ -175,93 +183,7 @@ def proposer_etablissement():
 @maps_bp.route("/verifier_etablissement", methods=["POST"])
 def verifier_etablissement():
     # Vérifier le token CSRF en utilisant la fonction utilitaire
-    # #region agent log
-    import json
-
-    with open("/home/damien/PlanFlan/planflan2/.cursor/debug.log", "a") as f:
-        f.write(
-            json.dumps(
-                {
-                    "sessionId": "debug-session",
-                    "runId": "run1",
-                    "hypothesisId": "B",
-                    "location": "maps.py:177",
-                    "message": "verifier_etablissement - before verifier_csrf_ou_renvoyer_erreur",
-                    "data": {},
-                    "timestamp": int(__import__("time").time() * 1000),
-                }
-            )
-            + "\n"
-        )
-    # #endregion
-    try:
-        csrf_result = verifier_csrf_ou_renvoyer_erreur()
-        # #region agent log
-        with open("/home/damien/PlanFlan/planflan2/.cursor/debug.log", "a") as f:
-            f.write(
-                json.dumps(
-                    {
-                        "sessionId": "debug-session",
-                        "runId": "run1",
-                        "hypothesisId": "B",
-                        "location": "maps.py:178",
-                        "message": "verifier_etablissement - after verifier_csrf_ou_renvoyer_erreur",
-                        "data": {
-                            "result_type": str(type(csrf_result)),
-                            "result_length": (
-                                len(csrf_result)
-                                if isinstance(csrf_result, tuple)
-                                else "not_tuple"
-                            ),
-                        },
-                        "timestamp": int(__import__("time").time() * 1000),
-                    }
-                )
-                + "\n"
-            )
-        # #endregion
-        csrf_valide, response = csrf_result[
-            :2
-        ]  # Prendre seulement les 2 premiers éléments
-        # #region agent log
-        with open("/home/damien/PlanFlan/planflan2/.cursor/debug.log", "a") as f:
-            f.write(
-                json.dumps(
-                    {
-                        "sessionId": "debug-session",
-                        "runId": "run1",
-                        "hypothesisId": "B",
-                        "location": "maps.py:179",
-                        "message": "verifier_etablissement - after unpacking",
-                        "data": {
-                            "csrf_valide": csrf_valide,
-                            "has_response": response is not None,
-                        },
-                        "timestamp": int(__import__("time").time() * 1000),
-                    }
-                )
-                + "\n"
-            )
-        # #endregion
-    except Exception as e:
-        # #region agent log
-        with open("/home/damien/PlanFlan/planflan2/.cursor/debug.log", "a") as f:
-            f.write(
-                json.dumps(
-                    {
-                        "sessionId": "debug-session",
-                        "runId": "run1",
-                        "hypothesisId": "B",
-                        "location": "maps.py:180",
-                        "message": "verifier_etablissement - unpacking error",
-                        "data": {"error": str(e), "error_type": type(e).__name__},
-                        "timestamp": int(__import__("time").time() * 1000),
-                    }
-                )
-                + "\n"
-            )
-        # #endregion
-        raise
+    csrf_valide, response = verifier_csrf_ou_renvoyer_erreur()
     if not csrf_valide:
         return response
 
