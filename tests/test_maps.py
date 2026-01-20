@@ -37,46 +37,41 @@ def test_geoloc_route(client):
 
 
 @pytest.mark.maps
-def test_etablissements_proches_route(client):
-    """Test de la route /etablissements_proches"""
-    user = client.application.config["TEST_USER"]
-
-    with client.application.app_context():
-        # Créer un établissement de référence
-        etab_ref = Etablissement(
-            nom="Etablissement Reference",
-            adresse="1 rue de la République",
-            code_postal="69001",
-            ville="Lyon",
-            latitude=45.764043,
-            longitude=4.835659,
-            id_user=user.id_user,
-        )
-        db.session.add(etab_ref)
-
-        # Créer des établissements proches
-        for i in range(3):
-            etab = Etablissement(
-                nom=f"Etablissement Proche {i}",
-                adresse=f"{i+1} rue de la République",
-                code_postal="69001",
-                ville="Lyon",
-                latitude=45.764043 + (i * 0.001),
-                longitude=4.835659 + (i * 0.001),
-                id_user=user.id_user,
-            )
-            db.session.add(etab)
-
-        db.session.commit()
-
-    # Tester la route
+def test_geolocalisation_frontend_only():
+    """Test que la géolocalisation est gérée côté frontend uniquement"""
+    # Ce test vérifie que les routes backend de géolocalisation ont été supprimées
+    
+    # La route /etablissements_proches ne devrait plus exister
     response = client.post(
         "/etablissements_proches",
-        json={"latitude": 45.764043, "longitude": 4.835659, "distance_max": 1},  # 1 km
+        json={"latitude": 45.764043, "longitude": 4.835659}
     )
-    assert response.status_code == 200
-    data = response.get_json()
-    assert len(data) > 0, "Aucun établissement proche trouvé"
+    assert response.status_code == 404, "La route /etablissements_proches devrait être supprimée"
+    
+    # La route /geoloc ne devrait plus exister non plus
+    response = client.post(
+        "/geoloc",
+        json={"latitude": 45.764043, "longitude": 4.835659}
+    )
+    assert response.status_code == 404, "La route /geoloc devrait être supprimée"
+
+
+@pytest.mark.maps
+def test_geolocation_handler_class():
+    """Test que la classe GeolocationHandler est disponible pour le frontend"""
+    # Ce test vérifie que le nouveau système de géolocalisation frontend est disponible
+    
+    # Vérifier que le fichier geoloc.js existe
+    import os
+    geoloc_js_path = os.path.join('app', 'static', 'js', 'geoloc.js')
+    assert os.path.exists(geoloc_js_path), "Le fichier geoloc.js devrait exister"
+    
+    # Vérifier que le fichier contient la classe GeolocationHandler
+    with open(geoloc_js_path, 'r') as f:
+        content = f.read()
+        assert 'class GeolocationHandler' in content, "La classe GeolocationHandler devrait être définie"
+        assert 'calculateDistance' in content, "La méthode calculateDistance devrait être définie"
+        assert 'activate' in content, "La méthode activate devrait être définie"
 
 
 @pytest.mark.maps

@@ -60,87 +60,10 @@ def nettoyer_adresse(adresse):
     return adresse.split(",")[0].strip()
 
 
-@maps_bp.route("/geoloc", methods=["POST"])
-def geoloc():
-    """Gère la réception des données de géolocalisation.
-
-    Cette route reçoit les données GPS envoyées par le navigateur
-    et les traite pour mettre à jour la position de l'utilisateur.
-
-    Returns:
-        Response: JSON avec confirmation ou erreur
-    """
-    # Vérifier le token CSRF en utilisant la fonction utilitaire
-    csrf_valide, response = verifier_csrf_ou_renvoyer_erreur()
-    if not csrf_valide:
-        return response
-
-    try:
-        data = request.get_json()
-
-        if not data:
-            print("Données GPS non reçues")
-            return jsonify({"error": "Données GPS non reçues"}), 400
-        latitude = data.get("latitude")
-        longitude = data.get("longitude")
-        print(f"Latitude: {latitude}, Longitude: {longitude}")
-        return jsonify(
-            {"status": "success", "latitude": latitude, "longitude": longitude}
-        )
-    except Exception as e:
-        print(f"Erreur: {e}")
-        return jsonify({"status": "error", "message": str(e)}), 500
 
 
-@maps_bp.route("/etablissements_proches", methods=["POST"])
-def etablissements_proches():
-    # Vérifier le token CSRF en utilisant la fonction utilitaire
-    csrf_valide, response = verifier_csrf_ou_renvoyer_erreur()
-    if not csrf_valide:
-        return response
 
-    try:
-        data = request.get_json()
-        if not data:
-            return jsonify({"error": "Données manquantes"}), 400
 
-        user_lat = data.get("latitude")
-        user_lon = data.get("longitude")
-
-        if user_lat is None or user_lon is None:
-            return jsonify({"error": "Latitude et longitude requises"}), 400
-
-        rayon_km = 5  # Rayon en kilomètres
-
-        # Récupère tous les établissements depuis la base
-        etablissements = Etablissement.query.all()
-
-        # Filtre les établissements dans le rayon de 5 km
-        etablissements_proches_liste = []
-        for etab in etablissements:
-            if hasattr(etab, "latitude") and hasattr(etab, "longitude"):
-                distance = calculer_distance(
-                    user_lat, user_lon, etab.latitude, etab.longitude
-                )
-                if distance <= rayon_km:
-                    etablissements_proches_liste.append(
-                        {
-                            "id_etab": etab.id_etab,
-                            "nom": etab.nom,
-                            "adresse": etab.adresse,
-                            "latitude": etab.latitude,
-                            "longitude": etab.longitude,
-                            "distance": round(distance, 2),  # Arrondi à 2 décimales
-                            "visite": etab.visite,
-                            "label": etab.label,
-                        }
-                    )
-
-        return jsonify({"etablissements": etablissements_proches_liste})
-
-    except Exception as e:
-        current_app.logger.error(f"Erreur : {str(e)}")
-        return jsonify({"error": str(e)}), 500
 
 
 @maps_bp.route("/extraire_infos_adresse", methods=["POST"])

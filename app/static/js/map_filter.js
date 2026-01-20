@@ -3,6 +3,7 @@ let map;
 let markers = [];
 let etablissements = [];
 let userMarker = null;
+let geolocationHandler = null;
 
 let baseUrl = window.location.origin;
 let userLocation = null;
@@ -240,7 +241,7 @@ function createUserMarker(forceZoom = false) {
         }
     }
 }
-// Fonction pour ajouter le bouton de géolocalisation comme contrôle Leaflet -
+// Fonction pour ajouter le bouton de géolocalisation comme contrôle Leaflet
 function addGeolocateControl() {
     const geolocateControl = L.control({ position: 'bottomright' });
 
@@ -260,49 +261,15 @@ function addGeolocateControl() {
         L.DomEvent.on(link, 'click', L.DomEvent.stopPropagation)
             .on(link, 'click', L.DomEvent.preventDefault)
             .on(link, 'click', function() {
-                geoloc.getUserLocation(
-                    (coords) => {
-                        userLocation = { lat: coords.latitude, lon: coords.longitude };
-                        createUserMarker(true);
-
-                        // Met à jour les champs cachés du formulaire (si ils existent)
-                        const latitudeInput = document.getElementById('latitude');
-                        const longitudeInput = document.getElementById('longitude');
-
-                        if (latitudeInput && longitudeInput) {
-                            latitudeInput.value = coords.latitude;
-                            longitudeInput.value = coords.longitude;
-
-                            // Soumet le formulaire seulement si les champs de coordonnées existent
-                            const form = document.querySelector('form');
-                            if (form) {
-                                form.submit();
-                            }
-                        } else {
-                            // Si les champs n'existent pas, on recrée juste la carte avec la nouvelle position
-                            createUserMarker(true);
-                            updateMarkersBasedOnFilters();
-                        }
-                    },
-                    (error) => {
-                        // Gestion des erreurs
-                        let message = "Erreur de géolocalisation: ";
-                        switch(error.code) {
-                            case error.PERMISSION_DENIED:
-                                message += "L'utilisateur a refusé la demande de géolocalisation.";
-                                break;
-                            case error.POSITION_UNAVAILABLE:
-                                message += "Les informations de position sont indisponibles.";
-                                break;
-                            case error.TIMEOUT:
-                                message += "La demande de position a expiré.";
-                                break;
-                            default:
-                                message += error.message;
-                        }
-                        alert(message);
-                    }
-                );
+                // Utiliser le nouveau gestionnaire de géolocalisation
+                geolocationHandler.activate()
+                    .then(() => {
+                        // Succès - la carte est déjà centrée par le gestionnaire
+                        console.log("Géolocalisation réussie");
+                    })
+                    .catch(error => {
+                        console.error("Erreur de géolocalisation:", error.message);
+                    });
             });
 
         return container;
@@ -335,9 +302,12 @@ function initMap() {
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
 
-    // Ajouter le marqueur utilisateur si position disponible (sans forcer le zoom)
-    createUserMarker(false);
-    
+    // Initialiser le gestionnaire de géolocalisation
+    geolocationHandler = new GeolocationHandler(map, {
+        defaultZoom: 14,
+        userIconUrl: '/static/images/user-position.png'
+    });
+
     // Ajouter un écouteur d'événement pour le déplacement de la carte
     map.on('moveend', function() {
         // Sauvegarder l'état dans l'URL lorsque la carte est déplacée
@@ -422,32 +392,14 @@ function setupGeolocation() {
     const geolocateButton = document.getElementById('geolocate-me');
     if (geolocateButton) {
         geolocateButton.addEventListener('click', function() {
-            geoloc.getUserLocation(
-                (coords) => {
-                    userLocation = { lat: coords.latitude, lon: coords.longitude };
-                    
-                    // Créer le marqueur utilisateur avec zoom forcé
-                    createUserMarker(true);
-                },
-                (error) => {
-                    // Gestion des erreurs
-                    let message = "Erreur de géolocalisation: ";
-                    switch(error.code) {
-                        case error.PERMISSION_DENIED:
-                            message += "L'utilisateur a refusé la demande de géolocalisation.";
-                            break;
-                        case error.POSITION_UNAVAILABLE:
-                            message += "Les informations de position sont indisponibles.";
-                            break;
-                        case error.TIMEOUT:
-                            message += "La demande de position a expiré.";
-                            break;
-                        default:
-                            message += error.message;
-                    }
-                    alert(message);
-                }
-            );
+            // Utiliser le nouveau gestionnaire de géolocalisation
+            geolocationHandler.activate()
+                .then(() => {
+                    console.log("Géolocalisation réussie via bouton");
+                })
+                .catch(error => {
+                    console.error("Erreur de géolocalisation:", error.message);
+                });
         });
     }
 }

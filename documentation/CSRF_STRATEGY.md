@@ -127,8 +127,7 @@ def geoloc():
 ```
 
 **Routes API protégées :**
-- `/geoloc` (POST)
-- `/etablissements_proches` (POST)
+
 - `/extraire_infos_adresse` (POST)
 - `/verifier_etablissement` (POST)
 
@@ -260,8 +259,7 @@ def test_with_csrf():
 
 2. **Ajout de la protection CSRF aux routes manquantes** :
    - `/upload` (POST)
-   - `/geoloc` (POST)
-   - `/etablissements_proches` (POST)
+
    - `/extraire_infos_adresse` (POST)
    - `/verifier_etablissement` (POST)
 
