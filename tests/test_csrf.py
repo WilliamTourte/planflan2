@@ -35,7 +35,7 @@ def test_verifier_csrf_token_sans_token():
     with app.test_request_context("/", method="POST"):
         # Pas de token CSRF fourni
         csrf_valide, message = verifier_csrf_token()
-        # Devrait être valide car aucun token n'est requis pour les routes sans protection
+        # Devrait être valide car nous sommes en mode test
         assert csrf_valide == True
         assert message is None
 

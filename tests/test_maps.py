@@ -202,6 +202,7 @@ def test_verifier_etablissement_missing_data(client):
     assert response.status_code == 400
     data = response.get_json()
     assert "error" in data
+    assert "Le nom de l'établissement est requis" in data["error"]
 
 
 @pytest.mark.maps
@@ -212,6 +213,7 @@ def test_verifier_etablissement_empty_name(client):
     assert response.status_code == 400
     data = response.get_json()
     assert "error" in data
+    assert "Le nom ne peut pas être vide" in data["error"]
 
 
 @pytest.mark.maps

@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Python: Lancer run.py",
+            "name": "Python: Lancer run.py (Dev)",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/run.py",
@@ -10,7 +10,21 @@
             "justMyCode": true,
             "env": {
                 "FLASK_ENV": "development",
+                "FLASK_CONFIG": "Config",
                 "FLASK_APP": "run.py"
+            }
+        },
+        {
+            "name": "Python: Lancer avec wsgi.py (Prod)",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/wsgi.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "env": {
+                "FLASK_ENV": "production",
+                "FLASK_CONFIG": "ConfigProd",
+                "FLASK_APP": "wsgi.py"
             }
         }
     ]

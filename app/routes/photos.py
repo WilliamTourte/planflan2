@@ -21,6 +21,41 @@ from app.outils import verifier_csrf_token
 photos_bp = Blueprint("photos", __name__)
 
 
+def validate_file_signature(file):
+    """Valide le type de fichier en vérifiant les magic bytes (signature du fichier).
+
+    Args:
+        file: L'objet fichier uploadé (Werkzeug FileStorage)
+
+    Returns:
+        tuple: (bool, str) - (True, extension) si valide, (False, None) sinon
+    """
+    # Lire les premiers bytes du fichier
+    file.seek(0)
+    header = file.read(8)
+    file.seek(0)  # Remettre le curseur au début
+
+    # Signatures magic bytes pour les formats supportés
+    # PNG: 89 50 4E 47 0D 0A 1A 0A
+    if header.startswith(b"\x89PNG\r\n\x1a\n"):
+        return True, "png"
+
+    # JPEG: FF D8 FF (suivi de E0, E1, E2, etc.)
+    if header[:3] == b"\xff\xd8\xff":
+        # Vérifier aussi la fin du fichier pour JPEG (FF D9)
+        file.seek(-2, 2)  # Aller à 2 bytes de la fin
+        footer = file.read(2)
+        file.seek(0)  # Remettre le curseur au début
+        if footer == b"\xff\xd9":
+            return True, "jpg"
+
+    # GIF: GIF87a ou GIF89a
+    if header[:6] in (b"GIF87a", b"GIF89a"):
+        return True, "gif"
+
+    return False, None
+
+
 @photos_bp.route("/upload", methods=["GET", "POST"])
 def upload_file():
     """Gère le téléchargement de fichiers image.
@@ -48,15 +83,36 @@ def upload_file():
     if file.filename == "":
         return redirect(request.url)
     if file:
-        # Validez le fichier
-        if file.filename.lower().endswith((".png", ".jpg", ".jpeg", ".gif")):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(current_app.config["UPLOAD_FOLDER"], filename))
-            flash("Fichier téléversé avec succès!", "success")
-            return redirect(url_for("photos.show_uploads"))
-        else:
+        # Valider l'extension du fichier
+        if not file.filename.lower().endswith((".png", ".jpg", ".jpeg", ".gif")):
             flash("Fichier non valide. Veuillez téléverser une image.", "danger")
             return redirect(url_for("photos.show_uploads"))
+
+        # Valider le contenu du fichier par magic bytes
+        is_valid, detected_ext = validate_file_signature(file)
+        if not is_valid:
+            flash(
+                "Le fichier n'est pas une image valide. Le type de fichier ne correspond pas à l'extension.",
+                "danger",
+            )
+            return redirect(url_for("photos.show_uploads"))
+
+        # Vérifier que l'extension correspond au type détecté
+        filename_lower = file.filename.lower()
+        extension_map = {"png": (".png",), "jpg": (".jpg", ".jpeg"), "gif": (".gif",)}
+        if detected_ext and not filename_lower.endswith(
+            extension_map.get(detected_ext, ())
+        ):
+            flash(
+                "L'extension du fichier ne correspond pas au type de fichier détecté.",
+                "danger",
+            )
+            return redirect(url_for("photos.show_uploads"))
+
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(current_app.config["UPLOAD_FOLDER"], filename))
+        flash("Fichier téléversé avec succès!", "success")
+        return redirect(url_for("photos.show_uploads"))
 
 
 @photos_bp.route("/uploads")

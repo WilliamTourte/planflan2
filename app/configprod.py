@@ -29,7 +29,6 @@ class Config:
         os.getenv("DATABASE_URL")
         or "mysql+pymysql://flask_user:flanflask@localhost/planflan_db"
     )
-    print(f" ConfigProd - database URI : {SQLALCHEMY_DATABASE_URI}")
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
@@ -68,6 +67,22 @@ class ConfigProd(Config):
 
     DEBUG = False
     TESTING = False
+
+    # Exiger SECRET_KEY en production - validation au chargement de la classe
+    _secret_key = os.getenv("SECRET_KEY")
+    if not _secret_key:
+        raise ValueError(
+            "SECRET_KEY doit être définie en production via la variable d'environnement"
+        )
+    SECRET_KEY = _secret_key
+
+    # Exiger DATABASE_URL en production - validation au chargement de la classe
+    _database_url = os.getenv("DATABASE_URL")
+    if not _database_url:
+        raise ValueError(
+            "DATABASE_URL doit être définie en production via la variable d'environnement"
+        )
+    SQLALCHEMY_DATABASE_URI = _database_url
 
     # Configuration de la journalisation
     LOG_LEVEL = "WARNING"

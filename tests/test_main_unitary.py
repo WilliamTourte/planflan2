@@ -734,7 +734,9 @@ def test_filtrer_etablissements_avec_tous_comme_valeur(client):
 
 
 @pytest.mark.unitary
-@pytest.mark.skip(reason="Test de route nécessitant une configuration complète - à exécuter localement uniquement")
+@pytest.mark.skip(
+    reason="Test de route nécessitant une configuration complète - à exécuter localement uniquement"
+)
 def test_liste_etablissements_route_get(client, setup_data):
     """Test la route liste_etablissements avec une requête GET."""
     response = client.get("/liste_etablissements")
@@ -745,7 +747,9 @@ def test_liste_etablissements_route_get(client, setup_data):
 
 
 @pytest.mark.unitary
-@pytest.mark.skip(reason="Test de route nécessitant une configuration complète - à exécuter localement uniquement")
+@pytest.mark.skip(
+    reason="Test de route nécessitant une configuration complète - à exécuter localement uniquement"
+)
 def test_liste_etablissements_recherche_simple(client, setup_data):
     """Test la recherche simple dans liste_etablissements."""
     response = client.get("/liste_etablissements?recherche_simple=Paris")
@@ -757,7 +761,9 @@ def test_liste_etablissements_recherche_simple(client, setup_data):
 
 
 @pytest.mark.unitary
-@pytest.mark.skip(reason="Test de route nécessitant une configuration complète - à exécuter localement uniquement")
+@pytest.mark.skip(
+    reason="Test de route nécessitant une configuration complète - à exécuter localement uniquement"
+)
 def test_liste_etablissements_filtres_avances(client):
     """Test les filtres avancés dans liste_etablissements."""
     response = client.get("/liste_etablissements?ville=Paris&visite=oui")
@@ -769,7 +775,9 @@ def test_liste_etablissements_filtres_avances(client):
 
 
 @pytest.mark.unitary
-@pytest.mark.skip(reason="Test de route nécessitant une configuration complète - à exécuter localement uniquement")
+@pytest.mark.skip(
+    reason="Test de route nécessitant une configuration complète - à exécuter localement uniquement"
+)
 def test_liste_etablissements_filtre_prix(client, setup_data):
     """Test le filtre par prix dans liste_etablissements."""
     response = client.get("/liste_etablissements?prix=2.5")  # Prix entre 2.5 et 5
@@ -876,7 +884,9 @@ def test_get_infowindow_content_etablissement_inexistant(client):
 
 
 @pytest.mark.unitary
-@pytest.mark.skip(reason="Test de route nécessitant une configuration complète - à exécuter localement uniquement")
+@pytest.mark.skip(
+    reason="Test de route nécessitant une configuration complète - à exécuter localement uniquement"
+)
 def test_rechercher_route(client):
     """Test la route rechercher."""
     response = client.get("/rechercher")

@@ -45,7 +45,6 @@ class RegistrationForm(FlaskForm):
     confirm_password = PasswordField(
         "Confirmer le mot de passe", validators=[DataRequired(), EqualTo("password")]
     )
-    is_admin = BooleanField("Administrateur")
     submit = SubmitField("S'inscrire")
 
     def validate_pseudo(self, pseudo):

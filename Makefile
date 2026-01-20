@@ -4,11 +4,11 @@
 
 # Exécuter tous les tests (complet, pour CI/CD)
 test-all:
-	python -m pytest tests/ -v
+	python -m pytest tests/ -v -n auto
 
 # Exécuter les tests critiques seulement (pour développement rapide)
 test-critical:
-	python -m pytest tests/ -m "critical" -v
+	python -m pytest tests/ -m "critical" -v -n auto
 
 # Exécuter les tests d'authentification (tous les fichiers)
 test-all-auth:
@@ -69,7 +69,7 @@ test-list:
 
 # Exécuter les tests avec coverage
 test-coverage:
-	python -m pytest tests/ --cov=app --cov-report=html -v
+	python -m pytest tests/ -n auto --cov=app --cov-report=html -v
 
 # Exécuter les tests critiques avec coverage
 test-critical-coverage:
@@ -77,7 +77,7 @@ test-critical-coverage:
 
 # Exécuter les tests avec coverage complet (tous les tests)
 test-full-coverage:
-	python -m pytest tests/ --cov=app --cov-report=html --cov-report=term --cov-report=xml -v
+	python -m pytest tests/ -n auto --cov=app --cov-report=html --cov-report=term --cov-report=xml -v
 
 # Exécuter les tests pour CI/CD (optimisé pour les pipelines)
 test-ci:

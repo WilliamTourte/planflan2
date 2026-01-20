@@ -7,6 +7,7 @@ y compris l'inscription, la connexion, la déconnexion et la gestion des comptes
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_bcrypt import check_password_hash
+from urllib.parse import urlparse, urljoin
 
 from app import db, bcrypt
 from app.models import Utilisateur
@@ -14,6 +15,26 @@ from app.forms import LoginForm, RegistrationForm
 from app.outils import verifier_csrf_token
 
 auth_bp = Blueprint("auth", __name__)
+
+
+def is_safe_url(target):
+    """Vérifie si une URL est interne (sécurisée pour la redirection).
+
+    Args:
+        target: L'URL à vérifier
+
+    Returns:
+        bool: True si l'URL est interne, False sinon
+    """
+    if not target:
+        return False
+
+    # Parser l'URL cible
+    ref_url = urlparse(request.host_url)
+    test_url = urlparse(urljoin(request.host_url, target))
+
+    # Vérifier que l'URL est sur le même hôte
+    return test_url.scheme in ("http", "https") and test_url.netloc == ref_url.netloc
 
 
 @auth_bp.route("/register", methods=["GET", "POST"])
@@ -72,11 +93,13 @@ def login():
         if user and check_password_hash(user.password, form.password.data):
             login_user(user)
             # Redirige vers la page stockée dans 'next', ou vers une page par défaut
-            next_page = form.next.data or request.args.get(
-                "next", url_for("main.index")
-            )
+            next_page = form.next.data or request.args.get("next", "")
 
-            return redirect(next_page)
+            # Valider que l'URL de redirection est interne (sécurisée)
+            if next_page and is_safe_url(next_page):
+                return redirect(next_page)
+            else:
+                return redirect(url_for("main.index"))
 
         flash("Pseudo ou mot de passe incorrect.", "danger")
     return render_template("login.html", form=form)
