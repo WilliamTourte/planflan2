@@ -19,42 +19,18 @@
   defer
 ></script>
 <script src="{{ url_for('static', filename='js/geoloc.js') }}" defer></script>
-<script nonce="{{ csp_nonce }}">
-  document.addEventListener('DOMContentLoaded', function() {
-      const etablissementsData = {{ etablissements_json|tojson|safe }};
-      const etablissementsDataElement = document.createElement('div');
-      etablissementsDataElement.id = 'etablissements-data';
-      etablissementsDataElement.setAttribute('data-etablissements', JSON.stringify(etablissementsData));
-      document.body.appendChild(etablissementsDataElement);
+<!-- Données pour le script externe -->
+<div id="etablissements-data" data-etablissements="{{ etablissements_json|tojson|safe }}"></div>
+<div id="is-admin" data-is-admin="{{ current_user.is_admin|tojson|safe if current_user.is_authenticated else 'false' }}"></div>
+<div id="google-maps-api-key" data-api-key="{{ google_maps_api_key }}"></div>
+{% if user_lat and user_lon %}
+<div id="user-location" data-lat="{{ user_lat }}" data-lon="{{ user_lon }}"></div>
+{% endif %}
+{% if ville_selectionnee %}
+<div id="ville-selectionnee" data-ville="{{ ville_selectionnee }}"></div>
+{% endif %}
 
-      const isAdminElement = document.createElement('div');
-      isAdminElement.id = 'is-admin';
-      isAdminElement.setAttribute('data-is-admin', {{ current_user.is_admin|tojson|safe if current_user.is_authenticated else 'false' }});
-      document.body.appendChild(isAdminElement);
-
-      const googleMapsApiKeyElement = document.createElement('div');
-      googleMapsApiKeyElement.id = 'google-maps-api-key';
-      googleMapsApiKeyElement.setAttribute('data-api-key', '{{ google_maps_api_key }}');
-      document.body.appendChild(googleMapsApiKeyElement);
-
-      // Ajout des coordonnées utilisateur si disponibles
-      {% if user_lat and user_lon %}
-      const userLocationElement = document.createElement('div');
-      userLocationElement.id = 'user-location';
-      userLocationElement.setAttribute('data-lat', {{ user_lat }});
-      userLocationElement.setAttribute('data-lon', {{ user_lon }});
-      document.body.appendChild(userLocationElement);
-      {% endif %}
-
-      // Ajout de la ville sélectionnée si disponible
-      {% if ville_selectionnee %}
-      const villeSelectionneeElement = document.createElement('div');
-      villeSelectionneeElement.id = 'ville-selectionnee';
-      villeSelectionneeElement.setAttribute('data-ville', '{{ ville_selectionnee }}');
-      document.body.appendChild(villeSelectionneeElement);
-      {% endif %}
-  });
-</script>
+<script src="{{ url_for('static', filename='js/liste_etablissements.js') }}" nonce="{{ csp_nonce }}"></script>
 {% endblock %} {% block content %}
 <div class="container-fluid p-0 d-flex flex-column" style="height: calc(100vh - 120px);">
   <!-- Carte - 90% de la hauteur -->
