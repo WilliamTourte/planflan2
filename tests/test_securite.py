@@ -333,7 +333,7 @@ def test_utilisateur_regular_modification_ressource_autre_utilisateur(
         )
 
         # Vérifier que le flan n'a pas été modifié
-        flan_verif = Flan.query.get(flan_admin.id_flan)
+        flan_verif = db.session.get(Flan, flan_admin.id_flan)
         assert flan_verif.nom == "Flan Admin"  # Nom inchangé
 
 
@@ -365,7 +365,7 @@ def test_utilisateur_regular_suppression_ressource_autre_utilisateur(
         )
 
         # Vérifier que le flan n'a pas été supprimé
-        flan_verif = Flan.query.get(flan_admin.id_flan)
+        flan_verif = db.session.get(Flan, flan_admin.id_flan)
         assert flan_verif is not None
 
 
@@ -393,7 +393,7 @@ def test_admin_acces_routes_admin(client, setup_full_data):
         )
 
         # Vérifier que le flan a été validé
-        flan_verif = Flan.query.get(flan.id_flan)
+        flan_verif = db.session.get(Flan, flan.id_flan)
         assert flan_verif.statut.value == "VALIDE"
 
 
@@ -432,7 +432,7 @@ def test_admin_modification_ressource_autre_utilisateur(client, setup_full_data)
         )
 
         # Vérifier que le flan a été modifié
-        flan_verif = Flan.query.get(flan_user.id_flan)
+        flan_verif = db.session.get(Flan, flan_user.id_flan)
         assert flan_verif.nom == "Flan Modifié par Admin"
 
 
@@ -531,7 +531,7 @@ def test_injection_html_dans_formulaire(client, setup_full_data):
         assert response.status_code == 200
 
         # Vérifier que les données ont été stockées (l'échappement HTML est géré par les templates)
-        etab_verif = Etablissement.query.get(etab.id_etab)
+        etab_verif = db.session.get(Etablissement, etab.id_etab)
         assert (
             html_payload in etab_verif.nom
         )  # Les données sont stockées telles quelles
@@ -573,7 +573,7 @@ def test_caracteres_speciaux_dans_entrees(client, setup_full_data):
         assert response.status_code == 200
 
         # Vérifier que les caractères spéciaux ont été correctement traités
-        etab_verif = Etablissement.query.get(etab.id_etab)
+        etab_verif = db.session.get(Etablissement, etab.id_etab)
         assert special_chars in etab_verif.nom or "Test avec des" in etab_verif.nom
 
 

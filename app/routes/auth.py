@@ -120,7 +120,7 @@ def supprimer_compte():
         return redirect(url_for("main.dashboard"))
 
     # Suppression du compte
-    user = Utilisateur.query.get(current_user.id_user)
+    user = db.session.get(Utilisateur, current_user.id_user)
     db.session.delete(user)
     db.session.commit()
     flash("Votre compte a bien été supprimé", "success")

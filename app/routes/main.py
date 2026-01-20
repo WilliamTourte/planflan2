@@ -366,7 +366,7 @@ def api_etablissements():
 @main_bp.route("/get_infowindow_content")
 def get_infowindow_content():
     id_etab = request.args.get("id_etab", type=int)
-    etablissement = Etablissement.query.get(id_etab)
+    etablissement = db.session.get(Etablissement, id_etab)
     if not etablissement:
         return "Détails non disponibles", 404
 
@@ -465,7 +465,10 @@ def dashboard():
 ### Routes établissement, flan, évaluation
 @main_bp.route("/etablissement/<int:id_etab>", methods=["GET", "POST"])
 def afficher_etablissement_unique(id_etab):
-    etablissement = Etablissement.query.get_or_404(id_etab)
+    etablissement = db.session.get(Etablissement, id_etab)
+    if etablissement is None:
+        from flask import abort
+        abort(404)
     form_etab = EtabForm(prefix="edit-etab", obj=etablissement)
     delete_form = DeleteForm()
     validate_form = ValidateForm()
@@ -508,7 +511,10 @@ def afficher_etablissement_unique(id_etab):
 
 @main_bp.route("/flan/<int:id_flan>", methods=["GET", "POST"])
 def afficher_flan_unique(id_flan):
-    flan_unique = Flan.query.get_or_404(id_flan)
+    flan_unique = db.session.get(Flan, id_flan)
+    if flan_unique is None:
+        from flask import abort
+        abort(404)
     form_eval = EvalForm(prefix="flan-eval")
     form_flan = NewFlanForm(prefix="edit-flan", obj=flan_unique)
     delete_form = DeleteForm()
@@ -540,7 +546,10 @@ def afficher_flan_unique(id_flan):
 @main_bp.route("/etablissement/<int:id_etab>/proposer_flan", methods=["GET", "POST"])
 @login_required
 def proposer_flan(id_etab):
-    etablissement = Etablissement.query.get_or_404(id_etab)
+    etablissement = db.session.get(Etablissement, id_etab)
+    if etablissement is None:
+        from flask import abort
+        abort(404)
     form = NewFlanForm(prefix="ajout-flan")
     form.id_etab.data = id_etab
     if form.validate_on_submit():
@@ -569,7 +578,10 @@ def valider_flan(id_flan):
     if not current_user.is_admin:
         flash("Vous n'avez pas le droit d'accéder à cette page.", "danger")
         return redirect(url_for("main.dashboard"))
-    flan = Flan.query.get_or_404(id_flan)
+    flan = db.session.get(Flan, id_flan)
+    if flan is None:
+        from flask import abort
+        abort(404)
     flan.statut = "VALIDE"
     try:
         db.session.commit()
@@ -583,7 +595,10 @@ def valider_flan(id_flan):
 @main_bp.route("/modifier_flan/<int:id_flan>", methods=["POST"])
 @login_required
 def modifier_flan(id_flan):
-    flan = Flan.query.get_or_404(id_flan)
+    flan = db.session.get(Flan, id_flan)
+    if flan is None:
+        from flask import abort
+        abort(404)
     form = NewFlanForm(prefix="edit-flan")
     if current_user.id_user != flan.id_user and not current_user.is_admin:
         flash("Vous n'avez pas le droit de modifier ce flan.", "danger")
@@ -607,7 +622,10 @@ def modifier_flan(id_flan):
 @main_bp.route("/supprimer_flan/<int:id_flan>", methods=["POST"])
 @login_required
 def supprimer_flan(id_flan):
-    flan = Flan.query.get_or_404(id_flan)
+    flan = db.session.get(Flan, id_flan)
+    if flan is None:
+        from flask import abort
+        abort(404)
     if current_user.id_user != flan.id_user and not current_user.is_admin:
         flash("Vous n'avez pas le droit de supprimer ce flan.", "danger")
         return redirect(url_for("main.dashboard"))
@@ -661,8 +679,14 @@ def evaluer_flan(id_flan):
 @main_bp.route("/evaluation/<int:id_eval>", methods=["GET", "POST"])
 @login_required
 def afficher_evaluation_unique(id_eval):
-    evaluation = Evaluation.query.get_or_404(id_eval)
-    flan_unique = Flan.query.get_or_404(evaluation.id_flan)
+    evaluation = db.session.get(Evaluation, id_eval)
+    if evaluation is None:
+        from flask import abort
+        abort(404)
+    flan_unique = db.session.get(Flan, evaluation.id_flan)
+    if flan_unique is None:
+        from flask import abort
+        abort(404)
     form = EvalForm(prefix="eval-detail")
     delete_form = DeleteForm()
     validate_form = ValidateForm()
@@ -761,7 +785,10 @@ def valider_evaluation(id_eval):
     if not current_user.is_admin:
         flash("Vous n'avez pas le droit d'accéder à cette page.", "danger")
         return redirect(url_for("main.dashboard"))
-    evaluation = Evaluation.query.get_or_404(id_eval)
+    evaluation = db.session.get(Evaluation, id_eval)
+    if evaluation is None:
+        from flask import abort
+        abort(404)
     evaluation.statut = "VALIDE"
     try:
         db.session.commit()
@@ -777,7 +804,10 @@ def valider_evaluation(id_eval):
 @main_bp.route("/supprimer_evaluation/<int:id_eval>", methods=["POST"])
 @login_required
 def supprimer_evaluation(id_eval):
-    evaluation = Evaluation.query.get_or_404(id_eval)
+    evaluation = db.session.get(Evaluation, id_eval)
+    if evaluation is None:
+        from flask import abort
+        abort(404)
     if current_user.id_user != evaluation.id_user and not current_user.is_admin:
         flash("Vous n'avez pas le droit de supprimer cette évaluation.", "danger")
         return redirect(url_for("main.dashboard"))

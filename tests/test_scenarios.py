@@ -234,7 +234,7 @@ def test_scenario_suppression_contenu(client):
 
     # Étape 4 : Vérifier la suppression du flan
     with client.application.app_context():
-        deleted_flan = Flan.query.get(flan_id)
+        deleted_flan = db.session.get(Flan, flan_id)
         assert deleted_flan is None
 
     # Étape 5 : Supprimer l'établissement (il faut d'abord supprimer les flans associés)
@@ -247,13 +247,13 @@ def test_scenario_suppression_contenu(client):
         ), "Il reste des flans associés à l'établissement"
 
         # Supprimer l'établissement directement via la base
-        etab_to_delete = Etablissement.query.get(etab_id)
+        etab_to_delete = db.session.get(Etablissement, etab_id)
         db.session.delete(etab_to_delete)
         db.session.commit()
 
     # Étape 6 : Vérifier la suppression de l'établissement
     with client.application.app_context():
-        deleted_etab = Etablissement.query.get(etab_id)
+        deleted_etab = db.session.get(Etablissement, etab_id)
         assert deleted_etab is None
 
 
@@ -325,7 +325,7 @@ def test_scenario_gestion_evaluations(client):
 
     # Étape 5 : Vérifier les modifications
     with client.application.app_context():
-        updated_eval = Evaluation.query.get(eval_id)
+        updated_eval = db.session.get(Evaluation, eval_id)
         assert updated_eval.visuel == 4.0
         assert updated_eval.description == "Evaluation modifiée"
 
@@ -335,7 +335,7 @@ def test_scenario_gestion_evaluations(client):
 
     # Étape 7 : Vérifier la suppression
     with client.application.app_context():
-        deleted_eval = Evaluation.query.get(eval_id)
+        deleted_eval = db.session.get(Evaluation, eval_id)
         assert deleted_eval is None
 
 
@@ -383,7 +383,7 @@ def test_scenario_administration_complete(client):
 
     # Vérifier que l'établissement a été validé
     with client.application.app_context():
-        updated_etab = Etablissement.query.get(etab_id)
+        updated_etab = db.session.get(Etablissement, etab_id)
         assert updated_etab.statut.value == "VALIDE"
 
     # Étape 4 : Créer un flan non validé
@@ -410,7 +410,7 @@ def test_scenario_administration_complete(client):
 
     # Vérifier que le flan a été validé
     with client.application.app_context():
-        updated_flan = Flan.query.get(flan_id)
+        updated_flan = db.session.get(Flan, flan_id)
         assert updated_flan.statut.value == "VALIDE"
 
 

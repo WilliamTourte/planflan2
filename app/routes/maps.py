@@ -276,7 +276,7 @@ def ajouter_etablissement():
             current_app.logger.info(f"ID de l'établissement créé: {id_etab}")
 
             # Vérification en base de données
-            etablissement_verif = Etablissement.query.get(id_etab)
+            etablissement_verif = db.session.get(Etablissement, id_etab)
             current_app.logger.info(
                 f"Vérification en base - google_place_id: '{etablissement_verif.google_place_id}'"
             )
@@ -341,7 +341,10 @@ def ajouter_etablissement():
 @maps_bp.route("/modifier_etablissement/<int:id_etab>", methods=["GET", "POST"])
 @login_required
 def modifier_etablissement(id_etab):
-    etablissement = Etablissement.query.get_or_404(id_etab)
+    etablissement = db.session.get(Etablissement, id_etab)
+    if etablissement is None:
+        from flask import abort
+        abort(404)
 
     # Instanciation des formulaires avec leurs préfixes respectifs
     form_edit = EtabForm(prefix="edit-etab")
@@ -415,7 +418,10 @@ def modifier_etablissement(id_etab):
 @maps_bp.route("/valider_etablissement/<int:id_etab>", methods=["POST"])
 @login_required
 def valider_etablissement(id_etab):
-    etablissement = Etablissement.query.get_or_404(id_etab)
+    etablissement = db.session.get(Etablissement, id_etab)
+    if etablissement is None:
+        from flask import abort
+        abort(404)
 
     # Vérifier si l'utilisateur est un admin
     if not current_user.is_admin:
@@ -432,7 +438,10 @@ def valider_etablissement(id_etab):
 @maps_bp.route("/supprimer_etablissement/<int:id_etab>", methods=["POST"])
 @login_required
 def supprimer_etablissement(id_etab):
-    etablissement = Etablissement.query.get_or_404(id_etab)
+    etablissement = db.session.get(Etablissement, id_etab)
+    if etablissement is None:
+        from flask import abort
+        abort(404)
 
     # Vérifier si l'utilisateur est l'auteur de l'établissement ou un admin
     if current_user.id_user != etablissement.id_user and not current_user.is_admin:

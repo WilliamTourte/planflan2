@@ -318,7 +318,7 @@ def test_modifier_etablissement_route(client):
 
     # Vérifier que l'établissement a été modifié
     with client.application.app_context():
-        updated_etab = Etablissement.query.get(etab_id)
+        updated_etab = db.session.get(Etablissement, etab_id)
         assert updated_etab.nom == "Etablissement Modifié", "Le nom n'a pas été modifié"
         assert (
             updated_etab.adresse == "2 rue Modifiée"
@@ -351,7 +351,7 @@ def test_valider_etablissement_route(client):
 
     # Vérifier que l'établissement a été validé
     with client.application.app_context():
-        updated_etab = Etablissement.query.get(etab_id)
+        updated_etab = db.session.get(Etablissement, etab_id)
         assert (
             updated_etab.statut.value == "VALIDE"
         ), f"L'établissement n'a pas été validé. Statut: {updated_etab.statut.value}"
@@ -381,5 +381,5 @@ def test_supprimer_etablissement_route(client):
 
     # Vérifier que l'établissement a été supprimé
     with client.application.app_context():
-        deleted_etab = Etablissement.query.get(etab_id)
+        deleted_etab = db.session.get(Etablissement, etab_id)
         assert deleted_etab is None, "L'établissement n'a pas été supprimé"

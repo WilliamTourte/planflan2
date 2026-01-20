@@ -80,7 +80,7 @@ def create_app(config_class=None):
         """
         from .models import Utilisateur
 
-        return Utilisateur.query.get(int(user_id))
+        return db.session.get(Utilisateur, int(user_id))
 
     @app.template_filter("enlever_accents")
     def filtre_enlever_accents(text):

@@ -30,7 +30,7 @@ def test_fetch_photos(etablissement_id, api_key):
     
     with app.app_context():
         # Récupérer l'établissement
-        etablissement = Etablissement.query.get(etablissement_id)
+        etablissement = db.session.get(Etablissement, etablissement_id)
         
         if not etablissement:
             print(f"❌ Établissement avec ID {etablissement_id} non trouvé")

@@ -179,7 +179,7 @@ def test_valider_flan(client):
 
     # Vérifier que le flan a été validé
     with client.application.app_context():
-        updated_flan = Flan.query.get(flan_id)
+        updated_flan = db.session.get(Flan, flan_id)
         # Vérifier que le statut n'est plus 'EN_ATTENTE'
         # (la route devrait le mettre à 'VALIDE' mais il y a un bug connu avec 'valide' vs 'VALIDE')
         assert (
@@ -230,7 +230,7 @@ def test_modifier_flan(client):
 
     # Vérifier que le flan a été mis à jour dans la base de données
     with client.application.app_context():
-        updated_flan = Flan.query.get(flan_id)
+        updated_flan = db.session.get(Flan, flan_id)
         assert (
             updated_flan.nom == "Nouveau Nom"
         ), f"Le nom du flan n'a pas été mis à jour: {updated_flan.nom}"
@@ -277,7 +277,7 @@ def test_supprimer_flan(client):
 
     # Vérifier que le flan a été supprimé de la base de données
     with client.application.app_context():
-        deleted_flan = Flan.query.get(flan_id)
+        deleted_flan = db.session.get(Flan, flan_id)
         assert (
             deleted_flan is None
         ), "Le flan n'a pas été supprimé de la base de données"
@@ -433,7 +433,7 @@ def test_valider_evaluation(client):
 
     # Vérifier que l'évaluation a été validée
     with client.application.app_context():
-        updated_eval = Evaluation.query.get(eval_id)
+        updated_eval = db.session.get(Evaluation, eval_id)
         assert (
             updated_eval.statut.value == "VALIDE"
         ), f"Le statut de l'évaluation n'a pas été mis à jour. Statut actuel: {updated_eval.statut.value}"
@@ -481,7 +481,7 @@ def test_supprimer_evaluation(client):
 
     # Vérifier que l'évaluation a été supprimée de la base de données
     with client.application.app_context():
-        deleted_eval = Evaluation.query.get(eval_id)
+        deleted_eval = db.session.get(Evaluation, eval_id)
         assert (
             deleted_eval is None
         ), "L'évaluation n'a pas été supprimée de la base de données"
@@ -508,7 +508,7 @@ def test_dashboard_post_update_profile(client):
 
     # Vérifier que le profil a été mis à jour
     with client.application.app_context():
-        updated_user = Utilisateur.query.get(user.id_user)
+        updated_user = db.session.get(Utilisateur, user.id_user)
         assert updated_user.pseudo == "new_pseudo"
         assert updated_user.email == "new_email@example.com"
         # Vérifier que le mot de passe a été mis à jour (on vérifie juste qu'il a changé)
@@ -577,7 +577,7 @@ def test_afficher_etablissement_unique_post_update(client):
 
     # Vérifier que l'établissement a été mis à jour
     with client.application.app_context():
-        updated_etab = Etablissement.query.get(etab_id)
+        updated_etab = db.session.get(Etablissement, etab_id)
         assert updated_etab.nom == "Nouveau Nom"
         assert updated_etab.description == "Nouvelle description"
 
@@ -652,7 +652,7 @@ def test_afficher_flan_unique_post_update(client):
 
     # Vérifier que le flan a été mis à jour
     with client.application.app_context():
-        updated_flan = Flan.query.get(flan_id)
+        updated_flan = db.session.get(Flan, flan_id)
         assert updated_flan.nom == "Nouveau Flan"
         assert updated_flan.prix == 3.0
 
