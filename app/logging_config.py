@@ -106,7 +106,7 @@ def configure_console_logging(app, formatter):
     console_handler.setLevel(logging.DEBUG)
     app.logger.addHandler(console_handler)
 
-    app.logger.debug("Console logging configured for development")
+
 
 
 def configure_email_logging(app, formatter):

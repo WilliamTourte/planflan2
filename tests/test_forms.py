@@ -611,15 +611,6 @@ def test_formulaire_evaluation_avec_evaluation_existante(client):
         )
         form.description.data = eval.description
 
-        # Debug: print form errors if validation fails
-        if not form.validate():
-            print("Form validation failed with errors:")
-            for field, errors in form.errors.items():
-                print(f"Field '{field}': {errors}")
-            print(
-                f"Form data: visuel={form.visuel.data}, texture={form.texture.data}, pate={form.pate.data}, gout={form.gout.data}"
-            )
-
         # Le formulaire devrait être valide avec les données existantes
         assert form.validate()
 

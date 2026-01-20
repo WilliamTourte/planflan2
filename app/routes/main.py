@@ -117,11 +117,7 @@ def filtrer_etablissements(query, **kwargs):
 
 @main_bp.route("/liste_etablissements", methods=["GET", "POST"])
 def liste_etablissements():
-    print("DEBUG: Méthode HTTP:", request.method)
-    print(
-        "DEBUG: Données reçues:",
-        request.form if request.method == "POST" else request.args,
-    )
+
 
     # Détecter le mode géolocalisation
     geolocalisation_mode = (
@@ -136,10 +132,9 @@ def liste_etablissements():
         if request.method == "POST":
             form_recherche = RechercheForm(request.form)
         else:
-            print("DEBUG: Création du formulaire avec données GET")
+           
             form_recherche = RechercheForm(request.args)
-            print("DEBUG: Latitude reçue:", request.args.get("latitude"))
-            print("DEBUG: Longitude reçue:", request.args.get("longitude"))
+
     except Exception as e:
         # En cas d'erreur avec les formulaires, créer des formulaires vides
         print(f"ERREUR FORMULAIRE: {str(e)}")
@@ -163,15 +158,15 @@ def liste_etablissements():
 
     # Récupérer la ville sélectionnée depuis les paramètres (GET ou POST)
     if request.method == "POST":
-        print("DEBUG: Données POST reçues:", request.form)
+  
         if request.form.get("ville"):
             ville_selectionnee = request.form.get("ville")
-            print("DEBUG: Ville sélectionnée depuis POST:", ville_selectionnee)
+
     elif request.method == "GET":
 
         if request.args.get("ville"):
             ville_selectionnee = request.args.get("ville")
-            print("DEBUG: Ville sélectionnée depuis GET:", ville_selectionnee)
+
 
     # 3. Cas spécial: si on a des coordonnées mais pas de ville, on utilise les coordonnées pour le zoom
     user_lat = form_recherche.latitude.data
@@ -254,12 +249,7 @@ def liste_etablissements():
     # 5. Préparation pour le template
     etablissements, etablissements_json = afficher_etablissements(etablissements)
 
-    print(
-        "DEBUG: Préparation du rendu du template avec user_lat:",
-        user_lat,
-        "user_lon:",
-        user_lon,
-    )
+
     return render_template(
         "liste_etablissements.html",
         etablissements=etablissements,

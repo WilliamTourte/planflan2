@@ -52,7 +52,7 @@ def get_place_id(name, address):
     params = {"query": query, "key": GOOGLE_MAPS_API_KEY}
 
     try:
-        logger.debug(f"Requête API pour: {name}")
+
         response = requests.get(base_url, params=params, timeout=15)
         response.raise_for_status()
 
@@ -61,7 +61,7 @@ def get_place_id(name, address):
         # Vérifier le statut de la réponse
         if data.get("status") == "OK" and data.get("results"):
             place_id = data["results"][0]["place_id"]
-            logger.debug(f"Place ID trouvé: {place_id}")
+  
             return place_id
         elif data.get("status") == "ZERO_RESULTS":
             logger.warning(f"Aucun résultat trouvé pour {name}")

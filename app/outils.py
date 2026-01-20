@@ -45,26 +45,22 @@ def verifier_csrf_token():
     Returns:
         tuple: (bool, str) - (True, None) si le token est valide, (False, message_erreur) sinon
     """
-    current_app.logger.debug(
-        f"CSRF verification started for {request.method} {request.path}"
-    )
+
 
     # Pour les méthodes GET, HEAD, OPTIONS, la vérification CSRF n'est pas requise
     if request.method in ("GET", "HEAD", "OPTIONS"):
-        current_app.logger.debug(f"CSRF check skipped for {request.method} method")
+
         return True, None
 
     # Si nous sommes en environnement de test, désactiver la vérification CSRF
     if hasattr(current_app, "config") and current_app.config.get("TESTING", False):
-        current_app.logger.debug("CSRF check skipped - TESTING mode")
+
         return True, None
 
     # Pour POST, PUT, DELETE, la vérification CSRF est obligatoire
     # Extraire le token CSRF de l'en-tête ou du formulaire
     csrf_token = request.headers.get("X-CSRFToken") or request.form.get("csrf_token")
-    current_app.logger.debug(
-        f"CSRF token check for {request.method} - token present: {bool(csrf_token)}"
-    )
+
 
     if not csrf_token:
         # Si aucun token n'est fourni pour une méthode qui en nécessite un, c'est une erreur
@@ -75,7 +71,7 @@ def verifier_csrf_token():
 
     try:
         validate_csrf(csrf_token)
-        current_app.logger.debug("CSRF token validation successful")
+
         return True, None
     except Exception as e:
         current_app.logger.warning(f"Token CSRF invalide: {e}")
@@ -92,14 +88,10 @@ def verifier_csrf_ou_renvoyer_erreur():
         tuple: (bool, Response) - (True, None) si le token est valide,
         (False, response_erreur) si le token est invalide
     """
-    current_app.logger.debug(
-        f"CSRF verification with error response for {request.method} {request.path}"
-    )
+
 
     csrf_valide, message = verifier_csrf_token()
-    current_app.logger.debug(
-        f"CSRF verification result: valid={csrf_valide}, message={bool(message)}"
-    )
+
 
     if not csrf_valide:
         from flask import jsonify
@@ -111,7 +103,7 @@ def verifier_csrf_ou_renvoyer_erreur():
         )
         return False, error_response
 
-    current_app.logger.debug("CSRF verification successful, returning True")
+
     return True, None
 
 

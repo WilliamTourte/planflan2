@@ -214,9 +214,6 @@ function initGeolocButton() {
 
                     return; // Ne pas soumettre le formulaire
                 } else {
-                    console.error(
-                        "DEBUG: ERREUR - Champs latitude/longitude non trouvés",
-                    );
                     restoreButtonState();
                 }
             },
