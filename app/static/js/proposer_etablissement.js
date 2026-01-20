@@ -202,8 +202,15 @@ window.initMap = function (lat, lng, title) {
 };
 
 document.addEventListener("DOMContentLoaded", function () {
+    const googleMapsApiKeyElement = document.getElementById('google-maps-api-key');
+    if (!googleMapsApiKeyElement) {
+        console.error("Élément #google-maps-api-key introuvable !");
+        return;
+    }
+    const googleMapsApiKey = googleMapsApiKeyElement.getAttribute('data-api-key');
+    
     const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${window.googleMapsApiKey}&libraries=places&callback=initAutocomplete&v=weekly&loading=async`;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}&libraries=places&callback=initAutocomplete&v=weekly&loading=async`;
     script.async = true;
     script.defer = true;
     document.head.appendChild(script);

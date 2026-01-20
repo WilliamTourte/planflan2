@@ -12,9 +12,9 @@
   integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
   crossorigin=""
 ></script>
-<script>
-  window.googleMapsApiKey = '{{ google_maps_api_key }}';
-</script>
+<!-- Données pour le script externe -->
+<div id="google-maps-api-key" data-api-key="{{ google_maps_api_key }}"></div>
+
 <script src="{{ url_for('static', filename='js/proposer_etablissement.js') }}" nonce="{{ csp_nonce }}"></script>
 
 {% endblock %} {% block content %}

@@ -26,7 +26,7 @@ class GeolocationHandler {
         // Créer l'icône de l'utilisateur avec un emoji 📍 (plus gros que les autres marqueurs)
         this.userIcon = L.divIcon({
             html: '<div class="emoji-marker user-position-icon">📍</div>',
-            iconSize: [40, 40],  // Plus gros que les marqueurs standards (30x30)
+   
             iconAnchor: [20, 40],
             className: 'user-position-icon'
         });

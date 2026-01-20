@@ -103,8 +103,8 @@ def test_proposer_etablissement_contains_google_maps_api_key(client):
     """Test que la route /proposer_etablissement contient la clé API Google Maps"""
     response = client.get("/proposer_etablissement")
     assert response.status_code == 200
-    # Vérifier que la clé API Google Maps est présente dans la réponse
-    assert b"GOOGLE_MAPS_API_KEY" in response.data or b"google.maps" in response.data or b"window.googleMapsApiKey" in response.data
+    # Vérifier que la clé API Google Maps est présente dans la réponse via l'attribut data-api-key
+    assert b"data-api-key" in response.data or b"google.maps" in response.data
 
 
 @pytest.mark.maps
