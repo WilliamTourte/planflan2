@@ -171,6 +171,26 @@ function initAutocomplete() {
     return true;
 }
 
+// Fonction utilitaire légère pour la géolocalisation (sans dépendance Leaflet)
+function getUserLocationSimple() {
+    return new Promise((resolve, reject) => {
+        if (!navigator.geolocation) {
+            reject(new Error("La géolocalisation n'est pas supportée par votre navigateur"));
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => resolve(position),
+            (error) => reject(error),
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            }
+        );
+    });
+}
+
 // Fonction pour initialiser le bouton de géolocalisation
 function initGeolocButton() {
     const geolocButton = document.getElementById("geoloc-button");
@@ -186,9 +206,9 @@ function initGeolocButton() {
             '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
         geolocButton.disabled = true;
 
-        // Utiliser la fonction de géolocalisation existante
-        geoloc.getUserLocation(
-            function (coords) {
+        // Utiliser la fonction légère de géolocalisation
+        getUserLocationSimple()
+            .then((position) => {
                 // Remplir les champs cachés avec les coordonnées
                 const latitudeField = document.querySelector(
                     'input[name="latitude"]',
@@ -198,16 +218,16 @@ function initGeolocButton() {
                 );
 
                 if (latitudeField && longitudeField) {
-                    latitudeField.value = coords.latitude;
-                    longitudeField.value = coords.longitude;
+                    latitudeField.value = position.coords.latitude;
+                    longitudeField.value = position.coords.longitude;
 
                     // Construire l'URL avec les coordonnées et le flag de géolocalisation
                     const url = new URL(
                         window.location.origin +
                         '/liste_etablissements',
                     );
-                    url.searchParams.append("latitude", coords.latitude);
-                    url.searchParams.append("longitude", coords.longitude);
+                    url.searchParams.append("latitude", position.coords.latitude);
+                    url.searchParams.append("longitude", position.coords.longitude);
                     url.searchParams.append("geolocalisation", "true");
 
                     window.location.href = url.toString();
@@ -216,8 +236,8 @@ function initGeolocButton() {
                 } else {
                     restoreButtonState();
                 }
-            },
-            function (error) {
+            })
+            .catch((error) => {
                 // Gérer les erreurs de géolocalisation
                 let errorMessage = "Erreur de géolocalisation: ";
                 switch (error.code) {
@@ -236,8 +256,7 @@ function initGeolocButton() {
 
                 alert(errorMessage);
                 restoreButtonState();
-            },
-        );
+            });
 
         function restoreButtonState() {
             geolocButton.innerHTML = originalHTML;

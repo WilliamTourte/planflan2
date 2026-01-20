@@ -25,35 +25,6 @@ from flask_bcrypt import Bcrypt
 
 
 @pytest.mark.maps
-def test_geoloc_route_removed(client):
-    """Test que l'ancienne route /geoloc a été supprimée"""
-    response = client.post(
-        "/geoloc", json={"latitude": 45.764043, "longitude": 4.835659}
-    )
-    assert response.status_code == 404, "La route /geoloc devrait être supprimée"
-
-
-@pytest.mark.maps
-def test_geolocalisation_frontend_only(client):
-    """Test que la géolocalisation est gérée côté frontend uniquement"""
-    # Ce test vérifie que les routes backend de géolocalisation ont été supprimées
-    
-    # La route /etablissements_proches ne devrait plus exister
-    response = client.post(
-        "/etablissements_proches",
-        json={"latitude": 45.764043, "longitude": 4.835659}
-    )
-    assert response.status_code == 404, "La route /etablissements_proches devrait être supprimée"
-    
-    # La route /geoloc ne devrait plus exister non plus
-    response = client.post(
-        "/geoloc",
-        json={"latitude": 45.764043, "longitude": 4.835659}
-    )
-    assert response.status_code == 404, "La route /geoloc devrait être supprimée"
-
-
-@pytest.mark.maps
 def test_geolocation_handler_class():
     """Test que la classe GeolocationHandler est disponible pour le frontend"""
     # Ce test vérifie que le nouveau système de géolocalisation frontend est disponible

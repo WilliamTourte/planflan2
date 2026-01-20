@@ -20,16 +20,15 @@ class GeolocationHandler {
         this.options = {
             defaultZoom: options.defaultZoom || 14,
             maxAccuracyRadius: options.maxAccuracyRadius || 1000,
-            userIconUrl: options.userIconUrl || '/static/images/user-position.png',
             ...options
         };
         
-        // Créer l'icône de l'utilisateur
-        this.userIcon = L.icon({
-            iconUrl: this.options.userIconUrl,
-            iconSize: [32, 32],
-            iconAnchor: [16, 32],
-            popupAnchor: [0, -32]
+        // Créer l'icône de l'utilisateur avec un emoji 📍
+        this.userIcon = L.divIcon({
+            html: '📍',
+            iconSize: [30, 30],
+            iconAnchor: [15, 30],
+            className: 'user-position-icon'
         });
     }
 

@@ -304,8 +304,7 @@ function initMap() {
 
     // Initialiser le gestionnaire de géolocalisation
     geolocationHandler = new GeolocationHandler(map, {
-        defaultZoom: 14,
-        userIconUrl: '/static/images/user-position.png'
+        defaultZoom: 14
     });
 
     // Ajouter un écouteur d'événement pour le déplacement de la carte

@@ -249,6 +249,11 @@ def liste_etablissements():
     # 5. Préparation pour le template
     etablissements, etablissements_json = afficher_etablissements(etablissements)
 
+    # Debug: vérifier le type et le contenu
+    print(f"Type de etablissements_json: {type(etablissements_json)}")
+    if etablissements_json:
+        print(f"Premier élément: {etablissements_json[0]}")
+        print(f"Type du premier élément: {type(etablissements_json[0])}")
 
     return render_template(
         "liste_etablissements.html",
