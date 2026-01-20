@@ -25,19 +25,16 @@ from flask_bcrypt import Bcrypt
 
 
 @pytest.mark.maps
-def test_geoloc_route(client):
-    """Test de la route /geoloc pour la géolocalisation"""
+def test_geoloc_route_removed(client):
+    """Test que l'ancienne route /geoloc a été supprimée"""
     response = client.post(
         "/geoloc", json={"latitude": 45.764043, "longitude": 4.835659}
     )
-    assert response.status_code == 200
-    data = response.get_json()
-    assert "latitude" in data
-    assert "longitude" in data
+    assert response.status_code == 404, "La route /geoloc devrait être supprimée"
 
 
 @pytest.mark.maps
-def test_geolocalisation_frontend_only():
+def test_geolocalisation_frontend_only(client):
     """Test que la géolocalisation est gérée côté frontend uniquement"""
     # Ce test vérifie que les routes backend de géolocalisation ont été supprimées
     
