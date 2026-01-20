@@ -352,6 +352,7 @@ def modifier_etablissement(id_etab):
     etablissement = db.session.get(Etablissement, id_etab)
     if etablissement is None:
         from flask import abort
+
         abort(404)
 
     # Instanciation des formulaires avec leurs préfixes respectifs
@@ -429,6 +430,7 @@ def valider_etablissement(id_etab):
     etablissement = db.session.get(Etablissement, id_etab)
     if etablissement is None:
         from flask import abort
+
         abort(404)
 
     # Vérifier si l'utilisateur est un admin
@@ -449,6 +451,7 @@ def supprimer_etablissement(id_etab):
     etablissement = db.session.get(Etablissement, id_etab)
     if etablissement is None:
         from flask import abort
+
         abort(404)
 
     # Vérifier si l'utilisateur est l'auteur de l'établissement ou un admin

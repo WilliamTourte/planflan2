@@ -168,7 +168,7 @@ def liste_etablissements():
             ville_selectionnee = request.form.get("ville")
             print("DEBUG: Ville sélectionnée depuis POST:", ville_selectionnee)
     elif request.method == "GET":
-        print("DEBUG: Données GET reçues:", request.args)
+
         if request.args.get("ville"):
             ville_selectionnee = request.args.get("ville")
             print("DEBUG: Ville sélectionnée depuis GET:", ville_selectionnee)
@@ -178,9 +178,7 @@ def liste_etablissements():
     user_lon = form_recherche.longitude.data
 
     if user_lat and user_lon and not ville_selectionnee:
-        print("DEBUG: Mode géolocalisation - utilisation des coordonnées pour le zoom")
-        # On ne filtre pas les établissements ici, on les affiche tous
-        # Le filtre par proximité sera fait côté JavaScript ou via le rayon
+
         etablissements = query.distinct().all()
     else:
         # 4. Appliquer les autres filtres (sauf la ville)
@@ -468,6 +466,7 @@ def afficher_etablissement_unique(id_etab):
     etablissement = db.session.get(Etablissement, id_etab)
     if etablissement is None:
         from flask import abort
+
         abort(404)
     form_etab = EtabForm(prefix="edit-etab", obj=etablissement)
     delete_form = DeleteForm()
@@ -514,6 +513,7 @@ def afficher_flan_unique(id_flan):
     flan_unique = db.session.get(Flan, id_flan)
     if flan_unique is None:
         from flask import abort
+
         abort(404)
     form_eval = EvalForm(prefix="flan-eval")
     form_flan = NewFlanForm(prefix="edit-flan", obj=flan_unique)
@@ -549,6 +549,7 @@ def proposer_flan(id_etab):
     etablissement = db.session.get(Etablissement, id_etab)
     if etablissement is None:
         from flask import abort
+
         abort(404)
     form = NewFlanForm(prefix="ajout-flan")
     form.id_etab.data = id_etab
@@ -581,6 +582,7 @@ def valider_flan(id_flan):
     flan = db.session.get(Flan, id_flan)
     if flan is None:
         from flask import abort
+
         abort(404)
     flan.statut = "VALIDE"
     try:
@@ -598,6 +600,7 @@ def modifier_flan(id_flan):
     flan = db.session.get(Flan, id_flan)
     if flan is None:
         from flask import abort
+
         abort(404)
     form = NewFlanForm(prefix="edit-flan")
     if current_user.id_user != flan.id_user and not current_user.is_admin:
@@ -625,6 +628,7 @@ def supprimer_flan(id_flan):
     flan = db.session.get(Flan, id_flan)
     if flan is None:
         from flask import abort
+
         abort(404)
     if current_user.id_user != flan.id_user and not current_user.is_admin:
         flash("Vous n'avez pas le droit de supprimer ce flan.", "danger")
@@ -682,10 +686,12 @@ def afficher_evaluation_unique(id_eval):
     evaluation = db.session.get(Evaluation, id_eval)
     if evaluation is None:
         from flask import abort
+
         abort(404)
     flan_unique = db.session.get(Flan, evaluation.id_flan)
     if flan_unique is None:
         from flask import abort
+
         abort(404)
     form = EvalForm(prefix="eval-detail")
     delete_form = DeleteForm()
@@ -788,6 +794,7 @@ def valider_evaluation(id_eval):
     evaluation = db.session.get(Evaluation, id_eval)
     if evaluation is None:
         from flask import abort
+
         abort(404)
     evaluation.statut = "VALIDE"
     try:
@@ -807,6 +814,7 @@ def supprimer_evaluation(id_eval):
     evaluation = db.session.get(Evaluation, id_eval)
     if evaluation is None:
         from flask import abort
+
         abort(404)
     if current_user.id_user != evaluation.id_user and not current_user.is_admin:
         flash("Vous n'avez pas le droit de supprimer cette évaluation.", "danger")

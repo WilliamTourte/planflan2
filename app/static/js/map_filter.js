@@ -6,7 +6,6 @@ let userMarker = null;
 
 let baseUrl = window.location.origin;
 let userLocation = null;
-let proximityRadius = 5;
 let villeSelectionnee = null;
 
 // Désactiver les transformations 3D pour Leaflet
@@ -18,8 +17,7 @@ let activeFilters = {
     type_saveur: false,
     visited: false,
     unvisited: false,
-    label: false,
-    proximity: false
+    label: false
 };
 
 // Fonction pour initialiser les données dynamiques
@@ -265,7 +263,6 @@ function addGeolocateControl() {
                 geoloc.getUserLocation(
                     (coords) => {
                         userLocation = { lat: coords.latitude, lon: coords.longitude };
-                        activeFilters.proximity = true;
                         createUserMarker(true);
 
                         // Met à jour les champs cachés du formulaire (si ils existent)
@@ -620,7 +617,7 @@ function setupFilterButtons() {
     });
 
     document.getElementById('filter-all').addEventListener('click', function() {
-        activeFilters = { type_pate: false, type_saveur: false, visited: false, unvisited: false, label: false, proximity: false };
+        activeFilters = { type_pate: false, type_saveur: false, visited: false, unvisited: false, label: false};
         updateMarkersBasedOnFilters();
         document.getElementById('sub-filters').classList.remove('show');
         updateActiveButtonStates();

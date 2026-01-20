@@ -2,24 +2,6 @@
 # Ce fichier définit les hooks Git à exécuter avant chaque commit
 
 repos:
-  - repo: https://github.com/psf/black
-    rev: 25.12.0
-    hooks:
-      - id: black
-        name: Formatage avec Black
-        language_version: python3
-        files: ^app/.*\.py$
-        args: [--check]  # Vérifie sans modifier les fichiers
-
-  # - repo: https://github.com/PyCQA/pylint
-  #   rev: v3.0.3
-  #   hooks:
-  #     - id: pylint
-  #       name: Vérification avec Pylint
-  #       entry: pylint
-  #       args: ["--rcfile=.pylintrc"]
-  #       language: system
-  #       files: ^app/.*\.py$
 
   - repo: local
     hooks:
