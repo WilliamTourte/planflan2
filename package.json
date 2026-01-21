@@ -1,0 +1,28 @@
+{
+  "type": "module",
+  "name": "planflan3",
+  "version": "1.0.0",
+  "description": "1. Création de l'environnement :\r ```sh\r python -m venv env\r ```\r 2. Activer l'environnement :\r ```sh\r source env/bin/activate  # ou env\\Scripts\\activate sur Windows\r ```",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WilliamTourte/planflan2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/WilliamTourte/planflan2/issues"
+  },
+  "homepage": "https://github.com/WilliamTourte/planflan2#readme",
+  "devDependencies": {
+    "eslint": "^9.39.2",
+    "eslint-plugin-jsdoc": "^62.3.0"
+  }
+}

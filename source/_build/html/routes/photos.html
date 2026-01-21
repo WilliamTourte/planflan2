@@ -1,0 +1,322 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="fr" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Routes détaillées &mdash; Documentation PlanFlan 1.0</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=7a28dfa3"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/translations.js?v=e6b791cb"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Recherche" href="../search.html" />
+    <link rel="next" title="Documentation des templates et macros" href="../templates.html" />
+    <link rel="prev" title="Routes détaillées" href="maps.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            PlanFlan
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Rechercher docs" aria-label="Rechercher docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Modules de l'application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">Modules de l’application</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#structure-du-projet">Structure du projet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#architecture">Architecture</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation technique:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">Modules de l’application</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#structure-du-projet">Structure du projet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#architecture">Architecture</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../routes.html">Documentation des routes Flask</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="main.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="main.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="main.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auth.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auth.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auth.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="maps.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="maps.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="maps.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../routes.html#conventions-des-routes">Conventions des routes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../routes.html#exemple-de-documentation-d-une-route">Exemple de documentation d’une route</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../templates.html">Documentation des templates et macros</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../templates.html#structure-des-templates">Structure des templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../templates.html#macros-principales">Macros principales</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../templates.html#blocs-principaux">Blocs principaux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../templates.html#heritage-des-templates">Héritage des templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../templates.html#variables-globales">Variables globales</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../javascript.html">Documentation JavaScript</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../javascript.html#structure-des-scripts">Structure des scripts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../javascript.html#fonctions-principales">Fonctions principales</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../javascript.html#evenements-personnalises">Événements personnalisés</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../javascript.html#conventions-de-codage">Conventions de codage</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation technique:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">Modules de l’application</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#structure-du-projet">Structure du projet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#architecture">Architecture</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../routes.html">Documentation des routes Flask</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="main.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="main.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="main.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auth.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auth.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auth.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="maps.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="maps.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="maps.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../routes.html#conventions-des-routes">Conventions des routes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../routes.html#exemple-de-documentation-d-une-route">Exemple de documentation d’une route</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../templates.html">Documentation des templates et macros</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../templates.html#structure-des-templates">Structure des templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../templates.html#macros-principales">Macros principales</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../templates.html#blocs-principaux">Blocs principaux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../templates.html#heritage-des-templates">Héritage des templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../templates.html#variables-globales">Variables globales</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../javascript.html">Documentation JavaScript</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../javascript.html#structure-des-scripts">Structure des scripts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../javascript.html#fonctions-principales">Fonctions principales</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../javascript.html#evenements-personnalises">Événements personnalisés</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../javascript.html#conventions-de-codage">Conventions de codage</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation technique:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">Modules de l’application</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#structure-du-projet">Structure du projet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#architecture">Architecture</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../routes.html">Documentation des routes Flask</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="main.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="main.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="main.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auth.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auth.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="auth.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="maps.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="maps.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="maps.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../routes.html#conventions-des-routes">Conventions des routes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../routes.html#exemple-de-documentation-d-une-route">Exemple de documentation d’une route</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../templates.html">Documentation des templates et macros</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../templates.html#structure-des-templates">Structure des templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../templates.html#macros-principales">Macros principales</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../templates.html#blocs-principaux">Blocs principaux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../templates.html#heritage-des-templates">Héritage des templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../templates.html#variables-globales">Variables globales</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../javascript.html">Documentation JavaScript</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../javascript.html#structure-des-scripts">Structure des scripts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../javascript.html#fonctions-principales">Fonctions principales</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../javascript.html#evenements-personnalises">Événements personnalisés</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../javascript.html#conventions-de-codage">Conventions de codage</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Modules de l'application:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules.html">Modules de l’application</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#structure-du-projet">Structure du projet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../modules.html#architecture">Architecture</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">PlanFlan</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../routes.html">Documentation des routes Flask</a></li>
+      <li class="breadcrumb-item active">Routes détaillées</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/routes/photos.rst.txt" rel="nofollow"> Afficher la source de la page</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="routes-detaillees">
+<h1>Routes détaillées<a class="headerlink" href="#routes-detaillees" title="Lien vers cette rubrique"></a></h1>
+<p>Ce module contient les routes pour la gestion des photos et uploads.</p>
+</section>
+<section id="id1">
+<h1>Routes détaillées<a class="headerlink" href="#id1" title="Lien vers cette rubrique"></a></h1>
+</section>
+<hr class="docutils" />
+<section id="id2">
+<h1>Routes détaillées<a class="headerlink" href="#id2" title="Lien vers cette rubrique"></a></h1>
+<dl class="http get">
+<dt class="sig sig-object http" id="get--photos--int-photo_id-">
+<span class="sig-name descname"><span class="pre">GET</span> </span><span class="sig-name descname"><span class="pre">/photos/&lt;int:photo_id&gt;</span></span><a class="headerlink" href="#get--photos--int-photo_id-" title="Lien vers cette définition"></a></dt>
+<dd><p>Affiche une photo spécifique.</p>
+<p><strong>Paramètres</strong> :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">photo_id</span></code> (int) : ID de la photo</p></li>
+</ul>
+<p><strong>Exemple de réponse</strong> :</p>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">img</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;/static/uploads/photo_123.jpg&quot;</span> <span class="na">alt</span><span class="o">=</span><span class="s">&quot;Photo de l&#39;établissement&quot;</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Status Codes<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.2.1">200 OK</a></span> – succès</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.5">404 Not Found</a></span> – photo non trouvée</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="http post">
+<dt class="sig sig-object http" id="post--upload_photo">
+<span class="sig-name descname"><span class="pre">POST</span> </span><span class="sig-name descname"><span class="pre">/upload_photo</span></span><a class="headerlink" href="#post--upload_photo" title="Lien vers cette définition"></a></dt>
+<dd><p>Upload une nouvelle photo.</p>
+<p><strong>Description</strong> :</p>
+<p>Route pour uploader une nouvelle photo pour un établissement ou un flan.</p>
+<p><strong>Requiert</strong> :</p>
+<ul class="simple">
+<li><p>Utilisateur authentifié</p></li>
+<li><p>Fichier image dans le formulaire</p></li>
+</ul>
+<p><strong>Paramètres</strong> :</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">file</span></code> (file) : Fichier image à uploader</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">etablissement_id</span></code> (int) : ID de l’établissement associé</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">flan_id</span></code> (int, optionnel) : ID du flan associé</p></li>
+</ul>
+<p><strong>Exemple de requête</strong> :</p>
+<div class="highlight-http notranslate"><div class="highlight"><pre><span></span><span class="nf">POST</span> <span class="nn">/upload_photo</span> <span class="kr">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Content-Type</span><span class="o">:</span> <span class="l">multipart/form-data; boundary=----WebKitFormBoundary</span>
+
+------WebKitFormBoundary
+Content-Disposition: form-data; name=&quot;file&quot;; filename=&quot;flan.jpg&quot;
+Content-Type: image/jpeg
+
+[contenu binaire de l&#39;image]
+------WebKitFormBoundary
+Content-Disposition: form-data; name=&quot;etablissement_id&quot;
+
+123
+------WebKitFormBoundary--
+</pre></div>
+</div>
+<p><strong>Réponses</strong> :</p>
+<ul class="simple">
+<li><p>Redirige vers la page de l’établissement en cas de succès</p></li>
+<li><p>Réaffiche le formulaire avec erreurs en cas d’échec</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Status Codes<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.3.3">302 Found</a></span> – redirection en cas de succès</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.1">400 Bad Request</a></span> – requête invalide</p></li>
+<li><p><span><a class="reference external" href="https://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html#sec10.4.2">401 Unauthorized</a></span> – non authentifié</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pied de page">
+        <a href="maps.html" class="btn btn-neutral float-left" title="Routes détaillées" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Précédent</a>
+        <a href="../templates.html" class="btn btn-neutral float-right" title="Documentation des templates et macros" accesskey="n" rel="next">Suivant <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Droits d'auteur 2026, Damien Hugonnard.</p>
+  </div>
+
+  Compilé avec <a href="https://www.sphinx-doc.org/">Sphinx</a> en utilisant un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">thème</a>
+    fourni par <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
