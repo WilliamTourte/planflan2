@@ -61,7 +61,7 @@ def get_place_id(name, address):
         # Vérifier le statut de la réponse
         if data.get("status") == "OK" and data.get("results"):
             place_id = data["results"][0]["place_id"]
-  
+
             return place_id
         elif data.get("status") == "ZERO_RESULTS":
             logger.warning(f"Aucun résultat trouvé pour {name}")

@@ -107,8 +107,6 @@ def configure_console_logging(app, formatter):
     app.logger.addHandler(console_handler)
 
 
-
-
 def configure_email_logging(app, formatter):
     """Configure le handler SMTP pour les erreurs critiques."""
     # Configuration SMTP à partir des variables d'environnement

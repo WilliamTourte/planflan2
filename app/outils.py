@@ -46,7 +46,6 @@ def verifier_csrf_token():
         tuple: (bool, str) - (True, None) si le token est valide, (False, message_erreur) sinon
     """
 
-
     # Pour les méthodes GET, HEAD, OPTIONS, la vérification CSRF n'est pas requise
     if request.method in ("GET", "HEAD", "OPTIONS"):
 
@@ -60,7 +59,6 @@ def verifier_csrf_token():
     # Pour POST, PUT, DELETE, la vérification CSRF est obligatoire
     # Extraire le token CSRF de l'en-tête ou du formulaire
     csrf_token = request.headers.get("X-CSRFToken") or request.form.get("csrf_token")
-
 
     if not csrf_token:
         # Si aucun token n'est fourni pour une méthode qui en nécessite un, c'est une erreur
@@ -89,9 +87,7 @@ def verifier_csrf_ou_renvoyer_erreur():
         (False, response_erreur) si le token est invalide
     """
 
-
     csrf_valide, message = verifier_csrf_token()
-
 
     if not csrf_valide:
         from flask import jsonify
@@ -102,7 +98,6 @@ def verifier_csrf_ou_renvoyer_erreur():
             f"CSRF verification failed, returning error response: {message}"
         )
         return False, error_response
-
 
     return True, None
 

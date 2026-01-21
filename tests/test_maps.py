@@ -28,18 +28,23 @@ from flask_bcrypt import Bcrypt
 def test_geolocation_handler_class():
     """Test que la classe GeolocationHandler est disponible pour le frontend"""
     # Ce test vérifie que le nouveau système de géolocalisation frontend est disponible
-    
+
     # Vérifier que le fichier geoloc.js existe
     import os
-    geoloc_js_path = os.path.join('app', 'static', 'js', 'geoloc.js')
+
+    geoloc_js_path = os.path.join("app", "static", "js", "geoloc.js")
     assert os.path.exists(geoloc_js_path), "Le fichier geoloc.js devrait exister"
-    
+
     # Vérifier que le fichier contient la classe GeolocationHandler
-    with open(geoloc_js_path, 'r') as f:
+    with open(geoloc_js_path, "r", encoding="utf-8") as f:
         content = f.read()
-        assert 'class GeolocationHandler' in content, "La classe GeolocationHandler devrait être définie"
-        assert 'calculateDistance' in content, "La méthode calculateDistance devrait être définie"
-        assert 'activate' in content, "La méthode activate devrait être définie"
+        assert (
+            "class GeolocationHandler" in content
+        ), "La classe GeolocationHandler devrait être définie"
+        assert (
+            "calculateDistance" in content
+        ), "La méthode calculateDistance devrait être définie"
+        assert "activate" in content, "La méthode activate devrait être définie"
 
 
 @pytest.mark.maps

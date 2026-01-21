@@ -896,7 +896,7 @@ def test_liste_etablissements_cas_limites_caracteres_speciaux(client):
     )
     assert response.status_code == 200
     # Vérifier que l'établissement est présent dans la réponse (le nom peut être légèrement différent)
-    assert b"Boulangerie" in response.data or b"\u00c9pi" in response.data
+    assert b"Boulangerie" in response.data
 
     response = client.get(
         "/liste_etablissements", query_string={"recherche_simple": "Café"}

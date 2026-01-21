@@ -9,10 +9,12 @@ let baseUrl = window.location.origin;
 let userLocation = null;
 let villeSelectionnee = null;
 
-// Désactiver les transformations 3D pour Leaflet
+// Configuration de Leaflet pour désactiver les transformations 3D
+// Cela améliore les performances sur certains appareils
 L_DISABLE_3D = true;
 
-// Variables pour les filtres
+// État des filtres actifs pour la carte
+// Ces filtres sont utilisés pour afficher/masquer les marqueurs en fonction des critères sélectionnés
 let activeFilters = {
     type_pate: false,
     type_saveur: false,

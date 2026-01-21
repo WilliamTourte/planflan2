@@ -118,7 +118,6 @@ def filtrer_etablissements(query, **kwargs):
 @main_bp.route("/liste_etablissements", methods=["GET", "POST"])
 def liste_etablissements():
 
-
     # Détecter le mode géolocalisation
     geolocalisation_mode = (
         request.form.get("geolocalisation") == "true"
@@ -132,7 +131,7 @@ def liste_etablissements():
         if request.method == "POST":
             form_recherche = RechercheForm(request.form)
         else:
-           
+
             form_recherche = RechercheForm(request.args)
 
     except Exception as e:
@@ -142,7 +141,8 @@ def liste_etablissements():
         form_edit = EtabForm(prefix="edit-etab")
         form_recherche = RechercheForm()
 
-    # 1. Recherche simple (GET uniquement) - MODIFIÉ pour ignorer en mode géolocalisation
+    # 1. Recherche simple (GET uniquement) - Gère la recherche par nom ou ville
+    # Note: Désactivé en mode géolocalisation pour éviter les conflits
     recherche_simple = request.args.get("recherche_simple", None)
     if recherche_simple and request.method == "GET" and not geolocalisation_mode:
         query = Etablissement.query.filter(
@@ -158,7 +158,7 @@ def liste_etablissements():
 
     # Récupérer la ville sélectionnée depuis les paramètres (GET ou POST)
     if request.method == "POST":
-  
+
         if request.form.get("ville"):
             ville_selectionnee = request.form.get("ville")
 
@@ -166,7 +166,6 @@ def liste_etablissements():
 
         if request.args.get("ville"):
             ville_selectionnee = request.args.get("ville")
-
 
     # 3. Cas spécial: si on a des coordonnées mais pas de ville, on utilise les coordonnées pour le zoom
     user_lat = form_recherche.latitude.data

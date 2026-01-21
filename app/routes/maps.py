@@ -60,12 +60,6 @@ def nettoyer_adresse(adresse):
     return adresse.split(",")[0].strip()
 
 
-
-
-
-
-
-
 @maps_bp.route("/extraire_infos_adresse", methods=["POST"])
 def extraire_infos_adresse():
     # Vérifier le token CSRF en utilisant la fonction utilitaire
@@ -151,7 +145,8 @@ def ajouter_etablissement():
         current_app.logger.info(f"Méthode POST reçue")
         current_app.logger.info(f"Tous les champs de la requête: {dict(request.form)}")
 
-        # Vérification spécifique du google_place_id
+        # Vérification du google_place_id dans la requête
+        # Ce champ est utilisé pour récupérer les photos depuis Google Places
         if "ajout-etab-google_place_id" in request.form:
             google_place_id_from_request = request.form["ajout-etab-google_place_id"]
             current_app.logger.info(
@@ -167,7 +162,8 @@ def ajouter_etablissement():
             f"Formulaire créé, google_place_id.data: '{form_ajout.google_place_id.data}' (type: {type(form_ajout.google_place_id.data)})"
         )
 
-        # Vérification de la validation du formulaire
+        # Validation du formulaire et création de l'établissement
+        # Si le formulaire est valide, les données sont utilisées pour créer un nouvel établissement
         if form_ajout.validate():
             current_app.logger.info("✓ Formulaire validé avec succès")
             current_app.logger.info("=== CRÉATION DE L'ÉTABLISSEMENT ===")
