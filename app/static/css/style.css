@@ -52,7 +52,7 @@ body {
 main.container {
     flex: 1;
 }
-=======
+
 /* =============================================
    19. RESPONSIVE SPECIFIQUE POUR LISTE_ETABLISSEMENTS
    ============================================= */
@@ -132,11 +132,11 @@ main.container {
         min-width: auto !important;
     }
 
-    /* Bouton proposer adresse en plein largeur sur mobile */
+    /* Bouton proposer adresse en pleine largeur sur mobile */
     .btn-success.w-100 {
         max-width: 100% !important;
     }
-}
+
 
 @media (max-width: 480px) {
 
@@ -296,11 +296,15 @@ h1, h2, h3, h4, h5, h6 {
 /* =============================================
    3. LAYOUT & CONTAINERS
    ============================================= */
-.container {
+.container, .container-fluid {
     width: 100%;
     max-width: var(--max-width);
     margin: 0 auto;
     padding: 0 var(--padding-md);
+}
+
+.container-fluid {
+    max-width: 100%;
 }
 
 /* =============================================
@@ -317,44 +321,22 @@ header {
     transition: transform 0.3s ease;
 }
 
-.header-yellow nav {
-    background-color: transparent;
-    padding: 0;
-    margin: 0;
-    box-shadow: none;
-    border: none;
-}
-
-.header-yellow > nav > div {
-    width: 100%;
-    max-width: 100%;
-    padding: 0 var(--padding-md);
-    margin: 0 auto;
-    background-color: transparent;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
-    flex-wrap: nowrap;
-}
-
-.header-yellow form {
+.header form {
     display: flex;
     align-items: center;
     flex-grow: 1;
     margin: 0 0.5rem;
 }
 
-.header-yellow .btn,
-.header-yellow .btn i {
+.header .btn,
+.header .btn i {
     font-size: 1.1rem;
     margin: 0;
     position: relative;
     top: 0;
 }
 
-.header-yellow .form-control {
+.form-control {
     background-color: white;
     border: 1px solid #ddd;
     border-radius: 25px;
@@ -364,7 +346,7 @@ header {
     margin-right: 8px;
 }
 
-.header-yellow .btn:hover {
+ .btn:hover {
     background-color: var(--color-info-dark);
     transform: scale(1.05);
 }
@@ -560,7 +542,7 @@ input[type="submit"]:active {
 /* =============================================
    8. FLANS (Cartes spécifiques)
    ============================================= */
-.flan-price-tag {
+.flan-price-tag, .badge--price {
     background: var(--color-secondary);
     color: white;
     padding: var(--padding-xs) var(--padding-sm);
@@ -615,7 +597,7 @@ input[type="submit"]:active {
 /* =============================================
    9. BADGES
    ============================================= */
-.badge {
+.badge, .badge-labellise, .badge-type-etab, .statut-valide, .statut-en-attente {
     position: absolute;
     display: inline-block;
     font-family: var(--font-primary);
@@ -626,18 +608,17 @@ input[type="submit"]:active {
     padding: var(--padding-xs) var(--padding-sm);
     border-radius: 15px;
     box-shadow: var(--box-shadow);
+}
 
+.badge-labellise {
+    background-color: #87CEEB;
+    top: var(--margin-sm);
+    right: var(--margin-sm);
 }
 
 .badge-type-etab {
     top: var(--margin-sm);
     left: var(--margin-sm);
-}
-
-.badge-labellise {
-    top: var(--margin-sm);
-    right: var(--margin-sm);
-    background-color: #87CEEB;
 }
 
 .statut-valide {
@@ -692,10 +673,14 @@ input[type="submit"]:active {
     font-weight: bold;
 }
 
-.form-check {
+.form-check, .form-check-container {
     display: flex;
     align-items: center;
     margin-bottom: var(--margin-sm);
+}
+
+.form-check-container {
+    gap: var(--gap-sm);
 }
 
 .form-check-inline {
@@ -724,7 +709,8 @@ input[type="submit"]:active {
 
 .form-group input:not(.form-check-input),
 .form-group textarea,
-.form-group select {
+.form-group select,
+.form-select {
     width: 100%;
     padding: var(--padding-xs);
     border: 1px solid #ddd;
@@ -1059,17 +1045,15 @@ input[type="submit"]:active {
     box-shadow: var(--box-shadow);
     font-family: var(--font-primary), sans-serif;
     max-width: 300px;
-
 }
 
 .legende-text {
     color: var(--color-text);
     font-size: var(--font-size-sm);
-
+    margin: 0 !important;
     align-items: left;
     gap: var(--gap-sm);
 }
-
 
 /* Style spécifique pour les emojis dans la légende */
 .carte-legende .badge {
@@ -1191,7 +1175,7 @@ input[type="submit"]:active {
     margin-bottom: var(--margin-sm);
 }
 
-.classe {
+.type, .classe {
     display: inline-block;
     padding: var(--padding-xs) var(--padding-sm);
     background-color: #e3f2fd;
@@ -1207,10 +1191,16 @@ input[type="submit"]:active {
   
 }
 
-.description {
+.description, .legende-text {
     color: var(--color-text);
     line-height: 1.5;
     margin-bottom: var(--margin-md);
+}
+
+.legende-text {
+    font-size: var(--font-size-sm);
+    align-items: left;
+    gap: var(--gap-sm);
 }
 
 /* Icônes Bootstrap (à garder si tu utilises bootstrap-icons) */
@@ -1278,11 +1268,11 @@ input[type="submit"]:active {
         padding: 0 var(--padding-sm);
     }
 
-    .header-yellow > nav > div {
+    .header > nav > div {
         padding: 0 var(--padding-sm);
     }
 
-    .header-yellow .form-control {
+    .header .form-control {
         width: 120px;
     }
 }
