@@ -10,8 +10,9 @@
  */
 class GeolocationHandler {
     /**
-     * @param {L.Map} map - Instance de la carte Leaflet
-     * @param {Object} options - Options de configuration
+     * Creates a new GeolocationHandler instance.
+     * @param {object} map - Instance de la carte Leaflet
+     * @param {object} options - Options de configuration
      */
     constructor(map, options = {}) {
         this.map = map;
@@ -106,6 +107,8 @@ class GeolocationHandler {
 
     /**
      * Met à jour le marqueur de l'utilisateur
+     * @param {number} lat - Latitude de la position
+     * @param {number} lng - Longitude de la position
      */
     _updateUserMarker(lat, lng) {
         if (this.userMarker) {
@@ -129,6 +132,9 @@ class GeolocationHandler {
 
     /**
      * Met à jour le cercle de précision
+     * @param {number} lat - Latitude de la position
+     * @param {number} lng - Longitude de la position
+     * @param {number} accuracy - Précision de la géolocalisation en mètres
      */
     _updateAccuracyCircle(lat, lng, accuracy) {
         if (this.userCircle) {
@@ -157,6 +163,7 @@ class GeolocationHandler {
 
     /**
      * Gère les erreurs de géolocalisation
+     * @param {object} error - Objet d'erreur de géolocalisation
      */
     _handleError(error) {
         let message;
@@ -206,6 +213,8 @@ class GeolocationHandler {
 
     /**
      * Convertit les degrés en radians
+     * @param {number} degrees - Valeur en degrés à convertir
+     * @returns {number} Valeur convertie en radians
      */
     static _toRad(degrees) {
         return degrees * Math.PI / 180;
@@ -213,6 +222,7 @@ class GeolocationHandler {
 
     /**
      * Affiche un indicateur de chargement
+     * Affiche "Géolocalisation en cours..." message
      */
     _showLoading() {
         if (window.showLoading) {
@@ -231,6 +241,7 @@ class GeolocationHandler {
 
     /**
      * Affiche un message de succès
+     * @param {string} message - Message de succès à afficher
      */
     _showSuccess(message) {
         if (window.showToast) {
@@ -240,6 +251,7 @@ class GeolocationHandler {
 
     /**
      * Affiche un message d'erreur
+     * @param {string} message - Message d'erreur à afficher
      */
     _showError(message) {
         console.error("Géolocalisation:", message);

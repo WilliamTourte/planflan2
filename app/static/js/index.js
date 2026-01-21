@@ -1,4 +1,8 @@
-// Fonction d'initialisation de l'autocomplete
+/**
+ * Initialise le système d'autocomplétion pour la recherche de villes.
+ * Configure les événements et les fonctions nécessaires pour l'autocomplétion.
+ * @returns {boolean} True si l'initialisation a réussi, false sinon
+ */
 function initAutocomplete() {
     const input = document.getElementById("ville-autocomplete");
     const resultsContainer = document.getElementById("autocomplete-results");
@@ -11,7 +15,12 @@ function initAutocomplete() {
 
     console.log("Elements found, initializing autocomplete");
 
-    // Débounce function pour limiter les requêtes API
+    /**
+     * Fonction de débounce pour limiter les appels fréquents.
+     * @param {function} func - Fonction à exécuter
+     * @param {number} timeout - Délai en millisecondes (par défaut: 300)
+     * @returns {function} Fonction enveloppée avec débounce
+     */
     function debounce(func, timeout = 300) {
         let timer;
         return (...args) => {
@@ -22,7 +31,9 @@ function initAutocomplete() {
         };
     }
 
-    // Fonction pour synchroniser avec le champ caché du formulaire
+    /**
+     * Synchronise la valeur du champ de recherche avec le champ caché du formulaire.
+     */
     function syncWithHiddenField() {
         const hiddenField = document.querySelector('input[name="ville"]');
         if (hiddenField) {
@@ -33,7 +44,9 @@ function initAutocomplete() {
         }
     }
 
-    // Fonction pour afficher l'indicateur de chargement
+    /**
+     * Affiche un indicateur de chargement pendant la recherche.
+     */
     function showLoading() {
         resultsContainer.innerHTML = "";
         const loading = document.createElement("div");
@@ -43,7 +56,10 @@ function initAutocomplete() {
         resultsContainer.classList.add("show");
     }
 
-    // Fonction pour afficher les résultats
+    /**
+     * Affiche les résultats de recherche des villes.
+     * @param {Array<string>} villes - Liste des villes trouvées
+     */
     function showResults(villes) {
         console.log("showResults called with:", villes);
         resultsContainer.innerHTML = "";
@@ -94,7 +110,11 @@ function initAutocomplete() {
         console.log("Results container style:", resultsContainer.style.display);
     }
 
-    // Fonction pour récupérer les villes depuis l'API
+    /**
+     * Récupère les villes correspondant à la requête depuis l'API.
+     * @param {string} query - Terme de recherche pour les villes
+     * @returns {Promise<Array<string>>} Liste des villes trouvées
+     */
     async function fetchVilles(query) {
         console.log("fetchVilles called with query:", query);
 
@@ -171,7 +191,11 @@ function initAutocomplete() {
     return true;
 }
 
-// Fonction utilitaire légère pour la géolocalisation (sans dépendance Leaflet)
+/**
+ * Fonction utilitaire légère pour obtenir la position de l'utilisateur.
+ * Ne nécessite pas Leaflet, utilise l'API de géolocalisation native.
+ * @returns {Promise<object>} Objet contenant la latitude et la longitude
+ */
 function getUserLocationSimple() {
     return new Promise((resolve, reject) => {
         if (!navigator.geolocation) {
@@ -191,7 +215,9 @@ function getUserLocationSimple() {
     });
 }
 
-// Fonction pour initialiser le bouton de géolocalisation
+/**
+ * Initialise le bouton de géolocalisation et configure son comportement.
+ */
 function initGeolocButton() {
     const geolocButton = document.getElementById("geoloc-button");
     if (!geolocButton) return;
@@ -258,6 +284,9 @@ function initGeolocButton() {
                 restoreButtonState();
             });
 
+        /**
+         * Restaure l'état initial du bouton de géolocalisation.
+         */
         function restoreButtonState() {
             geolocButton.innerHTML = originalHTML;
             geolocButton.disabled = originalDisabled;

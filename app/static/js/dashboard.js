@@ -1,10 +1,15 @@
-// Afficher le formulaire de suppression de compte
+/**
+ * Show the delete account form and focus on the password field.
+ */
 function showDeleteAccountForm() {
     document.getElementById("delete-account-section").style.display = "block";
     document.getElementById("delete-password").focus();
 }
 
-// Annuler la suppression du compte
+/**
+ * Cancel account deletion and hide the delete account form.
+ * Also removes error parameters from the URL.
+ */
 function cancelDeleteAccount() {
     document.getElementById("delete-account-section").style.display = "none";
     // Supprimer les paramètres d'erreur de l'URL
@@ -20,6 +25,10 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 });
 
+/**
+ * Toggle the visibility of a section by its ID.
+ * @param {string} sectionId - The ID of the section to toggle
+ */
 function toggleSection(sectionId) {
     const section = document.getElementById(sectionId);
     if (section.style.display === "none") {

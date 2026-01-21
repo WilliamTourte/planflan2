@@ -1,4 +1,8 @@
-// Fonction pour gérer le retour avec fallback
+/**
+ * Function to handle navigation with fallback.
+ * Attempts to go back in history, falls back to specified URL if not possible.
+ * @param {string} fallbackUrl - The URL to fall back to if history navigation fails
+ */
 function goBackOrRedirect(fallbackUrl) {
     // Solution simple : utiliser le referrer pour décider
     var referrer = document.referrer;

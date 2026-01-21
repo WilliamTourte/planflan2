@@ -23,7 +23,10 @@ let activeFilters = {
     label: false
 };
 
-// Fonction pour initialiser les données dynamiques
+/**
+ * Initialise les éléments de données dynamiques pour la carte.
+ * Crée les éléments DOM nécessaires si ils n'existent pas.
+ */
 function initDataElements() {
     if (!document.getElementById('etablissements-data')) {
         const etablissementsDataElement = document.createElement('div');
@@ -75,7 +78,14 @@ const createEmojiIcon = (emoji, className) => {
 
 
 
-// Fonction pour créer un marqueur avec un popup asynchrone pour un établissement donné
+/**
+ * Crée un marqueur avec un popup asynchrone pour un établissement donné.
+ * 
+ * @param {Object} map - Instance de la carte Leaflet
+ * @param {Object} etablissement - Données de l'établissement
+ * @param {string} baseUrl - URL de base pour les liens (par défaut: origine du site)
+ * @returns {L.Marker} Marqueur Leaflet créé
+ */
 function createEtablissementMarker(map, etablissement, baseUrl = window.location.origin) {
     let icon = createEmojiIcon('🏠', 'default-icon');
     if (etablissement.label) {
@@ -154,7 +164,10 @@ function createEtablissementMarker(map, etablissement, baseUrl = window.location
     return marker;
 }
 
-// Fonction pour mettre à jour les marqueurs en fonction des filtres actifs
+/**
+ * Met à jour les marqueurs en fonction des filtres actifs.
+ * Affiche ou masque les marqueurs selon les critères de filtrage sélectionnés.
+ */
 function updateMarkersBasedOnFilters() {
     markers.forEach(marker => {
         const etablissement = marker.options.etablissement;
@@ -194,7 +207,12 @@ function updateMarkersBasedOnFilters() {
     });
 }
 
-// Fonction pour zoomer sur une ville spécifique
+/**
+ * Zoom sur une ville spécifique et centre la carte sur ses établissements.
+ * 
+ * @param {string} ville - Nom de la ville sur laquelle zoomer
+ * @returns {boolean} True si le zoom a été effectué, false sinon
+ */
 function zoomOnVille(ville) {
     if (!ville || !etablissements || etablissements.length === 0) {
         return false;
@@ -226,7 +244,11 @@ function zoomOnVille(ville) {
     return false;
 }
 
-// Fonction pour créer un marqueur utilisateur
+/**
+ * Crée un marqueur pour la position de l'utilisateur.
+ * 
+ * @param {boolean} forceZoom - Si true, zoom sur la position de l'utilisateur
+ */
 function createUserMarker(forceZoom = false) {
     if (userMarker) map.removeLayer(userMarker);
    
@@ -281,7 +303,10 @@ function addGeolocateControl() {
 }
 
 
-// Initialisation de la carte Leaflet
+/**
+ * Initialise la carte Leaflet avec les paramètres par défaut.
+ * Configure la vue initiale et les contrôles de base.
+ */
 function initMap() {
     const mapElement = document.getElementById("map");
     if (!mapElement) {
@@ -338,6 +363,11 @@ return div;
 }
 
 // Chargement des établissements
+/**
+ * Charge les données des établissements depuis l'élément DOM.
+ * 
+ * @returns {Array} Tableau des établissements ou tableau vide en cas d'erreur
+ */
 function loadEtablissements() {
     try {
         const etablissementsDataElement = document.getElementById('etablissements-data');
@@ -744,7 +774,10 @@ function restoreStateFromUrl() {
     }
 }
 
-// Initialisation globale
+/**
+ * Fonction d'initialisation globale pour la carte et les filtres.
+ * Appelle toutes les fonctions d'initialisation nécessaires.
+ */
 function initAll() {
     initDataElements();
     initMap();

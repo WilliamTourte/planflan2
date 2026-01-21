@@ -1,3 +1,9 @@
+"""
+Application-level tests for PlanFlan.
+
+This module contains tests for the main application functionality, including
+basic application setup and configuration tests.
+"""
 # tests/test_app.py
 from app import create_app, db
 
@@ -8,6 +14,7 @@ import pytest
 
 @pytest.fixture
 def client():
+    """Create a test client with in-memory database for application testing."""
     app = create_app()
     app.config["TESTING"] = True
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"

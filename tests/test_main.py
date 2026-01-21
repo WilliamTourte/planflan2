@@ -1,3 +1,9 @@
+"""
+Main application tests for PlanFlan.
+
+This module contains comprehensive tests for the main application routes and functionality,
+including user authentication, establishment management, flan operations, and evaluations.
+"""
 from app import db
 from app.models import Etablissement, Flan, Evaluation, Utilisateur
 from app.forms import (
@@ -37,6 +43,7 @@ def test_route_status(client, route, expected_status, expected_content):
 
 
 def test_afficher_etablissement_unique(client):
+    """Test displaying a single establishment page."""
     # Créer un établissement de test
     etab = Etablissement(
         nom="Test Etablissement",
@@ -52,6 +59,7 @@ def test_afficher_etablissement_unique(client):
 
 
 def test_afficher_flan_unique(client):
+    """Test displaying a single flan page."""
     # Créer un établissement et un flan de test
     etab = Etablissement(
         nom="Test Etablissement",
@@ -71,6 +79,7 @@ def test_afficher_flan_unique(client):
 
 
 def test_proposer_flan(client):
+    """Test proposing a new flan."""
     # Récupérer l'utilisateur créé dans la fixture (déjà connecté via la fixture)
     user = client.application.config["TEST_USER"]
     assert user is not None, "L'utilisateur de test n'existe pas"
@@ -148,6 +157,7 @@ def test_proposer_flan(client):
 
 @pytest.mark.main
 def test_valider_flan(client):
+    """Test validating a flan as admin."""
     # Récupérer l'utilisateur admin créé dans la fixture
     user = client.application.config["TEST_USER"]
     assert user.is_admin, "L'utilisateur doit être admin pour valider les flans"
@@ -189,6 +199,7 @@ def test_valider_flan(client):
 
 @pytest.mark.main
 def test_modifier_flan(client):
+    """Test modifying a flan."""
     # Récupérer l'utilisateur créé dans la fixture
     user = client.application.config["TEST_USER"]
     assert user is not None, "L'utilisateur de test n'existe pas"
@@ -248,6 +259,7 @@ def test_modifier_flan(client):
 
 @pytest.mark.main
 def test_supprimer_flan(client):
+    """Test deleting a flan."""
     # Récupérer l'utilisateur créé dans la fixture
     user = client.application.config["TEST_USER"]
     assert user is not None, "L'utilisateur de test n'existe pas"
@@ -285,6 +297,7 @@ def test_supprimer_flan(client):
 
 @pytest.mark.main
 def test_evaluer_flan(client):
+    """Test evaluating a flan."""
     # Récupérer l'utilisateur créé dans la fixture
     user = client.application.config["TEST_USER"]
     assert user is not None, "L'utilisateur de test n'existe pas"
@@ -350,6 +363,7 @@ def test_evaluer_flan(client):
 
 
 def test_afficher_evaluation_unique(client):
+    """Test displaying a single evaluation."""
     # Récupérer l'utilisateur créé dans la fixture
     user = client.application.config["TEST_USER"]
     assert user is not None, "L'utilisateur de test n'existe pas"
@@ -392,6 +406,7 @@ def test_afficher_evaluation_unique(client):
 
 
 def test_valider_evaluation(client):
+    """Test validating an evaluation as admin."""
     # Récupérer l'utilisateur admin créé dans la fixture
     user = client.application.config["TEST_USER"]
     assert user.is_admin, "L'utilisateur doit être admin pour valider les évaluations"
@@ -440,6 +455,7 @@ def test_valider_evaluation(client):
 
 
 def test_supprimer_evaluation(client):
+    """Test deleting an evaluation."""
     # Récupérer l'utilisateur créé dans la fixture
     user = client.application.config["TEST_USER"]
     assert user is not None, "L'utilisateur de test n'existe pas"
