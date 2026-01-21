@@ -68,7 +68,7 @@ def configure_file_logging(app, formatter):
     file_handler = RotatingFileHandler(
         os.path.join(log_dir, "planflan.log"),
         maxBytes=1024 * 1024 * 5,  # 5 Mo
-        backupCount=10,  # Garder 10 fichiers de backup
+        backupCount=2,  # Garder 10 fichiers de backup
         encoding="utf-8",
     )
     file_handler.setFormatter(formatter)
@@ -152,8 +152,8 @@ def configure_http_logging(app):
 
     http_file_handler = RotatingFileHandler(
         os.path.join(log_dir, "http_requests.log"),
-        maxBytes=1024 * 1024 * 2,  # 2 Mo
-        backupCount=5,  # Garder 5 fichiers de backup
+        maxBytes=1024 * 1024 * 5,  # 2 Mo
+        backupCount=2,  # Garder 5 fichiers de backup
         encoding="utf-8",
     )
 

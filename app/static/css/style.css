@@ -1062,15 +1062,6 @@ input[type="submit"]:active {
 
 }
 
-.legende-container {
-    display: left;
-    
-    gap: var(--gap-sm);
-
-}
-
-
-
 .legende-text {
     color: var(--color-text);
     font-size: var(--font-size-sm);
@@ -1433,11 +1424,6 @@ input[type="submit"]:active {
 /* =============================================
    ATTRIBUTION GOOGLE PHOTOS
    =============================================
-/* Conteneur pour les photos Google avec attribution */
-.google-photo-container {
-    position: relative;
-    display: inline-block;
-}
 
 .google-photo-attribution {
     position: absolute;

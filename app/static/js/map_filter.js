@@ -349,11 +349,11 @@ function initMap() {
         const div = L.DomUtil.create('div', 'carte-legende');
 
 div.innerHTML = `
-    <div class="legende-container">
+    
         <div class="legende-text">
             ❤️ Labellisé ✅ Visité 👋 Non visité
         </div>
-    </div>
+    
 `;
 
 return div;
