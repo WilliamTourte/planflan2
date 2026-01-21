@@ -4,6 +4,7 @@ Main application tests for PlanFlan.
 This module contains comprehensive tests for the main application routes and functionality,
 including user authentication, establishment management, flan operations, and evaluations.
 """
+
 from app import db
 from app.models import Etablissement, Flan, Evaluation, Utilisateur
 from app.forms import (

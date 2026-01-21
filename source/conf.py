@@ -6,29 +6,29 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'PlanFlan'
-copyright = '2026, Damien Hugonnard'
-author = 'Damien Hugonnard'
-release = '1.0'
+project = "PlanFlan"
+copyright = "2026, Damien Hugonnard"
+author = "Damien Hugonnard"
+release = "1.0"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.viewcode',
-    'sphinx.ext.napoleon',
-    'sphinx.ext.todo',
-    'sphinxcontrib.httpdomain',
+    "sphinx.ext.autodoc",
+    "sphinx.ext.viewcode",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.todo",
+    "sphinxcontrib.httpdomain",
 ]
 
 # Configuration pour autodoc
 autodoc_default_options = {
-    'members': True,
-    'undoc-members': True,
-    'private-members': False,
-    'special-members': '__init__',
-    'show-inheritance': True,
+    "members": True,
+    "undoc-members": True,
+    "private-members": False,
+    "special-members": "__init__",
+    "show-inheritance": True,
 }
 
 # Configuration pour napoleon (support Google et NumPy style docstrings)
@@ -45,7 +45,7 @@ napoleon_use_param = True
 napoleon_use_rtype = True
 
 # Configuration pour le domaine HTTP
-primary_domain = 'http'
+primary_domain = "http"
 
 # Configuration pour la documentation des templates et JS
 # Nous utilisons des directives personnalisées dans les fichiers RST
@@ -53,24 +53,25 @@ primary_domain = 'http'
 # Add the application directory to the Python path
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../app'))
 
-templates_path = ['_templates']
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+sys.path.insert(0, os.path.abspath("../app"))
 
-language = 'fr'
+templates_path = ["_templates"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+
+language = "fr"
 
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = 'sphinx_rtd_theme'
-html_static_path = ['_static']
+html_theme = "sphinx_rtd_theme"
+html_static_path = ["_static"]
 
 # Theme options
 html_theme_options = {
-    'navigation_depth': 4,
-    'collapse_navigation': False,
+    "navigation_depth": 4,
+    "collapse_navigation": False,
 }
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'PlanFlondoc'
+htmlhelp_basename = "PlanFlondoc"

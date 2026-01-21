@@ -4,6 +4,7 @@ Test configuration and fixtures for PlanFlan application.
 This module contains pytest fixtures and test configuration for the PlanFlan application.
 It provides shared test clients, database setup, and test data fixtures.
 """
+
 import pytest
 from app import create_app, db
 from app.config import TestConfig

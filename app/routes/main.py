@@ -62,9 +62,9 @@ def index():
 @main_bp.route("/api/villes")
 def get_villes():
     """Route API pour récupérer les villes pour l'autocomplete
-    
+
     Version optimisée utilisant les données statiques au lieu des requêtes SQL.
-    
+
     Paramètres:
         q: Terme de recherche pour les villes
         with_gps: Si présent, retourne aussi les coordonnées GPS (format: "nom|lat|lng")
@@ -72,36 +72,41 @@ def get_villes():
     search_term = request.args.get("q", "").lower()
     with_gps = request.args.get("with_gps", "").lower() in ("true", "1", "yes")
 
-    print(f"API /api/villes called with search_term: '{search_term}', with_gps: {with_gps}")
+    print(
+        f"API /api/villes called with search_term: '{search_term}', with_gps: {with_gps}"
+    )
 
     # Utiliser les données statiques directement
     try:
         import json
         import os
-        
+
         # Charger les données une seule fois (cache au niveau du module)
-        if not hasattr(get_villes, 'villes_cache'):
+        if not hasattr(get_villes, "villes_cache"):
             # Charger le fichier avec les données de population
-            autocomplete_file = os.path.join(current_app.root_path, '..', 'app', 'data', 'villes_autocomplete.json')
-            with open(autocomplete_file, 'r', encoding='utf-8') as f:
+            autocomplete_file = os.path.join(
+                current_app.root_path, "..", "app", "data", "villes_autocomplete.json"
+            )
+            with open(autocomplete_file, "r", encoding="utf-8") as f:
                 get_villes.villes_cache = json.load(f)
                 print(f"Loaded {len(get_villes.villes_cache)} villes from static file")
-        
+
         # Recherche ultra-rapide dans la liste statique
         if search_term:
             results = [
-                ville for ville in get_villes.villes_cache
+                ville
+                for ville in get_villes.villes_cache
                 if search_term in ville["nom"].lower()
             ]
         else:
             results = get_villes.villes_cache[:]  # Copier toutes les villes
-        
+
         # Trier les résultats par population décroissante
-        results.sort(key=lambda x: x.get('population', 0), reverse=True)
-        
+        results.sort(key=lambda x: x.get("population", 0), reverse=True)
+
         # Limiter à 20 résultats
         results = results[:20]
-        
+
         # Formater les résultats selon le paramètre with_gps
         if with_gps:
             # Retourner les noms avec les coordonnées GPS (format: "nom|latitude|longitude")
@@ -116,7 +121,7 @@ def get_villes():
             simple_results = [ville["nom"] for ville in results]
             print(f"Found {len(simple_results)} villes")
             return jsonify(simple_results)
-        
+
     except Exception as e:
         print(f"Error loading static data: {e}")
         # En cas d'erreur, tomber en secours sur l'ancienne méthode
@@ -128,7 +133,7 @@ def get_villes():
 
         villes = query.all()
         villes = [ville[0] for ville in villes if ville[0]]
-        
+
         print(f"Found {len(villes)} villes in database")
         return jsonify(sorted(villes))
 

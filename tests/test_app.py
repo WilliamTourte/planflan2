@@ -4,6 +4,7 @@ Application-level tests for PlanFlan.
 This module contains tests for the main application functionality, including
 basic application setup and configuration tests.
 """
+
 # tests/test_app.py
 from app import create_app, db
 

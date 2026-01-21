@@ -4,6 +4,7 @@ Map-related tests for PlanFlan application.
 This module contains tests for map functionality, including establishment
 geolocation, map display, and location-based features.
 """
+
 from app import create_app, db
 from app.config import TestConfig
 
