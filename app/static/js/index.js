@@ -89,17 +89,47 @@ function initAutocomplete() {
                 }
                 resultsContainer.classList.remove("show");
                 
-                // Soumettre le formulaire après avoir mis à jour le champ caché
-                setTimeout(() => {
-                    const form = document.querySelector('form');
-                    if (form) {
-                        console.log("Soumission du formulaire avec ville :", hiddenField.value);
-                        console.log("Méthode du formulaire :", form.method);
-                        form.submit();
-                    } else {
-                        console.error("Formulaire non trouvé !");
-                    }
-                }, 100);
+                // Récupérer les coordonnées GPS pour zoomer sur la carte
+                fetch(`/api/villes?q=${encodeURIComponent(ville)}&with_gps=true`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.length > 0) {
+                            const parts = data[0].split('|');
+                            if (parts.length === 3) {
+                                const lat = parseFloat(parts[1]);
+                                const lng = parseFloat(parts[2]);
+                                
+                                // Zoomer sur la ville si la carte existe
+                                if (typeof zoomToLocation === 'function') {
+                                    zoomToLocation(lat, lng, ville);
+                                } else {
+                                    console.log("Fonction zoomToLocation non disponible, coordonnées GPS:", lat, lng);
+                                }
+                            }
+                        }
+                        
+                        // Soumettre le formulaire après avoir mis à jour le champ caché
+                        setTimeout(() => {
+                            const form = document.querySelector('form');
+                            if (form) {
+                                console.log("Soumission du formulaire avec ville :", hiddenField.value);
+                                console.log("Méthode du formulaire :", form.method);
+                                form.submit();
+                            } else {
+                                console.error("Formulaire non trouvé !");
+                            }
+                        }, 100);
+                    })
+                    .catch(error => {
+                        console.error("Erreur lors de la récupération des coordonnées GPS:", error);
+                        // Soumettre le formulaire même en cas d'erreur
+                        setTimeout(() => {
+                            const form = document.querySelector('form');
+                            if (form) {
+                                form.submit();
+                            }
+                        }, 100);
+                    });
             });
             resultsContainer.appendChild(div);
         });
@@ -299,6 +329,62 @@ if (!initAutocomplete()) {
     // Fallback to DOMContentLoaded if elements not found
     console.log("Falling back to DOMContentLoaded...");
     document.addEventListener("DOMContentLoaded", initAutocomplete);
+}
+
+/**
+ * Fonction pour zoomer sur une localisation spécifique sur la carte
+ * @param {number} lat - Latitude
+ * @param {number} lng - Longitude
+ * @param {string} villeName - Nom de la ville pour le marqueur
+ */
+function zoomToLocation(lat, lng, villeName) {
+    console.log("Zoom vers:", lat, lng, villeName);
+    
+    // Vérifier si la carte Google Maps existe
+    if (typeof google !== 'undefined' && google.maps && window.map) {
+        console.log("Zoom avec Google Maps");
+        window.map.setCenter({lat: lat, lng: lng});
+        window.map.setZoom(12);
+        
+        // Ajouter un marqueur
+        if (window.marker) {
+            window.marker.setMap(null);
+        }
+        window.marker = new google.maps.Marker({
+            position: {lat: lat, lng: lng},
+            map: window.map,
+            title: villeName
+        });
+        
+        // Si c'est une recherche d'établissements, on peut aussi centrer la recherche
+        const searchForm = document.querySelector('form[action*="liste_etablissements"]');
+        if (searchForm) {
+            const latField = searchForm.querySelector('input[name="latitude"]');
+            const lngField = searchForm.querySelector('input[name="longitude"]');
+            if (latField && lngField) {
+                latField.value = lat;
+                lngField.value = lng;
+            }
+        }
+    }
+    // Vérifier si Leaflet est utilisé
+    else if (typeof L !== 'undefined' && window.map) {
+        console.log("Zoom avec Leaflet");
+        window.map.setView([lat, lng], 12);
+        
+        // Ajouter un marqueur
+        if (window.marker) {
+            window.map.removeLayer(window.marker);
+        }
+        window.marker = L.marker([lat, lng]).addTo(window.map)
+            .bindPopup(villeName)
+            .openPopup();
+    }
+    // Si aucune carte n'est chargée, stocker les coordonnées pour plus tard
+    else {
+        console.log("Aucune carte détectée, stockage des coordonnées pour plus tard");
+        window.pendingZoom = {lat: lat, lng: lng, ville: villeName};
+    }
 }
 
 // Initialiser le bouton de géolocalisation
