@@ -132,6 +132,67 @@ def get_villes():
         return jsonify(sorted(villes))
 
 
+def extraire_parametres_filtre(source=None, request=None, form=None):
+    """Extraire les paramètres de filtre depuis différentes sources.
+
+    Args:
+        source: 'get', 'post', ou None (pour utiliser form)
+        request: Objet request Flask (pour GET/POST)
+        form: Formulaire Flask (pour les routes avec formulaire)
+
+    Returns:
+        dict: Paramètres de filtre prêts pour filtrer_etablissements
+    """
+    filtres = {}
+
+    if source == 'post' and request:
+        data = request.get_json() or {}
+        filtres['nom'] = data.get('nom', '')
+        filtres['visite'] = data.get('visite', '')
+        filtres['labellise'] = data.get('labellise', '')
+        filtres['ville'] = data.get('ville', '')
+        filtres['type_pate'] = data.get('type_pate', 'tous')
+        filtres['type_saveur'] = data.get('type_saveur', 'tous')
+        filtres['prix'] = data.get('prix', 'tous')
+
+    elif source == 'get' and request:
+        filtres['nom'] = request.args.get('nom', '')
+        filtres['visite'] = request.args.get('visite', '')
+        filtres['labellise'] = request.args.get('labellise', '')
+        filtres['ville'] = request.args.get('ville', '')
+        filtres['type_pate'] = request.args.get('type_pate', 'tous')
+        filtres['type_saveur'] = request.args.get('type_saveur', 'tous')
+        filtres['prix'] = request.args.get('prix', 'tous')
+
+    elif form:
+        # Pour les routes avec formulaire comme /liste_etablissements
+        if form.nom.data:
+            filtres['nom'] = form.nom.data
+        if form.visite.data and form.visite.data != 'tous':
+            filtres['visite'] = form.visite.data
+        if form.labellise.data and form.labellise.data != 'tous':
+            filtres['labellise'] = form.labellise.data
+        if form.type_saveur.data and form.type_saveur.data != 'tous':
+            filtres['type_saveur'] = form.type_saveur.data
+        if form.type_pate.data and form.type_pate.data != 'tous':
+            filtres['type_pate'] = form.type_pate.data
+        if form.type_texture.data and form.type_texture.data != 'tous':
+            filtres['type_texture'] = form.type_texture.data
+        if form.prix.data and form.prix.data != 'tous':
+            filtres['prix'] = form.prix.data
+
+    # Nettoyer les valeurs vides
+    return {k: v for k, v in filtres.items() if v}
+
+
+def extraire_parametres_filtre_api(request):
+    """Version spécifique pour l'API qui gère à la fois GET et POST."""
+    if request.method == 'POST':
+        return extraire_parametres_filtre(source='post', request=request)
+    else:
+        return extraire_parametres_filtre(source='get', request=request)
+
+
 def filtrer_etablissements(query, **kwargs):
     """Applique les filtres communs à une requête Etablissement."""
     # Filtres sur Etablissement
@@ -254,73 +315,17 @@ def liste_etablissements():
 
         etablissements = query.distinct().all()
     else:
-        # 4. Appliquer les autres filtres (sauf la ville)
+        # 4. Appliquer les filtres en utilisant la fonction filtrer_etablissements
         if (
             request.method == "POST"
             or form_recherche.validate_on_submit()
             or (request.method == "GET" and form_recherche.validate())
         ):
-            # On ne fait la jointure que si un filtre sur Flan est activé
-            need_join = (
-                (
-                    form_recherche.type_saveur.data
-                    and form_recherche.type_saveur.data != "tous"
-                )
-                or (
-                    form_recherche.type_pate.data
-                    and form_recherche.type_pate.data != "tous"
-                )
-                or (
-                    form_recherche.type_texture.data
-                    and form_recherche.type_texture.data != "tous"
-                )
-                or (form_recherche.prix.data and form_recherche.prix.data != "tous")
-            )
-            if need_join:
-                query = query.join(Flan)
+            # Extraire les paramètres de filtre en utilisant la fonction centralisée
+            filtres = extraire_parametres_filtre(form=form_recherche)
 
-            if form_recherche.nom.data:
-                query = query.filter(
-                    Etablissement.nom.ilike(f"%{form_recherche.nom.data}%")
-                )
-
-            if (
-                form_recherche.type_saveur.data
-                and form_recherche.type_saveur.data != "tous"
-            ):
-                query = query.filter(
-                    Flan.type_saveur == form_recherche.type_saveur.data
-                )
-            if (
-                form_recherche.type_pate.data
-                and form_recherche.type_pate.data != "tous"
-            ):
-                query = query.filter(Flan.type_pate == form_recherche.type_pate.data)
-            if (
-                form_recherche.type_texture.data
-                and form_recherche.type_texture.data != "tous"
-            ):
-                query = query.filter(
-                    Flan.type_texture == form_recherche.type_texture.data
-                )
-            if form_recherche.prix.data and form_recherche.prix.data != "tous":
-                if form_recherche.prix.data == "0":
-                    query = query.filter(Flan.prix < 2.5)
-                elif form_recherche.prix.data == "2.5":
-                    query = query.filter(Flan.prix >= 2.5, Flan.prix < 5)
-                elif form_recherche.prix.data == "5":
-                    query = query.filter(Flan.prix >= 5)
-            if form_recherche.visite.data and form_recherche.visite.data != "tous":
-                query = query.filter(
-                    Etablissement.visite == (form_recherche.visite.data == "oui")
-                )
-            if (
-                form_recherche.labellise.data
-                and form_recherche.labellise.data != "tous"
-            ):
-                query = query.filter(
-                    Etablissement.label == (form_recherche.labellise.data == "oui")
-                )
+            # La fonction filtrer_etablissements gère maintenant automatiquement les jointures
+            query = filtrer_etablissements(query, **filtres)
 
         etablissements = query.distinct().all()
 
@@ -344,59 +349,25 @@ def liste_etablissements():
 @main_bp.route("/api/etablissements", methods=["GET", "POST"])
 def api_etablissements():
     try:
-        # Récupère les paramètres de filtre
-        if request.method == "POST":
-            data = (
-                request.get_json()
-            )  # Récupère les données JSON envoyées avec la requête POST
-            nom = data.get("nom", "")
-            visite = data.get("visite", "")
-            labellise = data.get("labellise", "")
-            ville = data.get("ville", "")
-
-            type_pate = data.get("type_pate", "tous")
-            type_saveur = data.get("type_saveur", "tous")
-            prix = data.get("prix", "tous")
-            format = data.get("format", "json")  # 'html' ou 'json'
-        else:
-            nom = request.args.get("nom", "")
-            visite = request.args.get("visite", "")
-            labellise = request.args.get("labellise", "")
-            ville = request.args.get("ville", "")
-
-            type_pate = request.args.get("type_pate", "tous")
-            type_saveur = request.args.get("type_saveur", "tous")
-            prix = request.args.get("prix", "tous")
-            format = request.args.get("format", "json")  # 'html' ou 'json'
-        # Applique les filtres
-        query = Etablissement.query.join(Flan)
-        if nom:
-            # Utilisation de paramètres sécurisés pour éviter les injections SQL
-            nom_pattern = f"%{nom}%"
-            query = query.filter(Etablissement.nom.ilike(nom_pattern))
-        if visite == "oui":
-            query = query.filter(Etablissement.visite == True)
-        elif visite == "non":
-            query = query.filter(Etablissement.visite == False)
-        if labellise == "oui":
-            query = query.filter(Etablissement.label == True)
-        elif labellise == "non":
-            query = query.filter(Etablissement.label == False)
-        if ville:
-            # Utilisation de paramètres sécurisés pour éviter les injections SQL
-            ville_pattern = f"%{ville}%"
-            query = query.filter(Etablissement.ville.ilike(ville_pattern))
-        if type_pate != "tous":
-            query = query.filter(Flan.type_pate == type_pate)
-        if type_saveur != "tous":
-            query = query.filter(Flan.type_saveur == type_saveur)
-        if prix != "tous":
-            if prix == "0":
-                query = query.filter(Flan.prix < 2.5)
-            elif prix == "2.5":
-                query = query.filter(Flan.prix >= 2.5, Flan.prix < 5)
-            elif prix == "5":
-                query = query.filter(Flan.prix >= 5)
+        # Extraire les paramètres de filtre en utilisant la fonction centralisée
+        filtres = extraire_parametres_filtre_api(request)
+        format = request.args.get("format", "json") if request.method == "GET" else request.get_json().get("format", "json")
+        
+        # Applique les filtres en utilisant la fonction centralisée
+        query = Etablissement.query
+        query = filtrer_etablissements(query, **filtres)
+        
+        # Filtrer pour ne retourner que les établissements qui ont des flans
+        # sauf si des filtres spécifiques sur les flans sont appliqués
+        has_flan_filters = any(
+            filtres.get(key) and filtres.get(key) != "tous"
+            for key in ["type_pate", "type_saveur", "type_texture", "prix"]
+        )
+        
+        if not has_flan_filters:
+            # Si aucun filtre spécifique sur les flans, ne retourner que les établissements avec flans
+            query = query.filter(Etablissement.flans.any())
+        
         # Récupère les résultats uniques
         etablissements = []
         seen = set()
@@ -404,6 +375,7 @@ def api_etablissements():
             if etab.id_etab not in seen:
                 seen.add(etab.id_etab)
                 etablissements.append(etab)
+        
         # Renvoie HTML ou JSON
         if format == "html":
             from flask import render_template_string
