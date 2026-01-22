@@ -49,7 +49,6 @@ def index():
 
     return render_template(
         "index.html",
-        google_maps_api_key=current_app.config["GOOGLE_MAPS_API_KEY"],
         form_recherche=form_recherche,
     )
 
