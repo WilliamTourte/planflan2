@@ -48,8 +48,6 @@ def index():
     form_recherche = RechercheForm()
     etablissements = Etablissement.query.all()
 
-    print(etablissements)
-
     return render_template(
         "index.html",
         etablissements=etablissements,
@@ -71,10 +69,6 @@ def get_villes():
     """
     search_term = request.args.get("q", "").lower()
     with_gps = request.args.get("with_gps", "").lower() in ("true", "1", "yes")
-
-    print(
-        f"API /api/villes called with search_term: '{search_term}', with_gps: {with_gps}"
-    )
 
     # Utiliser les données statiques directement
     try:
@@ -114,12 +108,12 @@ def get_villes():
                 f"{ville['nom']}|{ville['latitude']}|{ville['longitude']}"
                 for ville in results
             ]
-            print(f"Found {len(formatted_results)} villes with GPS data")
+
             return jsonify(formatted_results)
         else:
             # Retourner seulement les noms (pour la compatibilité)
             simple_results = [ville["nom"] for ville in results]
-            print(f"Found {len(simple_results)} villes")
+
             return jsonify(simple_results)
 
     except Exception as e:
@@ -134,7 +128,7 @@ def get_villes():
         villes = query.all()
         villes = [ville[0] for ville in villes if ville[0]]
 
-        print(f"Found {len(villes)} villes in database")
+
         return jsonify(sorted(villes))
 
 
@@ -304,12 +298,6 @@ def liste_etablissements():
 
     # 5. Préparation pour le template
     etablissements, etablissements_json = afficher_etablissements(etablissements)
-
-    # Debug: vérifier le type et le contenu
-    print(f"Type de etablissements_json: {type(etablissements_json)}")
-    if etablissements_json:
-        print(f"Premier élément: {etablissements_json[0]}")
-        print(f"Type du premier élément: {type(etablissements_json[0])}")
 
     return render_template(
         "liste_etablissements.html",
@@ -774,7 +762,6 @@ def afficher_evaluation_unique(id_eval):
 
 
 def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
-    print("Form data received:", form.data)
     visuel = (
         float(str(form.visuel.data).replace(",", "."))
         if form.visuel.data is not None

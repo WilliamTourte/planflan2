@@ -1496,29 +1496,6 @@ def test_etablissement_creation_get(client):
 @pytest.mark.api
 def test_api_villes_sans_parametre(client):
     """Test l'API /api/villes sans paramètre de recherche"""
-    # Créer des établissements avec différentes villes pour le test
-    with client.application.app_context():
-        etab1 = Etablissement(
-            nom="Boulangerie Lyon",
-            ville="Lyon",
-            adresse="123 Rue de Lyon",
-            code_postal="69001",
-        )
-        etab2 = Etablissement(
-            nom="Patisserie Paris",
-            ville="Paris",
-            adresse="456 Rue de Paris",
-            code_postal="75001",
-        )
-        etab3 = Etablissement(
-            nom="Boulangerie Marseille",
-            ville="Marseille",
-            adresse="789 Rue de Marseille",
-            code_postal="13001",
-        )
-        db.session.add_all([etab1, etab2, etab3])
-        db.session.commit()
-
     # Appeler l'API sans paramètre
     response = client.get("/api/villes")
     assert response.status_code == 200
@@ -1526,45 +1503,19 @@ def test_api_villes_sans_parametre(client):
 
     data = response.get_json()
     assert isinstance(data, list)
-    assert len(data) == 3
-    assert "Lyon" in data
+    # L'API retourne les 20 villes les plus peuplées de France (données statiques)
+    assert len(data) == 20
+    # Vérifier que les grandes villes sont présentes
     assert "Paris" in data
     assert "Marseille" in data
-
-    # Nettoyage
-    with client.application.app_context():
-        db.session.delete(etab1)
-        db.session.delete(etab2)
-        db.session.delete(etab3)
-        db.session.commit()
+    assert "Lyon" in data
+    assert "Toulouse" in data
+    assert "Nice" in data
 
 
 @pytest.mark.api
 def test_api_villes_avec_parametre(client):
     """Test l'API /api/villes avec paramètre de recherche"""
-    # Créer des établissements avec différentes villes pour le test
-    with client.application.app_context():
-        etab1 = Etablissement(
-            nom="Boulangerie Lyon",
-            ville="Lyon",
-            adresse="123 Rue de Lyon",
-            code_postal="69001",
-        )
-        etab2 = Etablissement(
-            nom="Patisserie Paris",
-            ville="Paris",
-            adresse="456 Rue de Paris",
-            code_postal="75001",
-        )
-        etab3 = Etablissement(
-            nom="Boulangerie Marseille",
-            ville="Marseille",
-            adresse="789 Rue de Marseille",
-            code_postal="13001",
-        )
-        db.session.add_all([etab1, etab2, etab3])
-        db.session.commit()
-
     # Appeler l'API avec paramètre de recherche
     response = client.get("/api/villes?q=ly")
     assert response.status_code == 200
@@ -1582,34 +1533,10 @@ def test_api_villes_avec_parametre(client):
     assert "Paris" in data
     assert "Lyon" not in data
 
-    # Nettoyage
-    with client.application.app_context():
-        db.session.delete(etab1)
-        db.session.delete(etab2)
-        db.session.delete(etab3)
-        db.session.commit()
-
 
 @pytest.mark.api
 def test_api_villes_aucune_correspondance(client):
     """Test l'API /api/villes quand aucune ville ne correspond"""
-    # Créer des établissements avec différentes villes pour le test
-    with client.application.app_context():
-        etab1 = Etablissement(
-            nom="Boulangerie Lyon",
-            ville="Lyon",
-            adresse="123 Rue de Lyon",
-            code_postal="69001",
-        )
-        etab2 = Etablissement(
-            nom="Patisserie Paris",
-            ville="Paris",
-            adresse="456 Rue de Paris",
-            code_postal="75001",
-        )
-        db.session.add_all([etab1, etab2])
-        db.session.commit()
-
     # Appeler l'API avec un paramètre qui ne correspond à rien
     response = client.get("/api/villes?q=zzz")
     assert response.status_code == 200
@@ -1618,12 +1545,6 @@ def test_api_villes_aucune_correspondance(client):
     data = response.get_json()
     assert isinstance(data, list)
     assert len(data) == 0  # Aucune correspondance
-
-    # Nettoyage
-    with client.application.app_context():
-        db.session.delete(etab1)
-        db.session.delete(etab2)
-        db.session.commit()
 
 
 @pytest.mark.api
