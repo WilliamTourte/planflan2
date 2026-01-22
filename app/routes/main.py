@@ -43,15 +43,12 @@ def index():
     """Affiche la page d'accueil de l'application.
 
     Returns:
-        Response: Page d'accueil avec la liste des établissements et formulaire de recherche
+        Response: Page d'accueil avec formulaire de recherche
     """
     form_recherche = RechercheForm()
-    etablissements = Etablissement.query.all()
 
     return render_template(
         "index.html",
-        etablissements=etablissements,
-        etablissements_json=[etab.to_dict() for etab in etablissements],
         google_maps_api_key=current_app.config["GOOGLE_MAPS_API_KEY"],
         form_recherche=form_recherche,
     )
