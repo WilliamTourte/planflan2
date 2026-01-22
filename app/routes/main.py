@@ -19,7 +19,8 @@ from flask import (
 
 from flask_login import login_required, current_user
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import select
+from sqlalchemy import or_
+from sqlalchemy.orm import joinedload
 from app.forms import (
     EvalForm,
     NewFlanForm,
@@ -281,9 +282,12 @@ def liste_etablissements():
     # Note: Désactivé en mode géolocalisation pour éviter les conflits
     recherche_simple = request.args.get("recherche_simple", None)
     if recherche_simple and request.method == "GET" and not geolocalisation_mode:
+        search_pattern = f"%{recherche_simple}%"
         query = Etablissement.query.filter(
-            (Etablissement.nom.ilike(f"%{recherche_simple}%"))
-            | (Etablissement.ville.ilike(f"%{recherche_simple}%"))
+            or_(
+                Etablissement.nom.ilike(search_pattern),
+                Etablissement.ville.ilike(search_pattern)
+            )
         )
     else:
         query = Etablissement.query
@@ -361,8 +365,12 @@ def api_etablissements():
         )
         
         if not has_flan_filters:
-            # Si aucun filtre spécifique sur les flans, ne retourner que les établissements avec flans
-            query = query.filter(Etablissement.flans.any())
+            # Utiliser une sous-requête pour vérifier l'existence de flans
+            query = query.filter(
+                Etablissement.id_etab.in_(
+                    db.session.query(Flan.id_etab).distinct()
+                )
+            )
         
         # Récupère les résultats uniques
         etablissements = []
@@ -434,21 +442,30 @@ def dashboard():
     pending_etablissements = []
     if current_user.is_admin:
         pending_evaluations = (
-            Evaluation.query.filter_by(statut="EN_ATTENTE")
+            Evaluation.query
             .join(Utilisateur)
-            .filter(Utilisateur.is_admin == False)
+            .filter(
+                Evaluation.statut == "EN_ATTENTE",
+                Utilisateur.is_admin == False
+            )
             .all()
         )
         pending_flans = (
-            Flan.query.filter_by(statut="EN_ATTENTE")
+            Flan.query
             .join(Utilisateur)
-            .filter(Utilisateur.is_admin == False)
+            .filter(
+                Flan.statut == "EN_ATTENTE",
+                Utilisateur.is_admin == False
+            )
             .all()
         )
         pending_etablissements = (
-            Etablissement.query.filter_by(statut="EN_ATTENTE")
+            Etablissement.query
             .join(Utilisateur)
-            .filter(Utilisateur.is_admin == False)
+            .filter(
+                Etablissement.statut == "EN_ATTENTE",
+                Utilisateur.is_admin == False
+            )
             .all()
         )
 
@@ -498,7 +515,10 @@ def dashboard():
 ### Routes établissement, flan, évaluation
 @main_bp.route("/etablissement/<int:id_etab>", methods=["GET", "POST"])
 def afficher_etablissement_unique(id_etab):
-    etablissement = db.session.get(Etablissement, id_etab)
+    # Utiliser joinedload pour charger les photos
+    etablissement = db.session.query(Etablissement).options(
+        joinedload(Etablissement.photos)
+    ).filter(Etablissement.id_etab == id_etab).first()
     if etablissement is None:
         from flask import abort
 
@@ -545,7 +565,10 @@ def afficher_etablissement_unique(id_etab):
 
 @main_bp.route("/flan/<int:id_flan>", methods=["GET", "POST"])
 def afficher_flan_unique(id_flan):
-    flan_unique = db.session.get(Flan, id_flan)
+    # Utiliser joinedload pour charger les évaluations
+    flan_unique = db.session.query(Flan).options(
+        joinedload(Flan.evaluations)
+    ).filter(Flan.id_flan == id_flan).first()
     if flan_unique is None:
         from flask import abort
 
