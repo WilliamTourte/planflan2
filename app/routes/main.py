@@ -134,35 +134,63 @@ def get_villes():
 
 def filtrer_etablissements(query, **kwargs):
     """Applique les filtres communs à une requête Etablissement."""
+    # Filtres sur Etablissement
     if kwargs.get("nom"):
-        # Utilisation de paramètres sécurisés pour éviter les injections SQL
-        nom_pattern = f"%{kwargs['nom']}%"
-        query = query.filter(Etablissement.nom.ilike(nom_pattern))
+        query = query.filter(Etablissement.nom.ilike(f"%{kwargs['nom']}%"))
     if kwargs.get("ville"):
-        # Utilisation de paramètres sécurisés pour éviter les injections SQL
-        ville_pattern = f"%{kwargs['ville']}%"
-        query = query.filter(Etablissement.ville.ilike(ville_pattern))
+        query = query.filter(Etablissement.ville.ilike(f"%{kwargs['ville']}%"))
+
+    # Filtres booléens
+    # Correction: le champ s'appelle 'label' et non 'labellise'
     if kwargs.get("visite") == "oui":
         query = query.filter(Etablissement.visite == True)
     elif kwargs.get("visite") == "non":
         query = query.filter(Etablissement.visite == False)
-    if kwargs.get("labellise") == "oui":
+    
+    # Accepter à la fois 'label' et 'labellise' comme paramètres pour la compatibilité
+    labellise_value = kwargs.get("labellise") or kwargs.get("label")
+    if labellise_value == "oui":
         query = query.filter(Etablissement.label == True)
-    elif kwargs.get("labellise") == "non":
+    elif labellise_value == "non":
         query = query.filter(Etablissement.label == False)
-    if kwargs.get("type_pate") and kwargs["type_pate"] != "tous":
-        query = query.filter(Flan.type_pate == kwargs["type_pate"])
-    if kwargs.get("type_saveur") and kwargs["type_saveur"] != "tous":
-        query = query.filter(Flan.type_saveur == kwargs["type_saveur"])
-    if kwargs.get("type_texture") and kwargs["type_texture"] != "tous":
-        query = query.filter(Flan.type_texture == kwargs["type_texture"])
-    if kwargs.get("prix") and kwargs["prix"] != "tous":
-        if kwargs["prix"] == "0":
-            query = query.filter(Flan.prix < 2.5)
-        elif kwargs["prix"] == "2.5":
-            query = query.filter(Flan.prix >= 2.5, Flan.prix < 5)
-        elif kwargs["prix"] == "5":
-            query = query.filter(Flan.prix >= 5)
+
+    # Filtres sur Flan (nécessite une jointure)
+    flan_filters = {
+        "type_pate": kwargs.get("type_pate"),
+        "type_saveur": kwargs.get("type_saveur"),
+        "type_texture": kwargs.get("type_texture"),
+        "prix": kwargs.get("prix")
+    }
+
+    # Vérifier si au moins un filtre Flan est présent et différent de "tous"
+    if any(v and v != "tous" for v in flan_filters.values()):
+        # Vérifier si la requête est déjà jointe avec Flan pour éviter les ambiguïtés
+        # Convertir la requête en chaîne pour vérifier si elle contient déjà une jointure
+        query_str = str(query)
+        if "JOIN" not in query_str.upper() and "INNER JOIN" not in query_str.upper():
+            # Jointure explicite pour éviter les ambiguïtés
+            query = query.join(Flan, Etablissement.flans)
+
+        if flan_filters["type_pate"] and flan_filters["type_pate"] != "tous":
+            query = query.filter(Flan.type_pate == flan_filters["type_pate"])
+        if flan_filters["type_saveur"] and flan_filters["type_saveur"] != "tous":
+            query = query.filter(Flan.type_saveur == flan_filters["type_saveur"])
+        if flan_filters["type_texture"] and flan_filters["type_texture"] != "tous":
+            query = query.filter(Flan.type_texture == flan_filters["type_texture"])
+
+        # Gestion du filtre prix
+        prix_mapping = {
+            "0": (None, 2.5),
+            "2.5": (2.5, 5),
+            "5": (5, None)
+        }
+        if flan_filters["prix"] and flan_filters["prix"] in prix_mapping:
+            min_prix, max_prix = prix_mapping[flan_filters["prix"]]
+            if min_prix is not None:
+                query = query.filter(Flan.prix >= min_prix)
+            if max_prix is not None:
+                query = query.filter(Flan.prix < max_prix)
+
     return query
 
 
