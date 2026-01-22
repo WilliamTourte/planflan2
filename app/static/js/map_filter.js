@@ -250,16 +250,36 @@ function zoomOnVille(ville) {
  * @param {boolean} forceZoom - Si true, zoom sur la position de l'utilisateur
  */
 function createUserMarker(forceZoom = false) {
-    if (userMarker) map.removeLayer(userMarker);
-   
+    // Supprimer l'ancien marqueur s'il existe
+    if (userMarker) {
+        map.removeLayer(userMarker);
+        userMarker = null;
+    }
 
-    if (userLocation) {
-        userMarker = L.marker([userLocation.lat, userLocation.lon], {
-            icon : createEmojiIcon('📍', 'localisation-icon')
-            
-        }).addTo(map);
+    if (userLocation && geolocationHandler) {
+        // Créer une position mock avec les coordonnées existantes
+        const mockPosition = {
+            coords: {
+                latitude: userLocation.lat,
+                longitude: userLocation.lon,
+                accuracy: 50 // Précision par défaut pour le cercle
+            }
+        };
+
+        // Utiliser GeolocationHandler pour créer le marqueur avec cercle de précision
+        // Cela garantit un comportement uniforme
+        geolocationHandler._handlePosition(mockPosition);
 
         // Centrer la carte sur l'utilisateur seulement si forceZoom est vrai
+        if (forceZoom) {
+            map.setView([userLocation.lat, userLocation.lon], 13);
+        }
+    } else if (userLocation) {
+        // Fallback si GeolocationHandler n'est pas disponible
+        userMarker = L.marker([userLocation.lat, userLocation.lon], {
+            icon: createEmojiIcon('📍', 'localisation-icon')
+        }).addTo(map);
+
         if (forceZoom) {
             map.setView([userLocation.lat, userLocation.lon], 13);
         }
@@ -785,12 +805,21 @@ function initAll() {
     setupFilterButtons();
     setupGeolocation();
     
+    // Vérifier si on vient d'une géolocalisation depuis la page d'accueil
+    const urlParams = new URLSearchParams(window.location.search);
+    const fromGeoloc = urlParams.get('geolocalisation') === 'true';
+
     // Restaurer l'état depuis l'URL
     restoreStateFromUrl();
     
     // Mettre à jour les boutons pour refléter l'état restauré
     updateActiveButtonStates();
     updateMainFilterButtons();
+    
+    // Si on vient d'une géolocalisation, forcer l'affichage du marqueur utilisateur
+    if (fromGeoloc && userLocation) {
+        createUserMarker(true); // forceZoom = true
+    }
     
     // Sauvegarder l'état initial
     saveStateToUrl();
