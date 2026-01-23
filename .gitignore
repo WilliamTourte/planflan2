@@ -1629,3 +1629,4 @@ Thumbs.db
 app/data/communes-france-full.json
 node_modules
 coverage-js/lcov-report/main.js.html
+/copilot.exe
