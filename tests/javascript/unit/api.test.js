@@ -160,21 +160,63 @@ describe('API Module', () => {
   describe('fetchVilles', () => {
     it('should fetch cities successfully', async () => {
       const mockVilles = ['Paris', 'Lyon', 'Marseille'];
-      fetchMock.mockResponseOnce(JSON.stringify(mockVilles), { status: 200 });
+      
+      // Configurer le mock
+      if (fetchMock.mockResponseOnce) {
+        fetchMock.mockResponseOnce(JSON.stringify(mockVilles), { status: 200 });
+      } else if (fetchMock.once) {
+        fetchMock.once(JSON.stringify(mockVilles), { status: 200 });
+      } else {
+        // Mock global fetch
+        global.fetch = jest.fn(() =>
+          Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve(mockVilles)
+          })
+        );
+      }
 
       const result = await fetchVilles('test');
       expect(result).toEqual(mockVilles);
     });
 
     it('should handle city fetch errors', async () => {
-      fetchMock.mockResponseOnce(JSON.stringify({ error: 'Not Found' }), { status: 500 });
+      // Configurer le mock d'erreur
+      if (fetchMock.mockResponseOnce) {
+        fetchMock.mockResponseOnce(JSON.stringify({ error: 'Not Found' }), { status: 500 });
+      } else if (fetchMock.once) {
+        fetchMock.once(JSON.stringify({ error: 'Not Found' }), { status: 500 });
+      } else {
+        // Mock global fetch pour erreur
+        global.fetch = jest.fn(() =>
+          Promise.resolve({
+            ok: false,
+            status: 500,
+            json: () => Promise.resolve({ error: 'Not Found' })
+          })
+        );
+      }
 
       await expect(fetchVilles('test')).rejects.toThrow();
     });
 
     it('should encode query parameters', async () => {
       const mockVilles = ['Paris'];
-      fetchMock.mockResponseOnce(JSON.stringify(mockVilles), { status: 200 });
+      
+      // Configurer le mock
+      if (fetchMock.mockResponseOnce) {
+        fetchMock.mockResponseOnce(JSON.stringify(mockVilles), { status: 200 });
+      } else if (fetchMock.once) {
+        fetchMock.once(JSON.stringify(mockVilles), { status: 200 });
+      } else {
+        // Mock global fetch
+        global.fetch = jest.fn(() =>
+          Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve(mockVilles)
+          })
+        );
+      }
 
       const result = await fetchVilles('Paris Test');
       expect(result).toEqual(mockVilles);

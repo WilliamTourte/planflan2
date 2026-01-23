@@ -65,9 +65,14 @@ function initializeListeEtablissementsPage() {
     console.log("Initialisation de la page de liste des établissements");
     
     // Récupérer les données des établissements
-    const etablissementsData = JSON.parse(document.getElementById('etablissements-data')?.getAttribute('data-etablissements') || '[]');
-    const isAdmin = JSON.parse(document.getElementById('is-admin')?.getAttribute('data-is-admin') || 'false');
-    const googleMapsApiKey = document.getElementById('google-maps-api-key')?.getAttribute('data-api-key') || '';
+    const etablissementsDataElement = document.getElementById('etablissements-data');
+    const etablissementsData = etablissementsDataElement ? JSON.parse(etablissementsDataElement.getAttribute('data-etablissements') || '[]') : [];
+    
+    const isAdminElement = document.getElementById('is-admin');
+    const isAdmin = isAdminElement ? JSON.parse(isAdminElement.getAttribute('data-is-admin') || 'false') : false;
+    
+    const googleMapsApiKeyElement = document.getElementById('google-maps-api-key');
+    const googleMapsApiKey = googleMapsApiKeyElement ? googleMapsApiKeyElement.getAttribute('data-api-key') || '' : '';
 
     // Ajout des coordonnées utilisateur si disponibles
     const userLocationElement = document.getElementById('user-location');
@@ -235,8 +240,14 @@ function initGeolocButton() {
  * Fonction pour afficher le formulaire de suppression de compte
  */
 function showDeleteAccountForm() {
-    document.getElementById("delete-account-section")?.style.display = "block";
-    document.getElementById("delete-password")?.focus();
+    const deleteSection = document.getElementById("delete-account-section");
+    if (deleteSection) {
+        deleteSection.style.display = "block";
+    }
+    const passwordField = document.getElementById("delete-password");
+    if (passwordField) {
+        passwordField.focus();
+    }
 }
 
 /**
@@ -244,28 +255,44 @@ function showDeleteAccountForm() {
  */
 function setupDashboardButtons() {
     // Bouton d'édition du profil
-    document.getElementById("edit-profile-btn")?.addEventListener("click", function () {
-        document.getElementById("user-info")?.style.display = "none";
-        document.getElementById("edit-profile-form")?.style.display = "block";
-    });
+    const editProfileBtn = document.getElementById("edit-profile-btn");
+    if (editProfileBtn) {
+        editProfileBtn.addEventListener("click", function () {
+            const userInfo = document.getElementById("user-info");
+            if (userInfo) userInfo.style.display = "none";
+            const editProfileForm = document.getElementById("edit-profile-form");
+            if (editProfileForm) editProfileForm.style.display = "block";
+        });
+    }
 
     // Bouton d'annulation de l'édition du profil
-    document.getElementById("cancel-edit-btn")?.addEventListener("click", function () {
-        document.getElementById("user-info")?.style.display = "block";
-        document.getElementById("edit-profile-form")?.style.display = "none";
-    });
+    const cancelEditBtn = document.getElementById("cancel-edit-btn");
+    if (cancelEditBtn) {
+        cancelEditBtn.addEventListener("click", function () {
+            const userInfo = document.getElementById("user-info");
+            if (userInfo) userInfo.style.display = "block";
+            const editProfileForm = document.getElementById("edit-profile-form");
+            if (editProfileForm) editProfileForm.style.display = "none";
+        });
+    }
 
     // Bouton d'annulation de la suppression de compte
-    document.getElementById("cancel-delete-btn")?.addEventListener("click", function () {
-        cancelDeleteAccount();
-    });
+    const cancelDeleteBtn = document.getElementById("cancel-delete-btn");
+    if (cancelDeleteBtn) {
+        cancelDeleteBtn.addEventListener("click", function () {
+            cancelDeleteAccount();
+        });
+    }
 }
 
 /**
  * Fonction pour annuler la suppression de compte
  */
 function cancelDeleteAccount() {
-    document.getElementById("delete-account-section")?.style.display = "none";
+    const deleteAccountSection = document.getElementById("delete-account-section");
+    if (deleteAccountSection) {
+        deleteAccountSection.style.display = "none";
+    }
     // Supprimer les paramètres d'erreur de l'URL
     const url = new URL(window.location.href);
     url.searchParams.delete("error");
