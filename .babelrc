@@ -4,7 +4,7 @@
       "targets": {
         "node": "current"
       },
-      "modules": "commonjs",
+      "modules": false,
       "useBuiltIns": "usage",
       "corejs": 3,
       "bugfixes": true,
@@ -16,12 +16,25 @@
   "plugins": [
     ["@babel/plugin-transform-runtime", {
       "corejs": 3
-    }]
+    }],
+    "@babel/plugin-transform-modules-commonjs",
+    "@babel/plugin-transform-optional-chaining",
+    "@babel/plugin-transform-nullish-coalescing-operator"
   ],
   "env": {
     "test": {
+      "presets": [
+        ["@babel/preset-env", {
+          "targets": {
+            "node": "current"
+          },
+          "modules": "commonjs"
+        }]
+      ],
       "plugins": [
-        "@babel/plugin-transform-modules-commonjs"
+        "@babel/plugin-transform-modules-commonjs",
+        "@babel/plugin-transform-optional-chaining",
+        "@babel/plugin-transform-nullish-coalescing-operator"
       ]
     }
   }
