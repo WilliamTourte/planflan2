@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">2.85% </span>
+                <span class="strong">45.71% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>1/35</span>
+                <span class='fraction'>16/35</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">71.42% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>0/7</span>
+                <span class='fraction'>5/7</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">0% </span>
+                <span class="strong">10% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>0/10</span>
+                <span class='fraction'>1/10</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">2.94% </span>
+                <span class="strong">47.05% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>1/34</span>
+                <span class='fraction'>16/34</span>
             </div>
         
             
@@ -236,33 +236,33 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-yes">2x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -393,12 +393,12 @@ import { showLoading, hideLoading, showToast } from './utils.js';
  * @param {object} options - Options de la requête
  * @returns {Promise} Promesse avec la réponse
  */
-export async function <span class="fstat-no" title="function not covered" >fetchWithErrorHandling(</span>url, options = <span class="branch-0 cbranch-no" title="branch not covered" >{})</span> {
-<span class="cstat-no" title="statement not covered" >    try {</span>
-<span class="cstat-no" title="statement not covered" >        showLoading("Chargement des données...");</span>
-<span class="cstat-no" title="statement not covered" >        console.log(`Appel API: ${url}`, options);</span>
+export async function fetchWithErrorHandling(url, options = {}) {
+    try {
+        showLoading("Chargement des données...");
+        console.log(`Appel API: ${url}`, options);
         
-        const response = <span class="cstat-no" title="statement not covered" >await fetch(url, {</span>
+        const response = await fetch(url, {
             ...options,
             headers: {
                 'Content-Type': 'application/json',
@@ -406,21 +406,21 @@ export async function <span class="fstat-no" title="function not covered" >fetch
             }
         });
         
-<span class="cstat-no" title="statement not covered" >        if (!response.ok) {</span>
-            const errorData = <span class="cstat-no" title="statement not covered" >await response.json().catch(<span class="fstat-no" title="function not covered" >()</span> =&gt; (<span class="cstat-no" title="statement not covered" >{})</span>);</span>
-            const errorMessage = <span class="cstat-no" title="statement not covered" >errorData.message || `Erreur API: ${response.status}`;</span>
-<span class="cstat-no" title="statement not covered" >            throw new Error(errorMessage);</span>
+        if (!response.ok) {
+            const errorData = await response.json().catch(<span class="fstat-no" title="function not covered" >()</span> =&gt; (<span class="cstat-no" title="statement not covered" >{})</span>);
+            const errorMessage = errorData.message || `Erreur API: ${response.status}`;
+            throw new Error(errorMessage);
         }
         
-        const data = <span class="cstat-no" title="statement not covered" >await response.json();</span>
-<span class="cstat-no" title="statement not covered" >        console.log(`Réponse API réussie pour ${url}:`, data);</span>
-<span class="cstat-no" title="statement not covered" >        return data;</span>
+        const data = await response.json();
+        console.log(`Réponse API réussie pour ${url}:`, data);
+        return data;
     } catch (error) {
-<span class="cstat-no" title="statement not covered" >        console.error(`Erreur lors de l'appel API à ${url}:`, error);</span>
-<span class="cstat-no" title="statement not covered" >        showToast(error.message, 'error');</span>
-<span class="cstat-no" title="statement not covered" >        throw error;</span>
+        console.error(`Erreur lors de l'appel API à ${url}:`, error);
+        showToast(error.message, 'error');
+        throw error;
     } finally {
-<span class="cstat-no" title="statement not covered" >        hideLoading();</span>
+        hideLoading();
     }
 }
 &nbsp;
@@ -544,7 +544,7 @@ document.api = {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-23T16:11:24.413Z
+                at 2026-01-23T20:03:17.760Z
             </div>
         <script src="prettify.js"></script>
         <script>

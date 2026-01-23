@@ -21,12 +21,20 @@ describe('Autocomplete Module', () => {
     input = document.getElementById("ville-autocomplete");
     resultsContainer = document.getElementById("autocomplete-results");
     
-    fetchMock.reset();
-    fetchMock.catch(500);
+    // Configurer fetchMock correctement
+    if (typeof fetchMock === 'function') {
+      fetchMock.reset();
+      fetchMock.catch(500);
+    } else if (typeof fetchMock === 'object' && fetchMock.mockReset) {
+      fetchMock.mockReset();
+      fetchMock.mockResponse(JSON.stringify({}), { status: 500 });
+    }
   });
 
   afterEach(() => {
-    fetchMock.restore();
+    if (typeof fetchMock === 'function' && typeof fetchMock.restore === 'function') {
+      fetchMock.restore();
+    }
   });
 
   describe('initAutocomplete', () => {
@@ -42,18 +50,33 @@ describe('Autocomplete Module', () => {
     });
 
     it('should initialize event listeners', () => {
+      const addEventListenerSpy = jest.spyOn(input, 'addEventListener');
       initAutocomplete();
       
       // Vérifier que les event listeners sont ajoutés
-      const inputEventListeners = input._events ? input._events.input : [];
-      expect(inputEventListeners.length).toBeGreaterThan(0);
+      expect(addEventListenerSpy).toHaveBeenCalled();
+      expect(addEventListenerSpy).toHaveBeenCalledWith('input', expect.any(Function));
+      
+      addEventListenerSpy.mockRestore();
     });
   });
 
   describe('Autocomplete functionality', () => {
     it('should show results when typing', async () => {
-      // Mock de la réponse API
-      fetchMock.mockResponseOnce(JSON.stringify(['Paris', 'Paris 1er']), { status: 200 });
+      // Configurer le mock de fetch
+      if (typeof fetchMock === 'function') {
+        fetchMock.mockResponseOnce(JSON.stringify(['Paris', 'Paris 1er']), { status: 200 });
+      } else if (typeof fetchMock === 'object' && fetchMock.mockResponseOnce) {
+        fetchMock.mockResponseOnce(JSON.stringify(['Paris', 'Paris 1er']), { status: 200 });
+      } else {
+        // Mock global fetch si fetchMock n'est pas disponible
+        global.fetch = jest.fn(() =>
+          Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve(['Paris', 'Paris 1er'])
+          })
+        );
+      }
       
       initAutocomplete();
       
@@ -62,8 +85,8 @@ describe('Autocomplete Module', () => {
       const event = new Event('input');
       input.dispatchEvent(event);
       
-      // Attendre que la requête soit traitée
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Attendre que la requête soit traitée (debounce est à 300ms par défaut)
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       // Vérifier que les résultats sont affichés
       expect(resultsContainer.classList.contains('show')).toBe(true);
@@ -71,8 +94,21 @@ describe('Autocomplete Module', () => {
     });
 
     it('should handle API errors gracefully', async () => {
-      // Mock d'une erreur API
-      fetchMock.mockResponseOnce(JSON.stringify({ error: 'Internal Server Error' }), { status: 500 });
+      // Configurer le mock d'erreur API
+      if (typeof fetchMock === 'function') {
+        fetchMock.mockResponseOnce(JSON.stringify({ error: 'Internal Server Error' }), { status: 500 });
+      } else if (typeof fetchMock === 'object' && fetchMock.mockResponseOnce) {
+        fetchMock.mockResponseOnce(JSON.stringify({ error: 'Internal Server Error' }), { status: 500 });
+      } else {
+        // Mock global fetch pour erreur
+        global.fetch = jest.fn(() =>
+          Promise.resolve({
+            ok: false,
+            status: 500,
+            json: () => Promise.resolve({ error: 'Internal Server Error' })
+          })
+        );
+      }
       
       initAutocomplete();
       
@@ -81,8 +117,8 @@ describe('Autocomplete Module', () => {
       const event = new Event('input');
       input.dispatchEvent(event);
       
-      // Attendre que la requête soit traitée
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Attendre que la requête soit traitée (debounce est à 300ms par défaut)
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       // Vérifier que l'erreur est affichée
       expect(resultsContainer.classList.contains('show')).toBe(true);
@@ -105,9 +141,37 @@ describe('Autocomplete Module', () => {
 
   describe('Result selection', () => {
     it('should handle city selection', async () => {
-      // Mock de la réponse API avec coordonnées GPS
-      fetchMock.mockResponseOnce(JSON.stringify(['Paris']), { status: 200 });
-      fetchMock.mockResponseOnce(JSON.stringify(['Paris|48.8566|2.3522']), { status: 200 });
+      // Configurer les mocks de fetch
+      if (typeof fetchMock === 'function') {
+        fetchMock.mockResponseOnce(JSON.stringify(['Paris']), { status: 200 });
+        fetchMock.mockResponseOnce(JSON.stringify(['Paris|48.8566|2.3522']), { status: 200 });
+      } else if (typeof fetchMock === 'object' && fetchMock.mockResponseOnce) {
+        fetchMock.mockResponseOnce(JSON.stringify(['Paris']), { status: 200 });
+        fetchMock.mockResponseOnce(JSON.stringify(['Paris|48.8566|2.3522']), { status: 200 });
+      } else {
+        // Mock global fetch
+        let callCount = 0;
+        global.fetch = jest.fn(() => {
+          callCount++;
+          if (callCount === 1) {
+            return Promise.resolve({
+              ok: true,
+              json: () => Promise.resolve(['Paris'])
+            });
+          } else {
+            return Promise.resolve({
+              ok: true,
+              json: () => Promise.resolve(['Paris|48.8566|2.3522'])
+            });
+          }
+        });
+      }
+      
+      // Mock pour empêcher la soumission du formulaire dans le test
+      const originalSubmit = HTMLFormElement.prototype.submit;
+      HTMLFormElement.prototype.submit = jest.fn(function() {
+        console.log('Form submission prevented in test');
+      });
       
       initAutocomplete();
       
@@ -116,19 +180,28 @@ describe('Autocomplete Module', () => {
       const inputEvent = new Event('input');
       input.dispatchEvent(inputEvent);
       
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Attendre que la requête soit traitée (debounce est à 300ms par défaut)
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       // Cliquer sur le premier résultat
       const firstResult = resultsContainer.firstChild;
       const clickEvent = new Event('click');
       firstResult.dispatchEvent(clickEvent);
       
-      await new Promise(resolve => setTimeout(resolve, 200));
+      // Attendre que le clic soit traité
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       // Vérifier que le champ est mis à jour
+      // Note: Le champ input est mis à jour avec juste "Paris" par le clic
+      // mais le champ caché peut contenir le format complet
       expect(input.value).toBe('Paris');
       const hiddenField = document.querySelector('input[name="ville"]');
       expect(hiddenField.value).toBe('Paris');
+      
+      // Restaurer le submit original
+      if (originalSubmit) {
+        HTMLFormElement.prototype.submit = originalSubmit;
+      }
     });
   });
 });
