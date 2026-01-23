@@ -8,7 +8,12 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest --coverage --detectOpenHandles",
+    "test:watch": "jest --watch",
+    "test:unit": "jest tests/javascript/unit",
+    "test:integration": "jest tests/javascript/integration",
+    "lint": "eslint app/static/js/",
+    "lint:fix": "eslint app/static/js/ --fix"
   },
   "repository": {
     "type": "git",
@@ -21,8 +26,40 @@
     "url": "https://github.com/WilliamTourte/planflan2/issues"
   },
   "homepage": "https://github.com/WilliamTourte/planflan2#readme",
+  "jest": {
+    "testEnvironment": "jsdom",
+    "setupFilesAfterEnv": [
+      "<rootDir>/tests/javascript/setupTests.js"
+    ],
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/app/static/js/$1"
+    },
+    "transform": {
+      "^.+\\.js$": "babel-jest"
+    },
+    "collectCoverageFrom": [
+      "app/static/js/**/*.js",
+      "!app/static/js/**/*.test.js"
+    ],
+    "coverageDirectory": "coverage-js",
+    "coverageReporters": [
+      "json",
+      "lcov",
+      "text",
+      "clover"
+    ]
+  },
   "devDependencies": {
-    "eslint": "^9.39.2",
-    "eslint-plugin-jsdoc": "^62.3.0"
+    "@babel/core": "^7.25.2",
+    "@babel/preset-env": "^7.25.3",
+    "@testing-library/jest-dom": "^6.4.8",
+    "babel-jest": "^29.7.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-jest": "^27.9.0",
+    "eslint-plugin-jsdoc": "^62.3.0",
+    "fetch-mock": "^12.6.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "msw": "^2.3.5"
   }
 }

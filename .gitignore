@@ -41,6 +41,18 @@ build/
 .coverage
 *.cover
 
+# Fichiers Node.js
+node_modules/
+.coverage-js
+nyc_output/
+
+# Fichiers de cache npm
+npm-debug.log*
+.yarn*
+
+# Fichiers de build JavaScript
+dist/
+build/
 
 # Fichiers de pytest
 .pytest_cache/
