@@ -7,37 +7,37 @@ import fetchMock from 'fetch-mock';
 
 describe('API Module', () => {
   beforeEach(() => {
-    fetchMock.reset();
-    fetchMock.catch(500);
+    fetchMock.mockReset();
+    fetchMock.mockResponse(JSON.stringify({}), { status: 500 });
   });
 
   afterEach(() => {
-    fetchMock.restore();
+    fetchMock.mockRestore();
   });
 
   describe('fetchWithErrorHandling', () => {
     it('should handle successful API calls', async () => {
       const mockData = { success: true, data: 'test' };
-      fetchMock.get('/api/test', mockData);
+      fetchMock.mockResponseOnce(JSON.stringify(mockData), { status: 200 });
 
       const result = await fetchWithErrorHandling('/api/test');
       expect(result).toEqual(mockData);
     });
 
     it('should handle API errors', async () => {
-      fetchMock.get('/api/error', 500);
+      fetchMock.mockResponseOnce(JSON.stringify({ error: 'Internal Server Error' }), { status: 500 });
 
       await expect(fetchWithErrorHandling('/api/error')).rejects.toThrow();
     });
 
     it('should handle network errors', async () => {
-      fetchMock.get('/api/network-error', { throws: new Error('Network error') });
+      fetchMock.mockReject(new Error('Network error'));
 
       await expect(fetchWithErrorHandling('/api/network-error')).rejects.toThrow('Network error');
     });
 
     it('should handle JSON parsing errors', async () => {
-      fetchMock.get('/api/invalid-json', 'invalid json');
+      fetchMock.mockResponseOnce('invalid json', { status: 200 });
 
       await expect(fetchWithErrorHandling('/api/invalid-json')).rejects.toThrow();
     });
@@ -49,14 +49,14 @@ describe('API Module', () => {
         { id_etab: 1, nom: 'Boulangerie 1' },
         { id_etab: 2, nom: 'Boulangerie 2' }
       ];
-      fetchMock.get('/api/etablissements', mockEtablissements);
+      fetchMock.mockResponseOnce(JSON.stringify(mockEtablissements), { status: 200 });
 
       const result = await fetchEtablissements();
       expect(result).toEqual(mockEtablissements);
     });
 
     it('should handle establishment fetch errors', async () => {
-      fetchMock.get('/api/etablissements', 500);
+      fetchMock.mockResponseOnce(JSON.stringify({ error: 'Not Found' }), { status: 500 });
 
       await expect(fetchEtablissements()).rejects.toThrow();
     });
@@ -65,21 +65,21 @@ describe('API Module', () => {
   describe('fetchVilles', () => {
     it('should fetch cities successfully', async () => {
       const mockVilles = ['Paris', 'Lyon', 'Marseille'];
-      fetchMock.get('/api/villes?q=test', mockVilles);
+      fetchMock.mockResponseOnce(JSON.stringify(mockVilles), { status: 200 });
 
       const result = await fetchVilles('test');
       expect(result).toEqual(mockVilles);
     });
 
     it('should handle city fetch errors', async () => {
-      fetchMock.get('/api/villes?q=test', 500);
+      fetchMock.mockResponseOnce(JSON.stringify({ error: 'Not Found' }), { status: 500 });
 
       await expect(fetchVilles('test')).rejects.toThrow();
     });
 
     it('should encode query parameters', async () => {
       const mockVilles = ['Paris'];
-      fetchMock.get('/api/villes?q=Paris%20Test', mockVilles);
+      fetchMock.mockResponseOnce(JSON.stringify(mockVilles), { status: 200 });
 
       const result = await fetchVilles('Paris Test');
       expect(result).toEqual(mockVilles);
