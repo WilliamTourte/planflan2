@@ -1,4 +1,6 @@
-{% extends "base.html" %} {% block scripts_head %}
+{% extends "base.html" %}
+{% block page_type %}home{% endblock %}
+{% block scripts_head %}
 <meta name="csrf-token" content="{{ csrf_token() }}" />
 {% endblock %}
 {% block styles %}
