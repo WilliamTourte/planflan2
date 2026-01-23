@@ -39,30 +39,22 @@ jobs:
       uses: actions/setup-python@v4
       with:
         python-version: ${{ env.PYTHON_VERSION }}
-
-    - name: Cache pip dependencies
-      uses: actions/cache@v4
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
+        cache: 'pip'
+        cache-dependency-path: 'requirements.txt'
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
+        pip install --no-cache-dir -r requirements.txt
+        pip install --no-cache-dir bandit safety
 
     - name: Check Python syntax
       run: |
         find app/ -name "*.py" -exec python -m py_compile {} \;
         echo "Python syntax check passed"
 
-
-
     - name: Run security checks
       run: |
-        pip install bandit safety
         bandit -r app/ -f json -o bandit-report.json || echo "Bandit security scan completed"
         safety check --json || echo "Safety dependency check completed"
 
