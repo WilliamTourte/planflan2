@@ -32,24 +32,38 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Check commit status
         id: check_commit
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Check if commit already has a "processed" status
-          STATUS_URL="https://api.github.com/repos/${{ github.repository }}/commits/${{ github.sha }}/status"
-          RESPONSE=$(curl -s -H "Authorization: token $GITHUB_TOKEN" "$STATUS_URL")
-          
-          # Look for our specific context
-          PROCESSED=$(echo "$RESPONSE" | jq -r '.statuses[] | select(.context == "ci/processed") | .state')
-          
-          if [ "$PROCESSED" = "success" ]; then
-            echo "Commit ${{ github.sha }} already processed. Skipping..."
-            echo "should_skip=true" >> $GITHUB_OUTPUT
+          # For main branch: check if code is identical to dev
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "Checking if main is a fast-forward merge from dev..."
+            
+            # Get the tree hash of dev and main
+            DEV_TREE=$(git rev-parse dev^{tree} 2>/dev/null)
+            MAIN_TREE=$(git rev-parse main^{tree} 2>/dev/null)
+            
+            # Get content hashes of relevant directories
+            DEV_CONTENT=$(git ls-tree -r dev -- app tests Dockerfile docker-compose.yml entrypoint.sh | awk '{print $3}' | sort | md5sum | awk '{print $1}')
+            MAIN_CONTENT=$(git ls-tree -r main -- app tests Dockerfile docker-compose.yml entrypoint.sh | awk '{print $3}' | sort | md5sum | awk '{print $1}')
+            
+            echo "dev content hash: $DEV_CONTENT"
+            echo "main content hash: $MAIN_CONTENT"
+            
+            if [ "$DEV_CONTENT" = "$MAIN_CONTENT" ]; then
+              echo "Code is identical to dev branch. Skipping CI..."
+              echo "should_skip=true" >> $GITHUB_OUTPUT
+            else
+              echo "Code differs from dev. Running CI..."
+              echo "should_skip=false" >> $GITHUB_OUTPUT
+            fi
           else
-            echo "Commit ${{ github.sha }} not processed yet."
+            # For dev branch or other branches: always run CI
             echo "should_skip=false" >> $GITHUB_OUTPUT
           fi
 
@@ -91,22 +105,6 @@ jobs:
         RUN_DEPLOYMENT_TESTS: "false"  # Disabled in CI as production site is not accessible
       run: |
         python -m pytest tests/test_deployment.py -v --tb=short
-
-    - name: Mark commit as processed
-      if: success()
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        # Mark commit as processed by creating a status
-        STATUS_URL="https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}"
-        curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
-          -H "Accept: application/vnd.github.v3+json" \
-          "$STATUS_URL" \
-          -d '{
-            "state": "success",
-            "description": "CI processed",
-            "context": "ci/processed"
-          }'
 
 
   docker-build:
@@ -171,19 +169,3 @@ jobs:
         docker tag ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }} \
           ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest
         docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest
-
-    - name: Mark commit as processed (docker-build)
-      if: success()
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        # Mark commit as processed by creating a status
-        STATUS_URL="https://api.github.com/repos/${{ github.repository }}/statuses/${{ github.sha }}"
-        curl -X POST -H "Authorization: token $GITHUB_TOKEN" \
-          -H "Accept: application/vnd.github.v3+json" \
-          "$STATUS_URL" \
-          -d '{
-            "state": "success",
-            "description": "CI processed (docker-build)",
-            "context": "ci/processed"
-          }'
