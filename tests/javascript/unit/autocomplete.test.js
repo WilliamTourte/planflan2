@@ -53,7 +53,7 @@ describe('Autocomplete Module', () => {
   describe('Autocomplete functionality', () => {
     it('should show results when typing', async () => {
       // Mock de la réponse API
-      fetchMock.get('/api/villes?q=Par', ['Paris', 'Paris 1er']);
+      fetchMock.mockResponseOnce(JSON.stringify(['Paris', 'Paris 1er']), { status: 200 });
       
       initAutocomplete();
       
@@ -72,7 +72,7 @@ describe('Autocomplete Module', () => {
 
     it('should handle API errors gracefully', async () => {
       // Mock d'une erreur API
-      fetchMock.get('/api/villes?q=Error', 500);
+      fetchMock.mockResponseOnce(JSON.stringify({ error: 'Internal Server Error' }), { status: 500 });
       
       initAutocomplete();
       
@@ -106,8 +106,8 @@ describe('Autocomplete Module', () => {
   describe('Result selection', () => {
     it('should handle city selection', async () => {
       // Mock de la réponse API avec coordonnées GPS
-      fetchMock.get('/api/villes?q=Paris', ['Paris']);
-      fetchMock.get('/api/villes?q=Paris&with_gps=true', ['Paris|48.8566|2.3522']);
+      fetchMock.mockResponseOnce(JSON.stringify(['Paris']), { status: 200 });
+      fetchMock.mockResponseOnce(JSON.stringify(['Paris|48.8566|2.3522']), { status: 200 });
       
       initAutocomplete();
       

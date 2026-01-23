@@ -31,13 +31,20 @@ beforeEach(() => {
   };
 });
 
-// Mock pour les modules ES6 qui pourraient être importés
-jest.mock('fetch-mock', () => {
-  const originalModule = jest.requireActual('fetch-mock');
-  return {
-    ...originalModule,
-    default: originalModule,
-  };
+// Configuration pour fetch-mock
+import fetchMock from 'fetch-mock';
+
+// Configurer fetch-mock pour les tests
+global.fetchMock = fetchMock;
+
+// Activer fetch-mock avant les tests
+beforeAll(() => {
+  fetchMock.config.overwriteRoutes = false;
+});
+
+// Nettoyer après les tests
+afterAll(() => {
+  fetchMock.restore();
 });
 
 // Mock des fonctions globales qui pourraient être utilisées
