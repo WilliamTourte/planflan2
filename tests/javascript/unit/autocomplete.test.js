@@ -151,17 +151,24 @@ describe('Autocomplete Module', () => {
       } else {
         // Mock global fetch
         let callCount = 0;
-        global.fetch = jest.fn(() => {
+        global.fetch = jest.fn((url) => {
           callCount++;
           if (callCount === 1) {
             return Promise.resolve({
               ok: true,
               json: () => Promise.resolve(['Paris'])
             });
-          } else {
+          } else if (callCount === 2) {
+            // Pour le deuxième appel (coordonnées GPS), retourner le format attendu
             return Promise.resolve({
               ok: true,
               json: () => Promise.resolve(['Paris|48.8566|2.3522'])
+            });
+          } else {
+            // Pour les appels supplémentaires, retourner une réponse vide
+            return Promise.resolve({
+              ok: true,
+              json: () => Promise.resolve([])
             });
           }
         });
@@ -191,9 +198,14 @@ describe('Autocomplete Module', () => {
       // Attendre que le clic soit traité
       await new Promise(resolve => setTimeout(resolve, 500));
       
+      // Attendre un peu plus longtemps pour que toutes les opérations asynchrones se terminent
+      await new Promise(resolve => setTimeout(resolve, 200));
+      
       // Vérifier que le champ est mis à jour
       // Note: Le champ input est mis à jour avec juste "Paris" par le clic
       // mais le champ caché peut contenir le format complet
+      console.log('Valeur finale de input:', input.value);
+      console.log('Valeur finale de hiddenField:', hiddenField.value);
       expect(input.value).toBe('Paris');
       const hiddenField = document.querySelector('input[name="ville"]');
       expect(hiddenField.value).toBe('Paris');
@@ -201,6 +213,11 @@ describe('Autocomplete Module', () => {
       // Restaurer le submit original
       if (originalSubmit) {
         HTMLFormElement.prototype.submit = originalSubmit;
+      }
+      
+      // Restaurer le fetch original
+      if (global.fetch && global.fetch.mockRestore) {
+        global.fetch.mockRestore();
       }
     });
   });
