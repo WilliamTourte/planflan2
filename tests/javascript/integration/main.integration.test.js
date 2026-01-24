@@ -7,6 +7,7 @@ import * as main from '../../../app/static/js/main.js';
 import * as utils from '../../../app/static/js/utils.js';
 import * as api from '../../../app/static/js/api.js';
 import * as autocomplete from '../../../app/static/js/autocomplete.js';
+import { initGeolocButton } from '../../../app/static/js/main.js';
 
 describe('Main Module Integration', () => {
   beforeEach(() => {
@@ -23,6 +24,18 @@ describe('Main Module Integration', () => {
         </form>
       </div>
     `;
+    
+    // Configurer window.location pour JSDOM
+    delete window.location;
+    window.location = {
+      href: 'http://localhost/home',
+      origin: 'http://localhost',
+      hostname: 'localhost',
+      pathname: '/home',
+      search: '',
+      hash: '',
+      toString: () => 'http://localhost/home'
+    };
     
     // Mock des fonctions globales
     global.showToast = jest.fn();
@@ -69,11 +82,17 @@ describe('Main Module Integration', () => {
   });
 
   describe('Geolocation Integration', () => {
-    it('should handle geolocation button click', () => {
+    it('should handle geolocation button click', async () => {
+      // Initialiser le bouton de géolocalisation
+      initGeolocButton();
+      
       // Simuler le clic sur le bouton de géolocalisation
       const geolocButton = document.getElementById('geoloc-button');
       const clickEvent = new Event('click');
       geolocButton.dispatchEvent(clickEvent);
+      
+      // Attendre que la promesse de géolocalisation se résolve
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       // Vérifier que la géolocalisation a été appelée
       expect(navigator.geolocation.getCurrentPosition).toHaveBeenCalled();
@@ -82,11 +101,15 @@ describe('Main Module Integration', () => {
       const latitudeField = document.querySelector('input[name="latitude"]');
       const longitudeField = document.querySelector('input[name="longitude"]');
       
+      // Note: Dans le test, la redirection est empêchée, donc les champs devraient être mis à jour
       expect(latitudeField.value).toBe('48.8566');
       expect(longitudeField.value).toBe('2.3522');
     });
 
-    it('should handle geolocation errors', () => {
+    it('should handle geolocation errors', async () => {
+      // Initialiser le bouton de géolocalisation
+      initGeolocButton();
+      
       // Configurer un mock d'erreur
       global.navigator.geolocation.getCurrentPosition = jest.fn((success, error) => {
         error({
@@ -99,6 +122,9 @@ describe('Main Module Integration', () => {
       const geolocButton = document.getElementById('geoloc-button');
       const clickEvent = new Event('click');
       geolocButton.dispatchEvent(clickEvent);
+      
+      // Attendre que la promesse d'erreur se résolve
+      await new Promise(resolve => setTimeout(resolve, 100));
       
       // Vérifier que l'erreur est affichée
       expect(showToast).toHaveBeenCalledWith('Erreur de géolocalisation: Permission refusée', 'error');
@@ -121,6 +147,13 @@ describe('Main Module Integration', () => {
     });
 
     it('should verify global exports for backward compatibility', () => {
+      // Importer le module main.js pour déclencher les exports globaux
+      try {
+        require('../../../app/static/js/main.js');
+      } catch (error) {
+        console.log('Module main.js déjà chargé ou erreur de chargement:', error.message);
+      }
+      
       // Vérifier que les exports globaux sont disponibles
       expect(typeof window.utils).toBe('object');
       expect(typeof window.api).toBe('object');

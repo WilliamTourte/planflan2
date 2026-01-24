@@ -149,28 +149,28 @@ describe('Autocomplete Module', () => {
         fetchMock.mockResponseOnce(JSON.stringify(['Paris']), { status: 200 });
         fetchMock.mockResponseOnce(JSON.stringify(['Paris|48.8566|2.3522']), { status: 200 });
       } else {
-        // Mock global fetch
-        let callCount = 0;
+        // Mock global fetch - version corrigée pour distinguer les types de requêtes
         global.fetch = jest.fn((url) => {
-          callCount++;
-          if (callCount === 1) {
-            return Promise.resolve({
-              ok: true,
-              json: () => Promise.resolve(['Paris'])
-            });
-          } else if (callCount === 2) {
-            // Pour le deuxième appel (coordonnées GPS), retourner le format attendu
-            return Promise.resolve({
-              ok: true,
-              json: () => Promise.resolve(['Paris|48.8566|2.3522'])
-            });
-          } else {
-            // Pour les appels supplémentaires, retourner une réponse vide
-            return Promise.resolve({
-              ok: true,
-              json: () => Promise.resolve([])
-            });
+          if (url.includes('/api/villes')) {
+            if (url.includes('with_gps=true')) {
+              // Requête pour les coordonnées GPS - retourner le format complet
+              return Promise.resolve({
+                ok: true,
+                json: () => Promise.resolve(['Paris|48.8566|2.3522'])
+              });
+            } else {
+              // Requête normale pour les villes - retourner juste les noms
+              return Promise.resolve({
+                ok: true,
+                json: () => Promise.resolve(['Paris'])
+              });
+            }
           }
+          // Pour les autres URLs, retourner une réponse vide
+          return Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve([])
+          });
         });
       }
       
@@ -178,6 +178,8 @@ describe('Autocomplete Module', () => {
       const originalSubmit = HTMLFormElement.prototype.submit;
       HTMLFormElement.prototype.submit = jest.fn(function() {
         console.log('Form submission prevented in test');
+        // Ne pas réinitialiser les champs du formulaire
+        return false;
       });
       
       initAutocomplete();
@@ -199,15 +201,19 @@ describe('Autocomplete Module', () => {
       await new Promise(resolve => setTimeout(resolve, 500));
       
       // Attendre un peu plus longtemps pour que toutes les opérations asynchrones se terminent
-      await new Promise(resolve => setTimeout(resolve, 200));
+      await new Promise(resolve => setTimeout(resolve, 500));
       
       // Vérifier que le champ est mis à jour
       // Note: Le champ input est mis à jour avec juste "Paris" par le clic
       // mais le champ caché peut contenir le format complet
       console.log('Valeur finale de input:', input.value);
-      console.log('Valeur finale de hiddenField:', hiddenField.value);
-      expect(input.value).toBe('Paris');
+      console.log('Valeur de input avant le clic:', 'Paris'); // Valeur attendue
       const hiddenField = document.querySelector('input[name="ville"]');
+      console.log('Valeur finale de hiddenField:', hiddenField.value);
+      
+      // Le problème semble être que le champ input est réinitialisé après le clic
+      // Vérifions si le formulaire est soumis
+      expect(input.value).toBe('Paris');
       expect(hiddenField.value).toBe('Paris');
       
       // Restaurer le submit original
