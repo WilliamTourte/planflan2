@@ -99,36 +99,39 @@ function initAutocomplete() {
                                 const lat = parseFloat(parts[1]);
                                 const lng = parseFloat(parts[2]);
                                 
-                                // Zoomer sur la ville si la carte existe
-                                if (typeof zoomToLocation === 'function') {
-                                    zoomToLocation(lat, lng, ville);
-                                } else {
-                                    console.log("Fonction zoomToLocation non disponible, coordonnées GPS:", lat, lng);
+                                // Stocker les coordonnées dans les champs cachés
+                                const latitudeField = document.querySelector('input[name="latitude"]');
+                                const longitudeField = document.querySelector('input[name="longitude"]');
+                                if (latitudeField && longitudeField) {
+                                    latitudeField.value = lat;
+                                    longitudeField.value = lng;
                                 }
+                                
+                                // Rediriger vers la page de liste avec les coordonnées
+                                const url = new URL(window.location.origin + '/liste_etablissements');
+                                url.searchParams.append("ville", ville);
+                                url.searchParams.append("latitude", lat);
+                                url.searchParams.append("longitude", lng);
+                                url.searchParams.append("from_ville_selection", "true");
+                                
+                                window.location.href = url.toString();
+                                return;
                             }
                         }
                         
-                        // Soumettre le formulaire après avoir mis à jour le champ caché
-                        setTimeout(() => {
-                            const form = document.querySelector('form');
-                            if (form) {
-                                console.log("Soumission du formulaire avec ville :", hiddenField.value);
-                                console.log("Méthode du formulaire :", form.method);
-                                form.submit();
-                            } else {
-                                console.error("Formulaire non trouvé !");
-                            }
-                        }, 100);
+                        // Si pas de coordonnées trouvées, soumettre le formulaire normalement
+                        const form = document.querySelector('form');
+                        if (form) {
+                            form.submit();
+                        }
                     })
                     .catch(error => {
                         console.error("Erreur lors de la récupération des coordonnées GPS:", error);
-                        // Soumettre le formulaire même en cas d'erreur
-                        setTimeout(() => {
-                            const form = document.querySelector('form');
-                            if (form) {
-                                form.submit();
-                            }
-                        }, 100);
+                        // Soumettre le formulaire en cas d'erreur
+                        const form = document.querySelector('form');
+                        if (form) {
+                            form.submit();
+                        }
                     });
             });
             resultsContainer.appendChild(div);

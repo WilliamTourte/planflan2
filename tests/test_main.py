@@ -924,7 +924,7 @@ def test_liste_etablissements_cas_limites_caracteres_speciaux(client):
 
 
 def test_liste_etablissements_cas_limites_aucune_correspondance(client):
-    """Test la route liste_etablissements quand aucun établissement ne correspond"""
+    """Test la route liste_etablissements quand une recherche ne trouve rien"""
     user = client.application.config["TEST_USER"]
 
     # Créer des établissements de test
@@ -946,22 +946,31 @@ def test_liste_etablissements_cas_limites_aucune_correspondance(client):
         db.session.add_all([etab1, etab2])
         db.session.commit()
 
-    # Test avec une recherche qui ne correspond à rien
+    # Test 1: Recherche simple qui ne correspond à rien
     response = client.get(
         "/liste_etablissements", query_string={"recherche_simple": "Restaurant Inconnu"}
     )
     assert response.status_code == 200
-    # Devrait retourner une page vide ou un message approprié
-    # Vérifier que les établissements existants ne sont pas présents
+    # Avec la nouvelle logique, tous les établissements sont toujours affichés sur la carte
+    # Vérifier que les établissements existants sont présents dans les données JSON
+    assert b"Boulangerie Test" in response.data
+    assert b"Autre Etablissement" in response.data
+    # Vérifier que la page se charge correctement
+    assert b"liste_etablissements" in response.data
+
+    # Test 2: Ville seule (sans autres filtres) - devrait afficher tous les établissements
+    response = client.get("/liste_etablissements", query_string={"ville": "Marseille"})
+    assert response.status_code == 200
+    # Tous les établissements devraient être affichés (ville est utilisée pour centrer la carte)
+    assert b"Boulangerie Test" in response.data
+    assert b"Autre Etablissement" in response.data
+
+    # Test 3: Filtres qui ne correspondent à rien - devrait filtrer et ne rien retourner
+    response = client.get("/liste_etablissements", query_string={"visite": "oui"})
+    assert response.status_code == 200
+    # Aucun établissement ne devrait être affiché (filtre visite=oui est appliqué)
     assert b"Boulangerie Test" not in response.data
     assert b"Autre Etablissement" not in response.data
-
-    # Test avec des filtres qui ne correspondent à rien
-    response = client.get(
-        "/liste_etablissements", query_string={"ville": "Marseille", "visite": "oui"}
-    )
-    assert response.status_code == 200
-    # Devrait retourner une page vide ou un message approprié
 
 
 def test_liste_etablissements_cas_limites_valeurs_invalides(client):

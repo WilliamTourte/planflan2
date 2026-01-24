@@ -40,6 +40,7 @@ build/
 # Fichiers de coverage
 .coverage
 *.cover
+coverage-js/
 
 # Fichiers Node.js
 node_modules/

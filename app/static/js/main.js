@@ -100,6 +100,7 @@ function initializeListeEtablissementsPage() {
     // Vérifier si on vient d'une géolocalisation depuis la page d'accueil
     const urlParams = new URLSearchParams(window.location.search);
     const fromGeoloc = urlParams.get('geolocalisation') === 'true';
+    const fromVilleSelection = urlParams.get('from_ville_selection') === 'true';
 
     // Restaurer l'état depuis l'URL
     const restoredFilters = filters.restoreFiltersFromUrl();
@@ -112,6 +113,11 @@ function initializeListeEtablissementsPage() {
     // Si on vient d'une géolocalisation, forcer l'affichage du marqueur utilisateur
     if (fromGeoloc && userLat && userLon) {
         map.createUserMarker(true); // forceZoom = true
+    }
+    
+    // Si on vient d'une sélection de ville, centrer la carte sur les coordonnées
+    if (fromVilleSelection && userLat && userLon) {
+        map.setView([userLat, userLon], 13);
     }
 }
 

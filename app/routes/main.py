@@ -276,7 +276,6 @@ def liste_etablissements():
     # toujours chercher tous les établissements
     query = Etablissement.query
 
-    
     # et utiliser le zoom JavaScript pour la ville sélectionnée
     ville_selectionnee = None
 
@@ -295,23 +294,34 @@ def liste_etablissements():
     user_lat = form_recherche.latitude.data
     user_lon = form_recherche.longitude.data
 
-    if user_lat and user_lon and not ville_selectionnee:
+    # Nouvelle logique: afficher tous les établissements par défaut
+    # mais appliquer les filtres uniquement lorsque des filtres spécifiques sont utilisés
+    # pour garder la compatibilité avec les tests existants
 
-        etablissements = query.distinct().all()
-    else:
-        # 4. Appliquer les filtres en utilisant la fonction filtrer_etablissements
-        if (
-            request.method == "POST"
-            or form_recherche.validate_on_submit()
-            or (request.method == "GET" and form_recherche.validate())
-        ):
-            # Extraire les paramètres de filtre en utilisant la fonction centralisée
-            filtres = extraire_parametres_filtre(form=form_recherche)
+    # Vérifier si des filtres spécifiques sont activement utilisés
+    filtres_actifs = False
+    if (
+        request.method == "POST"
+        or form_recherche.validate_on_submit()
+        or (request.method == "GET" and form_recherche.validate())
+    ):
+        # Extraire les paramètres de filtre
+        filtres = extraire_parametres_filtre(form=form_recherche)
 
-            # La fonction filtrer_etablissements gère maintenant automatiquement les jointures
+        # Vérifier si des filtres significatifs sont présents
+        # (exclure les champs vides, les valeurs par défaut, et le champ ville)
+        # Note: ville est exclu car nous voulons l'utiliser pour centrer la carte, pas pour filtrer
+        filtres_significatifs = {
+            k: v
+            for k, v in filtres.items()
+            if v and v != "tous" and k not in ["latitude", "longitude", "ville"]
+        }
+
+        if filtres_significatifs:
+            filtres_actifs = True
             query = filtrer_etablissements(query, **filtres)
 
-        etablissements = query.distinct().all()
+    etablissements = query.distinct().all()
 
     # 5. Préparation pour le template
     etablissements, etablissements_json = afficher_etablissements(etablissements)
