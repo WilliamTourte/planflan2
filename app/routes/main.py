@@ -125,7 +125,6 @@ def get_villes():
         villes = query.all()
         villes = [ville[0] for ville in villes if ville[0]]
 
-
         return jsonify(sorted(villes))
 
 
@@ -142,41 +141,41 @@ def extraire_parametres_filtre(source=None, request=None, form=None):
     """
     filtres = {}
 
-    if source == 'post' and request:
+    if source == "post" and request:
         data = request.get_json() or {}
-        filtres['nom'] = data.get('nom', '')
-        filtres['visite'] = data.get('visite', '')
-        filtres['labellise'] = data.get('labellise', '')
-        filtres['ville'] = data.get('ville', '')
-        filtres['type_pate'] = data.get('type_pate', 'tous')
-        filtres['type_saveur'] = data.get('type_saveur', 'tous')
-        filtres['prix'] = data.get('prix', 'tous')
+        filtres["nom"] = data.get("nom", "")
+        filtres["visite"] = data.get("visite", "")
+        filtres["labellise"] = data.get("labellise", "")
+        filtres["ville"] = data.get("ville", "")
+        filtres["type_pate"] = data.get("type_pate", "tous")
+        filtres["type_saveur"] = data.get("type_saveur", "tous")
+        filtres["prix"] = data.get("prix", "tous")
 
-    elif source == 'get' and request:
-        filtres['nom'] = request.args.get('nom', '')
-        filtres['visite'] = request.args.get('visite', '')
-        filtres['labellise'] = request.args.get('labellise', '')
-        filtres['ville'] = request.args.get('ville', '')
-        filtres['type_pate'] = request.args.get('type_pate', 'tous')
-        filtres['type_saveur'] = request.args.get('type_saveur', 'tous')
-        filtres['prix'] = request.args.get('prix', 'tous')
+    elif source == "get" and request:
+        filtres["nom"] = request.args.get("nom", "")
+        filtres["visite"] = request.args.get("visite", "")
+        filtres["labellise"] = request.args.get("labellise", "")
+        filtres["ville"] = request.args.get("ville", "")
+        filtres["type_pate"] = request.args.get("type_pate", "tous")
+        filtres["type_saveur"] = request.args.get("type_saveur", "tous")
+        filtres["prix"] = request.args.get("prix", "tous")
 
     elif form:
         # Pour les routes avec formulaire comme /liste_etablissements
         if form.nom.data:
-            filtres['nom'] = form.nom.data
-        if form.visite.data and form.visite.data != 'tous':
-            filtres['visite'] = form.visite.data
-        if form.labellise.data and form.labellise.data != 'tous':
-            filtres['labellise'] = form.labellise.data
-        if form.type_saveur.data and form.type_saveur.data != 'tous':
-            filtres['type_saveur'] = form.type_saveur.data
-        if form.type_pate.data and form.type_pate.data != 'tous':
-            filtres['type_pate'] = form.type_pate.data
-        if form.type_texture.data and form.type_texture.data != 'tous':
-            filtres['type_texture'] = form.type_texture.data
-        if form.prix.data and form.prix.data != 'tous':
-            filtres['prix'] = form.prix.data
+            filtres["nom"] = form.nom.data
+        if form.visite.data and form.visite.data != "tous":
+            filtres["visite"] = form.visite.data
+        if form.labellise.data and form.labellise.data != "tous":
+            filtres["labellise"] = form.labellise.data
+        if form.type_saveur.data and form.type_saveur.data != "tous":
+            filtres["type_saveur"] = form.type_saveur.data
+        if form.type_pate.data and form.type_pate.data != "tous":
+            filtres["type_pate"] = form.type_pate.data
+        if form.type_texture.data and form.type_texture.data != "tous":
+            filtres["type_texture"] = form.type_texture.data
+        if form.prix.data and form.prix.data != "tous":
+            filtres["prix"] = form.prix.data
 
     # Nettoyer les valeurs vides
     return {k: v for k, v in filtres.items() if v}
@@ -184,10 +183,10 @@ def extraire_parametres_filtre(source=None, request=None, form=None):
 
 def extraire_parametres_filtre_api(request):
     """Version spécifique pour l'API qui gère à la fois GET et POST."""
-    if request.method == 'POST':
-        return extraire_parametres_filtre(source='post', request=request)
+    if request.method == "POST":
+        return extraire_parametres_filtre(source="post", request=request)
     else:
-        return extraire_parametres_filtre(source='get', request=request)
+        return extraire_parametres_filtre(source="get", request=request)
 
 
 def filtrer_etablissements(query, **kwargs):
@@ -204,7 +203,7 @@ def filtrer_etablissements(query, **kwargs):
         query = query.filter(Etablissement.visite == True)
     elif kwargs.get("visite") == "non":
         query = query.filter(Etablissement.visite == False)
-    
+
     # Accepter à la fois 'label' et 'labellise' comme paramètres pour la compatibilité
     labellise_value = kwargs.get("labellise") or kwargs.get("label")
     if labellise_value == "oui":
@@ -217,7 +216,7 @@ def filtrer_etablissements(query, **kwargs):
         "type_pate": kwargs.get("type_pate"),
         "type_saveur": kwargs.get("type_saveur"),
         "type_texture": kwargs.get("type_texture"),
-        "prix": kwargs.get("prix")
+        "prix": kwargs.get("prix"),
     }
 
     # Vérifier si au moins un filtre Flan est présent et différent de "tous"
@@ -237,11 +236,7 @@ def filtrer_etablissements(query, **kwargs):
             query = query.filter(Flan.type_texture == flan_filters["type_texture"])
 
         # Gestion du filtre prix
-        prix_mapping = {
-            "0": (None, 2.5),
-            "2.5": (2.5, 5),
-            "5": (5, None)
-        }
+        prix_mapping = {"0": (None, 2.5), "2.5": (2.5, 5), "5": (5, None)}
         if flan_filters["prix"] and flan_filters["prix"] in prix_mapping:
             min_prix, max_prix = prix_mapping[flan_filters["prix"]]
             if min_prix is not None:
@@ -278,21 +273,10 @@ def liste_etablissements():
         form_edit = EtabForm(prefix="edit-etab")
         form_recherche = RechercheForm()
 
-    # 1. Recherche simple (GET uniquement) - Gère la recherche par nom ou ville
-    # Note: Désactivé en mode géolocalisation pour éviter les conflits
-    recherche_simple = request.args.get("recherche_simple", None)
-    if recherche_simple and request.method == "GET" and not geolocalisation_mode:
-        search_pattern = f"%{recherche_simple}%"
-        query = Etablissement.query.filter(
-            or_(
-                Etablissement.nom.ilike(search_pattern),
-                Etablissement.ville.ilike(search_pattern)
-            )
-        )
-    else:
-        query = Etablissement.query
+    # toujours chercher tous les établissements
+    query = Etablissement.query
 
-    # 2. Nouvelle logique: toujours afficher tous les établissements
+    
     # et utiliser le zoom JavaScript pour la ville sélectionnée
     ville_selectionnee = None
 
@@ -351,27 +335,29 @@ def api_etablissements():
     try:
         # Extraire les paramètres de filtre en utilisant la fonction centralisée
         filtres = extraire_parametres_filtre_api(request)
-        format = request.args.get("format", "json") if request.method == "GET" else request.get_json().get("format", "json")
-        
+        format = (
+            request.args.get("format", "json")
+            if request.method == "GET"
+            else request.get_json().get("format", "json")
+        )
+
         # Applique les filtres en utilisant la fonction centralisée
         query = Etablissement.query
         query = filtrer_etablissements(query, **filtres)
-        
+
         # Filtrer pour ne retourner que les établissements qui ont des flans
         # sauf si des filtres spécifiques sur les flans sont appliqués
         has_flan_filters = any(
             filtres.get(key) and filtres.get(key) != "tous"
             for key in ["type_pate", "type_saveur", "type_texture", "prix"]
         )
-        
+
         if not has_flan_filters:
             # Utiliser une sous-requête pour vérifier l'existence de flans
             query = query.filter(
-                Etablissement.id_etab.in_(
-                    db.session.query(Flan.id_etab).distinct()
-                )
+                Etablissement.id_etab.in_(db.session.query(Flan.id_etab).distinct())
             )
-        
+
         # Récupère les résultats uniques
         etablissements = []
         seen = set()
@@ -379,7 +365,7 @@ def api_etablissements():
             if etab.id_etab not in seen:
                 seen.add(etab.id_etab)
                 etablissements.append(etab)
-        
+
         # Renvoie HTML ou JSON
         if format == "html":
             from flask import render_template_string
@@ -442,30 +428,18 @@ def dashboard():
     pending_etablissements = []
     if current_user.is_admin:
         pending_evaluations = (
-            Evaluation.query
-            .join(Utilisateur)
-            .filter(
-                Evaluation.statut == "EN_ATTENTE",
-                Utilisateur.is_admin == False
-            )
+            Evaluation.query.join(Utilisateur)
+            .filter(Evaluation.statut == "EN_ATTENTE", Utilisateur.is_admin == False)
             .all()
         )
         pending_flans = (
-            Flan.query
-            .join(Utilisateur)
-            .filter(
-                Flan.statut == "EN_ATTENTE",
-                Utilisateur.is_admin == False
-            )
+            Flan.query.join(Utilisateur)
+            .filter(Flan.statut == "EN_ATTENTE", Utilisateur.is_admin == False)
             .all()
         )
         pending_etablissements = (
-            Etablissement.query
-            .join(Utilisateur)
-            .filter(
-                Etablissement.statut == "EN_ATTENTE",
-                Utilisateur.is_admin == False
-            )
+            Etablissement.query.join(Utilisateur)
+            .filter(Etablissement.statut == "EN_ATTENTE", Utilisateur.is_admin == False)
             .all()
         )
 
@@ -516,9 +490,12 @@ def dashboard():
 @main_bp.route("/etablissement/<int:id_etab>", methods=["GET", "POST"])
 def afficher_etablissement_unique(id_etab):
     # Utiliser joinedload pour charger les photos
-    etablissement = db.session.query(Etablissement).options(
-        joinedload(Etablissement.photos)
-    ).filter(Etablissement.id_etab == id_etab).first()
+    etablissement = (
+        db.session.query(Etablissement)
+        .options(joinedload(Etablissement.photos))
+        .filter(Etablissement.id_etab == id_etab)
+        .first()
+    )
     if etablissement is None:
         from flask import abort
 
@@ -566,9 +543,12 @@ def afficher_etablissement_unique(id_etab):
 @main_bp.route("/flan/<int:id_flan>", methods=["GET", "POST"])
 def afficher_flan_unique(id_flan):
     # Utiliser joinedload pour charger les évaluations
-    flan_unique = db.session.query(Flan).options(
-        joinedload(Flan.evaluations)
-    ).filter(Flan.id_flan == id_flan).first()
+    flan_unique = (
+        db.session.query(Flan)
+        .options(joinedload(Flan.evaluations))
+        .filter(Flan.id_flan == id_flan)
+        .first()
+    )
     if flan_unique is None:
         from flask import abort
 

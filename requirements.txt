@@ -118,4 +118,5 @@ WTForms==3.2.1
 
 # Ne pas installer sous Windows
 uwsgi==2.0.31; sys_platform != 'win32'
+# Installer seulement sous Windows
 mysqlclient==2.2.7; sys_platform == 'win32'

@@ -328,4 +328,7 @@ window.api = api;
 window.GeolocationHandler = GeolocationHandler;
 window.getUserLocationSimple = getUserLocationSimple;
 
+// Export pour les tests
+export { initGeolocButton, cancelDeleteAccount };
+
 console.log("Modules PlanFlan chargés et prêts");

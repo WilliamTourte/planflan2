@@ -82,4 +82,21 @@ beforeEach(() => {
       }
     });
   }
+  
+  // Mock pour window.location qui n'est pas complètement implémenté dans jsdom
+  if (typeof window !== 'undefined') {
+    delete window.location;
+    window.location = {
+      href: '',
+      hostname: 'test.example.com',
+      pathname: '/',
+      search: '',
+      hash: '',
+      origin: 'http://test.example.com',
+      assign: jest.fn(),
+      replace: jest.fn(),
+      reload: jest.fn(),
+      toString: function() { return this.href; }
+    };
+  }
 });

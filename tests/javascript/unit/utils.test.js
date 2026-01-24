@@ -23,9 +23,9 @@ describe('Utils Module', () => {
       jest.useRealTimers();
     });
 
-    it('should debounce function calls', async () => {
+    it('should debounce function calls', (done) => {
       const mockFn = jest.fn();
-      const debouncedFn = debounce(mockFn, 500);
+      const debouncedFn = debounce(mockFn, 100); // Réduire le délai pour le test
 
       // Appeler plusieurs fois rapidement
       debouncedFn();
@@ -35,36 +35,39 @@ describe('Utils Module', () => {
       // Vérifier que la fonction n'a pas été appelée immédiatement
       expect(mockFn).not.toHaveBeenCalled();
 
-      // Avancer le temps et exécuter les timers
-      jest.advanceTimersByTime(500);
-      await new Promise(resolve => setTimeout(resolve, 100));
-
-      // Vérifier que la fonction a été appelée une seule fois
-      expect(mockFn).toHaveBeenCalledTimes(1);
+      // Attendre que le timer se termine
+      setTimeout(() => {
+        // Vérifier que la fonction a été appelée une seule fois
+        expect(mockFn).toHaveBeenCalledTimes(1);
+        done();
+      }, 150);
     });
 
-    it('should call function with latest arguments', async () => {
+    it('should call function with latest arguments', (done) => {
       const mockFn = jest.fn();
-      const debouncedFn = debounce(mockFn, 500);
+      const debouncedFn = debounce(mockFn, 100); // Réduire le délai pour le test
 
       debouncedFn('arg1');
       debouncedFn('arg2');
       debouncedFn('arg3');
 
-      jest.advanceTimersByTime(500);
-      await new Promise(resolve => setTimeout(resolve, 100));
-
-      expect(mockFn).toHaveBeenCalledWith('arg3');
+      // Attendre que le timer se termine
+      setTimeout(() => {
+        expect(mockFn).toHaveBeenCalledWith('arg3');
+        done();
+      }, 150);
     });
   });
 
   describe('showLoading', () => {
     it('should show loading indicator', () => {
-      document.body.innerHTML = '<div id="global-loading-indicator" style="display: none;"></div>';
+      // La fonction showLoading crée l'élément si nécessaire
+      document.body.innerHTML = '';
       
       showLoading('Chargement...');
       
       const indicator = document.getElementById('global-loading-indicator');
+      expect(indicator).not.toBeNull();
       expect(indicator.style.display).toBe('flex');
       // Vérifier que le texte est dans l'élément span
       const messageElement = indicator.querySelector('span');
