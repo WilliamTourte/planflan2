@@ -826,4 +826,5 @@ function initAll() {
 }
 
 // Initialisation au chargement de la page
-document.addEventListener('DOMContentLoaded', initAll);
+// Note: L'initialisation est maintenant gérée par main.js pour éviter les conflits
+// document.addEventListener('DOMContentLoaded', initAll);

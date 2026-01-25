@@ -4,7 +4,6 @@
  * Ce module gère l'initialisation et les interactions avec la carte Leaflet
  */
 
-import { createEmojiIcon as createEmojiIconUtils } from './utils.js';
 import { GeolocationHandler } from './geolocation.js';
 
 // Variables globales pour le module
@@ -277,9 +276,7 @@ export function initMap(options = {}) {
     // Ajouter un écouteur d'événement pour le déplacement de la carte
     map.on('moveend', function() {
         // Sauvegarder l'état dans l'URL lorsque la carte est déplacée
-        if (typeof saveStateToUrl === 'function') {
-            saveStateToUrl();
-        }
+        saveCompleteStateToUrl();
     });
 
     // Ajouter le bouton de géolocalisation comme contrôle Leaflet
@@ -413,6 +410,55 @@ export function setVilleSelectionnee(ville) {
     villeSelectionnee = ville;
 }
 
+/**
+ * Sauvegarde l'état complet (filtres + carte) dans l'URL
+ */
+export function saveCompleteStateToUrl() {
+    const url = new URL(window.location.href);
+    const currentFilters = getActiveFilters();
+    
+    // Sauvegarder les filtres
+    if (currentFilters.type_pate) {
+        url.searchParams.set('pate', currentFilters.type_pate);
+    } else {
+        url.searchParams.delete('pate');
+    }
+    
+    if (currentFilters.type_saveur) {
+        url.searchParams.set('saveur', currentFilters.type_saveur);
+    } else {
+        url.searchParams.delete('saveur');
+    }
+    
+    if (currentFilters.visited) {
+        url.searchParams.set('visited', 'true');
+    } else {
+        url.searchParams.delete('visited');
+    }
+    
+    if (currentFilters.unvisited) {
+        url.searchParams.set('unvisited', 'true');
+    } else {
+        url.searchParams.delete('unvisited');
+    }
+    
+    if (currentFilters.label) {
+        url.searchParams.set('label', 'true');
+    } else {
+        url.searchParams.delete('label');
+    }
+    
+    // Sauvegarder la position et le zoom de la carte
+    if (map) {
+        const center = map.getCenter();
+        url.searchParams.set('lat', center.lat.toFixed(6));
+        url.searchParams.set('lng', center.lng.toFixed(6));
+        url.searchParams.set('zoom', map.getZoom());
+    }
+    
+    window.history.replaceState({}, '', url);
+}
+
 // Export pour compatibilité avec les anciens scripts
 document.map = {
     initMap,
@@ -426,5 +472,6 @@ document.map = {
     getActiveFilters,
     setUserLocation,
     setVilleSelectionnee,
-    loadEtablissements
+    loadEtablissements,
+    saveCompleteStateToUrl
 };
