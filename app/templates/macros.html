@@ -106,16 +106,16 @@
         {% if current_page == page_attendue %}
             {% if current_user.id_user == objet.id_user and not objet.statut.value == 'VALIDE' %}
                 <div class="action-buttons">
-                    <button type="button" class="btn btn-success" title="Modifier"
-                            onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
+                    <button type="button" class="btn btn-success macro-edit-btn" title="Modifier"
+                            data-object-type="{{ type_objet }}" data-object-id="{{ objet[id_field] }}">
                         <i class="bi bi-pencil"></i>
                     </button>
                     {% if delete_form %}
                         <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}"
-                              class="inline-form">
+                              class="inline-form macro-delete-form"
+                              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
                             {{ delete_form.hidden_tag() }}
-                            <button type="submit" class="btn btn-danger" title="Supprimer"
-                                    onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
+                            <button type="submit" class="btn btn-danger" title="Supprimer">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </form>
@@ -126,23 +126,24 @@
                     <div class="action-buttons d-flex gap-1">
                         {% if validate_form %}
                             <form method="POST" action="{{ url_for(validate_route, **{id_field: objet[id_field]}) }}"
-                                  class="inline-form">
+                                  class="inline-form macro-validate-form"
+                                  onsubmit="return confirm('Êtes-vous sûr de vouloir valider cet élément ?');">
                                 {{ validate_form.hidden_tag() }}
                                 <button type="submit" class="btn btn-success" title="Valider">
                                     <i class="bi bi-check"></i>
                                 </button>
                             </form>
                         {% endif %}
-                        <button type="button" class="btn btn-success" title="Modifier"
-                                onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
+                        <button type="button" class="btn btn-success macro-edit-btn" title="Modifier"
+                                data-object-type="{{ type_objet }}" data-object-id="{{ objet[id_field] }}">
                             <i class="bi bi-pencil"></i>
                         </button>
                         {% if delete_form %}
                             <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}"
-                                  class="inline-form">
+                                  class="inline-form macro-delete-form"
+                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
                                 {{ delete_form.hidden_tag() }}
-                                <button type="submit" class="btn btn-danger" title="Supprimer"
-                                        onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
+                                <button type="submit" class="btn btn-danger" title="Supprimer">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>
@@ -150,16 +151,16 @@
                     </div>
                 {% else %}
                     <div class="action-buttons d-flex gap-1">
-                        <button type="button" class="btn btn-success" title="Modifier"
-                                onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
+                        <button type="button" class="btn btn-success macro-edit-btn" title="Modifier"
+                                data-object-type="{{ type_objet }}" data-object-id="{{ objet[id_field] }}">
                             <i class="bi bi-pencil"></i>
                         </button>
                         {% if delete_form %}
                             <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}"
-                                  class="inline-form">
+                                  class="inline-form macro-delete-form"
+                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
                                 {{ delete_form.hidden_tag() }}
-                                <button type="submit" class="btn btn-danger" title="Supprimer"
-                                        onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
+                                <button type="submit" class="btn btn-danger" title="Supprimer">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>

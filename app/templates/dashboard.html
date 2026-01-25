@@ -57,7 +57,7 @@
             <button
               type="button"
               class="btn btn-success"
-              onclick="cancelDeleteAccount()"
+              id="cancel-delete-account-btn"
               title="Annuler la suppression du compte"
             >
               Annuler
@@ -69,7 +69,7 @@
       <button
         type="button"
         class="btn btn-danger"
-        onclick="showDeleteAccountForm()"
+        id="delete-account-btn"
         title="Supprimer mon compte"
       >
         <i class="bi bi-trash-fill"></i>
@@ -136,7 +136,7 @@
   </div>
 
   <!-- Section Mes Évaluations -->
-  <h2 class="section-title" onclick="toggleSection('mes-evaluations')">
+  <h2 class="section-title" id="mes-evaluations-title">
     Mes evaluations
   </h2>
   <div id="mes-evaluations" class="section-content" style="display: none">
@@ -145,21 +145,21 @@
   <!-- Sections Admin -->
   {% if current_user.is_admin %}
 
-  <h2 class="section-title" onclick="toggleSection('evaluations-a-valider')">
+  <h2 class="section-title" id="evaluations-a-valider-title">
     Evaluations en attente de validation
   </h2>
   <div id="evaluations-a-valider" class="section-content" style="display: none">
     {{ afficher_grille('evaluation', pending_evaluations, current_user) }}
   </div>
 
-  <h2 class="section-title" onclick="toggleSection('flans-a-valider')">
+  <h2 class="section-title" id="flans-a-valider-title">
     Flans en attente de validation
   </h2>
   <div id="flans-a-valider" class="section-content" style="display: none">
     {{ afficher_grille('flan', pending_flans, current_user) }}
   </div>
 
-  <h2 class="section-title" onclick="toggleSection('etablissements-a-valider')">
+  <h2 class="section-title" id="etablissements-a-valider-title">
     Etablissements en attente de validation
   </h2>
   <div
@@ -172,6 +172,42 @@
 
   {% endif %}
 </div>
+
+<script nonce="{{ csp_nonce }}">
+    // Ajouter les écouteurs d'événements pour les boutons du dashboard
+    document.addEventListener('DOMContentLoaded', function() {
+        // Bouton pour afficher le formulaire de suppression de compte
+        const deleteAccountBtn = document.getElementById('delete-account-btn');
+        if (deleteAccountBtn) {
+            deleteAccountBtn.addEventListener('click', showDeleteAccountForm);
+        }
+        
+        // Bouton pour annuler la suppression de compte
+        const cancelDeleteAccountBtn = document.getElementById('cancel-delete-account-btn');
+        if (cancelDeleteAccountBtn) {
+            cancelDeleteAccountBtn.addEventListener('click', cancelDeleteAccount);
+        }
+        
+        // Titres cliquables pour basculer les sections
+        const sectionTitles = [
+            { id: 'mes-evaluations-title', section: 'mes-evaluations' },
+            { id: 'evaluations-a-valider-title', section: 'evaluations-a-valider' },
+            { id: 'flans-a-valider-title', section: 'flans-a-valider' },
+            { id: 'etablissements-a-valider-title', section: 'etablissements-a-valider' }
+        ];
+        
+        sectionTitles.forEach(function(title) {
+            const element = document.getElementById(title.id);
+            if (element) {
+                element.addEventListener('click', function() {
+                    toggleSection(title.section);
+                });
+                // Ajouter le curseur pointer pour indiquer que c'est cliquable
+                element.style.cursor = 'pointer';
+            }
+        });
+    });
+</script>
 
 <script src="{{ url_for('static', filename='js/dashboard.js') }}" nonce="{{ csp_nonce }}"></script>
 {% endblock %}
