@@ -4,8 +4,8 @@
  * Ce module gère les filtres de la carte et leur interaction avec les marqueurs
  */
 
-import { updateActiveButtonStates, updateMainFilterButtons, toggleActiveButton, saveStateToUrl } from './utils.js';
-import { updateMarkersBasedOnFilters as updateMapMarkers } from './map.js';
+import { updateActiveButtonStates, updateMainFilterButtons, toggleActiveButton } from './utils.js';
+import { updateMarkersBasedOnFilters as updateMapMarkers, saveCompleteStateToUrl, setActiveFilters as setMapActiveFilters } from './map.js';
 
 // État des filtres actifs
 let activeFilters = {
@@ -20,8 +20,10 @@ let activeFilters = {
  * Met à jour les marqueurs en fonction des filtres actifs.
  * Affiche ou masque les marqueurs selon les critères de filtrage sélectionnés.
  */
-export function updateMarkersBasedOnFilters() {
-    // Cette fonction est maintenant dans map.js, on appelle juste la version mise à jour
+function updateMarkersBasedOnFilters() {
+    // Synchroniser les filtres avec map.js
+    setMapActiveFilters(activeFilters);
+    // Appeler la fonction de map.js pour mettre à jour les marqueurs
     updateMapMarkers();
     updateActiveButtonStates(activeFilters);
     updateMainFilterButtons(activeFilters);
@@ -50,7 +52,7 @@ export function setupPateButtons() {
                 toggleActiveButton(this, isActive);
                 
                 // Sauvegarder l'état dans l'URL
-                saveStateToUrl();
+                saveCompleteStateToUrl();
             });
         }
     });
@@ -80,7 +82,7 @@ export function setupSaveurButtons() {
                 toggleActiveButton(this, isActive);
                 
                 // Sauvegarder l'état dans l'URL
-                saveStateToUrl();
+                saveCompleteStateToUrl();
             });
         }
     });
@@ -114,7 +116,7 @@ export function setupStatutButtons() {
                 toggleActiveButton(this, isActive);
                 
                 // Sauvegarder l'état dans l'URL
-                saveStateToUrl();
+                saveCompleteStateToUrl();
             });
         }
     });
@@ -143,7 +145,7 @@ export function setupFilterButtons() {
             updateMainFilterButtons(activeFilters);
             
             // Sauvegarder l'état dans l'URL
-            saveStateToUrl();
+            saveCompleteStateToUrl();
         });
     }
 
@@ -295,7 +297,6 @@ document.filters = {
     setupPateButtons,
     setupSaveurButtons,
     setupStatutButtons,
-    updateMarkersBasedOnFilters,
     restoreFiltersFromUrl,
     getActiveFilters,
     setActiveFilters

@@ -119,6 +119,9 @@ function initializeListeEtablissementsPage() {
     if (fromVilleSelection && userLat && userLon) {
         map.setView([userLat, userLon], 13);
     }
+    
+    // Sauvegarder l'état initial
+    map.saveCompleteStateToUrl();
 }
 
 /**

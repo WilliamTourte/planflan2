@@ -100,9 +100,7 @@ class GeolocationHandler {
                 timestamp: position.timestamp
             }
         });
-        document.dispatchEvent(event);
 
-        this._showSuccess("Position mise à jour avec succès");
     }
 
     /**
