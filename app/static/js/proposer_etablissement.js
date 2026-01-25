@@ -1,18 +1,24 @@
-let autocomplete;
+// Note: L'initialisation de l'autocomplete est maintenant gérée par main.js
+// pour éviter les conflits de chargement multiple de l'API Google Maps
+// La variable autocomplete sera définie par main.js via window.autocompleteInstance
+let autocomplete = null;
 let map;
 let etablissementUrl = null;
 let etablissementId = null;
 
-window.initAutocomplete = function () {
-    const input = document.getElementById("search");
-    if (!input) {
-        console.error("Élément #search introuvable !");
-        return;
+// Fonction pour configurer l'autocomplete une fois que main.js l'a initialisé
+function setupAutocompleteEventListeners() {
+    if (!autocomplete) {
+        // Si autocomplete n'est pas encore défini, essayer de le récupérer
+        // depuis la variable globale définie par main.js
+        if (window.autocompleteInstance) {
+            autocomplete = window.autocompleteInstance;
+        } else {
+            // Attendre que l'autocomplete soit initialisé
+            setTimeout(setupAutocompleteEventListeners, 100);
+            return;
+        }
     }
-    autocomplete = new google.maps.places.Autocomplete(input, {
-    types: ["bakery", "cafe", "restaurant", "bar", "food"],
-    componentRestrictions: { country: "fr" },
-    });
 
     autocomplete.addListener("place_changed", function () {
         console.log("=== DEBUT place_changed ===");
@@ -23,6 +29,9 @@ window.initAutocomplete = function () {
             console.error(
                 "❌ Aucune information de géolocalisation disponible pour ce lieu.",
             );
+            if (typeof showToast === 'function') {
+                showToast("Aucune information de géolocalisation disponible pour ce lieu.", 'error');
+            }
             return;
         }
 
@@ -201,20 +210,29 @@ window.initMap = function (lat, lng, title) {
     }
 };
 
-document.addEventListener("DOMContentLoaded", function () {
-    const googleMapsApiKeyElement = document.getElementById('google-maps-api-key');
-    if (!googleMapsApiKeyElement) {
-        console.error("Élément #google-maps-api-key introuvable !");
-        return;
-    }
-    const googleMapsApiKey = googleMapsApiKeyElement.getAttribute('data-api-key');
-    
-    const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}&libraries=places&callback=initAutocomplete&v=weekly&loading=async`;
-    script.async = true;
-    script.defer = true;
-    document.head.appendChild(script);
-});
+// Note: Le chargement de l'API Google Maps est maintenant géré par main.js via autocomplete.js
+// pour éviter les conflits de chargement multiple
+// document.addEventListener("DOMContentLoaded", function () {
+//     const googleMapsApiKeyElement = document.getElementById('google-maps-api-key');
+//     if (!googleMapsApiKeyElement) {
+//         console.error("Élément #google-maps-api-key introuvable !");
+//         return;
+//     }
+//     const googleMapsApiKey = googleMapsApiKeyElement.getAttribute('data-api-key');
+//     
+//     const script = document.createElement("script");
+//     script.src = `https://maps.googleapis.com/maps/api/js?key=${googleMapsApiKey}&libraries=places&callback=initAutocomplete&v=weekly&loading=async`;
+//     script.async = true;
+//     script.defer = true;
+//     document.head.appendChild(script);
+// });
+
+// Fonction globale pour initialiser l'autocomplete depuis main.js
+window.initProposerEtablissementAutocomplete = function(autocompleteInstance) {
+    console.log("Initialisation de l'autocomplete pour proposer_etablissement...");
+    autocomplete = autocompleteInstance;
+    setupAutocompleteEventListeners();
+};
 
 // Gestion de la soumission du formulaire
 document.addEventListener("DOMContentLoaded", function () {

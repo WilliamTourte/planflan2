@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">1.81% </span>
+                <span class="strong">1.8% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>2/110</span>
+                <span class='fraction'>2/111</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">1.83% </span>
+                <span class="strong">1.81% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>2/109</span>
+                <span class='fraction'>2/110</span>
             </div>
         
             
@@ -364,7 +364,8 @@
 <a name='L299'></a><a href='#L299'>299</a>
 <a name='L300'></a><a href='#L300'>300</a>
 <a name='L301'></a><a href='#L301'>301</a>
-<a name='L302'></a><a href='#L302'>302</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L302'></a><a href='#L302'>302</a>
+<a name='L303'></a><a href='#L303'>303</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -389,6 +390,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -657,7 +660,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -671,8 +673,8 @@
  * Ce module gère les filtres de la carte et leur interaction avec les marqueurs
  */
 &nbsp;
-import { updateActiveButtonStates, updateMainFilterButtons, toggleActiveButton, saveStateToUrl } from './utils.js';
-import { updateMarkersBasedOnFilters as updateMapMarkers } from './map.js';
+import { updateActiveButtonStates, updateMainFilterButtons, toggleActiveButton } from './utils.js';
+import { updateMarkersBasedOnFilters as updateMapMarkers, saveCompleteStateToUrl, setActiveFilters as setMapActiveFilters } from './map.js';
 &nbsp;
 // État des filtres actifs
 let activeFilters = {
@@ -687,8 +689,10 @@ let activeFilters = {
  * Met à jour les marqueurs en fonction des filtres actifs.
  * Affiche ou masque les marqueurs selon les critères de filtrage sélectionnés.
  */
-export function <span class="fstat-no" title="function not covered" >updateMarkersBasedOnFilters(</span>) {
-    // Cette fonction est maintenant dans map.js, on appelle juste la version mise à jour
+function <span class="fstat-no" title="function not covered" >updateMarkersBasedOnFilters(</span>) {
+    // Synchroniser les filtres avec map.js
+<span class="cstat-no" title="statement not covered" >    setMapActiveFilters(activeFilters);</span>
+    // Appeler la fonction de map.js pour mettre à jour les marqueurs
 <span class="cstat-no" title="statement not covered" >    updateMapMarkers();</span>
 <span class="cstat-no" title="statement not covered" >    updateActiveButtonStates(activeFilters);</span>
 <span class="cstat-no" title="statement not covered" >    updateMainFilterButtons(activeFilters);</span>
@@ -717,7 +721,7 @@ export function <span class="fstat-no" title="function not covered" >setupPateBu
 <span class="cstat-no" title="statement not covered" >                toggleActiveButton(this, isActive);</span>
                 
                 // Sauvegarder l'état dans l'URL
-<span class="cstat-no" title="statement not covered" >                saveStateToUrl();</span>
+<span class="cstat-no" title="statement not covered" >                saveCompleteStateToUrl();</span>
             });
         }
     });
@@ -747,7 +751,7 @@ export function <span class="fstat-no" title="function not covered" >setupSaveur
 <span class="cstat-no" title="statement not covered" >                toggleActiveButton(this, isActive);</span>
                 
                 // Sauvegarder l'état dans l'URL
-<span class="cstat-no" title="statement not covered" >                saveStateToUrl();</span>
+<span class="cstat-no" title="statement not covered" >                saveCompleteStateToUrl();</span>
             });
         }
     });
@@ -781,7 +785,7 @@ export function <span class="fstat-no" title="function not covered" >setupStatut
 <span class="cstat-no" title="statement not covered" >                toggleActiveButton(this, isActive);</span>
                 
                 // Sauvegarder l'état dans l'URL
-<span class="cstat-no" title="statement not covered" >                saveStateToUrl();</span>
+<span class="cstat-no" title="statement not covered" >                saveCompleteStateToUrl();</span>
             });
         }
     });
@@ -810,7 +814,7 @@ export function <span class="fstat-no" title="function not covered" >setupFilter
 <span class="cstat-no" title="statement not covered" >            updateMainFilterButtons(activeFilters);</span>
             
             // Sauvegarder l'état dans l'URL
-<span class="cstat-no" title="statement not covered" >            saveStateToUrl();</span>
+<span class="cstat-no" title="statement not covered" >            saveCompleteStateToUrl();</span>
         });
     }
 &nbsp;
@@ -962,7 +966,6 @@ document.filters = {
     setupPateButtons,
     setupSaveurButtons,
     setupStatutButtons,
-    updateMarkersBasedOnFilters,
     restoreFiltersFromUrl,
     getActiveFilters,
     setActiveFilters
@@ -973,7 +976,7 @@ document.filters = {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-01-24T08:37:03.439Z
+                at 2026-01-25T08:47:38.786Z
             </div>
         <script src="prettify.js"></script>
         <script>
