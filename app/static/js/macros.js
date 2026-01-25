@@ -27,14 +27,24 @@ export function editFlan(idFlan) {
     const editElement = document.getElementById('flan-' + idFlan + '-edit');
     const nomElement = document.getElementById('flan-' + idFlan + '-nom');
     const descriptionElement = document.getElementById('flan-' + idFlan + '-description');
+    const editNomInput = document.getElementById('edit-flan-nom');
+    const editDescriptionInput = document.getElementById('edit-flan-description');
 
-    if (displayElement && editElement && nomElement && descriptionElement) {
-        document.getElementById('edit-flan-nom').value = nomElement.textContent;
-        document.getElementById('edit-flan-description').value = descriptionElement.textContent.replace('Description : ', '').trim();
+    if (displayElement && editElement && nomElement && descriptionElement && editNomInput && editDescriptionInput) {
+        editNomInput.value = nomElement.textContent;
+        // Remove the .replace() call since the description doesn't have "Description : " prefix
+        editDescriptionInput.value = descriptionElement.textContent.trim();
         displayElement.style.display = 'none';
         editElement.style.display = 'block';
     } else {
-        console.error('Elements not found');
+        console.error('Elements not found for flan editing:', {
+            displayElement: !!displayElement,
+            editElement: !!editElement,
+            nomElement: !!nomElement,
+            descriptionElement: !!descriptionElement,
+            editNomInput: !!editNomInput,
+            editDescriptionInput: !!editDescriptionInput
+        });
     }
 }
 
@@ -50,7 +60,10 @@ export function cancelEditFlan(idFlan) {
         displayElement.style.display = 'block';
         editElement.style.display = 'none';
     } else {
-        console.error('Elements not found');
+        console.error('Elements not found for flan cancel editing:', {
+            displayElement: !!displayElement,
+            editElement: !!editElement
+        });
     }
 }
 
@@ -109,6 +122,39 @@ export function initMacroEventListeners() {
                         break;
                     case 'evaluation':
                         editEvaluation(parseInt(objectId));
+                        break;
+                    default:
+                        console.error('Unknown object type:', objectType);
+                }
+            });
+        });
+        
+        // Setup cancel buttons event listeners
+        const cancelButtons = document.querySelectorAll('.btn-canceledit');
+        cancelButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const objectType = this.getAttribute('data-object-type');
+                const objectId = this.getAttribute('data-object-id');
+                
+                // Call the appropriate cancel function based on object type
+                switch(objectType) {
+                    case 'etablissement':
+                        cancelEdit(parseInt(objectId));
+                        break;
+                    case 'flan':
+                        cancelEditFlan(parseInt(objectId));
+                        break;
+                    case 'evaluation':
+                        cancelEditEval(parseInt(objectId));
+                        break;
+                    case 'profile':
+                        // Handle profile edit cancellation
+                        const userInfo = document.getElementById('user-info');
+                        const editProfileForm = document.getElementById('edit-profile-form');
+                        if (userInfo && editProfileForm) {
+                            userInfo.style.display = 'block';
+                            editProfileForm.style.display = 'none';
+                        }
                         break;
                     default:
                         console.error('Unknown object type:', objectType);

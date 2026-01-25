@@ -297,7 +297,8 @@
                     </div>
                 {% endif %}
                 <button type="submit" class="btn btn-success" title="Valider les modifications">Valider</button>
-                <button type="button" class="btn btn-canceledit" onclick="cancelEdit({{ etablissement.id_etab }})"
+                <button type="button" class="btn btn-canceledit" 
+                        data-object-type="etablissement" data-object-id="{{ etablissement.id_etab }}"
                         title="Annuler les modifications">Annuler
                 </button>
             </form>
@@ -448,7 +449,8 @@
                 <div class="form-group">
                     <button type="submit" class="btn btn-success" title="Enregistrer les modifications">Enregistrer
                     </button>
-                    <button type="button" class="btn btn-canceledit" onclick="cancelEdit({{ flan.id_flan }})"
+                    <button type="button" class="btn btn-canceledit" 
+                            data-object-type="flan" data-object-id="{{ flan.id_flan }}"
                             title="Annuler les modifications">Annuler
                     </button>
                 </div>
@@ -525,7 +527,8 @@
                 <div class="form-group">
                     <button type="submit" class="btn btn-success" title="Enregistrer les modifications">Enregistrer
                     </button>
-                    <button type="button" class="btn btn-canceledit" onclick="cancelEdit({{ evaluation.id_eval }})"
+                    <button type="button" class="btn btn-canceledit" 
+                            data-object-type="evaluation" data-object-id="{{ evaluation.id_eval }}"
                             title="Annuler les modifications">Annuler
                     </button>
                 </div>

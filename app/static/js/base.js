@@ -3,7 +3,7 @@
  * Attempts to go back in history, falls back to specified URL if not possible.
  * @param {string} fallbackUrl - The URL to fall back to if history navigation fails
  */
-function goBackOrRedirect(fallbackUrl) {
+export function goBackOrRedirect(fallbackUrl) {
     // Solution simple : utiliser le referrer pour décider
     var referrer = document.referrer;
     

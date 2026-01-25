@@ -11,6 +11,7 @@ import * as map from './map.js';
 import * as filters from './filters.js';
 import * as autocomplete from './autocomplete.js';
 import * as api from './api.js';
+import * as macros from './macros.js';
 
 // Initialisation globale
 document.addEventListener('DOMContentLoaded', function() {
@@ -339,10 +340,27 @@ window.map = map;
 window.filters = filters;
 window.autocomplete = autocomplete;
 window.api = api;
+window.macros = macros;
 window.GeolocationHandler = GeolocationHandler;
 window.getUserLocationSimple = getUserLocationSimple;
 
+// Initialize macros event listeners when main module loads
+if (macros && typeof macros.initMacroEventListeners === 'function') {
+    macros.initMacroEventListeners();
+}
+
 // Export pour les tests
 export { initGeolocButton, cancelDeleteAccount };
+
+// Export des fonctions de macros pour les tests
+export { 
+  editEtablissement, 
+  cancelEdit, 
+  editFlan, 
+  cancelEditFlan, 
+  editEvaluation, 
+  cancelEditEval,
+  initMacroEventListeners 
+} from './macros.js';
 
 console.log("Modules PlanFlan chargés et prêts");

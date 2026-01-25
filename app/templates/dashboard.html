@@ -57,7 +57,7 @@
             <button
               type="button"
               class="btn btn-success"
-              id="cancel-delete-account-btn"
+              id="cancel-delete-btn"
               title="Annuler la suppression du compte"
             >
               Annuler
@@ -128,6 +128,8 @@
           class="btn btn-canceledit"
           style="margin-left: 10px"
           title="Annuler les modifications"
+          data-object-type="profile"
+          data-object-id="1"
         >
           Annuler
         </button>
@@ -174,18 +176,55 @@
 </div>
 
 <script nonce="{{ csp_nonce }}">
+    // Fonction pour vérifier et appeler showDeleteAccountForm
+    let showDeleteAccountFormAttempts = 0;
+    const MAX_ATTEMPTS = 50; // 5 secondes max
+    function tryShowDeleteAccountForm() {
+        if (typeof showDeleteAccountForm === 'function') {
+            showDeleteAccountForm();
+        } else if (window.dashboard && typeof window.dashboard.showDeleteAccountForm === 'function') {
+            window.dashboard.showDeleteAccountForm();
+        } else {
+            showDeleteAccountFormAttempts++;
+            if (showDeleteAccountFormAttempts < MAX_ATTEMPTS) {
+                // Si les fonctions ne sont pas encore disponibles, réessayer plus tard
+                setTimeout(tryShowDeleteAccountForm, 100);
+            } else {
+                console.error('showDeleteAccountForm function not found after multiple attempts');
+            }
+        }
+    }
+    
+    // Fonction pour vérifier et appeler cancelDeleteAccount
+    let cancelDeleteAccountAttempts = 0;
+    function tryCancelDeleteAccount() {
+        if (typeof cancelDeleteAccount === 'function') {
+            cancelDeleteAccount();
+        } else if (window.dashboard && typeof window.dashboard.cancelDeleteAccount === 'function') {
+            window.dashboard.cancelDeleteAccount();
+        } else {
+            cancelDeleteAccountAttempts++;
+            if (cancelDeleteAccountAttempts < MAX_ATTEMPTS) {
+                // Si les fonctions ne sont pas encore disponibles, réessayer plus tard
+                setTimeout(tryCancelDeleteAccount, 100);
+            } else {
+                console.error('cancelDeleteAccount function not found after multiple attempts');
+            }
+        }
+    }
+    
     // Ajouter les écouteurs d'événements pour les boutons du dashboard
     document.addEventListener('DOMContentLoaded', function() {
         // Bouton pour afficher le formulaire de suppression de compte
         const deleteAccountBtn = document.getElementById('delete-account-btn');
         if (deleteAccountBtn) {
-            deleteAccountBtn.addEventListener('click', showDeleteAccountForm);
+            deleteAccountBtn.addEventListener('click', tryShowDeleteAccountForm);
         }
         
         // Bouton pour annuler la suppression de compte
-        const cancelDeleteAccountBtn = document.getElementById('cancel-delete-account-btn');
-        if (cancelDeleteAccountBtn) {
-            cancelDeleteAccountBtn.addEventListener('click', cancelDeleteAccount);
+        const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+        if (cancelDeleteBtn) {
+            cancelDeleteBtn.addEventListener('click', tryCancelDeleteAccount);
         }
         
         // Titres cliquables pour basculer les sections

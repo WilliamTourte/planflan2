@@ -67,7 +67,7 @@ describe('CSP Compatibility Tests', () => {
       const testButton = document.getElementById('test-button');
       testButton.click();
       
-      // Vérifier que la fonction appropriée a été appelée
+      // Vérifier que la fonction appropriée a été appelée (vérification du comportement réel)
       expect(document.getElementById('etablissement-1-display').style.display).toBe('none');
       expect(document.getElementById('etablissement-1-edit').style.display).toBe('block');
       
@@ -84,20 +84,29 @@ describe('CSP Compatibility Tests', () => {
         <div id="flan-2-edit" style="display: none;">Flan Edit</div>
         <div id="evaluation-3-display" style="display: block;">Eval Display</div>
         <div id="evaluation-3-edit" style="display: none;">Eval Edit</div>
+        <!-- Ajouter les éléments nécessaires pour que editFlan fonctionne -->
+        <div id="flan-2-nom">Flan Test</div>
+        <div id="flan-2-description">Description : Test flan</div>
+        <input id="edit-flan-nom" value="">
+        <input id="edit-flan-description" value="">
       `;
       
       // Réinitialiser les event listeners
-      initMacroEventListeners();
+      global.initMacroEventListeners();
       
-      // Tester le bouton Flan
+      // Tester le bouton Flan (vérification du comportement réel)
       const flanButton = document.querySelector('[data-object-type="flan"]');
       flanButton.click();
-      expect(global.editFlan).toHaveBeenCalledWith(2);
+      expect(document.getElementById('flan-2-display').style.display).toBe('none');
+      expect(document.getElementById('flan-2-edit').style.display).toBe('block');
+      expect(document.getElementById('edit-flan-nom').value).toBe('Flan Test');
+      expect(document.getElementById('edit-flan-description').value).toBe('Test flan');
       
-      // Tester le bouton Evaluation
+      // Tester le bouton Evaluation (vérification du comportement réel)
       const evalButton = document.querySelector('[data-object-type="evaluation"]');
       evalButton.click();
-      expect(global.editEvaluation).toHaveBeenCalledWith(3);
+      expect(document.getElementById('evaluation-3-display').style.display).toBe('none');
+      expect(document.getElementById('evaluation-3-edit').style.display).toBe('block');
       
       // Vérifier qu'aucun message d'erreur CSP n'a été logged
       expect(consoleErrorSpy).not.toHaveBeenCalled();
@@ -136,20 +145,27 @@ describe('CSP Compatibility Tests', () => {
         <div id="flan-2-edit" style="display: none;">Flan Edit</div>
         <div id="evaluation-3-display" style="display: block;">Eval Display</div>
         <div id="evaluation-3-edit" style="display: none;">Eval Edit</div>
+        <!-- Ajouter les éléments nécessaires pour editFlan -->
+        <div id="flan-2-nom">Flan Test</div>
+        <div id="flan-2-description">Description : Test flan</div>
+        <input id="edit-flan-nom" value="">
+        <input id="edit-flan-description" value="">
       `;
       
       // Tester editEtablissement
-      editEtablissement(1);
+      global.editEtablissement(1);
       expect(document.getElementById('etablissement-1-display').style.display).toBe('none');
       expect(document.getElementById('etablissement-1-edit').style.display).toBe('block');
       
       // Tester editFlan
-      editFlan(2);
+      global.editFlan(2);
       expect(document.getElementById('flan-2-display').style.display).toBe('none');
       expect(document.getElementById('flan-2-edit').style.display).toBe('block');
+      expect(document.getElementById('edit-flan-nom').value).toBe('Flan Test');
+      expect(document.getElementById('edit-flan-description').value).toBe('Test flan');
       
       // Tester editEvaluation
-      editEvaluation(3);
+      global.editEvaluation(3);
       expect(document.getElementById('evaluation-3-display').style.display).toBe('none');
       expect(document.getElementById('evaluation-3-edit').style.display).toBe('block');
       
