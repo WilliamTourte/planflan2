@@ -357,8 +357,8 @@
                     {{ afficher_boutons_actions(flan, current_user, 'id_flan',
                         'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan', 'flan', current_page,
                         delete_form, validate_form) }}
-                    {{ afficher_formulaire_edition_flan(flan, form) }}
                 </div>
+                {{ afficher_formulaire_edition_flan(flan, form) }}
             </div>
         </div>
     {% else %}
@@ -418,33 +418,33 @@
 
 {% macro afficher_formulaire_edition_flan(flan, form) %}
     {% if form %}
-        <div id="flan-{{ flan.id_flan }}-edit" style="display: none;" class="carte">
+        <div id="flan-{{ flan.id_flan }}-edit" class="carte">
             <form method="POST" action="{{ url_for('main.modifier_flan', id_flan=flan.id_flan) }}"
                   class="form-container">
                 {{ form.hidden_tag() }}
                 <div class="form-group">
-                    <label class="form-label" for="edit-flan-nom">{{ form.nom.label }}</label>
-                    {{ form.nom(class="form-control", id="edit-flan-nom") }}
+                    <label class="form-label" for="edit-flan-{{ flan.id_flan }}-nom">{{ form.nom.label }}</label>
+                    {{ form.nom(class="form-control", id="edit-flan-" + flan.id_flan|string + "-nom") }}
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="edit-flan-description">{{ form.description.label }}</label>
-                    {{ form.description(class="form-control", id="edit-flan-description") }}
+                    <label class="form-label" for="edit-flan-{{ flan.id_flan }}-description">{{ form.description.label }}</label>
+                    {{ form.description(class="form-control", id="edit-flan-" + flan.id_flan|string + "-description") }}
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="edit-flan-prix">{{ form.prix.label }}</label>
-                    {{ form.prix(class="form-control", id="edit-flan-prix") }}
+                    <label class="form-label" for="edit-flan-{{ flan.id_flan }}-prix">{{ form.prix.label }}</label>
+                    {{ form.prix(class="form-control", id="edit-flan-" + flan.id_flan|string + "-prix") }}
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="edit-flan-type_pate">{{ form.type_pate.label }}</label>
-                    {{ form.type_pate(class="form-control", id="edit-flan-type_pate") }}
+                    <label class="form-label" for="edit-flan-{{ flan.id_flan }}-type_pate">{{ form.type_pate.label }}</label>
+                    {{ form.type_pate(class="form-control", id="edit-flan-" + flan.id_flan|string + "-type_pate") }}
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="edit-flan-type_saveur">{{ form.type_saveur.label }}</label>
-                    {{ form.type_saveur(class="form-control", id="edit-flan-type_saveur") }}
+                    <label class="form-label" for="edit-flan-{{ flan.id_flan }}-type_saveur">{{ form.type_saveur.label }}</label>
+                    {{ form.type_saveur(class="form-control", id="edit-flan-" + flan.id_flan|string + "-type_saveur") }}
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="edit-flan-type_texture">{{ form.type_texture.label }}</label>
-                    {{ form.type_texture(class="form-control", id="edit-flan-type_texture") }}
+                    <label class="form-label" for="edit-flan-{{ flan.id_flan }}-type_texture">{{ form.type_texture.label }}</label>
+                    {{ form.type_texture(class="form-control", id="edit-flan-" + flan.id_flan|string + "-type_texture") }}
                 </div>
                 <div class="form-group">
                     <button type="submit" class="btn btn-success" title="Enregistrer les modifications">Enregistrer
