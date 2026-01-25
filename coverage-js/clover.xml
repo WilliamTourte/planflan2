@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1769330858867" clover="3.2.0">
-  <project timestamp="1769330858867" name="All files">
+<coverage generated="1769333650924" clover="3.2.0">
+  <project timestamp="1769333650925" name="All files">
     <metrics statements="1679" coveredstatements="254" conditionals="787" coveredconditionals="41" methods="300" coveredmethods="38" elements="2766" coveredelements="333" complexity="0" loc="1679" ncloc="1679" packages="1" files="15" classes="15"/>
     <file name="api.js" path="/home/damien/PlanFlan/planflan2/app/static/js/api.js">
       <metrics statements="34" coveredstatements="18" conditionals="7" coveredconditionals="5" methods="10" coveredmethods="3"/>
