@@ -12,6 +12,7 @@ import * as filters from './filters.js';
 import * as autocomplete from './autocomplete.js';
 import * as api from './api.js';
 import * as macros from './macros.js';
+import { showDeleteAccountForm } from './dashboard.js';
 
 // Initialisation globale
 document.addEventListener('DOMContentLoaded', function() {
@@ -251,19 +252,7 @@ function initGeolocButton() {
     });
 }
 
-/**
- * Fonction pour afficher le formulaire de suppression de compte
- */
-function showDeleteAccountForm() {
-    const deleteSection = document.getElementById("delete-account-section");
-    if (deleteSection) {
-        deleteSection.style.display = "block";
-    }
-    const passwordField = document.getElementById("delete-password");
-    if (passwordField) {
-        passwordField.focus();
-    }
-}
+
 
 /**
  * Fonction pour configurer les boutons du dashboard
@@ -291,28 +280,10 @@ function setupDashboardButtons() {
         });
     }
 
-    // Bouton d'annulation de la suppression de compte
-    const cancelDeleteBtn = document.getElementById("cancel-delete-btn");
-    if (cancelDeleteBtn) {
-        cancelDeleteBtn.addEventListener("click", function () {
-            cancelDeleteAccount();
-        });
-    }
+
 }
 
-/**
- * Fonction pour annuler la suppression de compte
- */
-function cancelDeleteAccount() {
-    const deleteAccountSection = document.getElementById("delete-account-section");
-    if (deleteAccountSection) {
-        deleteAccountSection.style.display = "none";
-    }
-    // Supprimer les paramètres d'erreur de l'URL
-    const url = new URL(window.location.href);
-    url.searchParams.delete("error");
-    window.history.replaceState({}, "", url);
-}
+
 
 /**
  * Fonction pour configurer les éléments communs
@@ -350,7 +321,7 @@ if (macros && typeof macros.initMacroEventListeners === 'function') {
 }
 
 // Export pour les tests
-export { initGeolocButton, cancelDeleteAccount };
+export { initGeolocButton };
 
 // Export des fonctions de macros pour les tests
 export { 

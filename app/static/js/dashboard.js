@@ -53,10 +53,15 @@ function toggleSection(sectionId) {
     }
 }
 
-// Script pour basculer entre affichage infos et formulaire
+/**
+ * Initialize all event listeners for the dashboard page.
+ * Sets up handlers for profile editing, account deletion, and section toggling.
+ */
 function initDashboardEventListeners() {
     const editProfileBtn = document.getElementById("edit-profile-btn");
     const cancelEditBtn = document.getElementById("cancel-edit-btn");
+    const deleteAccountBtn = document.getElementById("delete-account-btn");
+    const cancelDeleteBtn = document.getElementById("cancel-delete-btn");
     
     if (editProfileBtn) {
         editProfileBtn.addEventListener("click", function () {
@@ -83,6 +88,35 @@ function initDashboardEventListeners() {
             }
         });
     }
+    
+    // Bouton pour afficher le formulaire de suppression de compte
+    if (deleteAccountBtn) {
+        deleteAccountBtn.addEventListener("click", showDeleteAccountForm);
+    }
+    
+    // Bouton pour annuler la suppression de compte
+    if (cancelDeleteBtn) {
+        cancelDeleteBtn.addEventListener("click", cancelDeleteAccount);
+    }
+    
+    // Titres cliquables pour basculer les sections
+    const sectionTitles = [
+        { id: 'mes-evaluations-title', section: 'mes-evaluations' },
+        { id: 'evaluations-a-valider-title', section: 'evaluations-a-valider' },
+        { id: 'flans-a-valider-title', section: 'flans-a-valider' },
+        { id: 'etablissements-a-valider-title', section: 'etablissements-a-valider' }
+    ];
+    
+    sectionTitles.forEach(function(title) {
+        const element = document.getElementById(title.id);
+        if (element) {
+            element.addEventListener('click', function() {
+                toggleSection(title.section);
+            });
+            // Ajouter le curseur pointer pour indiquer que c'est cliquable
+            element.style.cursor = 'pointer';
+        }
+    });
 }
 
 // Export for testing and global access
