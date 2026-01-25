@@ -1627,3 +1627,5 @@ Thumbs.db
 /node_modules/yocto-queue/readme.md
 /node_modules/.package-lock.json
 app/data/communes-france-full.json
+node_modules
+coverage-js/lcov-report/main.js.html
