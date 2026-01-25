@@ -35,6 +35,10 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Fetch dev branch
+        if: github.ref == 'refs/heads/main'
+        run: git fetch origin dev:dev
+
       - name: Check commit status
         id: check_commit
         env:
@@ -44,22 +48,28 @@ jobs:
           if [ "${{ github.ref }}" = "refs/heads/main" ]; then
             echo "Checking if main is a fast-forward merge from dev..."
             
-            # Get the tree hash of dev and main
-            DEV_TREE=$(git rev-parse dev^{tree} 2>/dev/null)
-            MAIN_TREE=$(git rev-parse main^{tree} 2>/dev/null)
-            
-            # Get content hashes of relevant directories
-            DEV_CONTENT=$(git ls-tree -r dev -- app tests Dockerfile docker-compose.yml entrypoint.sh | awk '{print $3}' | sort | md5sum | awk '{print $1}')
-            MAIN_CONTENT=$(git ls-tree -r main -- app tests Dockerfile docker-compose.yml entrypoint.sh | awk '{print $3}' | sort | md5sum | awk '{print $1}')
-            
-            echo "dev content hash: $DEV_CONTENT"
-            echo "main content hash: $MAIN_CONTENT"
-            
-            if [ "$DEV_CONTENT" = "$MAIN_CONTENT" ]; then
-              echo "Code is identical to dev branch. Skipping CI..."
-              echo "should_skip=true" >> $GITHUB_OUTPUT
+            # Check if dev branch exists
+            if git show-ref --verify --quiet refs/heads/dev; then
+              # Get the tree hash of dev and main
+              DEV_TREE=$(git rev-parse dev^{tree} 2>/dev/null)
+              MAIN_TREE=$(git rev-parse main^{tree} 2>/dev/null)
+              
+              # Get content hashes of relevant directories
+              DEV_CONTENT=$(git ls-tree -r dev -- app tests Dockerfile docker-compose.yml entrypoint.sh | awk '{print $3}' | sort | md5sum | awk '{print $1}')
+              MAIN_CONTENT=$(git ls-tree -r main -- app tests Dockerfile docker-compose.yml entrypoint.sh | awk '{print $3}' | sort | md5sum | awk '{print $1}')
+              
+              echo "dev content hash: $DEV_CONTENT"
+              echo "main content hash: $MAIN_CONTENT"
+              
+              if [ "$DEV_CONTENT" = "$MAIN_CONTENT" ]; then
+                echo "Code is identical to dev branch. Skipping CI..."
+                echo "should_skip=true" >> $GITHUB_OUTPUT
+              else
+                echo "Code differs from dev. Running CI..."
+                echo "should_skip=false" >> $GITHUB_OUTPUT
+              fi
             else
-              echo "Code differs from dev. Running CI..."
+              echo "dev branch not found. Running CI..."
               echo "should_skip=false" >> $GITHUB_OUTPUT
             fi
           else
