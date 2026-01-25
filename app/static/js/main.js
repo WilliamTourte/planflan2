@@ -142,6 +142,11 @@ function initializeProposerEtablissementPage() {
         .then(autocompleteInstance => {
             console.log("Google Places Autocomplete initialisé avec succès");
             window.autocompleteInstance = autocompleteInstance;
+            
+            // Initialiser l'autocomplete pour proposer_etablissement.js si nécessaire
+            if (typeof window.initProposerEtablissementAutocomplete === 'function') {
+                window.initProposerEtablissementAutocomplete(autocompleteInstance);
+            }
         })
         .catch(error => {
             console.error("Erreur lors de l'initialisation de Google Places Autocomplete:", error);

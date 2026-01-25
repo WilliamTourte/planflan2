@@ -213,9 +213,9 @@ export function initGooglePlacesAutocomplete(inputId, apiKey) {
     return new Promise((resolve, reject) => {
         // Vérifier si l'API Google est déjà chargée
         if (typeof google === 'undefined' || !google.maps || !google.maps.places) {
-            // Charger l'API Google Maps
+            // Charger l'API Google Maps avec loading=async pour éviter les avertissements
             const script = document.createElement("script");
-            script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initGooglePlacesCallback&v=weekly`;
+            script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initGooglePlacesCallback&v=weekly&loading=async`;
             script.async = true;
             script.defer = true;
             script.onerror = () => reject(new Error("Failed to load Google Maps API"));
