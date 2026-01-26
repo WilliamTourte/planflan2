@@ -54,14 +54,16 @@ describe('CSP Integration Tests', () => {
         <div class="macro-section">
           <h3>Flans</h3>
           <div id="flan-2-display" style="display: block;">
-            <p>Flan Vanille</p>
+            <h2 id="flan-2-nom">Flan Vanille</h2>
+            <span id="flan-2-description">Un délicieux flan à la vanille</span>
             <button class="macro-edit-btn" data-object-type="flan" data-object-id="2">
               <i class="bi bi-pencil"></i> Modifier
             </button>
           </div>
           <div id="flan-2-edit" style="display: none;">
             <form id="edit-flan-2">
-              <input name="nom" value="Flan Vanille">
+              <input type="text" id="edit-flan-2-nom" value="">
+              <input type="text" id="edit-flan-2-description" value="">
               <button type="button" onclick="cancelEditFlan(2)">Annuler</button>
             </form>
           </div>

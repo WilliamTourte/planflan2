@@ -25,17 +25,13 @@ describe('Main Module Integration', () => {
       </div>
     `;
     
-    // Configurer window.location pour JSDOM
-    delete window.location;
-    window.location = {
-      href: 'http://localhost/home',
-      origin: 'http://localhost',
-      hostname: 'localhost',
-      pathname: '/home',
-      search: '',
-      hash: '',
-      toString: () => 'http://localhost/home'
-    };
+    // Configurer window.location pour JSDOM (utiliser le mock existant de setupTests)
+    window.location.href = 'http://localhost/home';
+    window.location.origin = 'http://localhost';
+    window.location.hostname = 'localhost';
+    window.location.pathname = '/home';
+    window.location.search = '';
+    window.location.hash = '';
     
     // Mock des fonctions globales
     global.showToast = jest.fn();

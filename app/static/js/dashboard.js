@@ -27,7 +27,7 @@ function cancelDeleteAccount() {
         // Supprimer les paramètres d'erreur de l'URL
         const url = new URL(window.location.href);
         url.searchParams.delete("error");
-        window.history.replaceState({}, "", url);
+        window.history.replaceState({}, "", url.toString());
     } else {
         console.error('Delete account section not found');
     }
