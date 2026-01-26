@@ -247,6 +247,7 @@ export function setupFilterButtons() {
 
 /**
  * Fonction pour restaurer l'état des filtres depuis l'URL
+ * @returns {void}
  */
 export function restoreFiltersFromUrl() {
     const url = new URL(window.location.href);

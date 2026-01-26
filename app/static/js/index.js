@@ -17,9 +17,9 @@ function initAutocomplete() {
 
     /**
      * Fonction de débounce pour limiter les appels fréquents.
-     * @param {function} func - Fonction à exécuter
+     * @param {Function} func - Fonction à exécuter
      * @param {number} timeout - Délai en millisecondes (par défaut: 300)
-     * @returns {function} Fonction enveloppée avec débounce
+     * @returns {Function} Fonction enveloppée avec débounce
      */
     function debounce(func, timeout = 300) {
         let timer;

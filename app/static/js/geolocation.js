@@ -72,7 +72,11 @@ export class GeolocationHandler {
 
     /**
      * Traite la position reçue
-     * @param {GeolocationPosition} position - Position géolocalisée
+     * @param {object} position - Position géolocalisée avec coords
+     * @param {object} position.coords - Les coordonnées
+     * @param {number} position.coords.latitude - Latitude
+     * @param {number} position.coords.longitude - Longitude
+     * @param {number} position.coords.accuracy - Précision
      */
     _handlePosition(position) {
         const lat = position.coords.latitude;

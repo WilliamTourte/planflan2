@@ -205,9 +205,18 @@ export function initAutocomplete(options = {}) {
 }
 
 /**
+ * Zoom vers la localisation spécifiée et met à jour le champ de ville
+ * @param {number} lat - Latitude de la localisation
+ * @param {number} lng - Longitude de la localisation
+ * @param {string} villeName - Nom de la ville
+ * @returns {void}
+ */
+
+/**
  * Initialise l'autocomplete Google Places pour la proposition d'établissements
  * @param {string} inputId - ID du champ de recherche
  * @param {string} apiKey - Clé API Google Maps
+ * @returns {Promise<void>} Promesse résolue quand l'API est prête
  */
 export function initGooglePlacesAutocomplete(inputId, apiKey) {
     return new Promise((resolve, reject) => {
@@ -231,6 +240,14 @@ export function initGooglePlacesAutocomplete(inputId, apiKey) {
     });
 }
 
+/**
+ * Initialise l'autocomplétion des lieux avec l'API Google Places
+ * @param {string} inputId - ID du champ de recherche
+ * @param {string} apiKey - Clé API Google Maps
+ * @param {Function} resolve - Callback de résolution de la promesse
+ * @param {Function} reject - Callback de rejet de la promesse
+ * @returns {void}
+ */
 function initializeAutocomplete(inputId, apiKey, resolve, reject) {
     try {
         const input = document.getElementById(inputId);

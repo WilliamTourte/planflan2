@@ -6,9 +6,9 @@
 
 /**
  * Fonction de débounce pour limiter les appels fréquents.
- * @param {function} func - Fonction à exécuter
+ * @param {Function} func - Fonction à exécuter
  * @param {number} timeout - Délai en millisecondes (par défaut: 300)
- * @returns {function} Fonction enveloppée avec débounce
+ * @returns {Function} Fonction enveloppée avec débounce
  */
 export function debounce(func, timeout = 300) {
     let timer;
@@ -23,6 +23,7 @@ export function debounce(func, timeout = 300) {
 /**
  * Affiche un indicateur de chargement.
  * @param {string} message - Message à afficher (par défaut: "Chargement...")
+ * @returns {void}
  */
 export function showLoading(message = "Chargement...") {
     console.log("Affichage du chargement:", message);
@@ -130,6 +131,10 @@ export function showToast(message, type = 'info') {
     }, 5000);
 }
 
+/**
+ * Crée le conteneur pour les notifications toast
+ * @returns {Object} Élément conteneur créé
+ */
 function createToastContainer() {
     const container = document.createElement('div');
     container.id = 'toast-container';
@@ -141,6 +146,11 @@ function createToastContainer() {
     return container;
 }
 
+/**
+ * Récupère la couleur du header du toast selon le type
+ * @param {string} type - Type de toast ('success', 'error', 'info', 'warning')
+ * @returns {string} Code couleur hexadécimal
+ */
 function getToastHeaderColor(type) {
     const colors = {
         'success': '#28a745',
@@ -151,6 +161,11 @@ function getToastHeaderColor(type) {
     return colors[type] || colors['info'];
 }
 
+/**
+ * Récupère le titre du toast selon le type
+ * @param {string} type - Type de toast ('success', 'error', 'info', 'warning')
+ * @returns {string} Titre à afficher
+ */
 function getToastTitle(type) {
     const titles = {
         'success': 'Succès',
@@ -163,8 +178,9 @@ function getToastTitle(type) {
 
 /**
  * Basculer l'état actif d'un bouton.
- * @param {HTMLElement} button - Bouton à modifier
+ * @param {Object} button - Bouton à modifier
  * @param {boolean} isActive - État actuel du bouton
+ * @returns {void}
  */
 export function toggleActiveButton(button, isActive) {
     if (isActive) {

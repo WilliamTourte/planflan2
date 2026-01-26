@@ -29,7 +29,7 @@ let activeFilters = {
  * Fonction pour créer des icônes personnalisées
  * @param {string} emoji - Emoji à utiliser
  * @param {string} className - Classe CSS supplémentaire
- * @returns {L.DivIcon} Icône Leaflet personnalisée
+ * @returns {object} Icône Leaflet personnalisée
  */
 export function createEmojiIcon(emoji, className) {
     return L.divIcon({
@@ -42,11 +42,10 @@ export function createEmojiIcon(emoji, className) {
 
 /**
  * Crée un marqueur avec un popup asynchrone pour un établissement donné.
- * 
- * @param {Object} map - Instance de la carte Leaflet
- * @param {Object} etablissement - Données de l'établissement
+ * @param {object} map - Instance de la carte Leaflet
+ * @param {object} etablissement - Données de l'établissement
  * @param {string} baseUrl - URL de base pour les liens (par défaut: origine du site)
- * @returns {L.Marker} Marqueur Leaflet créé
+ * @returns {object} Marqueur Leaflet créé
  */
 export function createEtablissementMarker(map, etablissement, baseUrl = window.location.origin) {
     let icon = createEmojiIcon('🏠', 'default-icon');
@@ -128,7 +127,6 @@ export function createEtablissementMarker(map, etablissement, baseUrl = window.l
 
 /**
  * Zoom sur une ville spécifique et centre la carte sur ses établissements.
- * 
  * @param {string} ville - Nom de la ville sur laquelle zoomer
  * @returns {boolean} True si le zoom a été effectué, false sinon
  */
@@ -165,7 +163,6 @@ export function zoomOnVille(ville) {
 
 /**
  * Crée un marqueur pour la position de l'utilisateur.
- * 
  * @param {boolean} forceZoom - Si true, zoom sur la position de l'utilisateur
  */
 export function createUserMarker(forceZoom = false) {
@@ -205,7 +202,11 @@ export function createUserMarker(forceZoom = false) {
     }
 }
 
-// Fonction pour ajouter le bouton de géolocalisation comme contrôle Leaflet
+/**
+ * Ajoute un bouton de géolocalisation à la carte Leaflet
+ * @param {object} map - Instance de la carte Leaflet
+ * @returns {void}
+ */
 export function addGeolocateControl(map) {
     const geolocateControl = L.control({ position: 'bottomright' });
 
@@ -245,6 +246,8 @@ export function addGeolocateControl(map) {
 /**
  * Initialise la carte Leaflet avec les paramètres par défaut.
  * Configure la vue initiale et les contrôles de base.
+ * @param {object} options - Options de configuration
+ * @returns {void}
  */
 export function initMap(options = {}) {
     const mapElement = document.getElementById("map");
@@ -300,7 +303,10 @@ export function initMap(options = {}) {
     return map;
 }
 
-// Chargement des établissements
+/**
+ * Charge les données des établissements depuis le DOM
+ * @returns {Array} Liste des établissements
+ */
 export function loadEtablissements() {
     try {
         const etablissementsDataElement = document.getElementById('etablissements-data');
@@ -315,7 +321,10 @@ export function loadEtablissements() {
     }
 }
 
-// Mise à jour de la carte et des marqueurs
+/**
+ * Met à jour la carte et les marqueurs avec les données actuelles
+ * @returns {void}
+ */
 export function updateMapAndMarkers() {
     etablissements = loadEtablissements();
     if (!etablissements || etablissements.length === 0) {
@@ -393,19 +402,37 @@ export function updateMarkersBasedOnFilters() {
     });
 }
 
-// Fonctions pour gérer l'état
+/**
+ * Définit les filtres actifs pour la carte
+ * @param {object} newFilters - Nouvel ensemble de filtres
+ * @returns {void}
+ */
 export function setActiveFilters(newFilters) {
     activeFilters = { ...activeFilters, ...newFilters };
 }
 
+/**
+ * Récupère l'état actuel des filtres
+ * @returns {object} Filtres actuels
+ */
 export function getActiveFilters() {
     return activeFilters;
 }
 
+/**
+ * Définit la localisation de l'utilisateur
+ * @param {object} location - Objet location avec lat et lon
+ * @returns {void}
+ */
 export function setUserLocation(location) {
     userLocation = location;
 }
 
+/**
+ * Définit la ville sélectionnée
+ * @param {string} ville - Nom de la ville
+ * @returns {void}
+ */
 export function setVilleSelectionnee(ville) {
     villeSelectionnee = ville;
 }
