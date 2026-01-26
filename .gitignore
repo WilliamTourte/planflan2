@@ -1664,3 +1664,4 @@ node_modules
 coverage-js/lcov-report/main.js.html
 /copilot.exe
 /logs/
+/source/_build/
