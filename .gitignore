@@ -1665,3 +1665,5 @@ coverage-js/lcov-report/main.js.html
 /copilot.exe
 /logs/
 /source/_build/
+logs/http_requests.log.1
+logs/http_requests.log.2

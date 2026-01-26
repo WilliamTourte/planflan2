@@ -154,19 +154,19 @@ def creer_flans_et_evaluations():
     flans = Table("flans", metadata, autoload_with=engine)
     evaluations = Table("evaluations", metadata, autoload_with=engine)
 
-    # 1. Supprimer tous les flans existants
-    logger.info("Suppression de tous les flans existants")
-    session.execute(delete(flans))
-    session.commit()
-    print("Tous les flans existants ont ete supprimes.")
-    logger.info("Tous les flans existants ont été supprimés")
-
-    # 2. Supprimer toutes les évaluations existantes
+    # 1. Supprimer toutes les évaluations existantes (avant les flans à cause des contraintes FK)
     logger.info("Suppression de toutes les évaluations existantes")
     session.execute(delete(evaluations))
     session.commit()
     print("Toutes les evaluations existantes ont ete supprimees.")
     logger.info("Toutes les évaluations existantes ont été supprimées")
+
+    # 2. Supprimer tous les flans existants
+    logger.info("Suppression de tous les flans existants")
+    session.execute(delete(flans))
+    session.commit()
+    print("Tous les flans existants ont ete supprimes.")
+    logger.info("Tous les flans existants ont été supprimés")
 
     # Ajouter un log pour indiquer que les données ont été supprimées
     logger.warning(

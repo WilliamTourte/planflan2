@@ -126,14 +126,14 @@ def logout():
 @login_required
 def supprimer_compte():
     """Delete the current user's account.
-    
+
     This is a security-critical operation that requires password verification
     and CSRF token validation. The user must provide their password to confirm
     account deletion, which will cascade delete all associated data.
-    
+
     Returns:
         Response: Redirect to dashboard on success, or back to referrer on error
-        
+
     Raises:
         Unauthorized: If CSRF token is invalid or password is missing/incorrect
     """

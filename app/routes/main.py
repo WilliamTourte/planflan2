@@ -568,6 +568,12 @@ def afficher_flan_unique(id_flan):
     delete_form = DeleteForm()
     validate_form = ValidateForm()
 
+    user_evaluation = None
+    if current_user.is_authenticated:
+        user_evaluation = Evaluation.query.filter_by(
+            id_flan=id_flan, id_user=current_user.id_user
+        ).first()
+
     # Traitement de la soumission du formulaire d'édition du flan
     if form_flan.validate_on_submit():
         flan_unique.nom = form_flan.nom.data
@@ -588,6 +594,7 @@ def afficher_flan_unique(id_flan):
         current_user=current_user,
         delete_form=delete_form,
         validate_form=validate_form,
+        user_evaluation=user_evaluation,
     )
 
 
@@ -699,6 +706,14 @@ def evaluer_flan(id_flan):
     evaluation = Evaluation.query.filter_by(
         id_flan=id_flan, id_user=current_user.id_user
     ).first()
+
+    if request.method == "POST" and evaluation is not None:
+        flash(
+            "Vous avez déjà une évaluation pour ce flan. Vous pouvez uniquement la modifier.",
+            "info",
+        )
+        return redirect(url_for("main.afficher_flan_unique", id_flan=id_flan))
+
     if request.method == "GET" and evaluation:
         form.visuel.data = str(evaluation.visuel)
         form.texture.data = str(evaluation.texture)

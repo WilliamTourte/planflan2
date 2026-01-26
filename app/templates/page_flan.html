@@ -7,7 +7,7 @@ current_user, form_flan, current_page, layout='detail') }}
 <!-- Grille des évaluations avec bouton d'ajout -->
 <h3>Evaluations</h3>
 {{ afficher_grille('evaluation', flan.evaluations, current_user, None,
-form_eval, None, flan) }}
+form_eval, None, flan, None, None, '', user_evaluation) }}
 
 <!-- Boutons retour -->
 <div class="action-buttons">

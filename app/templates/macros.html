@@ -566,7 +566,7 @@
 {% endmacro %}
 
 
-{% macro afficher_grille(objet_type, objets, current_user=None, form_edit=None, form_ajout=None, etablissement=None, flan=None, delete_form=None, validate_form=None, current_page='') %}
+{% macro afficher_grille(objet_type, objets, current_user=None, form_edit=None, form_ajout=None, etablissement=None, flan=None, delete_form=None, validate_form=None, current_page='', user_evaluation=None) %}
     <div class="grille">
         {% if not objets %}
             Vide
@@ -578,7 +578,7 @@
         {% endfor %}
         <!-- Bouton ou formulaire d'ajout -->
 
-        {{ afficher_bouton_ajout(objet_type, current_user, etablissement, form_ajout, flan) }}
+        {{ afficher_bouton_ajout(objet_type, current_user, etablissement, form_ajout, flan, user_evaluation) }}
 
     </div>
 {% endmacro %}
@@ -602,7 +602,7 @@
 
 
 
-{% macro afficher_bouton_ajout(objet_type, current_user, etablissement=None, form_ajout=None, flan=None) %}
+{% macro afficher_bouton_ajout(objet_type, current_user, etablissement=None, form_ajout=None, flan=None, user_evaluation=None) %}
     {% if objet_type == 'etablissement' %}
         <div>
 
@@ -629,7 +629,16 @@
         <div>
 
             {% if current_user.is_authenticated %}
-                {{ proposer_evaluation(form_ajout, url_for('main.evaluer_flan', id_flan=flan.id_flan)) }}
+                {% if user_evaluation %}
+                    <div class="alert alert-info">
+                        Vous avez déjà une évaluation pour ce flan.
+                        <a href="{{ url_for('main.afficher_evaluation_unique', id_eval=user_evaluation.id_eval) }}" class="btn btn-primary btn-sm">
+                            Modifier votre évaluation
+                        </a>
+                    </div>
+                {% else %}
+                    {{ proposer_evaluation(form_ajout, url_for('main.evaluer_flan', id_flan=flan.id_flan)) }}
+                {% endif %}
             {% else %}
                 <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn btn-success">
                     Ajouter une evaluation (connectez-vous)

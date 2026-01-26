@@ -357,6 +357,10 @@ class Evaluation(db.Model):
     """
 
     __tablename__ = "evaluations"
+    __table_args__ = (
+        db.UniqueConstraint("id_user", "id_flan", name="uq_user_flan_evaluation"),
+    )
+
     id_eval = db.Column(db.Integer, primary_key=True)
     id_user = db.Column(
         db.Integer, db.ForeignKey("utilisateurs.id_user"), nullable=False

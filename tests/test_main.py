@@ -363,6 +363,83 @@ def test_evaluer_flan(client):
     ), f"Aucun message de succès trouvé: {messages}"
 
 
+def test_evaluer_flan_duplicate_prevention(client):
+    """Test that a user cannot create a second evaluation for the same flan."""
+    # Récupérer l'utilisateur créé dans la fixture
+    user = client.application.config["TEST_USER"]
+    assert user is not None, "L'utilisateur de test n'existe pas"
+
+    # Créer un établissement et un flan de test
+    with client.application.app_context():
+        etab = Etablissement(
+            nom="Test Etablissement",
+            adresse="Test Adresse",
+            code_postal="69001",
+            ville="Test Ville",
+            id_user=user.id_user,
+        )
+        db.session.add(etab)
+        db.session.commit()
+
+        flan = Flan(
+            nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user
+        )
+        db.session.add(flan)
+        db.session.commit()
+        flan_id = flan.id_flan
+
+    # Créer une première évaluation
+    response1 = client.post(
+        f"/flan/{flan_id}/evaluer",
+        data={
+            "flan-eval-visuel": 5,
+            "flan-eval-texture": 5,
+            "flan-eval-pate": 5,
+            "flan-eval-gout": 5,
+            "flan-eval-description": "First Evaluation",
+        },
+        follow_redirects=True,
+    )
+    assert response1.status_code == 200
+
+    # Vérifier que la première évaluation a été créée
+    with client.application.app_context():
+        evaluations = Evaluation.query.filter_by(
+            id_flan=flan_id, id_user=user.id_user
+        ).all()
+        assert len(evaluations) == 1, "Une seule évaluation devrait exister"
+        first_eval_id = evaluations[0].id_eval
+
+    # Tenter de créer une deuxième évaluation
+    response2 = client.post(
+        f"/flan/{flan_id}/evaluer",
+        data={
+            "flan-eval-visuel": 4,
+            "flan-eval-texture": 4,
+            "flan-eval-pate": 4,
+            "flan-eval-gout": 4,
+            "flan-eval-description": "Second Evaluation",
+        },
+        follow_redirects=True,
+    )
+    assert response2.status_code == 200
+
+    # Vérifier que la deuxième évaluation a été rejetée
+    with client.application.app_context():
+        evaluations = Evaluation.query.filter_by(
+            id_flan=flan_id, id_user=user.id_user
+        ).all()
+        assert (
+            len(evaluations) == 1
+        ), "Une seule évaluation devrait exister (création bloquée)"
+
+        # Vérifier que l'évaluation n'a pas été modifiée par la tentative
+        eval_obj = evaluations[0]
+        assert (
+            eval_obj.description == "First Evaluation"
+        ), "La première évaluation ne devrait pas être modifiée par le rejet de la deuxième"
+
+
 def test_afficher_evaluation_unique(client):
     """Test displaying a single evaluation."""
     # Récupérer l'utilisateur créé dans la fixture
