@@ -12,9 +12,10 @@ form_eval, None, flan) }}
 <!-- Boutons retour -->
 <div class="action-buttons">
   <button
-    onclick="goBackOrRedirect('{{ url_for('main.afficher_etablissement_unique', id_etab=flan.etablissement.id_etab) }}')"
+    id="back-button"
     class="btn btn-danger"
     title="Retour à la page précédente"
+    data-fallback="{{ url_for('main.afficher_etablissement_unique', id_etab=flan.etablissement.id_etab) }}"
   >
     <i class="bi bi-arrow-return-left"></i> Retour
   </button>
@@ -26,4 +27,10 @@ form_eval, None, flan) }}
     <i class="bi bi-house"></i> Établissement
   </a>
 </div>
+<script nonce="{{ csp_nonce }}">
+    // Ajouter l'écouteur d'événement pour le bouton retour
+    document.getElementById('back-button').addEventListener('click', function() {
+        goBackOrRedirect(this.getAttribute('data-fallback'));
+    });
+</script>
 {% endblock %}

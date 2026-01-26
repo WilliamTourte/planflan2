@@ -104,18 +104,18 @@
     {% set page_attendue = 'page_' + type_objet %}
     {% if current_user.is_authenticated %}
         {% if current_page == page_attendue %}
-            {% if current_user.id_user == objet.id_user and not objet.statut.value == 'VALIDE' %}
+            {% if current_user.id_user == objet.id_user or current_user.is_admin %}
                 <div class="action-buttons">
-                    <button type="button" class="btn btn-success" title="Modifier"
-                            onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
+                    <button type="button" class="btn btn-success macro-edit-btn" title="Modifier"
+                            data-object-type="{{ type_objet }}" data-object-id="{{ objet[id_field] }}">
                         <i class="bi bi-pencil"></i>
                     </button>
                     {% if delete_form %}
                         <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}"
-                              class="inline-form">
+                              class="inline-form macro-delete-form"
+                              onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
                             {{ delete_form.hidden_tag() }}
-                            <button type="submit" class="btn btn-danger" title="Supprimer"
-                                    onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
+                            <button type="submit" class="btn btn-danger" title="Supprimer">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </form>
@@ -126,23 +126,24 @@
                     <div class="action-buttons d-flex gap-1">
                         {% if validate_form %}
                             <form method="POST" action="{{ url_for(validate_route, **{id_field: objet[id_field]}) }}"
-                                  class="inline-form">
+                                  class="inline-form macro-validate-form"
+                                  onsubmit="return confirm('Êtes-vous sûr de vouloir valider cet élément ?');">
                                 {{ validate_form.hidden_tag() }}
                                 <button type="submit" class="btn btn-success" title="Valider">
                                     <i class="bi bi-check"></i>
                                 </button>
                             </form>
                         {% endif %}
-                        <button type="button" class="btn btn-success" title="Modifier"
-                                onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
+                        <button type="button" class="btn btn-success macro-edit-btn" title="Modifier"
+                                data-object-type="{{ type_objet }}" data-object-id="{{ objet[id_field] }}">
                             <i class="bi bi-pencil"></i>
                         </button>
                         {% if delete_form %}
                             <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}"
-                                  class="inline-form">
+                                  class="inline-form macro-delete-form"
+                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
                                 {{ delete_form.hidden_tag() }}
-                                <button type="submit" class="btn btn-danger" title="Supprimer"
-                                        onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
+                                <button type="submit" class="btn btn-danger" title="Supprimer">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>
@@ -150,16 +151,16 @@
                     </div>
                 {% else %}
                     <div class="action-buttons d-flex gap-1">
-                        <button type="button" class="btn btn-success" title="Modifier"
-                                onclick="edit{{ type_objet|capitalize }}({{ objet[id_field] }})">
+                        <button type="button" class="btn btn-success macro-edit-btn" title="Modifier"
+                                data-object-type="{{ type_objet }}" data-object-id="{{ objet[id_field] }}">
                             <i class="bi bi-pencil"></i>
                         </button>
                         {% if delete_form %}
                             <form method="POST" action="{{ url_for(delete_route, **{id_field: objet[id_field]}) }}"
-                                  class="inline-form">
+                                  class="inline-form macro-delete-form"
+                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
                                 {{ delete_form.hidden_tag() }}
-                                <button type="submit" class="btn btn-danger" title="Supprimer"
-                                        onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet élément ?');">
+                                <button type="submit" class="btn btn-danger" title="Supprimer">
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </form>
@@ -296,7 +297,8 @@
                     </div>
                 {% endif %}
                 <button type="submit" class="btn btn-success" title="Valider les modifications">Valider</button>
-                <button type="button" class="btn btn-canceledit" onclick="cancelEdit({{ etablissement.id_etab }})"
+                <button type="button" class="btn btn-canceledit" 
+                        data-object-type="etablissement" data-object-id="{{ etablissement.id_etab }}"
                         title="Annuler les modifications">Annuler
                 </button>
             </form>
@@ -355,8 +357,8 @@
                     {{ afficher_boutons_actions(flan, current_user, 'id_flan',
                         'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan', 'flan', current_page,
                         delete_form, validate_form) }}
-                    {{ afficher_formulaire_edition_flan(flan, form) }}
                 </div>
+                {{ afficher_formulaire_edition_flan(flan, form) }}
             </div>
         </div>
     {% else %}
@@ -416,38 +418,39 @@
 
 {% macro afficher_formulaire_edition_flan(flan, form) %}
     {% if form %}
-        <div id="flan-{{ flan.id_flan }}-edit" style="display: none;" class="carte">
+        <div id="flan-{{ flan.id_flan }}-edit" class="carte">
             <form method="POST" action="{{ url_for('main.modifier_flan', id_flan=flan.id_flan) }}"
                   class="form-container">
                 {{ form.hidden_tag() }}
                 <div class="form-group">
-                    <label class="form-label" for="edit-flan-nom">{{ form.nom.label }}</label>
-                    {{ form.nom(class="form-control", id="edit-flan-nom") }}
+                    <label class="form-label" for="edit-flan-{{ flan.id_flan }}-nom">{{ form.nom.label }}</label>
+                    {{ form.nom(class="form-control", id="edit-flan-" + flan.id_flan|string + "-nom") }}
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="edit-flan-description">{{ form.description.label }}</label>
-                    {{ form.description(class="form-control", id="edit-flan-description") }}
+                    <label class="form-label" for="edit-flan-{{ flan.id_flan }}-description">{{ form.description.label }}</label>
+                    {{ form.description(class="form-control", id="edit-flan-" + flan.id_flan|string + "-description") }}
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="edit-flan-prix">{{ form.prix.label }}</label>
-                    {{ form.prix(class="form-control", id="edit-flan-prix") }}
+                    <label class="form-label" for="edit-flan-{{ flan.id_flan }}-prix">{{ form.prix.label }}</label>
+                    {{ form.prix(class="form-control", id="edit-flan-" + flan.id_flan|string + "-prix") }}
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="edit-flan-type_pate">{{ form.type_pate.label }}</label>
-                    {{ form.type_pate(class="form-control", id="edit-flan-type_pate") }}
+                    <label class="form-label" for="edit-flan-{{ flan.id_flan }}-type_pate">{{ form.type_pate.label }}</label>
+                    {{ form.type_pate(class="form-control", id="edit-flan-" + flan.id_flan|string + "-type_pate") }}
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="edit-flan-type_saveur">{{ form.type_saveur.label }}</label>
-                    {{ form.type_saveur(class="form-control", id="edit-flan-type_saveur") }}
+                    <label class="form-label" for="edit-flan-{{ flan.id_flan }}-type_saveur">{{ form.type_saveur.label }}</label>
+                    {{ form.type_saveur(class="form-control", id="edit-flan-" + flan.id_flan|string + "-type_saveur") }}
                 </div>
                 <div class="form-group">
-                    <label class="form-label" for="edit-flan-type_texture">{{ form.type_texture.label }}</label>
-                    {{ form.type_texture(class="form-control", id="edit-flan-type_texture") }}
+                    <label class="form-label" for="edit-flan-{{ flan.id_flan }}-type_texture">{{ form.type_texture.label }}</label>
+                    {{ form.type_texture(class="form-control", id="edit-flan-" + flan.id_flan|string + "-type_texture") }}
                 </div>
                 <div class="form-group">
                     <button type="submit" class="btn btn-success" title="Enregistrer les modifications">Enregistrer
                     </button>
-                    <button type="button" class="btn btn-canceledit" onclick="cancelEdit({{ flan.id_flan }})"
+                    <button type="button" class="btn btn-canceledit" 
+                            data-object-type="flan" data-object-id="{{ flan.id_flan }}"
                             title="Annuler les modifications">Annuler
                     </button>
                 </div>
@@ -473,23 +476,19 @@
                         {{ evaluation.date_creation.strftime('%d/%m/%Y') }}
                     </small>
                 </div>
-                {% if current_user.is_authenticated and (current_user.id_user == evaluation.id_user or current_user.is_admin) %}
-                    <div id="evaluation-{{ evaluation.id_eval }}-display">
-                        {{ afficher_criteres_evaluation(evaluation) }}
-                        {{ afficher_boutons_actions(evaluation, current_user,
+                {{ afficher_criteres_evaluation(evaluation) }}
+            </div>
+        </a>
+        {% if current_user.is_authenticated and (current_user.id_user == evaluation.id_user or current_user.is_admin) %}
+            <div id="evaluation-{{ evaluation.id_eval }}-display">
+                {{ afficher_boutons_actions(evaluation, current_user,
                     'id_eval', 'main.afficher_evaluation_unique', 'main.supprimer_evaluation', 'main.valider_evaluation',
                     'evaluation', current_page,
-                            delete_form, validate_form) }}
-                    </div>
-                    {{ afficher_formulaire_edition_evaluation(evaluation, form) }}
-                {% else %}
-                    {{ afficher_criteres_evaluation(evaluation) }}
-                {% endif %}
-
+                    delete_form, validate_form) }}
+            </div>
+            {{ afficher_formulaire_edition_evaluation(evaluation, form) }}
+        {% endif %}
     </div>
-    </a>
-    </div>
-
 
 {% endmacro %}
 
@@ -524,7 +523,8 @@
                 <div class="form-group">
                     <button type="submit" class="btn btn-success" title="Enregistrer les modifications">Enregistrer
                     </button>
-                    <button type="button" class="btn btn-canceledit" onclick="cancelEdit({{ evaluation.id_eval }})"
+                    <button type="button" class="btn btn-canceledit" 
+                            data-object-type="evaluation" data-object-id="{{ evaluation.id_eval }}"
                             title="Annuler les modifications">Annuler
                     </button>
                 </div>

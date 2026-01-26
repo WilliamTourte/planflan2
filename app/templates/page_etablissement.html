@@ -8,11 +8,17 @@
 {{ afficher_grille('flan', etablissement.flans, current_user, None, form_flan, etablissement, None, delete_form, validate_form) }}
 <!-- Boutons retour -->
 <div class="action-buttons">
-    <button onclick="goBackOrRedirect('{{ url_for('main.liste_etablissements') }}')" class="btn btn-danger" title="Retour à la page précédente">
+    <button id="back-button" class="btn btn-danger" title="Retour à la page précédente" data-fallback="{{ url_for('main.liste_etablissements') }}">
         <i class="bi bi-arrow-return-left"></i> Retour
     </button>
     <a href="{{ url_for('main.liste_etablissements') }}" class="btn btn-primary" title="Retour à la carte">
         <i class="bi bi-map"></i></i> Carte
     </a>
 </div>
+<script nonce="{{ csp_nonce }}">
+    // Ajouter l'écouteur d'événement pour le bouton retour
+    document.getElementById('back-button').addEventListener('click', function() {
+        goBackOrRedirect(this.getAttribute('data-fallback'));
+    });
+</script>
 {% endblock %}

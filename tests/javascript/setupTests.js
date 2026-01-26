@@ -87,7 +87,7 @@ beforeEach(() => {
   if (typeof window !== 'undefined') {
     delete window.location;
     window.location = {
-      href: '',
+      href: 'http://test.example.com/',
       hostname: 'test.example.com',
       pathname: '/',
       search: '',

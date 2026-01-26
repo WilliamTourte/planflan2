@@ -57,7 +57,7 @@
             <button
               type="button"
               class="btn btn-success"
-              onclick="cancelDeleteAccount()"
+              id="cancel-delete-btn"
               title="Annuler la suppression du compte"
             >
               Annuler
@@ -69,7 +69,7 @@
       <button
         type="button"
         class="btn btn-danger"
-        onclick="showDeleteAccountForm()"
+        id="delete-account-btn"
         title="Supprimer mon compte"
       >
         <i class="bi bi-trash-fill"></i>
@@ -128,6 +128,8 @@
           class="btn btn-canceledit"
           style="margin-left: 10px"
           title="Annuler les modifications"
+          data-object-type="profile"
+          data-object-id="1"
         >
           Annuler
         </button>
@@ -136,7 +138,7 @@
   </div>
 
   <!-- Section Mes Évaluations -->
-  <h2 class="section-title" onclick="toggleSection('mes-evaluations')">
+  <h2 class="section-title" id="mes-evaluations-title">
     Mes evaluations
   </h2>
   <div id="mes-evaluations" class="section-content" style="display: none">
@@ -145,21 +147,21 @@
   <!-- Sections Admin -->
   {% if current_user.is_admin %}
 
-  <h2 class="section-title" onclick="toggleSection('evaluations-a-valider')">
+  <h2 class="section-title" id="evaluations-a-valider-title">
     Evaluations en attente de validation
   </h2>
   <div id="evaluations-a-valider" class="section-content" style="display: none">
     {{ afficher_grille('evaluation', pending_evaluations, current_user) }}
   </div>
 
-  <h2 class="section-title" onclick="toggleSection('flans-a-valider')">
+  <h2 class="section-title" id="flans-a-valider-title">
     Flans en attente de validation
   </h2>
   <div id="flans-a-valider" class="section-content" style="display: none">
     {{ afficher_grille('flan', pending_flans, current_user) }}
   </div>
 
-  <h2 class="section-title" onclick="toggleSection('etablissements-a-valider')">
+  <h2 class="section-title" id="etablissements-a-valider-title">
     Etablissements en attente de validation
   </h2>
   <div

@@ -1383,7 +1383,16 @@ input[type="submit"]:active {
     flex: 2;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    justify-content: flex-start; /* Changed from space-between to flex-start */
+    gap: var(--margin-md); /* Added gap for better spacing */
+}
+
+/* Style pour le formulaire d'édition dans le détail du flan */
+.flan-detail .detail-right-column > .carte {
+    display: none; /* Masqué par défaut */
+    width: 100%;
+    margin-top: var(--margin-md);
+    order: 2; /* Placé après le contenu principal */
 }
 
 .flan-detail .detail-left-column .carte-image-container {

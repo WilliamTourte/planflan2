@@ -15,8 +15,6 @@
   crossorigin=""
 ></script>
 
-<!-- Inclure le fichier JavaScript externe -->
-<script src="{{ url_for('static', filename='js/geoloc.js') }}" defer></script>
 <!-- Données pour le script externe -->
 <div id="etablissements-data" data-etablissements='{{ etablissements_json|tojson|safe }}'></div>
 <div id="is-admin" data-is-admin="{{ current_user.is_admin|tojson|safe if current_user.is_authenticated else 'false' }}"></div>
