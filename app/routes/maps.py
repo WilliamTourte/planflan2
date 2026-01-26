@@ -31,6 +31,21 @@ maps_bp = Blueprint("maps", __name__)
 
 
 def extraire_code_postal(adresse):
+    """Extract postal code from a complete address string.
+    
+    Uses a regular expression to find and extract the 5-digit French postal code
+    from an address containing postal code and city name.
+    
+    Args:
+        adresse (str): The complete address string (e.g., "75001 Paris")
+    
+    Returns:
+        str: The 5-digit postal code, or None if not found
+        
+    Example:
+        >>> extraire_code_postal("75001 Paris")
+        '75001'
+    """
     match = re.search(r"(\d{5})", adresse)
     return match.group(1) if match else None
 

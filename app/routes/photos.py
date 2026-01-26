@@ -117,5 +117,13 @@ def upload_file():
 
 @photos_bp.route("/uploads")
 def show_uploads():
+    """Display list of all uploaded files in the uploads folder.
+    
+    Retrieves the list of files stored in the configured UPLOAD_FOLDER
+    and renders them in the upload template for viewing and management.
+    
+    Returns:
+        Response: Rendered HTML template with list of uploaded files
+    """
     uploads = os.listdir(current_app.config["UPLOAD_FOLDER"])
     return render_template("upload.html", uploads=uploads)

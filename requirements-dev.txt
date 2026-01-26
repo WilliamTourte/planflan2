@@ -19,6 +19,8 @@ mistral-vibe
 # types-flask==1.1.11
 # types-flask-sqlalchemy==2.5.7
 
-# Documentation (optionnel)
-# sphinx==7.2.6
-# sphinx-rtd-theme==2.0.0
+# Documentation
+sphinx==7.2.6
+sphinx-rtd-theme==2.0.0
+sphinx-js==3.2.2
+nodeenv>=1.8.0  # For Node.js in virtual environment (JSDoc support)

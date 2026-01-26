@@ -1,8 +1,26 @@
 # Makefile pour PlanFlan - Commandes de test optimisées
 
-.PHONY: test, test-quick, test-auth, test-admin, test-critical, test-slow, test-all
+.PHONY: test, test-quick, test-auth, test-admin, test-critical, test-slow, test-all, docs, docs-clean, docs-serve
 
-# Exécuter tous les tests (complet, pour CI/CD)
+# ==================== DOCUMENTATION ====================
+
+# Générer la documentation Sphinx
+docs:
+	cd source && sphinx-build -b html . _build/html && cd ..
+
+# Nettoyer les fichiers de documentation générés
+docs-clean:
+	rm -rf source/_build
+
+# Générer et servir la documentation sur http://localhost:8000
+docs-serve: docs
+	python -m http.server --directory source/_build/html 8000
+
+# Générer la documentation avec les avertissements traités comme des erreurs
+docs-strict:
+	cd source && sphinx-build -W -b html . _build/html && cd ..
+
+# ==================== TESTS ====================
 test-all:
 	python -m pytest tests/ -v -n auto
 

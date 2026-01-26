@@ -19,17 +19,19 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.napoleon",
     "sphinx.ext.todo",
+    "sphinx.ext.intersphinx",  # Cross-references to external projects
     "sphinxcontrib.httpdomain",
-    # "sphinx_js",  # Désactivé temporairement pour résoudre les problèmes de dépendances
+    # "sphinx_js",  # Temporarily disabled due to node.cmd permission issue
+    # Manual JavaScript documentation in javascript_autogen.rst is used instead
 ]
 
-# Configuration pour sphinx-js (désactivée temporairement)
-# js_source_path = "../app/static/js"
+# Configuration pour sphinx-js
+js_source_path = "../app/static/js"
 
 # Configuration pour autodoc
 autodoc_default_options = {
     "members": True,
-    "undoc-members": True,
+    "undoc-members": False,  # Only document functions with docstrings
     "private-members": False,
     "special-members": "__init__",
     "show-inheritance": True,
@@ -58,7 +60,7 @@ primary_domain = "http"
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath("../app"))
+sys.path.insert(0, os.path.abspath(".."))
 
 templates_path = ["_templates"]
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
@@ -79,3 +81,12 @@ html_theme_options = {
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = "PlanFlondoc"
+
+# Intersphinx mappings for cross-referencing external projects
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3", None),
+    "flask": ("https://flask.palletsprojects.com/en/3.0.x/", None),
+    "sqlalchemy": ("https://docs.sqlalchemy.org/en/20/", None),
+    "werkzeug": ("https://werkzeug.palletsprojects.com/", None),
+    "jinja": ("https://jinja.palletsprojects.com/", None),
+}
