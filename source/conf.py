@@ -20,7 +20,11 @@ extensions = [
     "sphinx.ext.napoleon",
     "sphinx.ext.todo",
     "sphinxcontrib.httpdomain",
+    # "sphinx_js",  # Désactivé temporairement pour résoudre les problèmes de dépendances
 ]
+
+# Configuration pour sphinx-js (désactivée temporairement)
+# js_source_path = "../app/static/js"
 
 # Configuration pour autodoc
 autodoc_default_options = {
