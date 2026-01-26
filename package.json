@@ -69,5 +69,8 @@
     "jest-environment-jsdom": "^29.7.0",
     "msw": "^2.3.5",
     "regenerator-runtime": "^0.14.1"
+  },
+  "dependencies": {
+    "jsdoc": "^4.0.5"
   }
 }

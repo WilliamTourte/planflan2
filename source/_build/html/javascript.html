@@ -42,7 +42,187 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Modules de l'application:</span></p>
+              <p class="caption" role="heading"><span class="caption-text">Documentation technique:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules de l’application</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#structure-du-projet">Structure du projet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#architecture">Architecture</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="routes.html">Documentation des routes Flask</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="routes/main.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/main.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/main.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/auth.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/auth.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/auth.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/maps.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/maps.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/maps.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/photos.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/photos.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/photos.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes.html#conventions-des-routes">Conventions des routes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes.html#exemple-de-documentation-d-une-route">Exemple de documentation d’une route</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="templates.html">Documentation des templates et macros</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#structure-des-templates">Structure des templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#macros-principales">Macros principales</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#blocs-principaux">Blocs principaux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#heritage-des-templates">Héritage des templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#variables-globales">Variables globales</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Documentation JavaScript</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#fonctions-principales-documentees">Fonctions principales documentées</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-pour-les-etablissements">Fonctions pour les établissements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-pour-les-flans">Fonctions pour les flans</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-pour-les-evaluations">Fonctions pour les évaluations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-utilitaires">Fonctions utilitaires</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#structure-des-scripts">Structure des scripts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#conventions-de-codage">Conventions de codage</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation technique:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules de l’application</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#structure-du-projet">Structure du projet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#architecture">Architecture</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="routes.html">Documentation des routes Flask</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="routes/main.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/main.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/main.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/auth.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/auth.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/auth.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/maps.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/maps.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/maps.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/photos.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/photos.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/photos.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes.html#conventions-des-routes">Conventions des routes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes.html#exemple-de-documentation-d-une-route">Exemple de documentation d’une route</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="templates.html">Documentation des templates et macros</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#structure-des-templates">Structure des templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#macros-principales">Macros principales</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#blocs-principaux">Blocs principaux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#heritage-des-templates">Héritage des templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#variables-globales">Variables globales</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Documentation JavaScript</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#fonctions-principales-documentees">Fonctions principales documentées</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-pour-les-etablissements">Fonctions pour les établissements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-pour-les-flans">Fonctions pour les flans</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-pour-les-evaluations">Fonctions pour les évaluations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-utilitaires">Fonctions utilitaires</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#structure-des-scripts">Structure des scripts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#conventions-de-codage">Conventions de codage</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation technique:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules de l’application</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#structure-du-projet">Structure du projet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#architecture">Architecture</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="routes.html">Documentation des routes Flask</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="routes/main.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/main.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/main.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/auth.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/auth.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/auth.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/maps.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/maps.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/maps.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/photos.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/photos.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/photos.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes.html#conventions-des-routes">Conventions des routes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes.html#exemple-de-documentation-d-une-route">Exemple de documentation d’une route</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="templates.html">Documentation des templates et macros</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#structure-des-templates">Structure des templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#macros-principales">Macros principales</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#blocs-principaux">Blocs principaux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#heritage-des-templates">Héritage des templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#variables-globales">Variables globales</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Documentation JavaScript</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#fonctions-principales-documentees">Fonctions principales documentées</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-pour-les-etablissements">Fonctions pour les établissements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-pour-les-flans">Fonctions pour les flans</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-pour-les-evaluations">Fonctions pour les évaluations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-utilitaires">Fonctions utilitaires</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#structure-des-scripts">Structure des scripts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#conventions-de-codage">Conventions de codage</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation technique:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules de l’application</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#structure-du-projet">Structure du projet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#architecture">Architecture</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="routes.html">Documentation des routes Flask</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="routes/main.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/main.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/main.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/auth.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/auth.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/auth.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/maps.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/maps.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/maps.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/photos.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/photos.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/photos.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes.html#conventions-des-routes">Conventions des routes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes.html#exemple-de-documentation-d-une-route">Exemple de documentation d’une route</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="templates.html">Documentation des templates et macros</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#structure-des-templates">Structure des templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#macros-principales">Macros principales</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#blocs-principaux">Blocs principaux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#heritage-des-templates">Héritage des templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#variables-globales">Variables globales</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Documentation JavaScript</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#fonctions-principales-documentees">Fonctions principales documentées</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-pour-les-etablissements">Fonctions pour les établissements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-pour-les-flans">Fonctions pour les flans</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-pour-les-evaluations">Fonctions pour les évaluations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-utilitaires">Fonctions utilitaires</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#structure-des-scripts">Structure des scripts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#conventions-de-codage">Conventions de codage</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Modules de l'application:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="modules.html">Modules de l’application</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="modules.html#structure-du-projet">Structure du projet</a></li>
@@ -51,6 +231,39 @@
 </li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Documentation technique:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules de l’application</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#structure-du-projet">Structure du projet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#architecture">Architecture</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="routes.html">Documentation des routes Flask</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="routes/main.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/main.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/main.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/auth.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/auth.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/auth.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/maps.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/maps.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/maps.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/photos.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/photos.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/photos.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes.html#conventions-des-routes">Conventions des routes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes.html#exemple-de-documentation-d-une-route">Exemple de documentation d’une route</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="templates.html">Documentation des templates et macros</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#structure-des-templates">Structure des templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#macros-principales">Macros principales</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#blocs-principaux">Blocs principaux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#heritage-des-templates">Héritage des templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#variables-globales">Variables globales</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation technique:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="modules.html">Modules de l’application</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="modules.html#structure-du-projet">Structure du projet</a></li>
@@ -83,9 +296,14 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Documentation JavaScript</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#fonctions-principales-documentees">Fonctions principales documentées</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-pour-les-etablissements">Fonctions pour les établissements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-pour-les-flans">Fonctions pour les flans</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-pour-les-evaluations">Fonctions pour les évaluations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-utilitaires">Fonctions utilitaires</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#structure-des-scripts">Structure des scripts</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#fonctions-principales">Fonctions principales</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#evenements-personnalises">Événements personnalisés</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#conventions-de-codage">Conventions de codage</a></li>
 </ul>
 </li>
@@ -123,9 +341,14 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Documentation JavaScript</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#fonctions-principales-documentees">Fonctions principales documentées</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-pour-les-etablissements">Fonctions pour les établissements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-pour-les-flans">Fonctions pour les flans</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-pour-les-evaluations">Fonctions pour les évaluations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-utilitaires">Fonctions utilitaires</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#structure-des-scripts">Structure des scripts</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#fonctions-principales">Fonctions principales</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#evenements-personnalises">Événements personnalisés</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#conventions-de-codage">Conventions de codage</a></li>
 </ul>
 </li>
@@ -163,9 +386,59 @@
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Documentation JavaScript</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#fonctions-principales-documentees">Fonctions principales documentées</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-pour-les-etablissements">Fonctions pour les établissements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-pour-les-flans">Fonctions pour les flans</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-pour-les-evaluations">Fonctions pour les évaluations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-utilitaires">Fonctions utilitaires</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#structure-des-scripts">Structure des scripts</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#fonctions-principales">Fonctions principales</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#evenements-personnalises">Événements personnalisés</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#conventions-de-codage">Conventions de codage</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Documentation technique:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="modules.html">Modules de l’application</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#structure-du-projet">Structure du projet</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html#architecture">Architecture</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="routes.html">Documentation des routes Flask</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="routes/main.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/main.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/main.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/auth.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/auth.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/auth.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/maps.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/maps.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/maps.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/photos.html">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/photos.html#id1">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes/photos.html#id2">Routes détaillées</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes.html#conventions-des-routes">Conventions des routes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="routes.html#exemple-de-documentation-d-une-route">Exemple de documentation d’une route</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="templates.html">Documentation des templates et macros</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#structure-des-templates">Structure des templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#macros-principales">Macros principales</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#blocs-principaux">Blocs principaux</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#heritage-des-templates">Héritage des templates</a></li>
+<li class="toctree-l2"><a class="reference internal" href="templates.html#variables-globales">Variables globales</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Documentation JavaScript</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#fonctions-principales-documentees">Fonctions principales documentées</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-pour-les-etablissements">Fonctions pour les établissements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-pour-les-flans">Fonctions pour les flans</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-pour-les-evaluations">Fonctions pour les évaluations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fonctions-utilitaires">Fonctions utilitaires</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#structure-des-scripts">Structure des scripts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#conventions-de-codage">Conventions de codage</a></li>
 </ul>
 </li>
@@ -206,70 +479,78 @@
   <section id="documentation-javascript">
 <h1>Documentation JavaScript<a class="headerlink" href="#documentation-javascript" title="Lien vers cette rubrique"></a></h1>
 <p>Ce chapitre documente les scripts JavaScript utilisés dans l’application.</p>
+<section id="fonctions-principales-documentees">
+<h2>Fonctions principales documentées<a class="headerlink" href="#fonctions-principales-documentees" title="Lien vers cette rubrique"></a></h2>
+<p>Les fonctions JavaScript principales sont documentées avec des commentaires JSDoc.
+Voici quelques exemples de fonctions clés :</p>
+<section id="fonctions-pour-les-etablissements">
+<h3>Fonctions pour les établissements<a class="headerlink" href="#fonctions-pour-les-etablissements" title="Lien vers cette rubrique"></a></h3>
+<p><strong>cancelEdit(idEtab)</strong></p>
+<p>Annule l’édition d’un établissement et revient en mode affichage.</p>
+<ul class="simple">
+<li><p><strong>Paramètre</strong> : <code class="docutils literal notranslate"><span class="pre">idEtab</span></code> (number) - L’identifiant de l’établissement à annuler l’édition</p></li>
+<li><p><strong>Retourne</strong> : void</p></li>
+</ul>
+<p><strong>editEtablissement(idEtab)</strong></p>
+<p>Active le mode édition pour un établissement.</p>
+<ul class="simple">
+<li><p><strong>Paramètre</strong> : <code class="docutils literal notranslate"><span class="pre">idEtab</span></code> (number) - L’identifiant de l’établissement à éditer</p></li>
+<li><p><strong>Retourne</strong> : void</p></li>
+</ul>
+</section>
+<section id="fonctions-pour-les-flans">
+<h3>Fonctions pour les flans<a class="headerlink" href="#fonctions-pour-les-flans" title="Lien vers cette rubrique"></a></h3>
+<p><strong>editFlan(idFlan)</strong></p>
+<p>Active le mode édition pour un flan.</p>
+<ul class="simple">
+<li><p><strong>Paramètre</strong> : <code class="docutils literal notranslate"><span class="pre">idFlan</span></code> (number) - L’identifiant du flan à éditer</p></li>
+<li><p><strong>Retourne</strong> : void</p></li>
+</ul>
+<p><strong>cancelEditFlan(idFlan)</strong></p>
+<p>Annule l’édition d’un flan et revient en mode affichage.</p>
+<ul class="simple">
+<li><p><strong>Paramètre</strong> : <code class="docutils literal notranslate"><span class="pre">idFlan</span></code> (number) - L’identifiant du flan à annuler l’édition</p></li>
+<li><p><strong>Retourne</strong> : void</p></li>
+</ul>
+</section>
+<section id="fonctions-pour-les-evaluations">
+<h3>Fonctions pour les évaluations<a class="headerlink" href="#fonctions-pour-les-evaluations" title="Lien vers cette rubrique"></a></h3>
+<p><strong>editEvaluation(idEval)</strong></p>
+<p>Active le mode édition pour une évaluation.</p>
+<ul class="simple">
+<li><p><strong>Paramètre</strong> : <code class="docutils literal notranslate"><span class="pre">idEval</span></code> (number) - L’identifiant de l’évaluation à éditer</p></li>
+<li><p><strong>Retourne</strong> : void</p></li>
+</ul>
+<p><strong>cancelEditEval(idEval)</strong></p>
+<p>Annule l’édition d’une évaluation et revient en mode affichage.</p>
+<ul class="simple">
+<li><p><strong>Paramètre</strong> : <code class="docutils literal notranslate"><span class="pre">idEval</span></code> (number) - L’identifiant de l’évaluation à annuler l’édition</p></li>
+<li><p><strong>Retourne</strong> : void</p></li>
+</ul>
+</section>
+<section id="fonctions-utilitaires">
+<h3>Fonctions utilitaires<a class="headerlink" href="#fonctions-utilitaires" title="Lien vers cette rubrique"></a></h3>
+<p><strong>initMacroEventListeners()</strong></p>
+<p>Initialise les écouteurs d’événements pour les boutons d’action macro.
+Cette fonction est appelée automatiquement lors du chargement du script.</p>
+<ul class="simple">
+<li><p><strong>Retourne</strong> : void</p></li>
+</ul>
+</section>
+</section>
 <section id="structure-des-scripts">
 <h2>Structure des scripts<a class="headerlink" href="#structure-des-scripts" title="Lien vers cette rubrique"></a></h2>
 <p>Les scripts JavaScript sont organisés dans le dossier <code class="docutils literal notranslate"><span class="pre">app/static/js/</span></code> :</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">base.js</span></code> - Scripts de base communs à toutes les pages</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">dashboard.js</span></code> - Fonctionnalités du tableau de bord</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">geoloc.js</span></code> - Gestion de la géolocalisation</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">geolocation.js</span></code> - Gestion de la géolocalisation</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">index.js</span></code> - Scripts pour la page d’accueil</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">liste_etablissements.js</span></code> - Gestion de la liste des établissements</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">macros.js</span></code> - Fonctions JavaScript réutilisables</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">map_filter.js</span></code> - Filtres pour la carte</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">proposer_etablissement.js</span></code> - Formulaire de proposition d’établissement</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">map.js</span></code> - Gestion de la carte</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">main.js</span></code> - Script principal</p></li>
 </ul>
-</section>
-<section id="fonctions-principales">
-<h2>Fonctions principales<a class="headerlink" href="#fonctions-principales" title="Lien vers cette rubrique"></a></h2>
-<p>Fonction <code class="docutils literal notranslate"><span class="pre">initMap()</span></code></p>
-<p>Initialise la carte Google Maps.</p>
-<p><strong>Exemple d’utilisation</strong> :</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="c1">// Appelé automatiquement au chargement de la page</span>
-<span class="nx">initMap</span><span class="p">();</span>
-</pre></div>
-</div>
-<p>Fonction <code class="docutils literal notranslate"><span class="pre">updateMapMarkers(etablissements)</span></code></p>
-<p>Met à jour les marqueurs de la carte avec les établissements donnés.</p>
-<p><strong>Paramètres</strong> :</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">etablissements</span></code> (Array) : Liste des établissements à afficher</p></li>
-</ul>
-<p><strong>Exemple d’utilisation</strong> :</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="kd">const</span><span class="w"> </span><span class="nx">etablissements</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span>
-<span class="w">  </span><span class="p">{</span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="nx">nom</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Boulangerie&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">lat</span><span class="o">:</span><span class="w"> </span><span class="mf">48.8566</span><span class="p">,</span><span class="w"> </span><span class="nx">lng</span><span class="o">:</span><span class="w"> </span><span class="mf">2.3522</span><span class="p">},</span>
-<span class="w">  </span><span class="p">{</span><span class="nx">id</span><span class="o">:</span><span class="w"> </span><span class="mf">2</span><span class="p">,</span><span class="w"> </span><span class="nx">nom</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Pâtisserie&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">lat</span><span class="o">:</span><span class="w"> </span><span class="mf">48.8588</span><span class="p">,</span><span class="w"> </span><span class="nx">lng</span><span class="o">:</span><span class="w"> </span><span class="mf">2.3471</span><span class="p">}</span>
-<span class="p">];</span>
-<span class="nx">updateMapMarkers</span><span class="p">(</span><span class="nx">etablissements</span><span class="p">);</span>
-</pre></div>
-</div>
-<p>Fonction <code class="docutils literal notranslate"><span class="pre">getCurrentPosition()</span></code></p>
-<p>Récupère la position géographique actuelle de l’utilisateur.</p>
-<p><strong>Retourne</strong> :</p>
-<ul class="simple">
-<li><p>Promise qui résout avec les coordonnées {lat, lng}</p></li>
-</ul>
-<p><strong>Exemple d’utilisation</strong> :</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nx">getCurrentPosition</span><span class="p">()</span>
-<span class="w">  </span><span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">position</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">&quot;Position actuelle:&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">position</span><span class="p">);</span>
-<span class="w">  </span><span class="p">})</span>
-<span class="w">  </span><span class="p">.</span><span class="k">catch</span><span class="p">(</span><span class="nx">error</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
-<span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="s2">&quot;Erreur de géolocalisation:&quot;</span><span class="p">,</span><span class="w"> </span><span class="nx">error</span><span class="p">);</span>
-<span class="w">  </span><span class="p">});</span>
-</pre></div>
-</div>
-</section>
-<section id="evenements-personnalises">
-<h2>Événements personnalisés<a class="headerlink" href="#evenements-personnalises" title="Lien vers cette rubrique"></a></h2>
-<p>Événement <code class="docutils literal notranslate"><span class="pre">map:updated</span></code></p>
-<p>Événement déclenché lorsque la carte est mise à jour.</p>
-<p><strong>Exemple d’utilisation</strong> :</p>
-<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="nb">document</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">&#39;map:updated&#39;</span><span class="p">,</span><span class="w"> </span><span class="kd">function</span><span class="p">(</span><span class="nx">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Carte mise à jour avec&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">e</span><span class="p">.</span><span class="nx">detail</span><span class="p">.</span><span class="nx">etablissementsCount</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;établissements&#39;</span><span class="p">);</span>
-<span class="p">});</span>
-</pre></div>
-</div>
 </section>
 <section id="conventions-de-codage">
 <h2>Conventions de codage<a class="headerlink" href="#conventions-de-codage" title="Lien vers cette rubrique"></a></h2>
@@ -280,6 +561,7 @@
 <li><p><strong>Événements</strong> : Utilisation d’événements personnalisés pour la communication</p></li>
 <li><p><strong>Documentation</strong> : Commentaires JSDoc pour les fonctions principales</p></li>
 </ul>
+<p>Pour plus d’informations sur la documentation JavaScript avec Sphinx, voir le fichier <code class="docutils literal notranslate"><span class="pre">documentation/SPHINX_JS_DOCUMENTATION.md</span></code>.</p>
 </section>
 </section>
 
