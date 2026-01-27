@@ -480,7 +480,9 @@ def test_afficher_evaluation_unique(client):
     # Accéder à la page de l'évaluation
     response = client.get(f"/evaluation/{eval_id}")
     assert response.status_code == 200
-    assert b"Test Description" in response.data
+    # La description n'est plus affichée sur la page
+    # Vérifier que les critères d'évaluation sont affichés
+    assert b"Visuel" in response.data or b"visuel" in response.data.lower()
 
 
 def test_valider_evaluation(client):

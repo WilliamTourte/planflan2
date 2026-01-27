@@ -276,10 +276,7 @@
                     <label class="form-label">{{ form_edit.type_etab.label }}</label>
                     {{ form_edit.type_etab(class="form-control", value=etablissement.type_etab.name) }}
                 </div>
-                <div class="form-group">
-                    <label class="form-label">{{ form_edit.description.label }}</label>
-                    {{ form_edit.description(class="form-control", value=etablissement.description) }}
-                </div>
+
                 {% if current_user.is_admin %}
                     <div class="form-group">
                         <label>Labellisé</label><br>
@@ -340,11 +337,6 @@
                             <span class="attribute-label">Prix</span>
                             <span class="attribute-value">{{ "%.2f"|format(flan.prix) }} €</span>
                         </div>
-                        <div class="flan-description">
-                            <span class="attribute-value" id="flan-{{ flan.id_flan }}-description">
-                                {{ flan.description | default("Un flan à découvrir absolument !") }}
-                            </span>
-                        </div>
                         <!-- Affichage de la moyenne des évaluations -->
                         {% set moyenne_flan = flan.get_moyenne_evaluations() %}
                         {% if moyenne_flan is not none %}
@@ -387,11 +379,6 @@
                             <span class="attribute-label">Texture</span>
                             <span class="attribute-value">{{ flan.type_texture.value | default("Inconnue") }}</span>
                         </div>
-                        <div class="flan-description">
-                            <span class="attribute-value" id="flan-{{ flan.id_flan }}-description">
-                                {{ flan.description | default("Un flan à découvrir absolument !") }}
-                            </span>
-                        </div>
                         <div class="flan-price-tag">{{ "%.2f"|format(flan.prix) }} €</div>
                         <!-- Affichage de la moyenne des évaluations -->
                         {% set moyenne_flan = flan.get_moyenne_evaluations() %}
@@ -426,10 +413,7 @@
                     <label class="form-label" for="edit-flan-{{ flan.id_flan }}-nom">{{ form.nom.label }}</label>
                     {{ form.nom(class="form-control", id="edit-flan-" + flan.id_flan|string + "-nom") }}
                 </div>
-                <div class="form-group">
-                    <label class="form-label" for="edit-flan-{{ flan.id_flan }}-description">{{ form.description.label }}</label>
-                    {{ form.description(class="form-control", id="edit-flan-" + flan.id_flan|string + "-description") }}
-                </div>
+
                 <div class="form-group">
                     <label class="form-label" for="edit-flan-{{ flan.id_flan }}-prix">{{ form.prix.label }}</label>
                     {{ form.prix(class="form-control", id="edit-flan-" + flan.id_flan|string + "-prix") }}
@@ -516,10 +500,7 @@
                     <label for="eval-detail-gout" class="form-label">Goût</label>
                     {{ form.gout(class="form-control", id="eval-detail-gout") }}
                 </div>
-                <div class="form-group">
-                    <label for="eval-detail-description" class="form-label">Description</label>
-                    {{ form.description(class="form-control", id="eval-detail-description") }}
-                </div>
+
                 <div class="form-group">
                     <button type="submit" class="btn btn-success" title="Enregistrer les modifications">Enregistrer
                     </button>
@@ -562,7 +543,6 @@
             <span class="criterion-value">N/A</span>
         </div>
     {% endif %}
-    <p class="type">{{ evaluation.description }}</p>
 {% endmacro %}
 
 
@@ -666,10 +646,7 @@
             <label class="form-label" for="ajout-flan-nom">{{ form.nom.label }}</label>
             {{ form.nom(class="form-control", id="ajout-flan-nom") }}
         </div>
-        <div class="form-group">
-            <label class="form-label" for="ajout-flan-description">{{ form.description.label }}</label>
-            {{ form.description(class="form-control", id="ajout-flan-description") }}
-        </div>
+
         {{ afficher_champ_formulaire(form.prix) }}
         {{ afficher_champ_formulaire(form.type_pate) }}
         {{ afficher_champ_formulaire(form.type_saveur) }}
@@ -689,7 +666,6 @@
             <input type="text" id="search" class="form-control" placeholder="Rechercher un établissement">
 
         </div>
-        {{ afficher_champ_formulaire(form.description) }}
         {% if current_user.is_admin %}
             <!-- Utilise une div conteneur pour regrouper les cases -->
             <div class="form-check-container">
@@ -704,8 +680,6 @@
                     <label class="form-check-label" for="{{ form.visite.id }}">{{ form.visite.label }}</label>
                 </div>
             </div>
-
-
 
         {% endif %}
         <!-- Champs cachés avec préfixe -->
@@ -729,7 +703,7 @@
         {{ afficher_champ_formulaire(form.pate) }}
         {{ afficher_champ_formulaire(form.texture) }}
         {{ afficher_champ_formulaire(form.gout) }}
-        {{ afficher_champ_formulaire(form.description) }}
+
         <div class="form-group">
             {{ form.submit(class="btn btn-success") }}
         </div>
@@ -739,7 +713,6 @@
     <form method="POST" action="{{ action_url }}" class="form-container">
         {{ form.hidden_tag() }}
         {{ afficher_champ_formulaire(form.nom) }}
-        {{ afficher_champ_formulaire(form.description) }}
         {{ afficher_champ_formulaire(form.adresse) }}
         {{ afficher_champ_formulaire(form.ville) }}
         {{ afficher_champ_formulaire(form.code_postal) }}
@@ -786,7 +759,7 @@
     <form method="POST" action="{{ action_url }}" class="form-container">
         {{ form.hidden_tag() }}
         {{ afficher_champ_formulaire(form.nom) }}
-        {{ afficher_champ_formulaire(form.description) }}
+
         {{ afficher_champ_formulaire(form.prix) }}
         {{ afficher_champ_formulaire(form.type_pate) }}
         {{ afficher_champ_formulaire(form.type_saveur) }}

@@ -707,12 +707,6 @@ def evaluer_flan(id_flan):
         id_flan=id_flan, id_user=current_user.id_user
     ).first()
 
-    if request.method == "POST" and evaluation is not None:
-        flash(
-            "Vous avez déjà une évaluation pour ce flan. Vous pouvez uniquement la modifier.",
-            "info",
-        )
-        return redirect(url_for("main.afficher_flan_unique", id_flan=id_flan))
 
     if request.method == "GET" and evaluation:
         form.visuel.data = str(evaluation.visuel)

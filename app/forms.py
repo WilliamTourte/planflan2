@@ -218,6 +218,7 @@ class EtabForm(FlaskForm):
     description = StringField(
         "Description",
         validators=[
+            Optional(),
             Length(
                 min=0,
                 max=1000,
@@ -298,6 +299,7 @@ class NewFlanForm(FlaskForm):
     description = StringField(
         "Description",
         validators=[
+            Optional(),
             Length(
                 min=0,
                 max=1000,
@@ -395,13 +397,14 @@ class EvalForm(FlaskForm):
     description = StringField(
         "Description",
         validators=[
+            Optional(),
             Length(
                 min=0,
                 max=1000,
                 message="Doit contenir entre %(min)d et %(max)d caractères.",
             )
         ],
-    )  # Vérifier si obligatoire dans base de données
+    )  # Champ optionnel
     submit = SubmitField("Proposer une évaluation")
 
 
