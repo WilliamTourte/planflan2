@@ -300,7 +300,7 @@ export function updateMainFilterButtons(activeFilters) {
  * Fonction pour gérer la navigation avec fallback.
  * @param {string} fallbackUrl - URL de fallback
  */
-export function goBackOrRedirect(fallbackUrl) {
+function goBackOrRedirect(fallbackUrl) {
     // Solution simple : utiliser le referrer pour décider
     var referrer = document.referrer;
     
@@ -317,6 +317,12 @@ export function goBackOrRedirect(fallbackUrl) {
         window.location.href = fallbackUrl;
     }
 }
+
+// Ajouter la fonction au scope global pour compatibilité avec les scripts inline
+window.goBackOrRedirect = goBackOrRedirect;
+
+// Export pour les modules ES6
+export { goBackOrRedirect };
 
 // Export pour compatibilité avec les anciens scripts
 document.utils = {

@@ -3,7 +3,7 @@
  * Attempts to go back in history, falls back to specified URL if not possible.
  * @param {string} fallbackUrl - The URL to fall back to if history navigation fails
  */
-export function goBackOrRedirect(fallbackUrl) {
+function goBackOrRedirect(fallbackUrl) {
     // Solution simple : utiliser le referrer pour décider
     var referrer = document.referrer;
     
@@ -20,6 +20,12 @@ export function goBackOrRedirect(fallbackUrl) {
         window.location.href = fallbackUrl;
     }
 }
+
+// Ajouter la fonction au scope global pour compatibilité avec les scripts inline
+window.goBackOrRedirect = goBackOrRedirect;
+
+// Export pour les modules ES6
+export { goBackOrRedirect };
 
 // Logique pour alterner entre recherche simple et complexe
 document.addEventListener('DOMContentLoaded', function() {
