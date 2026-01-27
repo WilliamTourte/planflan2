@@ -157,6 +157,9 @@ class Utilisateur(db.Model, UserMixin):
         }
 
 
+from sqlalchemy import event
+
+
 class Etablissement(db.Model):
     """Modèle représentant un établissement.
 
@@ -203,6 +206,17 @@ class Etablissement(db.Model):
         "Photo", back_populates="etablissement", foreign_keys="Photo.id_etab"
     )
     utilisateur = db.relationship("Utilisateur", back_populates="etablissements")
+
+    def valider_label_visite(self):
+        """Valide que label ne peut être True que si visite est aussi True.
+
+        Raises:
+            ValueError: Si label est True et visite est False
+        """
+        if self.label and not self.visite:
+            raise ValueError(
+                "Un établissement ne peut être labellisé que s'il a été visité."
+            )
 
     def to_dict(self, include_flans=True, include_photos=False):
         """Convertit l'établissement en dictionnaire pour la sérialisation.
@@ -347,6 +361,18 @@ class Flan(db.Model):
 
         return data
 
+        @event.listens_for(Etablissement, "before_insert")
+        @event.listens_for(Etablissement, "before_update")
+        def validate_etablissement(mapper, connection, target):
+            """Valide automatiquement les contraintes de l'établissement avant insertion ou mise à jour."""
+            target.valider_label_visite()
+
+        @event.listens_for(Evaluation, "before_insert")
+        @event.listens_for(Evaluation, "before_update")
+        def calculate_evaluation_moyenne(mapper, connection, target):
+            """Calcule automatiquement la moyenne de l'évaluation avant insertion ou mise à jour."""
+            target.calc_moyenne()
+
 
 class Evaluation(db.Model):
     """Modèle représentant une évaluation.
@@ -383,6 +409,19 @@ class Evaluation(db.Model):
     # Relations
     utilisateur = db.relationship("Utilisateur", back_populates="evaluations")
     flan = db.relationship("Flan", back_populates="evaluations")
+
+    def calc_moyenne(self):
+        """Calcule la note moyenne à partir des 4 critères d'évaluation."""
+        if all(
+            v is not None for v in [self.visuel, self.texture, self.pate, self.gout]
+        ):
+            self.moyenne = (
+                float(self.visuel)
+                + float(self.texture)
+                + float(self.pate)
+                + float(self.gout)
+            ) / 4
+        return self.moyenne
 
     def to_dict(self, include_flan=False, include_utilisateur=False):
         """Convertit l'évaluation en dictionnaire pour la sérialisation.

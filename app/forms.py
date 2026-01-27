@@ -223,7 +223,7 @@ class EtabForm(FlaskForm):
                 min=0,
                 max=1000,
                 message="Doit contenir entre %(min)d et %(max)d caractères.",
-            )
+            ),
         ],
     )
     label = BooleanField("Labellisé")
@@ -304,7 +304,7 @@ class NewFlanForm(FlaskForm):
                 min=0,
                 max=1000,
                 message="Doit contenir entre %(min)d et %(max)d caractères.",
-            )
+            ),
         ],
     )
     prix = DecimalField(
@@ -402,7 +402,7 @@ class EvalForm(FlaskForm):
                 min=0,
                 max=1000,
                 message="Doit contenir entre %(min)d et %(max)d caractères.",
-            )
+            ),
         ],
     )  # Champ optionnel
     submit = SubmitField("Proposer une évaluation")

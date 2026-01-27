@@ -181,6 +181,23 @@ def ajouter_etablissement():
         # Si le formulaire est valide, les données sont utilisées pour créer un nouvel établissement
         if form_ajout.validate():
             current_app.logger.info("✓ Formulaire validé avec succès")
+
+            # Vérifier la logique métier : label ne peut être True que si visite est True
+            label_value = form_ajout.label.data
+            visite_value = form_ajout.visite.data
+
+            if label_value and not visite_value:
+                current_app.logger.error(
+                    "✗ Un établissement ne peut être labellisé que s'il a été visité"
+                )
+                flash(
+                    "Un établissement ne peut être labellisé que s'il a été visité.",
+                    "error",
+                )
+                return render_template(
+                    "page_proposer_etablissement.html", form=form_ajout
+                )
+
             current_app.logger.info("=== CRÉATION DE L'ÉTABLISSEMENT ===")
             current_app.logger.info(f"Valeurs utilisées pour la création:")
             current_app.logger.info(f"  nom: {form_ajout.nom.data}")
@@ -198,8 +215,8 @@ def ajouter_etablissement():
                 type_etab=form_ajout.type_etab.data,
                 description=form_ajout.description.data,
                 id_user=1,  # TEMPORAIRE
-                label=form_ajout.label.data,
-                visite=form_ajout.visite.data,
+                label=label_value,
+                visite=visite_value,
                 google_place_id=form_ajout.google_place_id.data,
             )
 
@@ -323,6 +340,19 @@ def modifier_etablissement(id_etab):
         # Recréation du formulaire d'édition avec les données POST
         form_edit = EtabForm(prefix="edit-etab", formdata=request.form)
         if form_edit.validate_on_submit():
+            # Vérifier la logique métier : label ne peut être True que si visite est True
+            label_value = form_edit.label.data == "Oui"
+            visite_value = form_edit.visite.data == "Oui"
+
+            if label_value and not visite_value:
+                flash(
+                    "Un établissement ne peut être labellisé que s'il a été visité.",
+                    "error",
+                )
+                return redirect(
+                    url_for("main.afficher_etablissement_unique", id_etab=id_etab)
+                )
+
             # Mise à jour des données de l'établissement
             etablissement.nom = form_edit.nom.data
             etablissement.adresse = form_edit.adresse.data
@@ -335,8 +365,8 @@ def modifier_etablissement(id_etab):
                 form_edit.longitude.data
             )  # Utilisation de form_edit au lieu de request.form
             etablissement.type_etab = TypeEtab[form_edit.type_etab.data]
-            etablissement.label = form_edit.label.data == "Oui"
-            etablissement.visite = form_edit.visite.data == "Oui"
+            etablissement.label = label_value
+            etablissement.visite = visite_value
             etablissement.description = form_edit.description.data
             db.session.commit()
             flash("Établissement mis à jour avec succès !", "success")
