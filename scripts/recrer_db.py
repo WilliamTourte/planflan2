@@ -262,12 +262,16 @@ def creer_flans_et_evaluations():
                 pate = round(random.uniform(1.0, 5.0), 1)
                 gout = round(random.uniform(1.0, 5.0), 1)
 
-                # Insérer l'évaluation
+                # Calculer la moyenne pour cette évaluation
+                moyenne = round((visuel + texture + pate + gout) / 4, 1)
+
+                # Insérer l'évaluation avec la moyenne calculée
                 stmt_eval = insert(evaluations).values(
                     visuel=visuel,
                     texture=texture,
                     pate=pate,
                     gout=gout,
+                    moyenne=moyenne,  # Ajouter la moyenne calculée
                     id_flan=flan["id_flan"],
                     statut="VALIDE",
                     id_user=1,  # admin_flan

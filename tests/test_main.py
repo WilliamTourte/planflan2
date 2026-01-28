@@ -583,6 +583,125 @@ def test_supprimer_evaluation(client):
         ), "L'évaluation n'a pas été supprimée de la base de données"
 
 
+def test_moyenne_evaluations_avec_calcul_automatique(client):
+    """Test que la moyenne des évaluations s'affiche correctement même sans moyenne pré-calculée"""
+    user = client.application.config["TEST_USER"]
+
+    # Créer un établissement et un flan de test
+    with client.application.app_context():
+        from flask_bcrypt import Bcrypt
+
+        bcrypt = Bcrypt(client.application)
+        etab = Etablissement(
+            nom="Test Etablissement Moyenne",
+            adresse="Test Adresse",
+            code_postal="69001",
+            ville="Test Ville",
+            id_user=user.id_user,
+        )
+        db.session.add(etab)
+        db.session.commit()
+
+        flan = Flan(
+            nom="Test Flan Moyenne",
+            prix=3.0,
+            id_etab=etab.id_etab,
+            id_user=user.id_user,
+        )
+        db.session.add(flan)
+        db.session.commit()
+
+        # Créer une évaluation SANS moyenne pré-calculée (simule le bug original)
+        eval1 = Evaluation(
+            visuel=4.0,
+            texture=4.5,
+            pate=3.5,
+            gout=4.0,
+            moyenne=None,  # Pas de moyenne pré-calculée - cela simule le bug
+            id_flan=flan.id_flan,
+            id_user=user.id_user,
+        )
+        db.session.add(eval1)
+        db.session.commit()
+
+        # Tester que la moyenne s'affiche quand même
+        moyenne_flan = flan.get_moyenne_evaluations()
+        assert (
+            moyenne_flan is not None
+        ), "La moyenne ne devrait pas être None même sans moyenne pré-calculée"
+
+        # Calculer la moyenne attendue manuellement
+        expected_moyenne = round((4.0 + 4.5 + 3.5 + 4.0) / 4, 1)
+        assert (
+            moyenne_flan == expected_moyenne
+        ), f"Moyenne attendue: {expected_moyenne}, obtenue: {moyenne_flan}"
+
+        # Créer un deuxième utilisateur pour la deuxième évaluation
+        # (car il y a une contrainte unique sur id_user + id_flan)
+        user2 = Utilisateur(pseudo="testuser2", email="test2@example.com")
+        user2.set_password("password", bcrypt)
+        db.session.add(user2)
+        db.session.commit()
+
+        # Ajouter une deuxième évaluation avec moyenne pré-calculée
+        eval2 = Evaluation(
+            visuel=5.0,
+            texture=5.0,
+            pate=4.5,
+            gout=5.0,
+            moyenne=4.9,  # Moyenne pré-calculée
+            id_flan=flan.id_flan,
+            id_user=user2.id_user,
+        )
+        db.session.add(eval2)
+        db.session.commit()
+
+        # Tester que la moyenne globale est correcte
+        nouvelle_moyenne = flan.get_moyenne_evaluations()
+        assert (
+            nouvelle_moyenne is not None
+        ), "La moyenne ne devrait pas être None avec plusieurs évaluations"
+
+        # La moyenne devrait être la moyenne des deux moyennes individuelles
+        expected_global = round((expected_moyenne + 4.9) / 2, 1)
+        assert (
+            nouvelle_moyenne == expected_global
+        ), f"Moyenne globale attendue: {expected_global}, obtenue: {nouvelle_moyenne}"
+
+        # Créer un troisième utilisateur pour la troisième évaluation
+        user3 = Utilisateur(pseudo="testuser3", email="test3@example.com")
+        user3.set_password("password", bcrypt)
+        db.session.add(user3)
+        db.session.commit()
+
+        # Tester avec une évaluation sans moyenne pré-calculée (mais avec tous les critères)
+        # Cela simule le cas où une évaluation est créée via SQL direct sans calcul de moyenne
+        eval3 = Evaluation(
+            visuel=3.0,
+            texture=3.5,  # Tous les critères sont présents
+            pate=3.5,
+            gout=4.0,
+            moyenne=None,  # Mais la moyenne n'est pas pré-calculée
+            id_flan=flan.id_flan,
+            id_user=user3.id_user,
+        )
+        db.session.add(eval3)
+        db.session.commit()
+
+        # La moyenne devrait toujours s'afficher (calculée à la volée)
+        moyenne_avec_manquants = flan.get_moyenne_evaluations()
+        assert (
+            moyenne_avec_manquants is not None
+        ), "La moyenne devrait s'afficher même sans moyenne pré-calculée"
+        
+        # Vérifier que la moyenne est correcte
+        expected_moyenne_eval3 = round((3.0 + 3.5 + 3.5 + 4.0) / 4, 1)
+        # La moyenne globale devrait inclure cette nouvelle évaluation
+        expected_global_final = round((expected_moyenne + 4.9 + expected_moyenne_eval3) / 3, 1)
+        assert abs(moyenne_avec_manquants - expected_global_final) < 0.1, \
+            f"Moyenne globale finale attendue: {expected_global_final}, obtenue: {moyenne_avec_manquants}"
+
+
 def test_dashboard_post_update_profile(client):
     """Test la mise à jour du profil via le dashboard"""
     user = client.application.config["TEST_USER"]

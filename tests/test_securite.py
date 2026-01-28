@@ -277,7 +277,7 @@ def test_utilisateur_regular_acces_route_admin(client, setup_full_data):
     # Se connecter en tant qu'utilisateur regular
     client.post(
         "/login",
-        data={"email": "test@example.com", "password": "password"},
+        data={"pseudo": "testuser", "password": "password"},
         follow_redirects=True,
     )
 
@@ -303,7 +303,7 @@ def test_utilisateur_regular_modification_ressource_autre_utilisateur(
     # Se connecter en tant qu'utilisateur regular
     client.post(
         "/login",
-        data={"email": "test@example.com", "password": "password"},
+        data={"pseudo": "testuser", "password": "password"},
         follow_redirects=True,
     )
 
@@ -344,7 +344,7 @@ def test_utilisateur_regular_suppression_ressource_autre_utilisateur(
     # Se connecter en tant qu'utilisateur regular
     client.post(
         "/login",
-        data={"email": "test@example.com", "password": "password"},
+        data={"pseudo": "testuser", "password": "password"},
         follow_redirects=True,
     )
 

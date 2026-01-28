@@ -310,17 +310,29 @@ class Flan(db.Model):
         if not self.evaluations:
             return None
 
-        # Filtrer les évaluations valides avec une moyenne
-        evaluations_valides = [
-            eval for eval in self.evaluations if eval.moyenne is not None
-        ]
+        moyennes = []
 
-        if not evaluations_valides:
+        for eval in self.evaluations:
+            # Si l'évaluation a déjà une moyenne calculée, l'utiliser
+            if eval.moyenne is not None:
+                moyennes.append(float(eval.moyenne))
+            else:
+                # Calculer la moyenne à la volée si possible
+                valeurs = [
+                    v
+                    for v in [eval.visuel, eval.texture, eval.pate, eval.gout]
+                    if v is not None
+                ]
+                if valeurs:  # Au moins un critère est rempli
+                    moyenne_calculee = sum(float(v) for v in valeurs) / len(valeurs)
+                    moyennes.append(moyenne_calculee)
+
+        if not moyennes:
             return None
 
         # Calculer la moyenne des moyennes
-        somme = sum(float(eval.moyenne) for eval in evaluations_valides)
-        return round(somme / len(evaluations_valides), 1)
+        somme = sum(moyennes)
+        return round(somme / len(moyennes), 1)
 
     def to_dict(
         self, include_etablissement=True, include_evaluations=True, include_photos=False
