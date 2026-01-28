@@ -86,8 +86,12 @@ describe('Macros Functions - Flan Edition', () => {
       // Appeler la fonction d'édition
       editFlan(1);
 
-      // Vérifier qu'un message d'erreur a été logged
-      expect(consoleErrorSpy).toHaveBeenCalled();
+      // Vérifier que les éléments sont correctement basculés
+      expect(document.getElementById('flan-1-display').style.display).toBe('none');
+      expect(document.getElementById('flan-1-edit').style.display).toBe('block');
+
+      // Vérifier qu'aucun message d'erreur n'a été logged (les vérifications sont optionnelles)
+      expect(consoleErrorSpy).not.toHaveBeenCalled();
     });
   });
 

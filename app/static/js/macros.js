@@ -59,8 +59,22 @@ export function editEtablissement(idEtab) {
  * editFlan(456);
  */
 export function editFlan(idFlan) {
+    // Masquer le mode affichage et afficher le mode édition
     document.getElementById('flan-' + idFlan + '-display').style.display = 'none';
     document.getElementById('flan-' + idFlan + '-edit').style.display = 'block';
+    
+    // Copier les valeurs des éléments d'affichage vers les champs de formulaire
+    const nomElement = document.getElementById('flan-' + idFlan + '-nom');
+    const descriptionElement = document.getElementById('flan-' + idFlan + '-description');
+    const nomInput = document.getElementById('edit-flan-' + idFlan + '-nom');
+    const descriptionInput = document.getElementById('edit-flan-' + idFlan + '-description');
+    
+    if (nomElement && nomInput) {
+        nomInput.value = nomElement.textContent.trim();
+    }
+    if (descriptionElement && descriptionInput) {
+        descriptionInput.value = descriptionElement.textContent.trim();
+    }
 }
 
 /**
