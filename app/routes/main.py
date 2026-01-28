@@ -775,7 +775,6 @@ def evaluer_flan(id_flan):
 
 
 @main_bp.route("/evaluation/<int:id_eval>", methods=["GET", "POST"])
-@login_required
 def afficher_evaluation_unique(id_eval):
     evaluation = db.session.get(Evaluation, id_eval)
     if evaluation is None:
