@@ -47,75 +47,20 @@ export function editEtablissement(idEtab) {
  * // Activer l'édition du flan avec l'ID 456
  * editFlan(456);
  */
+/**
+ * Active le mode édition pour un flan.
+ * 
+ * @function editFlan
+ * @param {number} idFlan - L'identifiant du flan à éditer
+ * @returns {void}
+ * 
+ * @example
+ * // Activer l'édition du flan avec l'ID 456
+ * editFlan(456);
+ */
 export function editFlan(idFlan) {
-    console.log('DEBUG: editFlan called with idFlan:', idFlan);
-    
-    const displayElement = document.getElementById('flan-' + idFlan + '-display');
-    const editElement = document.getElementById('flan-' + idFlan + '-edit');
-    const nomElement = document.getElementById('flan-' + idFlan + '-nom');
-    const descriptionElement = document.getElementById('flan-' + idFlan + '-description');
-    const editNomInput = document.getElementById('edit-flan-' + idFlan + '-nom');
-    const editDescriptionInput = document.getElementById('edit-flan-' + idFlan + '-description');
-
-    console.log('DEBUG: Element IDs searched:', {
-        displayId: 'flan-' + idFlan + '-display',
-        editId: 'flan-' + idFlan + '-edit',
-        nomId: 'flan-' + idFlan + '-nom',
-        descId: 'flan-' + idFlan + '-description',
-        editNomId: 'edit-flan-' + idFlan + '-nom',
-        editDescId: 'edit-flan-' + idFlan + '-description'
-    });
-
-    console.log('DEBUG: Elements found:', {
-        displayElement: displayElement,
-        editElement: editElement,
-        nomElement: nomElement,
-        descriptionElement: descriptionElement,
-        editNomInput: editNomInput,
-        editDescriptionInput: editDescriptionInput
-    });
-
-    if (displayElement && editElement && nomElement && descriptionElement && editNomInput && editDescriptionInput) {
-        console.log('DEBUG: All elements found, proceeding with edit');
-        editNomInput.value = nomElement.textContent;
-        // Remove the .replace() call since the description doesn't have "Description : " prefix
-        editDescriptionInput.value = descriptionElement.textContent.trim();
-        
-        console.log('DEBUG: Before display changes:', {
-            displayStyle: displayElement.style.display,
-            editStyle: editElement.style.display
-        });
-        
-        displayElement.style.display = 'none';
-        editElement.style.display = 'block';
-        
-        console.log('DEBUG: After display changes:', {
-            displayStyle: displayElement.style.display,
-            editStyle: editElement.style.display
-        });
-        
-        // Ajout d'un log pour vérifier si le formulaire est visible
-        setTimeout(() => {
-            console.log('DEBUG: Form visibility after 1 second:', {
-                editElementStyle: editElement.style.display,
-                editElementOffsetHeight: editElement.offsetHeight,
-                editElementClientHeight: editElement.clientHeight
-            });
-        }, 1000);
-    } else {
-        console.error('Elements not found for flan editing:', {
-            displayElement: !!displayElement,
-            editElement: !!editElement,
-            nomElement: !!nomElement,
-            descriptionElement: !!descriptionElement,
-            editNomInput: !!editNomInput,
-            editDescriptionInput: !!editDescriptionInput
-        });
-        
-        // Log all elements with similar IDs to help debugging
-        const allElements = document.querySelectorAll('[id^="flan-"], [id^="edit-flan-"]');
-        console.log('DEBUG: All elements with flan IDs:', Array.from(allElements).map(el => el.id));
-    }
+    document.getElementById('flan-' + idFlan + '-display').style.display = 'none';
+    document.getElementById('flan-' + idFlan + '-edit').style.display = 'block';
 }
 
 /**
@@ -145,6 +90,17 @@ export function cancelEditFlan(idFlan) {
 }
 
 // Fonctions pour les évaluations
+/**
+ * Active le mode édition pour une évaluation.
+ * 
+ * @function editEvaluation
+ * @param {number} idEval - L'identifiant de l'évaluation à éditer
+ * @returns {void}
+ * 
+ * @example
+ * // Activer l'édition de l'évaluation avec l'ID 789
+ * editEvaluation(789);
+ */
 /**
  * Active le mode édition pour une évaluation.
  * 

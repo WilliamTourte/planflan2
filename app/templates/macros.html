@@ -389,14 +389,13 @@
                             </div>
                         {% endif %}
                     </div>
+                    {{ afficher_boutons_actions(flan, current_user, 'id_flan',
+                        'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan', 'flan', current_page,
+                        delete_form, validate_form) }}
                 </div>
+            </div>
         </a>
-        {{ afficher_boutons_actions(flan, current_user, 'id_flan',
-                'main.modifier_flan', 'main.supprimer_flan', 'main.valider_flan', 'flan', current_page,
-                delete_form, validate_form) }}
-        <!-- Formulaire d'édition dans la même carte, mais masqué -->
         {{ afficher_formulaire_edition_flan(flan, form) }}
-    </div>
     </div>
     {% endif %}
 
@@ -405,30 +404,30 @@
 
 {% macro afficher_formulaire_edition_flan(flan, form) %}
     {% if form %}
-        <div id="flan-{{ flan.id_flan }}-edit" class="carte">
+        <div id="flan-{{ flan.id_flan }}-edit" style="display: none;">
             <form method="POST" action="{{ url_for('main.modifier_flan', id_flan=flan.id_flan) }}"
                   class="form-container">
                 {{ form.hidden_tag() }}
                 <div class="form-group">
                     <label class="form-label" for="edit-flan-{{ flan.id_flan }}-nom">{{ form.nom.label }}</label>
-                    {{ form.nom(class="form-control", id="edit-flan-" + flan.id_flan|string + "-nom") }}
+                    {{ form.nom(class="form-control", id="edit-flan-" + flan.id_flan|string + "-nom", value=flan.nom) }}
                 </div>
 
                 <div class="form-group">
                     <label class="form-label" for="edit-flan-{{ flan.id_flan }}-prix">{{ form.prix.label }}</label>
-                    {{ form.prix(class="form-control", id="edit-flan-" + flan.id_flan|string + "-prix") }}
+                    {{ form.prix(class="form-control", id="edit-flan-" + flan.id_flan|string + "-prix", value=flan.prix) }}
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="edit-flan-{{ flan.id_flan }}-type_pate">{{ form.type_pate.label }}</label>
-                    {{ form.type_pate(class="form-control", id="edit-flan-" + flan.id_flan|string + "-type_pate") }}
+                    {{ form.type_pate(class="form-control", id="edit-flan-" + flan.id_flan|string + "-type_pate", value=flan.type_pate.name) }}
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="edit-flan-{{ flan.id_flan }}-type_saveur">{{ form.type_saveur.label }}</label>
-                    {{ form.type_saveur(class="form-control", id="edit-flan-" + flan.id_flan|string + "-type_saveur") }}
+                    {{ form.type_saveur(class="form-control", id="edit-flan-" + flan.id_flan|string + "-type_saveur", value=flan.type_saveur.name) }}
                 </div>
                 <div class="form-group">
                     <label class="form-label" for="edit-flan-{{ flan.id_flan }}-type_texture">{{ form.type_texture.label }}</label>
-                    {{ form.type_texture(class="form-control", id="edit-flan-" + flan.id_flan|string + "-type_texture") }}
+                    {{ form.type_texture(class="form-control", id="edit-flan-" + flan.id_flan|string + "-type_texture", value=flan.type_texture.name) }}
                 </div>
                 <div class="form-group">
                     <button type="submit" class="btn btn-success" title="Enregistrer les modifications">Enregistrer
@@ -461,17 +460,17 @@
                     </small>
                 </div>
                 {{ afficher_criteres_evaluation(evaluation) }}
+                {% if current_user.is_authenticated and (current_user.id_user == evaluation.id_user or current_user.is_admin) %}
+                    <div id="evaluation-{{ evaluation.id_eval }}-display">
+                        {{ afficher_boutons_actions(evaluation, current_user,
+                            'id_eval', 'main.afficher_evaluation_unique', 'main.supprimer_evaluation', 'main.valider_evaluation',
+                            'evaluation', current_page,
+                            delete_form, validate_form) }}
+                    </div>
+                    {{ afficher_formulaire_edition_evaluation(evaluation, form) }}
+                {% endif %}
             </div>
         </a>
-        {% if current_user.is_authenticated and (current_user.id_user == evaluation.id_user or current_user.is_admin) %}
-            <div id="evaluation-{{ evaluation.id_eval }}-display">
-                {{ afficher_boutons_actions(evaluation, current_user,
-                    'id_eval', 'main.afficher_evaluation_unique', 'main.supprimer_evaluation', 'main.valider_evaluation',
-                    'evaluation', current_page,
-                    delete_form, validate_form) }}
-            </div>
-            {{ afficher_formulaire_edition_evaluation(evaluation, form) }}
-        {% endif %}
     </div>
 
 {% endmacro %}
@@ -486,19 +485,23 @@
                 {{ form.hidden_tag() }}
                 <div class="form-group">
                     <label for="eval-detail-visuel" class="form-label">Visuel</label>
-                    {{ form.visuel(class="form-control", id="eval-detail-visuel") }}
+                    {{ form.visuel(class="form-control", id="eval-detail-visuel", value=evaluation.visuel) }}
                 </div>
                 <div class="form-group">
                     <label for="eval-detail-pate" class="form-label">Pâte</label>
-                    {{ form.pate(class="form-control", id="eval-detail-pate") }}
+                    {{ form.pate(class="form-control", id="eval-detail-pate", value=evaluation.pate) }}
                 </div>
                 <div class="form-group">
                     <label for="eval-detail-texture" class="form-label">Texture</label>
-                    {{ form.texture(class="form-control", id="eval-detail-texture") }}
+                    {{ form.texture(class="form-control", id="eval-detail-texture", value=evaluation.texture) }}
                 </div>
                 <div class="form-group">
                     <label for="eval-detail-gout" class="form-label">Goût</label>
-                    {{ form.gout(class="form-control", id="eval-detail-gout") }}
+                    {{ form.gout(class="form-control", id="eval-detail-gout", value=evaluation.gout) }}
+                </div>
+                <div class="form-group">
+                    <label for="eval-detail-description" class="form-label">Description</label>
+                    {{ form.description(class="form-control", id="eval-detail-description", value=evaluation.description) }}
                 </div>
 
                 <div class="form-group">
