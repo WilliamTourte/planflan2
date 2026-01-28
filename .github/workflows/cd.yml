@@ -55,10 +55,6 @@ jobs:
         ./backup_db.sh
         cd ..
         
-        # Sauvegarder les photos avant l'arrêt des containers
-        echo "Sauvegarde des photos..."
-        mkdir -p backups/photos
-        tar -czf backups/photos/photos_backup_$(date +%Y%m%d_%H%M%S).tar.gz -C app/static/uploads .
         
         # Stop existing containers
         docker compose down || true
@@ -84,16 +80,6 @@ jobs:
           echo "Restauration réussie depuis : $LATEST_BACKUP"
         else
           echo "Aucun fichier de sauvegarde trouvé"
-        fi
-        
-        # Restaurer les photos après le démarrage des containers
-        echo "Restauration des photos..."
-        LATEST_PHOTOS_BACKUP=$(ls -t backups/photos/*.tar.gz | head -n 1)
-        if [ -n "$LATEST_PHOTOS_BACKUP" ]; then
-          tar -xzf "$LATEST_PHOTOS_BACKUP" -C app/static/uploads
-          echo "Restauration des photos réussie depuis : $LATEST_PHOTOS_BACKUP"
-        else
-          echo "Aucun fichier de sauvegarde de photos trouvé"
         fi
         
         # Clean up old images
