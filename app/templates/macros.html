@@ -447,33 +447,35 @@
 <!-- EVALUATION -->
 {% macro afficher_evaluation(evaluation, current_user, form, current_page, delete_form, validate_form) %}
     <div class="carte">
+        <!-- Partie cliquable (lien vers la page de détail) -->
         <a href="{{ url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval) }}" class="carte-link">
-            <div>
-                <div class="carte-header">
-                    <h2>{{ evaluation.flan.etablissement.nom | enlever_accents }}</h2>
-                    <h3>{{ evaluation.flan.nom | enlever_accents }}</h3>
-                    {{ afficher_badge_statut(evaluation, current_user) }}
-                </div>
-                <div class="evaluation-date-container">
-                    <small class="evaluation-date">
-                        {{ evaluation.date_creation.strftime('%d/%m/%Y') }}
-                    </small>
-                </div>
-                {{ afficher_criteres_evaluation(evaluation) }}
-                {% if current_user.is_authenticated and (current_user.id_user == evaluation.id_user or current_user.is_admin) %}
-                    <div id="evaluation-{{ evaluation.id_eval }}-display">
-                        {{ afficher_boutons_actions(evaluation, current_user,
-                            'id_eval', 'main.afficher_evaluation_unique', 'main.supprimer_evaluation', 'main.valider_evaluation',
-                            'evaluation', current_page,
-                            delete_form, validate_form) }}
-                    </div>
-                    {{ afficher_formulaire_edition_evaluation(evaluation, form) }}
-                {% endif %}
+            <div class="carte-header">
+                <h2>{{ evaluation.flan.etablissement.nom | enlever_accents }}</h2>
+                <h3>{{ evaluation.flan.nom | enlever_accents }}</h3>
+                {{ afficher_badge_statut(evaluation, current_user) }}
             </div>
+            <div class="evaluation-date-container">
+                <small class="evaluation-date">
+                    {{ evaluation.date_creation.strftime('%d/%m/%Y') }}
+                </small>
+            </div>
+            {{ afficher_criteres_evaluation(evaluation) }}
         </a>
-    </div>
 
+        <!-- Boutons et formulaire HORS du lien -->
+        {% if current_user.is_authenticated and (current_user.id_user == evaluation.id_user or current_user.is_admin) %}
+            <div id="evaluation-{{ evaluation.id_eval }}-display" class="evaluation-actions">
+                {{ afficher_boutons_actions(evaluation, current_user,
+                    'id_eval', 'main.afficher_evaluation_unique', 'main.supprimer_evaluation', 'main.valider_evaluation',
+                    'evaluation', current_page, delete_form, validate_form) }}
+            </div>
+            <div class="evaluation-edit-container">
+                {{ afficher_formulaire_edition_evaluation(evaluation, form) }}
+            </div>
+        {% endif %}
+    </div>
 {% endmacro %}
+
 
 
 
