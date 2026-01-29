@@ -323,13 +323,15 @@ def test_evaluer_flan(client):
         flan_id = flan.id_flan
 
     # Envoyer la requête d'évaluation avec les bons noms de champs
+    # Le formulaire utilise un prefix "flan-eval" donc les noms des champs sont préfixés
+    # Format uniforme avec .0 pour les entiers
     response = client.post(
         f"/flan/{flan_id}/evaluer",
         data={
-            "flan-eval-visuel": 5,
-            "flan-eval-texture": 5,
-            "flan-eval-pate": 5,
-            "flan-eval-gout": 5,
+            "flan-eval-visuel": 5.0,
+            "flan-eval-texture": 5.0,
+            "flan-eval-pate": 5.0,
+            "flan-eval-gout": 5.0,
             "flan-eval-description": "Test Description",
         },
         follow_redirects=True,
@@ -389,13 +391,15 @@ def test_evaluer_flan_duplicate_prevention(client):
         flan_id = flan.id_flan
 
     # Créer une première évaluation
+    # Le formulaire utilise un prefix "flan-eval" donc les noms des champs sont préfixés
+    # Format uniforme avec .0 pour les entiers
     response1 = client.post(
         f"/flan/{flan_id}/evaluer",
         data={
-            "flan-eval-visuel": 5,
-            "flan-eval-texture": 5,
-            "flan-eval-pate": 5,
-            "flan-eval-gout": 5,
+            "flan-eval-visuel": 5.0,
+            "flan-eval-texture": 5.0,
+            "flan-eval-pate": 5.0,
+            "flan-eval-gout": 5.0,
             "flan-eval-description": "First Evaluation",
         },
         follow_redirects=True,
@@ -693,13 +697,16 @@ def test_moyenne_evaluations_avec_calcul_automatique(client):
         assert (
             moyenne_avec_manquants is not None
         ), "La moyenne devrait s'afficher même sans moyenne pré-calculée"
-        
+
         # Vérifier que la moyenne est correcte
         expected_moyenne_eval3 = round((3.0 + 3.5 + 3.5 + 4.0) / 4, 1)
         # La moyenne globale devrait inclure cette nouvelle évaluation
-        expected_global_final = round((expected_moyenne + 4.9 + expected_moyenne_eval3) / 3, 1)
-        assert abs(moyenne_avec_manquants - expected_global_final) < 0.1, \
-            f"Moyenne globale finale attendue: {expected_global_final}, obtenue: {moyenne_avec_manquants}"
+        expected_global_final = round(
+            (expected_moyenne + 4.9 + expected_moyenne_eval3) / 3, 1
+        )
+        assert (
+            abs(moyenne_avec_manquants - expected_global_final) < 0.1
+        ), f"Moyenne globale finale attendue: {expected_global_final}, obtenue: {moyenne_avec_manquants}"
 
 
 def test_dashboard_post_update_profile(client):
@@ -1283,18 +1290,19 @@ def test_formulaire_evaluation_avec_selectfield(client):
         assert isinstance(form.gout, SelectField)
 
         # Vérifier que les choix sont corrects
+        # Format uniforme avec toujours .0 pour les entiers
         valid_choices = [
-            "0",
+            "0.0",
             "0.5",
-            "1",
+            "1.0",
             "1.5",
-            "2",
+            "2.0",
             "2.5",
-            "3",
+            "3.0",
             "3.5",
-            "4",
+            "4.0",
             "4.5",
-            "5",
+            "5.0",
         ]
         assert form.visuel.choices == [(choice, choice) for choice in valid_choices]
         assert form.texture.choices == [(choice, choice) for choice in valid_choices]
@@ -1302,9 +1310,10 @@ def test_formulaire_evaluation_avec_selectfield(client):
         assert form.gout.choices == [(choice, choice) for choice in valid_choices]
 
         # Tester avec des données valides
+        # Format uniforme avec .0 pour les entiers
         form.visuel.data = "4.5"
-        form.texture.data = "3"
-        form.pate.data = "5"
+        form.texture.data = "3.0"  # Format uniforme avec .0
+        form.pate.data = "5.0"  # Format uniforme avec .0
         form.gout.data = "2.5"
         form.description.data = "Test evaluation avec SelectField"
 

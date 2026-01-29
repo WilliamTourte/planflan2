@@ -118,13 +118,15 @@ def test_scenario_recherche_et_evaluation(client):
     assert b"Flan Evaluation" in response.data
 
     # Étape 4 : Évaluer le flan
+    # Le formulaire utilise un prefix "flan-eval" donc les noms des champs sont préfixés
+    # Format uniforme avec .0 pour les entiers
     response = client.post(
         f"/flan/{flan_id}/evaluer",
         data={
-            "flan-eval-visuel": 5,
-            "flan-eval-texture": 4,
-            "flan-eval-pate": 5,
-            "flan-eval-gout": 4,
+            "flan-eval-visuel": 5.0,
+            "flan-eval-texture": 4.0,
+            "flan-eval-pate": 5.0,
+            "flan-eval-gout": 4.0,
             "flan-eval-description": "Excellent flan!",
         },
         follow_redirects=True,

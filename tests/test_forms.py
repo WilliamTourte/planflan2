@@ -206,9 +206,9 @@ def test_newflanform_parametrize(client, test_name, form_data, expected_valid):
             "valid_data",
             {
                 "visuel": "4.5",
-                "texture": "5",
-                "pate": "3",
-                "gout": "4",
+                "texture": "5.0",  # Format uniforme avec .0
+                "pate": "3.0",  # Format uniforme avec .0
+                "gout": "4.0",  # Format uniforme avec .0
                 "description": "Très bon flan, texture parfaite.",
             },
             True,
@@ -218,9 +218,9 @@ def test_newflanform_parametrize(client, test_name, form_data, expected_valid):
             "invalid_data",
             {
                 "visuel": "6.0",  # Note > 5 - INVALIDE
-                "texture": "4",  # Valeur valide
-                "pate": "3",  # Valeur valide
-                "gout": "4",  # Valeur valide
+                "texture": "4.0",  # Format uniforme avec .0
+                "pate": "3.0",  # Format uniforme avec .0
+                "gout": "4.0",  # Format uniforme avec .0
                 "description": "Évaluation test",  # Description optionnelle
             },
             False,
@@ -241,18 +241,19 @@ def test_evalform_parametrize(client, test_name, form_data, expected_valid):
 
         # Pour les cas valides, vérifier que les données sont bien des chaînes parmi les choix valides
         if expected_valid:
+            # Format uniforme avec toujours .0 pour les entiers
             valid_choices = [
-                "0",
+                "0.0",
                 "0.5",
-                "1",
+                "1.0",
                 "1.5",
-                "2",
+                "2.0",
                 "2.5",
-                "3",
+                "3.0",
                 "3.5",
-                "4",
+                "4.0",
                 "4.5",
-                "5",
+                "5.0",
             ]
             # Vérifier que les valeurs sont dans les choix valides
             assert form.visuel.data in valid_choices
@@ -263,60 +264,61 @@ def test_evalform_parametrize(client, test_name, form_data, expected_valid):
         # Pour les cas invalides, vérifier les erreurs spécifiques
         if not expected_valid:
             # Vérifier les erreurs (indépendant de la langue)
+            # Format uniforme avec .0 pour les entiers
             if form_data.get("visuel") not in [
-                "0",
+                "0.0",
                 "0.5",
-                "1",
+                "1.0",
                 "1.5",
-                "2",
+                "2.0",
                 "2.5",
-                "3",
+                "3.0",
                 "3.5",
-                "4",
+                "4.0",
                 "4.5",
-                "5",
+                "5.0",
             ]:
                 assert form.visuel.errors and len(form.visuel.errors) > 0
             if form_data.get("texture") not in [
-                "0",
+                "0.0",
                 "0.5",
-                "1",
+                "1.0",
                 "1.5",
-                "2",
+                "2.0",
                 "2.5",
-                "3",
+                "3.0",
                 "3.5",
-                "4",
+                "4.0",
                 "4.5",
-                "5",
+                "5.0",
             ]:
                 assert form.texture.errors and len(form.texture.errors) > 0
             if form_data.get("pate") not in [
-                "0",
+                "0.0",
                 "0.5",
-                "1",
+                "1.0",
                 "1.5",
-                "2",
+                "2.0",
                 "2.5",
-                "3",
+                "3.0",
                 "3.5",
-                "4",
+                "4.0",
                 "4.5",
-                "5",
+                "5.0",
             ]:
                 assert form.pate.errors and len(form.pate.errors) > 0
             if form_data.get("gout") not in [
-                "0",
+                "0.0",
                 "0.5",
-                "1",
+                "1.0",
                 "1.5",
-                "2",
+                "2.0",
                 "2.5",
-                "3",
+                "3.0",
                 "3.5",
-                "4",
+                "4.0",
                 "4.5",
-                "5",
+                "5.0",
             ]:
                 assert form.gout.errors and len(form.gout.errors) > 0
             # Description est maintenant optionnelle, pas de vérification stricte
@@ -589,15 +591,17 @@ def test_formulaire_evaluation_avec_evaluation_existante(client):
 
         # Créer le formulaire avec les données converties en chaînes
         # car les SelectField attendent des chaînes, pas des floats
-        # Les choix du formulaire utilisent "4", "5", etc., pas "4.0", "5.0", etc.
+        # Les choix du formulaire utilisent maintenant "4.0", "5.0", etc. pour uniformité
         form = EvalForm()
         form.visuel.data = (
-            "4"  # Convertir explicitement en chaîne avec le format attendu
+            "4.0"  # Convertir explicitement en chaîne avec le format attendu
         )
         form.texture.data = (
-            "5"  # Convertir explicitement en chaîne avec le format attendu
+            "5.0"  # Convertir explicitement en chaîne avec le format attendu
         )
-        form.pate.data = "3"  # Convertir explicitement en chaîne avec le format attendu
+        form.pate.data = (
+            "3.0"  # Convertir explicitement en chaîne avec le format attendu
+        )
         form.gout.data = (
             "4.5"  # Convertir explicitement en chaîne avec le format attendu
         )
@@ -607,10 +611,10 @@ def test_formulaire_evaluation_avec_evaluation_existante(client):
         assert form.validate()
 
         # Vérifier que les données sont correctement chargées
-        # Note: Le formulaire utilise "4", "5", etc. tandis que la base de données utilise "4.0", "5.0", etc.
-        assert form.visuel.data == "4"  # Correspond à eval.visuel = 4.0
-        assert form.texture.data == "5"  # Correspond à eval.texture = 5.0
-        assert form.pate.data == "3"  # Correspond à eval.pate = 3.0
+        # Note: Le formulaire utilise maintenant "4.0", "5.0", etc. pour uniformité
+        assert form.visuel.data == "4.0"  # Correspond à eval.visuel = 4.0
+        assert form.texture.data == "5.0"  # Correspond à eval.texture = 5.0
+        assert form.pate.data == "3.0"  # Correspond à eval.pate = 3.0
         assert form.gout.data == "4.5"  # Correspond à eval.gout = 4.5
         assert form.description.data == eval.description
 
@@ -623,18 +627,19 @@ def test_evalform_selectfield_choices(client):
         form = EvalForm()
 
         # Vérifier que les choix sont corrects pour tous les champs
+        # Format uniforme avec toujours .0 pour les entiers
         valid_choices = [
-            "0",
+            "0.0",
             "0.5",
-            "1",
+            "1.0",
             "1.5",
-            "2",
+            "2.0",
             "2.5",
-            "3",
+            "3.0",
             "3.5",
-            "4",
+            "4.0",
             "4.5",
-            "5",
+            "5.0",
         ]
 
         assert form.visuel.choices == [(choice, choice) for choice in valid_choices]

@@ -525,7 +525,7 @@ def afficher_etablissement_unique(id_etab):
     # Si c'est une requête POST, recréer le formulaire avec les données POST
     if request.method == "POST":
         form_etab = EtabForm(prefix="edit-etab", formdata=request.form)
-        
+
         if form_etab.validate_on_submit():
             # Vérifier la logique métier : label ne peut être True que si visite est True
             label_value = form_etab.label.data == "Oui"
@@ -564,7 +564,9 @@ def afficher_etablissement_unique(id_etab):
                 db.session.rollback()
                 flash(str(e), "error")
 
-            return redirect(url_for("main.afficher_etablissement_unique", id_etab=id_etab))
+            return redirect(
+                url_for("main.afficher_etablissement_unique", id_etab=id_etab)
+            )
 
     return render_template(
         "page_etablissement.html",
@@ -760,16 +762,25 @@ def evaluer_flan(id_flan):
                     description=form.description.data,
                     id_flan=id_flan,
                     id_user=current_user.id_user,
-                    statut="EN_ATTENTE" if not current_user.is_admin else "VALIDE"
+                    statut="EN_ATTENTE" if not current_user.is_admin else "VALIDE",
                 )
-                
+
                 # Calculer la moyenne
-                values = [v for v in [new_evaluation.visuel, new_evaluation.texture, new_evaluation.pate, new_evaluation.gout] if v is not None]
+                values = [
+                    v
+                    for v in [
+                        new_evaluation.visuel,
+                        new_evaluation.texture,
+                        new_evaluation.pate,
+                        new_evaluation.gout,
+                    ]
+                    if v is not None
+                ]
                 if values:
                     new_evaluation.moyenne = sum(values) / len(values)
                 else:
                     new_evaluation.moyenne = 0
-                    
+
                 db.session.add(new_evaluation)
                 db.session.commit()
                 flash("Votre évaluation a été créée avec succès!", "success")
@@ -826,9 +837,6 @@ def afficher_evaluation_unique(id_eval):
     )
 
 
-
-
-
 @main_bp.route("/modifier_evaluation/<int:id_eval>", methods=["POST"])
 @login_required
 def modifier_evaluation(id_eval):
@@ -838,7 +846,7 @@ def modifier_evaluation(id_eval):
 
         abort(404)
     form = EvalForm(prefix="eval-detail")
-    
+
     # Pré-remplir le formulaire avec les valeurs existantes
     if not form.is_submitted():
         # Convertir les valeurs en chaînes avec format uniforme (toujours .0 pour les entiers)
@@ -852,14 +860,14 @@ def modifier_evaluation(id_eval):
                 return f"{rounded:.1f}"
             except (ValueError, TypeError):
                 return None
-        
+
         # Convertir les valeurs en chaînes qui correspondent exactement aux options
         form.visuel.data = convert_note_to_string(evaluation.visuel)
         form.texture.data = convert_note_to_string(evaluation.texture)
         form.pate.data = convert_note_to_string(evaluation.pate)
         form.gout.data = convert_note_to_string(evaluation.gout)
         form.description.data = evaluation.description
-    
+
     if current_user.id_user != evaluation.id_user and not current_user.is_admin:
         flash("Vous n'avez pas le droit de modifier cette évaluation.", "danger")
         return redirect(url_for("main.afficher_evaluation_unique", id_eval=id_eval))
@@ -870,17 +878,26 @@ def modifier_evaluation(id_eval):
         evaluation.pate = float(str(form.pate.data).replace(",", "."))
         evaluation.gout = float(str(form.gout.data).replace(",", "."))
         evaluation.description = form.description.data
-        
+
         # Recalculer la moyenne
-        values = [v for v in [evaluation.visuel, evaluation.texture, evaluation.pate, evaluation.gout] if v is not None]
+        values = [
+            v
+            for v in [
+                evaluation.visuel,
+                evaluation.texture,
+                evaluation.pate,
+                evaluation.gout,
+            ]
+            if v is not None
+        ]
         if values:
             evaluation.moyenne = sum(values) / len(values)
         else:
             evaluation.moyenne = 0
-            
+
         if current_user.is_admin:
             evaluation.statut = "VALIDE"
-            
+
         db.session.commit()
         flash("L'évaluation a été mise à jour avec succès!", "success")
     else:
