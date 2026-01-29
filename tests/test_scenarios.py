@@ -292,10 +292,10 @@ def test_scenario_gestion_evaluations(client):
     response = client.post(
         f"/flan/{flan_id}/evaluer",
         data={
-            "flan-eval-visuel": "5",
-            "flan-eval-texture": "4",
-            "flan-eval-pate": "5",
-            "flan-eval-gout": "4",
+            "flan-eval-visuel": "5.0",
+            "flan-eval-texture": "4.0",
+            "flan-eval-pate": "5.0",
+            "flan-eval-gout": "4.0",
             "flan-eval-description": "Première évaluation",
         },
         follow_redirects=True,
