@@ -481,35 +481,7 @@
             <form method="POST" action="{{ url_for('main.modifier_evaluation', id_eval=evaluation.id_eval) }}"
                   class="form-container">
                 {{ form.hidden_tag() }}
-                <!-- Debug: Afficher les valeurs du formulaire dans la console -->
-                <script>
-                    console.log('=== DEBUG FORM VALUES (SERVER SIDE) ===');
-                    console.log('form.visuel.data:', {{ form.visuel.data | safe }});
-                    console.log('form.texture.data:', {{ form.texture.data | safe }});
-                    console.log('form.pate.data:', {{ form.pate.data | safe }});
-                    console.log('form.gout.data:', {{ form.gout.data | safe }});
-                    console.log('form.prefix:', '{{ form.prefix }}');
-                    
-                    // Vérifier si les valeurs correspondent aux options
-                    const noteChoices = ['0', '0.5', '1', '1.5', '2', '2.5', '3', '3.5', '4', '4.5', '5'];
-                    console.log('Valeurs valides:', noteChoices);
-                    console.log('visuel est valide:', noteChoices.includes(String({{ form.visuel.data | safe }})));
-                    console.log('texture est valide:', noteChoices.includes(String({{ form.texture.data | safe }})));
-                    console.log('pate est valide:', noteChoices.includes(String({{ form.pate.data | safe }})));
-                    console.log('gout est valide:', noteChoices.includes(String({{ form.gout.data | safe }})));
-                    
-                    // Vérifier les valeurs des éléments d'affichage
-                    const visuelDisplay = document.getElementById('evaluation-{{ evaluation.id_eval }}-visuel');
-                    const pateDisplay = document.getElementById('evaluation-{{ evaluation.id_eval }}-pate');
-                    const textureDisplay = document.getElementById('evaluation-{{ evaluation.id_eval }}-texture');
-                    const goutDisplay = document.getElementById('evaluation-{{ evaluation.id_eval }}-gout');
-                    
-                    console.log('=== DEBUG DISPLAY VALUES ===');
-                    console.log('visuel display:', visuelDisplay ? visuelDisplay.textContent : 'NOT FOUND');
-                    console.log('pate display:', pateDisplay ? pateDisplay.textContent : 'NOT FOUND');
-                    console.log('texture display:', textureDisplay ? textureDisplay.textContent : 'NOT FOUND');
-                    console.log('gout display:', goutDisplay ? goutDisplay.textContent : 'NOT FOUND');
-                </script>
+
                 <div class="form-group">
                     <label for="{{ form.visuel.id }}" class="form-label">Visuel</label>
                     {{ form.visuel(class="form-control") }}
@@ -537,6 +509,11 @@
                     </button>
                 </div>
             </form>
+            <!-- Script minimal avec nonce CSP pour éviter les erreurs -->
+            <script nonce="{{ csp_nonce }}">
+                // Script minimal pour éviter les erreurs CSP
+                console.log('Formulaire évaluation {{ evaluation.id_eval }} prêt');
+            </script>
         </div>
     {% endif %}
 {% endmacro %}
