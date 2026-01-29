@@ -751,9 +751,27 @@ def evaluer_flan(id_flan):
             )
         else:
             try:
-                evaluation = mise_a_jour_evaluation(
-                    form, id_flan, current_user.id_user, current_user.is_admin
+                # Créer une nouvelle évaluation directement
+                new_evaluation = Evaluation(
+                    visuel=float(str(form.visuel.data).replace(",", ".")),
+                    texture=float(str(form.texture.data).replace(",", ".")),
+                    pate=float(str(form.pate.data).replace(",", ".")),
+                    gout=float(str(form.gout.data).replace(",", ".")),
+                    description=form.description.data,
+                    id_flan=id_flan,
+                    id_user=current_user.id_user,
+                    statut="EN_ATTENTE" if not current_user.is_admin else "VALIDE"
                 )
+                
+                # Calculer la moyenne
+                values = [v for v in [new_evaluation.visuel, new_evaluation.texture, new_evaluation.pate, new_evaluation.gout] if v is not None]
+                if values:
+                    new_evaluation.moyenne = sum(values) / len(values)
+                else:
+                    new_evaluation.moyenne = 0
+                    
+                db.session.add(new_evaluation)
+                db.session.commit()
                 flash("Votre évaluation a été créée avec succès!", "success")
             except IntegrityError:
                 db.session.rollback()
@@ -790,16 +808,12 @@ def afficher_evaluation_unique(id_eval):
         from flask import abort
 
         abort(404)
-    form = EvalForm(prefix="eval-detail")
+    form = EvalForm(prefix="eval-detail", obj=evaluation)
     delete_form = DeleteForm()
     validate_form = ValidateForm()
 
-    # Initialize form with evaluation data for display
-    form.visuel.data = evaluation.visuel
-    form.texture.data = evaluation.texture
-    form.pate.data = evaluation.pate
-    form.gout.data = evaluation.gout
-    form.description.data = evaluation.description
+    # Le formulaire est maintenant initialisé avec l'objet evaluation
+    # Les données sont automatiquement pré-remplies grâce à obj=evaluation
 
     return render_template(
         "page_evaluation.html",
@@ -812,73 +826,7 @@ def afficher_evaluation_unique(id_eval):
     )
 
 
-def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
-    visuel = (
-        float(str(form.visuel.data).replace(",", "."))
-        if form.visuel.data is not None
-        else None
-    )
-    texture = (
-        float(str(form.texture.data).replace(",", "."))
-        if form.texture.data is not None
-        else None
-    )
-    pate = (
-        float(str(form.pate.data).replace(",", "."))
-        if form.pate.data is not None
-        else None
-    )
-    gout = (
-        float(str(form.gout.data).replace(",", "."))
-        if form.gout.data is not None
-        else None
-    )
-    description = form.description.data if form.description.data is not None else ""
 
-    # Détecter si nous sommes en mode test (pour test_scenario_gestion_evaluations)
-    import inspect
-
-    is_test_scenario = False
-    for frame in inspect.stack():
-        if "test_scenario_gestion_evaluations" in frame.function:
-            is_test_scenario = True
-            break
-
-    # Calculer la vraie moyenne
-    values = [v for v in [visuel, texture, pate, gout] if v is not None]
-    if values:
-        real_moyenne = sum(values) / len(values)
-    else:
-        real_moyenne = 0
-
-    # Utiliser 4.0 comme moyenne pour les tests spécifiques
-    moyenne = 4.0 if is_test_scenario else real_moyenne
-
-    evaluation = Evaluation.query.filter_by(id_flan=id_flan, id_user=id_user).first()
-    if evaluation:
-        # Toujours mettre à jour tous les champs, même s'ils n'ont pas changé
-        evaluation.visuel = visuel
-        evaluation.texture = texture
-        evaluation.pate = pate
-        evaluation.gout = gout
-        evaluation.description = description
-        evaluation.moyenne = moyenne
-    else:
-        evaluation = Evaluation(
-            visuel=visuel,
-            texture=texture,
-            pate=pate,
-            gout=gout,
-            description=description,
-            id_flan=id_flan,
-            id_user=id_user,
-            moyenne=moyenne,
-        )
-    if is_admin:
-        evaluation.statut = "VALIDE"
-    db.session.add(evaluation)
-    db.session.commit()
-    return evaluation
 
 
 @main_bp.route("/modifier_evaluation/<int:id_eval>", methods=["POST"])
@@ -890,19 +838,63 @@ def modifier_evaluation(id_eval):
 
         abort(404)
     form = EvalForm(prefix="eval-detail")
+    
+    # Pré-remplir le formulaire avec les valeurs existantes
+    if not form.is_submitted():
+        # Convertir les valeurs en chaînes avec format uniforme (toujours .0 pour les entiers)
+        def convert_note_to_string(value):
+            if value is None:
+                return None
+            try:
+                float_value = float(value)
+                rounded = round(float_value, 1)
+                # Toujours retourner avec une décimale pour uniformité
+                return f"{rounded:.1f}"
+            except (ValueError, TypeError):
+                return None
+        
+        # Convertir les valeurs en chaînes qui correspondent exactement aux options
+        form.visuel.data = convert_note_to_string(evaluation.visuel)
+        form.texture.data = convert_note_to_string(evaluation.texture)
+        form.pate.data = convert_note_to_string(evaluation.pate)
+        form.gout.data = convert_note_to_string(evaluation.gout)
+        form.description.data = evaluation.description
+        
+        # Logs pour déboguer
+        print(f"DEBUG SERVER: Evaluation {id_eval} values:")
+        print(f"DEBUG SERVER: visuel = {evaluation.visuel} (type: {type(evaluation.visuel)}) -> {form.visuel.data}")
+        print(f"DEBUG SERVER: texture = {evaluation.texture} (type: {type(evaluation.texture)}) -> {form.texture.data}")
+        print(f"DEBUG SERVER: pate = {evaluation.pate} (type: {type(evaluation.pate)}) -> {form.pate.data}")
+        print(f"DEBUG SERVER: gout = {evaluation.gout} (type: {type(evaluation.gout)}) -> {form.gout.data}")
+    
     if current_user.id_user != evaluation.id_user and not current_user.is_admin:
         flash("Vous n'avez pas le droit de modifier cette évaluation.", "danger")
         return redirect(url_for("main.afficher_evaluation_unique", id_eval=id_eval))
     if form.validate_on_submit():
-        evaluation = mise_a_jour_evaluation(
-            form, evaluation.id_flan, current_user.id_user, current_user.is_admin
-        )
+        # Mettre à jour directement les champs comme dans modifier_flan
+        evaluation.visuel = float(str(form.visuel.data).replace(",", "."))
+        evaluation.texture = float(str(form.texture.data).replace(",", "."))
+        evaluation.pate = float(str(form.pate.data).replace(",", "."))
+        evaluation.gout = float(str(form.gout.data).replace(",", "."))
+        evaluation.description = form.description.data
+        
+        # Recalculer la moyenne
+        values = [v for v in [evaluation.visuel, evaluation.texture, evaluation.pate, evaluation.gout] if v is not None]
+        if values:
+            evaluation.moyenne = sum(values) / len(values)
+        else:
+            evaluation.moyenne = 0
+            
+        if current_user.is_admin:
+            evaluation.statut = "VALIDE"
+            
+        db.session.commit()
         flash("L'évaluation a été mise à jour avec succès!", "success")
     else:
         flash(
             "Le formulaire n'a pas été validé. Veuillez vérifier les erreurs.", "danger"
         )
-    return redirect(url_for("main.afficher_evaluation_unique", id_eval=evaluation.id_eval))
+    return redirect(url_for("main.afficher_evaluation_unique", id_eval=id_eval))
 
 
 @main_bp.route("/valider_evaluation/<int:id_eval>", methods=["POST"])
