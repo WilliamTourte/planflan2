@@ -522,45 +522,49 @@ def afficher_etablissement_unique(id_etab):
         current_app.config["GOOGLE_MAPS_API_KEY"],
     )
 
-    if form_etab.validate_on_submit():
-        # Vérifier la logique métier : label ne peut être True que si visite est True
-        label_value = form_etab.label.data == "Oui"
-        visite_value = form_etab.visite.data == "Oui"
+    # Si c'est une requête POST, recréer le formulaire avec les données POST
+    if request.method == "POST":
+        form_etab = EtabForm(prefix="edit-etab", formdata=request.form)
+        
+        if form_etab.validate_on_submit():
+            # Vérifier la logique métier : label ne peut être True que si visite est True
+            label_value = form_etab.label.data == "Oui"
+            visite_value = form_etab.visite.data == "Oui"
 
-        if label_value and not visite_value:
-            flash(
-                "Un établissement ne peut être labellisé que s'il a été visité.",
-                "error",
-            )
-            return redirect(
-                url_for("main.afficher_etablissement_unique", id_etab=id_etab)
-            )
+            if label_value and not visite_value:
+                flash(
+                    "Un établissement ne peut être labellisé que s'il a été visité.",
+                    "error",
+                )
+                return redirect(
+                    url_for("main.afficher_etablissement_unique", id_etab=id_etab)
+                )
 
-        # Si la validation a réussi, procéder à la mise à jour
-        try:
-            etablissement.nom = form_etab.nom.data
-            etablissement.description = form_etab.description.data
-            etablissement.adresse = form_etab.adresse.data
-            etablissement.ville = form_etab.ville.data
-            etablissement.code_postal = form_etab.code_postal.data
-            etablissement.latitude = form_etab.latitude.data
-            etablissement.longitude = form_etab.longitude.data
-            etablissement.type_etab = form_etab.type_etab.data
+            # Si la validation a réussi, procéder à la mise à jour
+            try:
+                etablissement.nom = form_etab.nom.data
+                etablissement.description = form_etab.description.data
+                etablissement.adresse = form_etab.adresse.data
+                etablissement.ville = form_etab.ville.data
+                etablissement.code_postal = form_etab.code_postal.data
+                etablissement.latitude = form_etab.latitude.data
+                etablissement.longitude = form_etab.longitude.data
+                etablissement.type_etab = form_etab.type_etab.data
 
-            if current_user.is_admin:
-                etablissement.label = label_value
-                etablissement.visite = visite_value
+                if current_user.is_admin:
+                    etablissement.label = label_value
+                    etablissement.visite = visite_value
 
-                # Appeler la méthode de validation du modèle
-                etablissement.valider_label_visite()
+                    # Appeler la méthode de validation du modèle
+                    etablissement.valider_label_visite()
 
-            db.session.commit()
-            flash("L'établissement a été mis à jour avec succès!", "success")
-        except ValueError as e:
-            db.session.rollback()
-            flash(str(e), "error")
+                db.session.commit()
+                flash("L'établissement a été mis à jour avec succès!", "success")
+            except ValueError as e:
+                db.session.rollback()
+                flash(str(e), "error")
 
-        return redirect(url_for("main.afficher_etablissement_unique", id_etab=id_etab))
+            return redirect(url_for("main.afficher_etablissement_unique", id_etab=id_etab))
 
     return render_template(
         "page_etablissement.html",

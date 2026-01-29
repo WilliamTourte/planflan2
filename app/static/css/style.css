@@ -3,7 +3,7 @@
 @media (max-width: 768px) {
 
 
-    /* Adapter les filtres pour mobile */
+
     #filter-controls {
         top: 5px !important;
         padding-left: 5px !important;
@@ -1254,6 +1254,31 @@ input[type="submit"]:active {
         min-width: 100%;
     }
 
+    .evaluation-detail {
+        flex-direction: column;
+    }
+
+    .evaluation-detail .detail-left-column {
+        min-width: 100%;
+        margin-bottom: var(--margin-lg);
+    }
+
+    .evaluation-detail .detail-right-column {
+        min-width: 100%;
+    }
+
+    .evaluation-detail .criteria {
+        grid-template-columns: 1fr;
+    }
+
+    .evaluation-detail .detail-left-column {
+        order: 1;
+    }
+
+    .evaluation-detail .detail-right-column {
+        order: 2;
+    }
+
     header h1 {
         font-size: 1.5rem;
     }
@@ -1290,7 +1315,17 @@ input[type="submit"]:active {
         padding: var(--padding-md);
     }
 
+    .evaluation-detail {
+        padding: var(--padding-md);
+    }
 
+    .evaluation-detail .detail-left-column {
+        min-width: 100%;
+    }
+
+    .evaluation-detail .detail-right-column {
+        min-width: 100%;
+    }
 
     .form-group {
         margin-bottom: var(--margin-md);
@@ -1546,3 +1581,134 @@ input[type="submit"]:active {
   .autocomplete-item.active {
     background-color: #e3f2fd;
   }
+
+
+/* =============================================
+   8.5. FLAN DETAIL (NOUVEAU)
+   ============================================= */
+.flan-detail {
+    display: flex;
+    gap: var(--gap-lg);
+    margin-bottom: var(--margin-lg);
+    background: white;
+    padding: var(--padding-lg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+.flan-detail .detail-left-column {
+    flex: 1;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.flan-detail .detail-right-column {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Changed from space-between to flex-start */
+    gap: var(--margin-md); /* Added gap for better spacing */
+}
+
+/* Style pour le formulaire d'édition dans le détail du flan */
+.flan-detail .detail-right-column > .carte {
+    display: none; /* Masqué par défaut */
+    width: 100%;
+    margin-top: var(--margin-md);
+    order: 2; /* Placé après le contenu principal */
+}
+
+.flan-detail .detail-left-column .carte-image-container {
+    height: 250px;
+    width: 100%;
+}
+
+.flan-detail .detail-right-column .carte-header {
+    text-align: left;
+    padding: 0;
+    margin-bottom: var(--margin-md);
+}
+
+.flan-detail .detail-right-column .carte-header h2 {
+    margin: 0;
+    font-size: var(--font-size-lg);
+    color: var(--color-text);
+}
+
+.flan-detail .detail-right-column .flan-details {
+    width: 100%;
+}
+
+.flan-detail .detail-right-column .flan-price-tag {
+    margin-bottom: var(--margin-md);
+}
+
+/* =============================================
+   12.5. EVALUATION DETAIL (NOUVEAU)
+   ============================================= */
+.evaluation-detail {
+    display: flex;
+    gap: var(--gap-lg);
+    margin-bottom: var(--margin-lg);
+    background: white;
+    padding: var(--padding-lg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    flex-wrap: wrap;
+}
+
+.evaluation-detail .detail-left-column {
+    flex: 1;
+    min-width: 250px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.evaluation-detail .detail-right-column {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: var(--margin-md);
+    min-width: 0; /* Permet le rétrécissement */
+}
+
+.evaluation-detail .detail-left-column .carte-image-container {
+    height: 250px;
+    width: 100%;
+}
+
+.evaluation-detail .detail-right-column .carte-header {
+    text-align: left;
+    padding: 0;
+    margin-bottom: var(--margin-md);
+}
+
+.evaluation-detail .detail-right-column .carte-header h2 {
+    margin: 0;
+    font-size: var(--font-size-md);
+    color: var(--color-text);
+}
+
+.evaluation-detail .detail-right-column .carte-header h3 {
+    margin: 0 0 var(--margin-sm) 0;
+    font-size: var(--font-size-lg);
+    color: var(--color-text);
+}
+
+.evaluation-detail .criteria {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--gap-sm);
+    margin: var(--margin-md) 0;
+}
+
+.evaluation-detail .evaluation-description {
+    margin-top: var(--margin-md);
+    padding: var(--padding-sm);
+    background-color: #f5f5f5;
+    border-radius: var(--border-radius);
+    line-height: 1.6;
+}

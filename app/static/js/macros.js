@@ -111,22 +111,16 @@ export function cancelEditFlan(idFlan) {
  * @param {number} idEval - L'identifiant de l'évaluation à éditer
  * @returns {void}
  * 
- * @example
- * // Activer l'édition de l'évaluation avec l'ID 789
- * editEvaluation(789);
- */
-/**
- * Active le mode édition pour une évaluation.
- * 
- * @function editEvaluation
- * @param {number} idEval - L'identifiant de l'évaluation à éditer
- * @returns {void}
+ * @description
+ * Cette fonction bascule entre le mode affichage et le mode édition pour une évaluation.
+ * Les valeurs du formulaire sont déjà initialisées par le serveur, donc pas besoin de les copier.
  * 
  * @example
  * // Activer l'édition de l'évaluation avec l'ID 789
  * editEvaluation(789);
  */
 export function editEvaluation(idEval) {
+    // Masquer le mode affichage et afficher le mode édition
     document.getElementById('evaluation-' + idEval + '-display').style.display = 'none';
     document.getElementById('evaluation-' + idEval + '-edit').style.display = 'block';
 }
