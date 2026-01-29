@@ -778,7 +778,7 @@ def evaluer_flan(id_flan):
     return redirect(url_for("main.afficher_flan_unique", id_flan=id_flan))
 
 
-@main_bp.route("/evaluation/<int:id_eval>", methods=["GET", "POST"])
+@main_bp.route("/evaluation/<int:id_eval>", methods=["GET"])
 def afficher_evaluation_unique(id_eval):
     evaluation = db.session.get(Evaluation, id_eval)
     if evaluation is None:
@@ -794,20 +794,13 @@ def afficher_evaluation_unique(id_eval):
     delete_form = DeleteForm()
     validate_form = ValidateForm()
 
-    if request.method == "GET":
-        form.visuel.data = evaluation.visuel
-        form.texture.data = evaluation.texture
-        form.pate.data = evaluation.pate
-        form.gout.data = evaluation.gout
-        form.description.data = evaluation.description
-    if form.validate_on_submit():
-        evaluation = mise_a_jour_evaluation(
-            form, flan_unique.id_flan, current_user.id_user, current_user.is_admin
-        )
-        flash("L'évaluation a été mise à jour avec succès!", "success")
-        return redirect(
-            url_for("main.afficher_evaluation_unique", id_eval=evaluation.id_eval)
-        )
+    # Initialize form with evaluation data for display
+    form.visuel.data = evaluation.visuel
+    form.texture.data = evaluation.texture
+    form.pate.data = evaluation.pate
+    form.gout.data = evaluation.gout
+    form.description.data = evaluation.description
+
     return render_template(
         "page_evaluation.html",
         evaluation=evaluation,
@@ -886,6 +879,30 @@ def mise_a_jour_evaluation(form, id_flan, id_user, is_admin=False):
     db.session.add(evaluation)
     db.session.commit()
     return evaluation
+
+
+@main_bp.route("/modifier_evaluation/<int:id_eval>", methods=["POST"])
+@login_required
+def modifier_evaluation(id_eval):
+    evaluation = db.session.get(Evaluation, id_eval)
+    if evaluation is None:
+        from flask import abort
+
+        abort(404)
+    form = EvalForm(prefix="eval-detail")
+    if current_user.id_user != evaluation.id_user and not current_user.is_admin:
+        flash("Vous n'avez pas le droit de modifier cette évaluation.", "danger")
+        return redirect(url_for("main.afficher_evaluation_unique", id_eval=id_eval))
+    if form.validate_on_submit():
+        evaluation = mise_a_jour_evaluation(
+            form, evaluation.id_flan, current_user.id_user, current_user.is_admin
+        )
+        flash("L'évaluation a été mise à jour avec succès!", "success")
+    else:
+        flash(
+            "Le formulaire n'a pas été validé. Veuillez vérifier les erreurs.", "danger"
+        )
+    return redirect(url_for("main.afficher_evaluation_unique", id_eval=evaluation.id_eval))
 
 
 @main_bp.route("/valider_evaluation/<int:id_eval>", methods=["POST"])

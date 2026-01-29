@@ -2,7 +2,7 @@
 {% from "macros.html" import afficher_objet %}
 {%block content %} 
 {% set current_page = 'page_evaluation' %}
-{{afficher_objet('evaluation', evaluation, current_user, form, current_page) }}
+{{afficher_objet('evaluation', evaluation, current_user, form, current_page, delete_form, validate_form) }}
 
 <!-- Boutons retour -->
 

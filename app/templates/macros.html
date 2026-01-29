@@ -421,20 +421,25 @@
                     <h3>{{ evaluation.flan.nom | enlever_accents }}</h3>
                     {{ afficher_badge_statut(evaluation, current_user) }}
                 </div>
-                <div id="evaluation-{{ evaluation.id_eval }}-display">
-                    <div class="evaluation-date-container">
-                        <small class="evaluation-date">
-                            {{ evaluation.date_creation.strftime('%d/%m/%Y') }}
-                        </small>
+                <!-- Conteneur pour basculer entre affichage et édition -->
+                <div class="evaluation-content-container">
+                    <div id="evaluation-{{ evaluation.id_eval }}-display">
+                        <div class="evaluation-date-container">
+                            <small class="evaluation-date">
+                                {{ evaluation.date_creation.strftime('%d/%m/%Y') }}
+                            </small>
+                        </div>
+                        {{ afficher_criteres_evaluation(evaluation) }}
+                        {% if current_user.is_authenticated %}
+                            <div class="evaluation-action-buttons">
+                                {{ afficher_boutons_actions(evaluation, current_user,
+                                    'id_eval', 'main.modifier_evaluation', 'main.supprimer_evaluation', 'main.valider_evaluation',
+                                    'evaluation', current_page, delete_form, validate_form) }}
+                            </div>
+                        {% endif %}
                     </div>
-                    {{ afficher_criteres_evaluation(evaluation) }}
-                    {% if current_user.is_authenticated %}
-                        {{ afficher_boutons_actions(evaluation, current_user,
-                            'id_eval', 'main.afficher_evaluation_unique', 'main.supprimer_evaluation', 'main.valider_evaluation',
-                            'evaluation', current_page, delete_form, validate_form) }}
-                    {% endif %}
+                    {{ afficher_formulaire_edition_evaluation(evaluation, form) }}
                 </div>
-                {{ afficher_formulaire_edition_evaluation(evaluation, form) }}
             </div>
         </div>
     {% else %}
@@ -459,10 +464,10 @@
             {% if current_user.is_authenticated %}
                 <div id="evaluation-{{ evaluation.id_eval }}-display">
                     {{ afficher_boutons_actions(evaluation, current_user,
-                        'id_eval', 'main.afficher_evaluation_unique', 'main.supprimer_evaluation', 'main.dashboard',
+                        'id_eval', 'main.modifier_evaluation', 'main.supprimer_evaluation', 'main.dashboard',
                         'evaluation', current_page, delete_form, validate_form) }}
-                    {{ afficher_formulaire_edition_evaluation(evaluation, form) }}
                 </div>
+                {{ afficher_formulaire_edition_evaluation(evaluation, form) }}
             {% endif %}
         </div>
     {% endif %}
@@ -472,9 +477,11 @@
 
 
 {% macro afficher_formulaire_edition_evaluation(evaluation, form) %}
-    {% if form is not none %}
+    {% if form %}
+        <!-- Debug: Form is not none, should display edit form -->
         <div id="evaluation-{{ evaluation.id_eval }}-edit" style="display: none;">
-            <form method="POST" action="{{ url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval) }}"
+            <h4>Modifier l'evaluation</h4>
+            <form method="POST" action="{{ url_for('main.modifier_evaluation', id_eval=evaluation.id_eval) }}"
                   class="form-container">
                 {{ form.hidden_tag() }}
                 <!-- Debug: Afficher les valeurs du formulaire -->
@@ -483,28 +490,25 @@
                     DEBUG: form.texture.data = {{ form.texture.data }}
                     DEBUG: form.pate.data = {{ form.pate.data }}
                     DEBUG: form.gout.data = {{ form.gout.data }}
-                    DEBUG: form.description.data = {{ form.description.data }}
+                    DEBUG: Form prefix = {{ form.prefix }}
                 </div>
                 <div class="form-group">
                     <label for="{{ form.visuel.id }}" class="form-label">Visuel</label>
-                    {{ form.visuel(class="form-control", value=form.visuel.data) }}
+                    {{ form.visuel(class="form-control") }}
                 </div>
                 <div class="form-group">
                     <label for="{{ form.pate.id }}" class="form-label">Pâte</label>
-                    {{ form.pate(class="form-control", value=form.pate.data) }}
+                    {{ form.pate(class="form-control") }}
                 </div>
                 <div class="form-group">
                     <label for="{{ form.texture.id }}" class="form-label">Texture</label>
-                    {{ form.texture(class="form-control", value=form.texture.data) }}
+                    {{ form.texture(class="form-control") }}
                 </div>
                 <div class="form-group">
                     <label for="{{ form.gout.id }}" class="form-label">Goût</label>
-                    {{ form.gout(class="form-control", value=form.gout.data) }}
+                    {{ form.gout(class="form-control") }}
                 </div>
-                <div class="form-group">
-                    <label for="{{ form.description.id }}" class="form-label">Description</label>
-                    {{ form.description(class="form-control", value=form.description.data) }}
-                </div>
+
 
                 <div class="form-group">
                     <button type="submit" class="btn btn-success" title="Enregistrer les modifications">Enregistrer
@@ -548,11 +552,6 @@
             <span class="criterion-value">N/A</span>
         </div>
     {% endif %}
-    {% if evaluation.description %}
-        <div class="evaluation-description" id="evaluation-{{ evaluation.id_eval }}-description">
-            {{ evaluation.description }}
-        </div>
-    {% endif %}
 {% endmacro %}
 
 
@@ -578,13 +577,13 @@
 
 
 
-{% macro afficher_objet(objet_type, objet, current_user=None, form_edit=None, current_page='', delete_form=None, validate_form=None, photo_paths=None, layout='grid') %}
+{% macro afficher_objet(objet_type, objet, current_user=None, form=None, current_page='', delete_form=None, validate_form=None, photo_paths=None, layout='grid') %}
     {% if objet_type == 'etablissement' %}
-        {{ afficher_etablissement(objet, current_user, form_edit, current_page, delete_form, validate_form, photo_paths, layout) }}
+        {{ afficher_etablissement(objet, current_user, form, current_page, delete_form, validate_form, photo_paths, layout) }}
     {% elif objet_type == 'flan' %}
-        {{ afficher_flan(objet, current_user, form_edit, current_page, delete_form, validate_form, layout) }}
+        {{ afficher_flan(objet, current_user, form, current_page, delete_form, validate_form, layout) }}
     {% elif objet_type == 'evaluation' %}
-        {{ afficher_evaluation(objet, current_user, form_edit, current_page, delete_form, validate_form, layout) }}
+        {{ afficher_evaluation(objet, current_user, form, current_page, delete_form, validate_form, layout) }}
     {% endif %}
 {% endmacro %}
 

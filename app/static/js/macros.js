@@ -121,8 +121,22 @@ export function cancelEditFlan(idFlan) {
  */
 export function editEvaluation(idEval) {
     // Masquer le mode affichage et afficher le mode édition
-    document.getElementById('evaluation-' + idEval + '-display').style.display = 'none';
-    document.getElementById('evaluation-' + idEval + '-edit').style.display = 'block';
+    const displayElement = document.getElementById('evaluation-' + idEval + '-display');
+    const editElement = document.getElementById('evaluation-' + idEval + '-edit');
+    
+    console.log('Edit evaluation:', idEval);
+    console.log('Display element:', displayElement);
+    console.log('Edit element:', editElement);
+    
+    if (displayElement && editElement) {
+        displayElement.style.display = 'none';
+        editElement.style.display = 'block';
+    } else {
+        console.error('Elements not found for evaluation editing:', {
+            displayElement: !!displayElement,
+            editElement: !!editElement
+        });
+    }
 }
 
 /**
