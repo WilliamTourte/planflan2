@@ -859,13 +859,6 @@ def modifier_evaluation(id_eval):
         form.pate.data = convert_note_to_string(evaluation.pate)
         form.gout.data = convert_note_to_string(evaluation.gout)
         form.description.data = evaluation.description
-        
-        # Logs pour déboguer
-        print(f"DEBUG SERVER: Evaluation {id_eval} values:")
-        print(f"DEBUG SERVER: visuel = {evaluation.visuel} (type: {type(evaluation.visuel)}) -> {form.visuel.data}")
-        print(f"DEBUG SERVER: texture = {evaluation.texture} (type: {type(evaluation.texture)}) -> {form.texture.data}")
-        print(f"DEBUG SERVER: pate = {evaluation.pate} (type: {type(evaluation.pate)}) -> {form.pate.data}")
-        print(f"DEBUG SERVER: gout = {evaluation.gout} (type: {type(evaluation.gout)}) -> {form.gout.data}")
     
     if current_user.id_user != evaluation.id_user and not current_user.is_admin:
         flash("Vous n'avez pas le droit de modifier cette évaluation.", "danger")

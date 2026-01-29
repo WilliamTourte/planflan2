@@ -120,44 +120,18 @@ export function cancelEditFlan(idFlan) {
  * editEvaluation(789);
  */
 export function editEvaluation(idEval) {
-    console.log('=== DEBUG EDIT EVALUATION ===');
-    console.log('ID de l\'évaluation:', idEval);
-    
     // Masquer le mode affichage et afficher le mode édition
     const displayElement = document.getElementById('evaluation-' + idEval + '-display');
     const editElement = document.getElementById('evaluation-' + idEval + '-edit');
     
-    console.log('Display element:', displayElement);
-    console.log('Edit element:', editElement);
-    
-    if (displayElement) {
-        console.log('Display element found! Current style:', displayElement.style.display);
+    if (displayElement && editElement) {
         displayElement.style.display = 'none';
-        console.log('Display element hidden. New style:', displayElement.style.display);
-    } else {
-        console.error('Display element NOT FOUND! Looking for: evaluation-' + idEval + '-display');
-        console.log('All elements with ID containing "evaluation":', Array.from(document.querySelectorAll('[id*="evaluation"]')).map(el => el.id));
-    }
-    
-    if (editElement) {
-        console.log('Edit element found! Current style:', editElement.style.display);
         editElement.style.display = 'block';
-        console.log('Edit element shown. New style:', editElement.style.display);
-        
-        // Vérifier les valeurs des champs de formulaire
-        const visuelInput = editElement.querySelector('[name="eval-detail-visuel"]');
-        const pateInput = editElement.querySelector('[name="eval-detail-pate"]');
-        const textureInput = editElement.querySelector('[name="eval-detail-texture"]');
-        const goutInput = editElement.querySelector('[name="eval-detail-gout"]');
-        
-        console.log('Form field values:');
-        console.log('visuel:', visuelInput ? visuelInput.value : 'NOT FOUND');
-        console.log('pate:', pateInput ? pateInput.value : 'NOT FOUND');
-        console.log('texture:', textureInput ? textureInput.value : 'NOT FOUND');
-        console.log('gout:', goutInput ? goutInput.value : 'NOT FOUND');
     } else {
-        console.error('Edit element NOT FOUND! Looking for: evaluation-' + idEval + '-edit');
-        console.log('All elements with ID containing "evaluation":', Array.from(document.querySelectorAll('[id*="evaluation"]')).map(el => el.id));
+        console.error('Elements not found for evaluation editing:', {
+            displayElement: !!displayElement,
+            editElement: !!editElement
+        });
     }
 }
 
@@ -173,8 +147,18 @@ export function editEvaluation(idEval) {
  * cancelEditEval(789);
  */
 export function cancelEditEval(idEval) {
-    document.getElementById('evaluation-' + idEval + '-display').style.display = 'block';
-    document.getElementById('evaluation-' + idEval + '-edit').style.display = 'none';
+    const displayElement = document.getElementById('evaluation-' + idEval + '-display');
+    const editElement = document.getElementById('evaluation-' + idEval + '-edit');
+    
+    if (displayElement && editElement) {
+        displayElement.style.display = 'block';
+        editElement.style.display = 'none';
+    } else {
+        console.error('Elements not found for evaluation cancel editing:', {
+            displayElement: !!displayElement,
+            editElement: !!editElement
+        });
+    }
 }
 
 /**

@@ -359,8 +359,6 @@
         {{ afficher_formulaire_edition_flan(flan, form) }}
     </div>
     {% endif %}
-
-
 {% endmacro %}
 
 {% macro afficher_formulaire_edition_flan(flan, form) %}
@@ -428,13 +426,9 @@
                         </small>
                     </div>
                     {{ afficher_criteres_evaluation(evaluation) }}
-                    {% if current_user.is_authenticated %}
-                        <div class="evaluation-action-buttons">
                             {{ afficher_boutons_actions(evaluation, current_user,
                                 'id_eval', 'main.modifier_evaluation', 'main.supprimer_evaluation', 'main.valider_evaluation',
                                 'evaluation', current_page, delete_form, validate_form) }}
-                        </div>
-                    {% endif %}
                 </div>
                 {{ afficher_formulaire_edition_evaluation(evaluation, form) }}
             </div>
@@ -442,46 +436,39 @@
     {% else %}
         <!-- Layout existant pour la grille -->
         <div class="carte">
-            <!-- Partie cliquable (lien vers la page de détail) -->
-            <a href="{{ url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval) }}" class="carte-link">
-                <div class="carte-header">
-                    <h2>{{ evaluation.flan.etablissement.nom | enlever_accents }}</h2>
-                    <h3>{{ evaluation.flan.nom | enlever_accents }}</h3>
-                    {{ afficher_badge_statut(evaluation, current_user) }}
-                </div>
-                <div class="evaluation-date-container">
-                    <small class="evaluation-date">
-                        {{ evaluation.date_creation.strftime('%d/%m/%Y') }}
-                    </small>
-                </div>
-                {{ afficher_criteres_evaluation(evaluation) }}
-            </a>
-
-            <!-- Boutons et formulaire HORS du lien -->
-            {% if current_user.is_authenticated %}
-                <div id="evaluation-{{ evaluation.id_eval }}-display">
-                    {{ afficher_boutons_actions(evaluation, current_user,
-                        'id_eval', 'main.modifier_evaluation', 'main.supprimer_evaluation', 'main.dashboard',
-                        'evaluation', current_page, delete_form, validate_form) }}
-                </div>
-                {{ afficher_formulaire_edition_evaluation(evaluation, form) }}
-            {% endif %}
+            <div id="evaluation-{{ evaluation.id_eval }}-display">
+                <!-- Partie cliquable (lien vers la page de détail) -->
+                <a href="{{ url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval) }}" class="carte-link">
+                    <div class="carte-header">
+                        <h2>{{ evaluation.flan.etablissement.nom | enlever_accents }}</h2>
+                        <h3>{{ evaluation.flan.nom | enlever_accents }}</h3>
+                        {{ afficher_badge_statut(evaluation, current_user) }}
+                    </div>
+                    <div class="evaluation-date-container">
+                        <small class="evaluation-date">
+                            {{ evaluation.date_creation.strftime('%d/%m/%Y') }}
+                        </small>
+                    </div>
+                    {{ afficher_criteres_evaluation(evaluation) }}
+                </a>
+                <!-- Boutons d'action -->
+                {{ afficher_boutons_actions(evaluation, current_user,
+                    'id_eval', 'main.modifier_evaluation', 'main.supprimer_evaluation', 'main.dashboard',
+                    'evaluation', current_page, delete_form, validate_form) }}
+            </div>
+            {{ afficher_formulaire_edition_evaluation(evaluation, form) }}
         </div>
     {% endif %}
 {% endmacro %}
 
 
-
-
 {% macro afficher_formulaire_edition_evaluation(evaluation, form) %}
-    {% if form %}
-        <!-- Debug: Form is not none, should display edit form -->
         <div id="evaluation-{{ evaluation.id_eval }}-edit" style="display: none;">
+     {% if form %}           
             <h4>Modifier l'evaluation</h4>
             <form method="POST" action="{{ url_for('main.modifier_evaluation', id_eval=evaluation.id_eval) }}"
                   class="form-container">
                 {{ form.hidden_tag() }}
-
                 <div class="form-group">
                     <label for="{{ form.visuel.id }}" class="form-label">Visuel</label>
                     {{ form.visuel(class="form-control") }}
@@ -498,8 +485,6 @@
                     <label for="{{ form.gout.id }}" class="form-label">Goût</label>
                     {{ form.gout(class="form-control") }}
                 </div>
-
-
                 <div class="form-group">
                     <button type="submit" class="btn btn-success" title="Enregistrer les modifications">Enregistrer
                     </button>
@@ -509,11 +494,6 @@
                     </button>
                 </div>
             </form>
-            <!-- Script minimal avec nonce CSP pour éviter les erreurs -->
-            <script nonce="{{ csp_nonce }}">
-                // Script minimal pour éviter les erreurs CSP
-                console.log('Formulaire évaluation {{ evaluation.id_eval }} prêt');
-            </script>
         </div>
     {% endif %}
 {% endmacro %}
