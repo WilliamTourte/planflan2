@@ -74,6 +74,9 @@ body {
     padding: 0;
     background-color: var(--color-secondary);
     color: var(--color-text);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 /* =============================================
@@ -105,12 +108,6 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* Style pour que le contenu principal + bouton tienne dans l'écran */
-body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
 main.container {
     flex: 1;
 }
@@ -146,14 +143,6 @@ header {
     min-width: 150px;
     order: 3;
     width: 100%;
-}
-
-.header .btn,
-.header .btn i {
-    font-size: 1.1rem;
-    margin: 0;
-    position: relative;
-    top: 0;
 }
 
 .form-control {
@@ -243,6 +232,7 @@ input[type="submit"]:active {
     border-radius: 50%;
 }
 
+=======
 /* Style pour les filtres actifs */
 .btn.active {
     background-color: var(--color-secondary) !important;
@@ -250,7 +240,22 @@ input[type="submit"]:active {
     font-weight: bold !important;
 }
 
-/* =============================================
+/* Header-specific button styles */
+.leaflet-control-geolocate i {
+    color: white !important;
+    font-size: 24px;
+    background: transparent !important;
+}
+
+.header .btn,
+.header .btn i {
+    font-size: 1.1rem;
+    margin: 0;
+    position: relative;
+    top: 0;
+}
+
+/* ==========================================================================================
    6. BARRE DE RECHERCHE
    ============================================= */
 #search-input {
@@ -304,7 +309,7 @@ input[type="submit"]:active {
 /* =============================================
    8. FLANS (Cartes spécifiques)
    ============================================= */
-.flan-price-tag, .badge--price {
+.flan-price-tag, .badge-price {
     background: var(--color-secondary);
     color: white;
     padding: var(--padding-xs) var(--padding-sm);
@@ -442,6 +447,8 @@ input[type="submit"]:active {
 }
 
 .form-check-container {
+    display: flex;
+    align-items: center;
     gap: var(--gap-sm);
 }
 
@@ -457,7 +464,6 @@ input[type="submit"]:active {
     height: 18px;
     margin: 0 var(--margin-xs) 0 0;
     vertical-align: middle;
-    appearance: auto;
     appearance: auto;
 }
 
@@ -500,12 +506,6 @@ input[type="submit"]:active {
     border-radius: var(--border-radius);
     font-family: var(--font-primary);
     background-color: white;
-}
-
-.form-check-container {
-    display: flex;
-    align-items: center;
-    gap: var(--gap-sm);
 }
 
 .form-control-lg {
@@ -705,12 +705,6 @@ input[type="submit"]:active {
     background: transparent !important;
 }
 
-.leaflet-control-geolocate i {
-    color: white !important;
-    font-size: 24px;
-    background: transparent !important;
-}
-
 .infowindow-content {
     font-family: Arial, sans-serif;
     width: 100%;
@@ -820,7 +814,6 @@ input[type="submit"]:active {
     color: var(--color-text);
     font-size: var(--font-size-sm);
     margin: 0 !important;
-    align-items: left;
     gap: var(--gap-sm);
 }
 
@@ -828,8 +821,8 @@ input[type="submit"]:active {
     min-width: 30px;
     height: 24px;
     display: flex;
-    align-items: left;
-    justify-content: left;
+    align-items: flex-start;
+    justify-content: flex-start;
     font-size: var(--font-size-sm);
 }
 
@@ -962,15 +955,9 @@ input[type="submit"]:active {
     margin-bottom: var(--margin-md);
 }
 
-.legende-text {
-    font-size: var(--font-size-sm);
-    align-items: left;
-    gap: var(--gap-sm);
-}
-
 /* Icônes Bootstrap */
 .bi {
-    font-family: bootstrap-icons !important;
+    font-family: bootstrap-icons, sans-serif !important;
     font-style: normal;
     font-weight: normal;
     font-variant: normal;
