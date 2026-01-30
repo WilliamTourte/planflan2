@@ -1,575 +1,12 @@
-
-
-@media (max-width: 768px) {
-
-
-
-    #filter-controls {
-        top: 5px !important;
-        padding-left: 5px !important;
-        padding-right: 5px !important;
-    }
-
-    #filter-controls .main-filters {
-        gap: 4px !important;
-    }
-
-    #filter-controls .btn {
-        font-size: 12px !important;
-        padding: 4px 8px !important;
-        min-width: auto !important;
-    }
-
-    /* Bouton proposer adresse en plein largeur sur mobile */
-    .btn-success.w-100 {
-        max-width: 100% !important;
-    }
-}
-
-@media (max-width: 480px) {
-
-
-    /* Adapter les filtres pour très petits écrans */
-    #filter-controls .btn {
-        font-size: 11px !important;
-        padding: 3px 6px !important;
-    }
-
-    /* Bouton proposer adresse avec marge réduite */
-    .row.mt-3.mb-3 {
-        margin-top: 1rem !important;
-        margin-bottom: 1rem !important;
-    }
-}
-
-/* Style pour que le contenu principal + bouton tienne dans l'écran */
-body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
-/* Style pour le conteneur d'évaluation */
-.evaluation-content-container {
-    position: relative;
-    min-height: 200px;
-    margin-top: 15px;
-    padding: 15px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    border: 1px solid #dee2e6;
-    transition: all 0.3s ease;
-}
-
-/* Style pour le formulaire d'édition */
-.evaluation-content-container .form-container {
-    margin-top: 15px;
-    padding: 15px;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-/* Style pour les champs du formulaire d'édition */
-.evaluation-content-container .form-group {
-    margin-bottom: 15px;
-}
-
-.evaluation-content-container .form-control {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    font-size: 16px;
-}
-
-/* Style pour les boutons du formulaire */
-.evaluation-content-container .btn {
-    padding: 8px 16px;
-    margin-right: 10px;
-    font-size: 16px;
-}
-
-/* Style pour le titre du formulaire */
-.evaluation-content-container h4 {
-    color: #2c3e50;
-    border-bottom: 2px solid #428bca;
-    padding-bottom: 10px;
-    margin-bottom: 20px;
-}
-
-/* Style pour les critères d'évaluation */
-.criteria {
-    margin: 15px 0;
-    padding: 10px;
-    background-color: white;
-    border-radius: 6px;
-    border: 1px solid #e9ecef;
-}
-
-.criterion {
-    margin-bottom: 8px;
-    padding: 5px 0;
-}
-
-.criterion-name {
-    font-weight: bold;
-    color: #495057;
-    margin-right: 10px;
-}
-
-.criterion-value {
-    color: #2c3e50;
-    font-weight: 500;
-}
-
-/* Style pour la moyenne */
-.moyenne {
-    margin-top: 10px;
-    padding: 8px;
-    background-color: #e7f3ff;
-    border-radius: 4px;
-    text-align: center;
-    font-weight: bold;
-    color: #0066cc;
-}
-
-
-
-/* Style pour le layout de détail des évaluations */
-.evaluation-detail {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    margin-bottom: 30px;
-    padding: 15px;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.evaluation-detail .detail-left-column {
-    flex: 1;
-    min-width: 250px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.evaluation-detail .detail-right-column {
-    flex: 2;
-    min-width: 300px;
-}
-
-.evaluation-detail .carte-image-container {
-    width: 100%;
-    max-width: 250px;
-    margin-bottom: 15px;
-}
-
-.evaluation-detail .carte-image {
-    width: 100%;
-    height: auto;
-    border-radius: 8px;
-    object-fit: cover;
-}
-
-.evaluation-detail .carte-header {
-    margin-bottom: 15px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid #e9ecef;
-}
-
-.evaluation-detail h2 {
-    color: #2c3e50;
-    font-size: 24px;
-    margin-bottom: 8px;
-}
-
-.evaluation-detail h3 {
-    color: #495057;
-    font-size: 20px;
-}
-
-.evaluation-date-container {
-    margin-bottom: 15px;
-    color: #6c757d;
-    font-size: 14px;
-}
-
-/* Style pour les boutons d'action */
-.action-buttons {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-    flex-wrap: wrap;
-}
-
-.action-buttons .btn {
-    padding: 6px 12px;
-    font-size: 14px;
-}
-
-/* Style spécifique pour les boutons d'action des évaluations */
-.evaluation-action-buttons {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-    flex-wrap: wrap;
-    padding: 10px;
-    background-color: #f8f9fa;
-    border-radius: 6px;
-    border: 1px solid #e9ecef;
-}
-
-.evaluation-action-buttons .btn {
-    padding: 8px 16px;
-    font-size: 14px;
-    border-radius: 4px;
-}
-
-.evaluation-action-buttons .btn-success {
-    background-color: #28a745;
-    border-color: #28a745;
-}
-
-.evaluation-action-buttons .btn-success:hover {
-    background-color: #218838;
-    border-color: #1e7e34;
-}
-
-.evaluation-action-buttons .btn-danger {
-    background-color: #dc3545;
-    border-color: #dc3545;
-}
-
-.evaluation-action-buttons .btn-danger:hover {
-    background-color: #c82333;
-    border-color: #bd2130;
-}
+/**
+ * PlanFlan CSS - Version Améliorée
+ * Structure organisée et optimisée pour la maintenance
+ * Approche Mobile-First avec media queries regroupées
+ */
 
 /* =============================================
-   RESPONSIVE POUR EVALUATIONS
+   1. VARIABLES & RESET
    ============================================= */
-@media (max-width: 768px) {
-    /* Adapter le conteneur d'évaluation pour mobile */
-    .evaluation-content-container {
-        padding: 10px;
-        min-height: 180px;
-    }
-
-    /* Réduire la taille des champs sur mobile */
-    .evaluation-content-container .form-control {
-        padding: 8px;
-        font-size: 14px;
-    }
-
-    /* Adapter les boutons pour mobile */
-    .evaluation-content-container .btn {
-        padding: 6px 12px;
-        font-size: 14px;
-        margin-bottom: 8px;
-        width: 100%;
-    }
-
-    /* Adapter le titre pour mobile */
-    .evaluation-content-container h4 {
-        font-size: 18px;
-        padding-bottom: 8px;
-    }
-
-    /* Adapter les critères pour mobile */
-    .criterion {
-        margin-bottom: 6px;
-        font-size: 14px;
-    }
-
-    /* Adapter la moyenne pour mobile */
-    .moyenne {
-        font-size: 16px;
-        padding: 6px;
-    }
-}
-
-@media (max-width: 480px) {
-    /* Adapter pour très petits écrans */
-    .evaluation-content-container {
-        padding: 8px;
-        min-height: 160px;
-    }
-
-    .evaluation-content-container .form-control {
-        padding: 6px;
-        font-size: 13px;
-    }
-
-    .evaluation-content-container .btn {
-        padding: 5px 10px;
-        font-size: 13px;
-    }
-
-    .criterion {
-        font-size: 13px;
-    }
-
-    .moyenne {
-        font-size: 15px;
-    }
-}
-
-/* =============================================
-   RESPONSIVE POUR LE LAYOUT DÉTAIL DES ÉVALUATIONS
-   ============================================= */
-@media (max-width: 768px) {
-    /* Adapter le layout de détail pour mobile */
-    .evaluation-detail {
-        flex-direction: column;
-        gap: 15px;
-        padding: 10px;
-    }
-
-    .evaluation-detail .detail-left-column,
-    .evaluation-detail .detail-right-column {
-        flex: none;
-        width: 100%;
-        min-width: auto;
-    }
-
-    .evaluation-detail h2 {
-        font-size: 20px;
-    }
-
-    .evaluation-detail h3 {
-        font-size: 18px;
-    }
-
-    .action-buttons {
-        gap: 8px;
-    }
-
-    .action-buttons .btn {
-        padding: 5px 10px;
-        font-size: 13px;
-    }
-
-    /* Adapter les boutons d'action des évaluations pour mobile */
-    .evaluation-action-buttons {
-        gap: 8px;
-        padding: 8px;
-    }
-
-    .evaluation-action-buttons .btn {
-        padding: 6px 12px;
-        font-size: 13px;
-    }
-}
-
-@media (max-width: 480px) {
-    /* Adapter pour très petits écrans */
-    .evaluation-detail {
-        padding: 8px;
-        gap: 10px;
-    }
-
-    .evaluation-detail h2 {
-        font-size: 18px;
-    }
-
-    .evaluation-detail h3 {
-        font-size: 16px;
-    }
-
-    .evaluation-date-container {
-        font-size: 12px;
-    }
-
-    .action-buttons {
-        gap: 6px;
-        flex-direction: column;
-    }
-
-    .action-buttons .btn {
-        width: 100%;
-        margin-bottom: 6px;
-    }
-
-    /* Adapter pour très petits écrans - évaluations */
-    .evaluation-action-buttons {
-        gap: 6px;
-        flex-direction: column;
-        padding: 6px;
-    }
-
-    .evaluation-action-buttons .btn {
-        width: 100%;
-        margin-bottom: 6px;
-        padding: 5px 10px;
-        font-size: 12px;
-    }
-}
-
-main.container {
-    flex: 1;
-}
-
-/* =============================================
-   19. RESPONSIVE SPECIFIQUE POUR LISTE_ETABLISSEMENTS
-   ============================================= */
-@media (max-width: 768px) {
-    /* Adapter les filtres pour mobile */
-    #filter-controls {
-        top: 5px !important;
-        padding-left: 5px !important;
-        padding-right: 5px !important;
-    }
-
-    #filter-controls .main-filters {
-        gap: 4px !important;
-    }
-
-    #filter-controls .btn {
-        font-size: 12px !important;
-        padding: 4px 8px !important;
-        min-width: auto !important;
-    }
-
-    /* Bouton proposer adresse en plein largeur sur mobile */
-    .btn-success.w-100 {
-        max-width: 100% !important;
-    }
-
-    /* Conteneur principal pour mobile */
-    .container-fluid.p-0.d-flex.flex-column {
-        height: calc(100vh - 140px) !important;
-    }
-
-    /* Bouton avec hauteur minimale sur mobile */
-    .d-flex.align-items-center.justify-content-center {
-        min-height: 50px !important;
-    }
-}
-
-@media (max-width: 480px) {
-    /* Adapter les filtres pour très petits écrans */
-    #filter-controls .btn {
-        font-size: 11px !important;
-        padding: 3px 6px !important;
-    }
-
-    /* Bouton proposer adresse avec marge réduite */
-    .row.mt-3.mb-3 {
-        margin-top: 1rem !important;
-        margin-bottom: 1rem !important;
-    }
-}
-
-/* Style pour que le contenu principal + bouton tienne dans l'écran */
-body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
-main.container {
-    flex: 1;
-}
-
-    /* Adapter les filtres pour mobile */
-    #filter-controls {
-        top: 5px !important;
-        padding-left: 5px !important;
-        padding-right: 5px !important;
-    }
-
-    #filter-controls .main-filters {
-        gap: 4px !important;
-    }
-
-    #filter-controls .btn {
-        font-size: 12px !important;
-        padding: 4px 8px !important;
-        min-width: auto !important;
-    }
-
-    /* Bouton proposer adresse en pleine largeur sur mobile */
-    .btn-success.w-100 {
-        max-width: 100% !important;
-    }
-
-
-@media (max-width: 480px) {
-
-
-    /* Adapter les filtres pour très petits écrans */
-    #filter-controls .btn {
-        font-size: 11px !important;
-        padding: 3px 6px !important;
-    }
-
-    /* Bouton proposer adresse avec marge réduite */
-    .row.mt-3.mb-3 {
-        margin-top: 1rem !important;
-        margin-bottom: 1rem !important;
-    }
-}
-
-/* =============================================
-   19. RESPONSIVE SPECIFIQUE POUR LISTE_ETABLISSEMENTS
-   ============================================= */
-@media (max-width: 768px) {
-
-    /* Adapter les filtres pour mobile */
-    #filter-controls {
-        top: 5px !important;
-        padding-left: 5px !important;
-        padding-right: 5px !important;
-    }
-
-    #filter-controls .main-filters {
-        gap: 4px !important;
-    }
-
-    #filter-controls .btn {
-        font-size: 12px !important;
-        padding: 4px 8px !important;
-        min-width: auto !important;
-    }
-
-    /* Bouton proposer adresse en plein largeur sur mobile */
-    .btn-success.w-100 {
-        max-width: 100% !important;
-    }
-}
-
-@media (max-width: 480px) {
-    /* Réduire encore la hauteur de la carte sur très petits écrans */
-
-
-    /* Adapter les filtres pour très petits écrans */
-    #filter-controls .btn {
-        font-size: 11px !important;
-        padding: 3px 6px !important;
-    }
-
-    /* Bouton proposer adresse avec marge réduite */
-    .row.mt-3.mb-3 {
-        margin-top: 1rem !important;
-        margin-bottom: 1rem !important;
-    }
-}
-
-/* Style pour que le contenu principal + bouton tienne dans l'écran */
-body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
-main.container {
-    flex: 1;
-}
-
 :root {
     /* Polices */
     --font-primary: 'Verdana', sans-serif;
@@ -667,8 +104,19 @@ h1, h2, h3, h4, h5, h6 {
     max-width: 100%;
 }
 
+/* Style pour que le contenu principal + bouton tienne dans l'écran */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main.container {
+    flex: 1;
+}
+
 /* =============================================
-   4. HEADER
+   4. HEADER COMPONENT
    ============================================= */
 header {
     background-color: var(--color-primary);
@@ -681,11 +129,23 @@ header {
     transition: transform 0.3s ease;
 }
 
+.header nav > div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--padding-sm) var(--padding-xs);
+    gap: var(--gap-sm);
+}
+
 .header form {
     display: flex;
     align-items: center;
     flex-grow: 1;
-    margin: 0 0.5rem;
+    margin: 0 var(--margin-xs);
+    min-width: 150px;
+    order: 3;
+    width: 100%;
 }
 
 .header .btn,
@@ -699,20 +159,16 @@ header {
 .form-control {
     background-color: white;
     border: 1px solid #ddd;
-    border-radius: 25px;
-    padding: 0.3rem 1rem;
+    border-radius: var(--border-radius-btn);
+    padding: var(--padding-xs) var(--padding-sm);
     height: 36px;
-    width: 120px;
-    margin-right: 8px;
-}
-
- .btn:hover {
-    background-color: var(--color-info-dark);
-    transform: scale(1.05);
+    width: 100%;
+    max-width: 200px;
+    margin-right: var(--margin-xs);
 }
 
 /* =============================================
-   5. BOUTONS (spécifiques à l'app)
+   5. BOUTONS COMPONENT
    ============================================= */
 .btn,
 button,
@@ -757,7 +213,7 @@ input[type="submit"]:active {
     box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
 }
 
-
+/* Variantes de boutons */
 .btn-success {
     background-color: var(--color-primary);
     color: white;
@@ -765,39 +221,6 @@ input[type="submit"]:active {
 
 .btn-success:hover {
     background-color: var(--color-secondary);
-}
-
-/* Style pour les filtres actifs (persistant) */
-.btn.active {
-    background-color: var(--color-secondary) !important;
-    color: white !important;
-    font-weight: bold !important;
-}
-
-/* Style pour les boutons principaux quand un filtre est actif dans leur catégorie */
-#filter-controls .main-filters .btn.active {
-    background-color: var(--color-secondary);
-    color: white !important;
-    font-weight: bold !important;
-}
-
-/* Style pour les sous-filtres */
-.filter-group {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 8px;
-    background-color: rgba(255, 255, 255, 0.9);
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    margin-top: 8px;
-}
-
-.filter-group .btn {
-    flex: 1;
-    min-width: 100px;
-    font-size: 14px;
-    padding: 6px 12px;
 }
 
 .btn-danger {
@@ -820,30 +243,11 @@ input[type="submit"]:active {
     border-radius: 50%;
 }
 
-.btn-canceledit {
-    background-color: var(--color-back);
-    color: white;
-}
-
-.btn-canceledit:hover {
-    background-color: var(--color-back-dark);
-}
-
-.action-buttons {
-    display: flex;
-    gap: var(--gap-sm);
-    justify-content: center; /* Corrigé */
-    margin-top: var(--margin-md);
-}
-
-.action-buttons form {
-    margin: 0;
-    padding: 0;
-    display: contents;
-}
-
-.inline-form {
-    display: inline-block;
+/* Style pour les filtres actifs */
+.btn.active {
+    background-color: var(--color-secondary) !important;
+    color: white !important;
+    font-weight: bold !important;
 }
 
 /* =============================================
@@ -854,7 +258,7 @@ input[type="submit"]:active {
 }
 
 /* =============================================
-   7. CARTES
+   7. CARTES COMPONENT
    ============================================= */
 .carte {
     text-decoration: none;
@@ -890,8 +294,6 @@ input[type="submit"]:active {
     object-fit: cover;
     border-radius: var(--border-radius) var(--border-radius) 0 0;
 }
-
-
 
 .carte-header {
     padding: var(--padding-md);
@@ -951,7 +353,7 @@ input[type="submit"]:active {
 }
 
 .moyenne-value {
-    color: var(--color-primary); /* Corrigé (text-decoration → color) */
+    color: var(--color-primary);
 }
 
 /* =============================================
@@ -996,7 +398,7 @@ input[type="submit"]:active {
 }
 
 /* =============================================
-   10. GRILLE
+   10. GRILLE COMPONENT
    ============================================= */
 .grille {
     display: grid;
@@ -1112,68 +514,84 @@ input[type="submit"]:active {
 }
 
 /* =============================================
-   12. ÉVALUATIONS
+   12. ÉVALUATIONS COMPONENT
    ============================================= */
+.evaluation-content-container {
+    position: relative;
+    min-height: 200px;
+    margin-top: 15px;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+}
+
+.evaluation-content-container .form-container {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.evaluation-content-container .form-group {
+    margin-bottom: 15px;
+}
+
+.evaluation-content-container .form-control {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.evaluation-content-container .btn {
+    padding: 8px 16px;
+    margin-right: 10px;
+    font-size: 16px;
+}
+
+.evaluation-content-container h4 {
+    color: #2c3e50;
+    border-bottom: 2px solid #428bca;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
 .criteria {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: var(--gap-sm);
-    margin: var(--margin-md) 0;
+    margin: 15px 0;
+    padding: 10px;
+    background-color: white;
+    border-radius: 6px;
+    border: 1px solid #e9ecef;
 }
 
 .criterion {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: var(--padding-xs) 0;
-    border-bottom: 1px solid #eee;
+    margin-bottom: 8px;
+    padding: 5px 0;
 }
 
 .criterion-name {
     font-weight: bold;
-    color: var(--color-text);
+    color: #495057;
+    margin-right: 10px;
 }
 
 .criterion-value {
-    color: var(--color-info);
-    font-weight: bold;
+    color: #2c3e50;
+    font-weight: 500;
 }
 
 .moyenne {
+    margin-top: 10px;
+    padding: 8px;
+    background-color: #e7f3ff;
+    border-radius: 4px;
     text-align: center;
-    margin: var(--margin-md) 0;
-}
-
-.flan-moyenne {
-    display: flex;
-    align-items: center;
-    gap: var(--margin-xs);
-    margin-top: var(--margin-sm);
-    padding: var(--padding-xs);
-    background-color: #f5f5f5;
-    border-radius: var(--border-radius-btn);
-}
-
-.flan-moyenne .moyenne-label {
     font-weight: bold;
-    color: var(--color-text);
-}
-
-.flan-moyenne .moyenne-value {
-    background: #e8f5e9;
-    padding: var(--padding-xs);
-    border-radius: var(--border-radius-btn);
-    font-weight: bold;
-    color: var(--color-primary);
-}
-
-.evaluation-date {
-    color: var(--color-text-light);
-    font-size: var(--font-size-sm);
-    font-weight: normal;
-    text-align: left;
-    display: block;
-    margin-bottom: var(--margin-xs);
+    color: #0066cc;
 }
 
 /* =============================================
@@ -1225,10 +643,7 @@ input[type="submit"]:active {
 .leaflet-popup-content {
     background: white;
     text-align: center;
-    
-
- 
-    padding : 0 !important;
+    padding: 0 !important;
 }
 
 .leaflet-popup-content::-webkit-scrollbar {
@@ -1250,7 +665,6 @@ input[type="submit"]:active {
     top: 5px;
     right: 5px;
 }
-
 
 /* Positionnement de la pointe du popup */
 .leaflet-popup-tip {
@@ -1301,7 +715,6 @@ input[type="submit"]:active {
     font-family: Arial, sans-serif;
     width: 100%;
     max-width: 100%;
-   
     margin: 0 auto;
     overflow-wrap: break-word;
     text-align: center;
@@ -1310,12 +723,11 @@ input[type="submit"]:active {
 .infowindow-header {
     position: relative;
     min-height: 30px;
-    padding-top: 40px; /* Espace pour les badges */
-    margin-top: 0; /* S'assurer qu'il n'y a pas de marge supplémentaire */
+    padding-top: 40px;
+    margin-top: 0;
 }
 
 .infowindow-header h3 {
-  
     font-size: 1em;
     line-height: 1.2;
     text-align: center;
@@ -1324,14 +736,14 @@ input[type="submit"]:active {
 
 .infowindow-badges {
     position: absolute;
-    top: 10px; /* Positionner légèrement en dessous du haut */
+    top: 10px;
     left: 0;
     right: 0;
     display: flex;
     justify-content: space-between;
     pointer-events: none;
-    z-index: 10; /* S'assurer qu'ils sont au-dessus du contenu mais pas du titre */
-    max-height: 30px; /* Limiter la hauteur */
+    z-index: 10;
+    max-height: 30px;
 }
 
 .infowindow-badges .badge {
@@ -1341,25 +753,22 @@ input[type="submit"]:active {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    height: 28px; /* Hauteur fixe */
-    line-height: 1; /* Alignement vertical */
+    height: 28px;
+    line-height: 1;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-/* Badge labellisé spécifique pour l'infowindow */
 .infowindow-badges .badge-labellise {
     background-color: #87CEEB;
     margin-right: 20px;
 }
 
-/* Badge type établissement spécifique pour l'infowindow */
 .infowindow-badges .badge-type-etab {
-    background-color: inherit; /* Conserver la couleur dynamique */
-    padding: 6px 8px; /* Padding légèrement réduit */
+    background-color: inherit;
+    padding: 6px 8px;
 }
-
 
 .infowindow-link {
     text-decoration: none;
@@ -1415,7 +824,6 @@ input[type="submit"]:active {
     gap: var(--gap-sm);
 }
 
-/* Style spécifique pour les emojis dans la légende */
 .carte-legende .badge {
     min-width: 30px;
     height: 24px;
@@ -1424,7 +832,6 @@ input[type="submit"]:active {
     justify-content: left;
     font-size: var(--font-size-sm);
 }
-
 
 #filter-controls {
     position: absolute;
@@ -1460,7 +867,6 @@ input[type="submit"]:active {
     line-height: 2;
     white-space: nowrap;
 }
-
 
 .sub-filters {
     display: none;
@@ -1500,7 +906,7 @@ input[type="submit"]:active {
 }
 
 /* =============================================
-   17. UTILITAIRES SPÉCIFIQUES À L'APP
+   17. UTILITAIRES
    ============================================= */
 .placeholder {
     color: var(--color-text-light);
@@ -1547,8 +953,7 @@ input[type="submit"]:active {
 .adresse {
     font-style: italic;
     color: var(--color-text-light);
-    margin:0 !important;
-  
+    margin: 0 !important;
 }
 
 .description, .legende-text {
@@ -1563,7 +968,7 @@ input[type="submit"]:active {
     gap: var(--gap-sm);
 }
 
-/* Icônes Bootstrap (à garder si tu utilises bootstrap-icons) */
+/* Icônes Bootstrap */
 .bi {
     font-family: 'bootstrap-icons' !important;
     font-style: normal;
@@ -1577,124 +982,305 @@ input[type="submit"]:active {
 }
 
 /* =============================================
-   18. RESPONSIVE
+   18. RESPONSIVE DESIGN
    ============================================= */
-@media (max-width: 768px) {
+/* Mobile-first approach - Base styles are mobile,
+   then we enhance for larger screens */
+
+/* Tablet and up */
+@media (min-width: 768px) {
+    /* Layout adjustments */
     .grille {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     }
 
-    .carte {
-        border-radius: var(--border-radius);
+    /* Header adjustments */
+    .header nav > div {
+        flex-wrap: nowrap;
+        gap: 0;
+        justify-content: flex-start;
+        padding: var(--padding-sm) var(--padding-md);
     }
 
-    .etablissement-detail {
-        flex-direction: column;
-    }
-
-    .detail-left-column {
-        min-width: 100%;
-        margin-bottom: var(--margin-lg);
-    }
-
-    .detail-right-column {
-        min-width: 100%;
-    }
-
-    .flan-detail {
-        flex-direction: column;
-    }
-
-    .flan-detail .detail-left-column {
-        min-width: 100%;
-        margin-bottom: var(--margin-lg);
-    }
-
-    .flan-detail .detail-right-column {
-        min-width: 100%;
-    }
-
-    .evaluation-detail {
-        flex-direction: column;
-    }
-
-    .evaluation-detail .detail-left-column {
-        min-width: 100%;
-        margin-bottom: var(--margin-lg);
-    }
-
-    .evaluation-detail .detail-right-column {
-        min-width: 100%;
-    }
-
-    .evaluation-detail .criteria {
-        grid-template-columns: 1fr;
-    }
-
-    .evaluation-detail .detail-left-column {
-        order: 1;
-    }
-
-    .evaluation-detail .detail-right-column {
-        order: 2;
-    }
-
-    header h1 {
-        font-size: 1.5rem;
-    }
-
-
-
-    #map {
-        height: 60vh;
-    }
-
-    .container {
-        padding: 0 var(--padding-sm);
-    }
-
-    .header > nav > div {
-        padding: 0 var(--padding-sm);
+    .header form {
+        order: 0;
+        width: auto;
+        margin: 0;
+        flex-grow: 1;
+        max-width: 300px;
     }
 
     .header .form-control {
-        width: 120px;
+        width: 100%;
+        max-width: 200px;
+    }
+
+    /* Card layout adjustments */
+    .etablissement-detail,
+    .flan-detail,
+    .evaluation-detail {
+        flex-direction: row;
+    }
+
+    .detail-left-column {
+        min-width: 300px;
+        margin-bottom: 0;
+    }
+
+    .detail-right-column {
+        min-width: 0;
+        flex: 2;
+    }
+
+    .evaluation-detail .criteria {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+
+    /* Map height */
+    #map {
+        height: 80vh;
+    }
+
+    /* Container padding */
+    .container {
+        padding: 0 var(--padding-md);
+    }
+
+    /* Filter controls */
+    #filter-controls {
+        top: 10px;
+        padding: 10px 20px;
+    }
+
+    #filter-controls .main-filters {
+        gap: var(--gap-md);
+    }
+
+    #filter-controls .btn {
+        font-size: var(--font-size-sm);
+        padding: var(--padding-xs) var(--padding-sm);
     }
 }
 
-@media (max-width: 480px) {
+/* Desktop and up */
+@media (min-width: 1024px) {
     .container {
-        padding: 0 var(--padding-xs);
+        padding: 0 var(--padding-lg);
     }
 
-    .form-control {
-        padding: var(--padding-xs);
+    /* Larger map on big screens */
+    #map {
+        height: 85vh;
     }
 
-    .form-container {
-        padding: var(--padding-md);
+    /* Wider content layout */
+    .grille {
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     }
+}
 
-    .evaluation-detail {
-        padding: var(--padding-md);
-    }
-
-    .evaluation-detail .detail-left-column {
-        min-width: 100%;
-    }
-
-    .evaluation-detail .detail-right-column {
-        min-width: 100%;
-    }
-
-    .form-group {
-        margin-bottom: var(--margin-md);
+/* Large screens */
+@media (min-width: 1200px) {
+    .grille {
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
     }
 }
 
 /* =============================================
-   17.5. ETABLISSEMENT DETAIL (NOUVEAU)
+   19. COMPONENT-SPECIFIC RESPONSIVE
    ============================================= */
+/* Evaluation component responsive */
+@media (max-width: 768px) {
+    .evaluation-content-container {
+        padding: 10px;
+        min-height: 180px;
+    }
+
+    .evaluation-content-container .form-control {
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    .evaluation-content-container .btn {
+        padding: 6px 12px;
+        font-size: 14px;
+        margin-bottom: 8px;
+        width: 100%;
+    }
+
+    .evaluation-content-container h4 {
+        font-size: 18px;
+        padding-bottom: 8px;
+    }
+
+    .criterion {
+        margin-bottom: 6px;
+        font-size: 14px;
+    }
+
+    .moyenne {
+        font-size: 16px;
+        padding: 6px;
+    }
+}
+
+@media (max-width: 480px) {
+    .evaluation-content-container {
+        padding: 8px;
+        min-height: 160px;
+    }
+
+    .evaluation-content-container .form-control {
+        padding: 6px;
+        font-size: 13px;
+    }
+
+    .evaluation-content-container .btn {
+        padding: 5px 10px;
+        font-size: 13px;
+    }
+
+    .criterion {
+        font-size: 13px;
+    }
+
+    .moyenne {
+        font-size: 15px;
+    }
+}
+
+/* Detail layouts responsive */
+@media (max-width: 768px) {
+    .evaluation-detail,
+    .etablissement-detail,
+    .flan-detail {
+        flex-direction: column;
+    }
+
+    .detail-left-column,
+    .detail-right-column {
+        flex: none;
+        width: 100%;
+        min-width: auto;
+    }
+
+    .evaluation-detail h2 {
+        font-size: 20px;
+    }
+
+    .evaluation-detail h3 {
+        font-size: 18px;
+    }
+
+    .action-buttons {
+        gap: 8px;
+    }
+
+    .action-buttons .btn {
+        padding: 5px 10px;
+        font-size: 13px;
+    }
+
+    .evaluation-action-buttons {
+        gap: 8px;
+        padding: 8px;
+    }
+
+    .evaluation-action-buttons .btn {
+        padding: 6px 12px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .evaluation-detail {
+        padding: 8px;
+        gap: 10px;
+    }
+
+    .evaluation-detail h2 {
+        font-size: 18px;
+    }
+
+    .evaluation-detail h3 {
+        font-size: 16px;
+    }
+
+    .evaluation-date-container {
+        font-size: 12px;
+    }
+
+    .action-buttons {
+        gap: 6px;
+        flex-direction: column;
+    }
+
+    .action-buttons .btn {
+        width: 100%;
+        margin-bottom: 6px;
+    }
+
+    .evaluation-action-buttons {
+        gap: 6px;
+        flex-direction: column;
+        padding: 6px;
+    }
+
+    .evaluation-action-buttons .btn {
+        width: 100%;
+        margin-bottom: 6px;
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+}
+
+/* Filter controls responsive */
+@media (max-width: 768px) {
+    #filter-controls {
+        top: 5px !important;
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+    }
+
+    #filter-controls .main-filters {
+        gap: 4px !important;
+    }
+
+    #filter-controls .btn {
+        font-size: 12px !important;
+        padding: 4px 8px !important;
+        min-width: auto !important;
+    }
+
+    .btn-success.w-100 {
+        max-width: 100% !important;
+    }
+
+    .container-fluid.p-0.d-flex.flex-column {
+        height: calc(100vh - 140px) !important;
+    }
+
+    .d-flex.align-items-center.justify-content-center {
+        min-height: 50px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    #filter-controls .btn {
+        font-size: 11px !important;
+        padding: 3px 6px !important;
+    }
+
+    .row.mt-3.mb-3 {
+        margin-top: 1rem !important;
+        margin-bottom: 1rem !important;
+    }
+}
+
+/* =============================================
+   20. AUTRE COMPONENTS
+   ============================================= */
+/* Etablissement detail layout */
 .etablissement-detail {
     display: flex;
     gap: var(--gap-lg);
@@ -1748,14 +1334,11 @@ input[type="submit"]:active {
     margin-bottom: var(--margin-md);
 }
 
-
 .detail-right-column .description {
     margin-bottom: var(--margin-lg);
 }
 
-/* =============================================
-   8.5. FLAN DETAIL (NOUVEAU)
-   ============================================= */
+/* Flan detail layout */
 .flan-detail {
     display: flex;
     gap: var(--gap-lg);
@@ -1778,206 +1361,15 @@ input[type="submit"]:active {
     flex: 2;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start; /* Changed from space-between to flex-start */
-    gap: var(--margin-md); /* Added gap for better spacing */
+    justify-content: flex-start;
+    gap: var(--margin-md);
 }
 
-/* Style pour le formulaire d'édition dans le détail du flan */
 .flan-detail .detail-right-column > .carte {
-    display: none; /* Masqué par défaut */
-    width: 100%;
-    margin-top: var(--margin-md);
-    order: 2; /* Placé après le contenu principal */
-}
-
-.flan-detail .detail-left-column .carte-image-container {
-    height: 250px;
-    width: 100%;
-}
-
-.flan-detail .detail-right-column .carte-header {
-    text-align: left;
-    padding: 0;
-    margin-bottom: var(--margin-md);
-}
-
-.flan-detail .detail-right-column .carte-header h2 {
-    margin: 0;
-    font-size: var(--font-size-lg);
-    color: var(--color-text);
-}
-
-.flan-detail .detail-right-column .flan-details {
-    width: 100%;
-}
-
-.flan-detail .detail-right-column .flan-price-tag {
-    margin-bottom: var(--margin-md);
-}
-
-/* =============================================
-   ATTRIBUTION GOOGLE PHOTOS
-   =============================================
-
-.google-photo-attribution {
-    position: absolute;
-    bottom: 5px;
-    right: 5px;
-    background-color: rgba(0, 0, 0, 0.6);
-    color: white;
-    padding: 3px 8px;
-    font-size: var(--font-size-xs);
-    border-radius: 3px;
-    font-family: var(--font-primary);
-}
-
-/* =============================================
-   19. RESPONSIVE SPECIFIQUE POUR LISTE_ETABLISSEMENTS
-   ============================================= */
-@media (max-width: 768px) {
-
-
-
-    /* Adapter les filtres pour mobile */
-    #filter-controls {
-        top: 5px !important;
-        padding-left: 5px !important;
-        padding-right: 5px !important;
-    }
-
-    #filter-controls .main-filters {
-        gap: 4px !important;
-    }
-
-    #filter-controls .btn {
-        font-size: 12px !important;
-        padding: 4px 8px !important;
-        min-width: auto !important;
-    }
-
-    /* Bouton proposer adresse en plein largeur sur mobile */
-    .btn-success.w-100 {
-        max-width: 100% !important;
-    }
-}
-
-@media (max-width: 480px) {
-
-
-    /* Adapter les filtres pour très petits écrans */
-    #filter-controls .btn {
-        font-size: 11px !important;
-        padding: 3px 6px !important;
-    }
-
-    /* Bouton proposer adresse avec marge réduite */
-    .row.mt-3.mb-3 {
-        margin-top: 1rem !important;
-        margin-bottom: 1rem !important;
-    }
-}
-
-
-  .autocomplete {
-    position: relative;
-    width: 100%;
-  }
-
-  .autocomplete-input {
-    width: 100%;
-    padding: 0.5rem;
-    background-color: rgba(255, 255, 255, 0.9);
-    border-radius: var(--border-radius-btn);
-    border: 1px solid #ddd;
-  }
-
-  .autocomplete-results {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background-color: white;
-    border: 1px solid #ddd;
-    border-top: none;
-    border-radius: 0 0 var(--border-radius-btn) var(--border-radius-btn);
-    max-height: 200px;
-    overflow-y: auto;
-    z-index: 1000;
     display: none;
-  }
-
-  .autocomplete-results.show {
-    display: block;
-  }
-
-  .autocomplete-item {
-    padding: 0.5rem;
-    cursor: pointer;
-    border-bottom: 1px solid #eee;
-  }
-
-  .autocomplete-item:hover {
-    background-color: #f0f0f0;
-  }
-
-  .autocomplete-item:last-child {
-    border-bottom: none;
-  }
-
-  .autocomplete-loading {
-    padding: 0.5rem;
-    text-align: center;
-    color: #666;
-    font-style: italic;
-  }
-
-  .autocomplete-no-results {
-    padding: 0.5rem;
-    text-align: center;
-    color: #999;
-    font-style: italic;
-  }
-
-  .autocomplete-item.active {
-    background-color: #e3f2fd;
-  }
-
-
-/* =============================================
-   8.5. FLAN DETAIL (NOUVEAU)
-   ============================================= */
-.flan-detail {
-    display: flex;
-    gap: var(--gap-lg);
-    margin-bottom: var(--margin-lg);
-    background: white;
-    padding: var(--padding-lg);
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-}
-
-.flan-detail .detail-left-column {
-    flex: 1;
-    min-width: 300px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.flan-detail .detail-right-column {
-    flex: 2;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start; /* Changed from space-between to flex-start */
-    gap: var(--margin-md); /* Added gap for better spacing */
-}
-
-/* Style pour le formulaire d'édition dans le détail du flan */
-.flan-detail .detail-right-column > .carte {
-    display: none; /* Masqué par défaut */
     width: 100%;
     margin-top: var(--margin-md);
-    order: 2; /* Placé après le contenu principal */
+    order: 2;
 }
 
 .flan-detail .detail-left-column .carte-image-container {
@@ -2005,9 +1397,7 @@ input[type="submit"]:active {
     margin-bottom: var(--margin-md);
 }
 
-/* =============================================
-   12.5. EVALUATION DETAIL (NOUVEAU)
-   ============================================= */
+/* Evaluation detail layout */
 .evaluation-detail {
     display: flex;
     gap: var(--gap-lg);
@@ -2033,7 +1423,7 @@ input[type="submit"]:active {
     flex-direction: column;
     justify-content: flex-start;
     gap: var(--margin-md);
-    min-width: 0; /* Permet le rétrécissement */
+    min-width: 0;
 }
 
 .evaluation-detail .detail-left-column .carte-image-container {
@@ -2071,4 +1461,86 @@ input[type="submit"]:active {
     background-color: #f5f5f5;
     border-radius: var(--border-radius);
     line-height: 1.6;
+}
+
+/* =============================================
+   21. GOOGLE PHOTOS ATTRIBUTION
+   ============================================= */
+.google-photo-attribution {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 3px 8px;
+    font-size: var(--font-size-xs);
+    border-radius: 3px;
+    font-family: var(--font-primary);
+}
+
+/* =============================================
+   22. AUTOCOMPLETE
+   ============================================= */
+.autocomplete {
+    position: relative;
+    width: 100%;
+}
+
+.autocomplete-input {
+    width: 100%;
+    padding: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: var(--border-radius-btn);
+    border: 1px solid #ddd;
+}
+
+.autocomplete-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-top: none;
+    border-radius: 0 0 var(--border-radius-btn) var(--border-radius-btn);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+}
+
+.autocomplete-results.show {
+    display: block;
+}
+
+.autocomplete-item {
+    padding: 0.5rem;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+.autocomplete-item:hover {
+    background-color: #f0f0f0;
+}
+
+.autocomplete-item:last-child {
+    border-bottom: none;
+}
+
+.autocomplete-loading {
+    padding: 0.5rem;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+}
+
+.autocomplete-no-results {
+    padding: 0.5rem;
+    text-align: center;
+    color: #999;
+    font-style: italic;
+}
+
+.autocomplete-item.active {
+    background-color: #e3f2fd;
 }
