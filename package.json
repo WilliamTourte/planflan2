@@ -68,7 +68,9 @@
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "msw": "^2.3.5",
-    "regenerator-runtime": "^0.14.1"
+    "regenerator-runtime": "^0.14.1",
+    "stylelint": "^17.0.0",
+    "stylelint-config-standard": "^40.0.0"
   },
   "dependencies": {
     "jsdoc": "^4.0.5"

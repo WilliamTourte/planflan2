@@ -52,8 +52,8 @@
 
     /* Effets & Transitions */
     --transition: all 0.3s ease;
-    --box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    --box-shadow-hover: 0 5px 10px rgba(0, 0, 0, 0.15);
+    --box-shadow: 0 2px 5px rgb(0 0 0 / 10%);
+    --box-shadow-hover: 0 5px 10px rgb(0 0 0 / 15%);
 
     /* Largeur des infowindows */
     --infowindow-width: 300px;
@@ -80,7 +80,7 @@ body {
    2. POLICES
    ============================================= */
 @font-face {
-    font-family: 'Bubblegum';
+    font-family: Bubblegum;
     src: url('/static/fonts/Bubblegum.ttf') format('truetype');
     font-weight: bold;
     font-style: normal;
@@ -210,7 +210,7 @@ button:active,
 input[type="button"]:active,
 input[type="submit"]:active {
     transform: translateY(0);
-    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 3px rgb(0 0 0 / 10%);
 }
 
 /* Variantes de boutons */
@@ -458,7 +458,7 @@ input[type="submit"]:active {
     margin: 0 var(--margin-xs) 0 0;
     vertical-align: middle;
     appearance: auto;
-    -webkit-appearance: checkbox;
+    appearance: auto;
 }
 
 .form-check-label {
@@ -532,7 +532,7 @@ input[type="submit"]:active {
     padding: 15px;
     background-color: white;
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgb(0 0 0 / 10%);
 }
 
 .evaluation-content-container .form-group {
@@ -591,7 +591,7 @@ input[type="submit"]:active {
     border-radius: 4px;
     text-align: center;
     font-weight: bold;
-    color: #0066cc;
+    color: #06c;
 }
 
 /* =============================================
@@ -731,7 +731,7 @@ input[type="submit"]:active {
     font-size: 1em;
     line-height: 1.2;
     text-align: center;
-    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .infowindow-badges {
@@ -779,7 +779,7 @@ input[type="submit"]:active {
 }
 
 .infowindow-link:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: rgb(0 0 0 / 5%);
     border-radius: 5px;
 }
 
@@ -970,7 +970,7 @@ input[type="submit"]:active {
 
 /* Icônes Bootstrap */
 .bi {
-    font-family: 'bootstrap-icons' !important;
+    font-family: bootstrap-icons !important;
     font-style: normal;
     font-weight: normal;
     font-variant: normal;
@@ -984,11 +984,12 @@ input[type="submit"]:active {
 /* =============================================
    18. RESPONSIVE DESIGN
    ============================================= */
+
 /* Mobile-first approach - Base styles are mobile,
    then we enhance for larger screens */
 
 /* Tablet and up */
-@media (min-width: 768px) {
+@media (width >= 768px) {
     /* Layout adjustments */
     .grille {
         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -1063,7 +1064,7 @@ input[type="submit"]:active {
 }
 
 /* Desktop and up */
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
     .container {
         padding: 0 var(--padding-lg);
     }
@@ -1080,7 +1081,7 @@ input[type="submit"]:active {
 }
 
 /* Large screens */
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
     .grille {
         grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
     }
@@ -1089,8 +1090,9 @@ input[type="submit"]:active {
 /* =============================================
    19. COMPONENT-SPECIFIC RESPONSIVE
    ============================================= */
+
 /* Evaluation component responsive */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .evaluation-content-container {
         padding: 10px;
         min-height: 180px;
@@ -1124,7 +1126,7 @@ input[type="submit"]:active {
     }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
     .evaluation-content-container {
         padding: 8px;
         min-height: 160px;
@@ -1150,7 +1152,7 @@ input[type="submit"]:active {
 }
 
 /* Detail layouts responsive */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     .evaluation-detail,
     .etablissement-detail,
     .flan-detail {
@@ -1192,7 +1194,7 @@ input[type="submit"]:active {
     }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
     .evaluation-detail {
         padding: 8px;
         gap: 10px;
@@ -1235,7 +1237,7 @@ input[type="submit"]:active {
 }
 
 /* Filter controls responsive */
-@media (max-width: 768px) {
+@media (width <= 768px) {
     #filter-controls {
         top: 5px !important;
         padding-left: 5px !important;
@@ -1265,7 +1267,7 @@ input[type="submit"]:active {
     }
 }
 
-@media (max-width: 480px) {
+@media (width <= 480px) {
     #filter-controls .btn {
         font-size: 11px !important;
         padding: 3px 6px !important;
@@ -1280,6 +1282,7 @@ input[type="submit"]:active {
 /* =============================================
    20. AUTRE COMPONENTS
    ============================================= */
+
 /* Etablissement detail layout */
 .etablissement-detail {
     display: flex;
@@ -1470,7 +1473,7 @@ input[type="submit"]:active {
     position: absolute;
     bottom: 5px;
     right: 5px;
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgb(0 0 0 / 60%);
     color: white;
     padding: 3px 8px;
     font-size: var(--font-size-xs);
@@ -1489,7 +1492,7 @@ input[type="submit"]:active {
 .autocomplete-input {
     width: 100%;
     padding: 0.5rem;
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgb(255 255 255 / 90%);
     border-radius: var(--border-radius-btn);
     border: 1px solid #ddd;
 }
