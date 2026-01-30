@@ -232,7 +232,7 @@ input[type="submit"]:active {
     border-radius: 50%;
 }
 
-=======
+
 /* Style pour les filtres actifs */
 .btn.active {
     background-color: var(--color-secondary) !important;
@@ -255,7 +255,7 @@ input[type="submit"]:active {
     top: 0;
 }
 
-/* ==========================================================================================
+/* =========================================
    6. BARRE DE RECHERCHE
    ============================================= */
 #search-input {
