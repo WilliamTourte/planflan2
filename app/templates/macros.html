@@ -1,26 +1,18 @@
 <!-- MACROS D'AFFICHAGE -->
 {% macro afficher_image_ou_placeholder(item, class='carte-image', photo_paths=None, is_google_photo=False) %}
-    {% if photo_paths or item.photos %}
-
-        {% if photo_paths and photo_paths|length > 0 %}
-            <img src="{{ url_for('static', filename=photo_paths[0].replace('app/static/', '')) }}" alt="{{ item.nom }}"
-                 class="{{ class }}">
-        {% elif item.photos %}
-            <img src="{{ url_for('static', filename='uploads/' + item.photos[0].path) }}" alt="{{ item.nom }}"
-                 class="{{ class }}">
-        {% endif %}
+    {% if photo_paths and photo_paths|length > 0 %}
+        <img src="{{ url_for('static', filename='uploads/' + photo_paths[0]) }}" alt="{{ item.nom }}" class="{{ class }}">
         {% if is_google_photo %}
             <div class="google-photo-attribution">Photo © Google Maps</div>
         {% endif %}
-
+    {% elif item.photos and item.photos|length > 0 %}
+        <img src="{{ url_for('static', filename='uploads/' + item.photos[0].path) }}" alt="{{ item.nom }}" class="{{ class }}">
+        <div class="google-photo-attribution">Photo © Google Maps</div>
     {% else %}
-        <!-- Afficher l'image par défaut -->
         {% if item.__class__.__name__ == 'Flan' %}
-            <img src="{{ url_for('static', filename='uploads/flan-vanille.webp') }}" alt="Flan par défaut"
-                 class="{{ class }}">
+            <img src="{{ url_for('static', filename='uploads/flan-vanille.webp') }}" alt="Flan par défaut" class="{{ class }}">
         {% elif item.__class__.__name__ == 'Etablissement' %}
-            <img src="{{ url_for('static', filename='uploads/defaut_etab.jpg') }}" alt="Etablissement par défaut"
-                 class="{{ class }}">
+            <img src="{{ url_for('static', filename='uploads/defaut_etab.jpg') }}" alt="Etablissement par défaut" class="{{ class }}">
         {% else %}
             <div class="{{ class }} placeholder"><span>Pas de photo</span></div>
         {% endif %}
