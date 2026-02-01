@@ -14,10 +14,10 @@ from app.models import Etablissement, Photo, TypeEtab, TypeCible
 def app():
     """Fixture pour l'application Flask avec configuration de test."""
     app = create_app(TestConfig)
-    app.config['TESTING'] = True
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-    app.config['WTF_CSRF_ENABLED'] = False
-    
+    app.config["TESTING"] = True
+    app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+    app.config["WTF_CSRF_ENABLED"] = False
+
     with app.app_context():
         db.create_all()
         yield app
@@ -46,13 +46,15 @@ class TestGestionPhotos:
                 longitude=2.3522,
                 type_etab=TypeEtab.BOULANGERIE,
                 google_place_id="ChIJTest123",
-                id_user=1
+                id_user=1,
             )
             db.session.add(etab)
             db.session.commit()
 
             # Vérifier que le google_place_id est sauvegardé
-            etab_saved = Etablissement.query.filter_by(google_place_id="ChIJTest123").first()
+            etab_saved = Etablissement.query.filter_by(
+                google_place_id="ChIJTest123"
+            ).first()
             assert etab_saved is not None
             assert etab_saved.google_place_id == "ChIJTest123"
 
@@ -68,7 +70,7 @@ class TestGestionPhotos:
                 longitude=2.3522,
                 type_etab=TypeEtab.BOULANGERIE,
                 google_place_id="ChIJTest123",
-                id_user=1
+                id_user=1,
             )
             db.session.add(etab)
             db.session.flush()
@@ -79,7 +81,7 @@ class TestGestionPhotos:
                 type_cible=TypeCible.ETABLISSEMENT,
                 path="ChIJTest123_photo_0.jpg",  # PAS "uploads/..."
                 largeur=400,
-                hauteur=400
+                hauteur=400,
             )
             db.session.add(photo)
             db.session.commit()
@@ -103,7 +105,7 @@ class TestGestionPhotos:
                 longitude=2.3522,
                 type_etab=TypeEtab.BOULANGERIE,
                 google_place_id="ChIJABC123",
-                id_user=1
+                id_user=1,
             )
             db.session.add(etab_dev)
             db.session.commit()
@@ -119,7 +121,7 @@ class TestGestionPhotos:
                 longitude=2.3522,
                 type_etab=TypeEtab.BOULANGERIE,
                 google_place_id="ChIJABC123",
-                id_user=2
+                id_user=2,
             )
             db.session.add(etab_prod)
             db.session.commit()
@@ -157,7 +159,7 @@ class TestGestionPhotos:
         """Test : vérifier qu'il n'y a pas de double 'uploads/' dans l'URL"""
         with app.app_context():
             # Configurer SERVER_NAME pour permettre url_for de fonctionner
-            app.config['SERVER_NAME'] = 'localhost'
+            app.config["SERVER_NAME"] = "localhost"
 
             etab = Etablissement(
                 nom="Test",
@@ -168,7 +170,7 @@ class TestGestionPhotos:
                 longitude=2.3522,
                 type_etab=TypeEtab.BOULANGERIE,
                 google_place_id="ChIJTest789",
-                id_user=1
+                id_user=1,
             )
             db.session.add(etab)
             db.session.flush()
@@ -178,7 +180,7 @@ class TestGestionPhotos:
                 type_cible=TypeCible.ETABLISSEMENT,
                 path="ChIJTest789_photo_0.jpg",  # JUSTE le nom
                 largeur=400,
-                hauteur=400
+                hauteur=400,
             )
             db.session.add(photo)
             db.session.commit()
@@ -186,8 +188,9 @@ class TestGestionPhotos:
             # L'URL générée devrait être /static/uploads/ChIJTest789_photo_0.jpg
             # PAS /static/uploads/uploads/ChIJTest789_photo_0.jpg
             from flask import url_for
+
             with app.test_request_context():
-                url = url_for('static', filename=f'uploads/{photo.path}')
+                url = url_for("static", filename=f"uploads/{photo.path}")
                 assert url == "/static/uploads/ChIJTest789_photo_0.jpg"
                 assert "uploads/uploads" not in url
 
@@ -203,7 +206,7 @@ class TestGestionPhotos:
                 longitude=2.3522,
                 type_etab=TypeEtab.BOULANGERIE,
                 google_place_id="ChIJTest999",
-                id_user=1
+                id_user=1,
             )
             db.session.add(etab)
             db.session.flush()
@@ -215,7 +218,7 @@ class TestGestionPhotos:
                     type_cible=TypeCible.ETABLISSEMENT,
                     path=f"ChIJTest999_photo_{i}.jpg",
                     largeur=400,
-                    hauteur=400
+                    hauteur=400,
                 )
                 db.session.add(photo)
             db.session.commit()
@@ -232,7 +235,7 @@ class TestGestionPhotos:
         """Test : vérifier le format correct du nom de fichier avec google_place_id"""
         with app.app_context():
             google_place_id = "ChIJUy4Drt5x5kcRkHl_c9NVwDM"
-            
+
             etab = Etablissement(
                 nom="Test Format",
                 adresse="1 rue Test",
@@ -242,20 +245,20 @@ class TestGestionPhotos:
                 longitude=2.3522,
                 type_etab=TypeEtab.BOULANGERIE,
                 google_place_id=google_place_id,
-                id_user=1
+                id_user=1,
             )
             db.session.add(etab)
             db.session.flush()
 
             # Format attendu: {google_place_id}_photo_{index}.jpg
             expected_filename = f"{google_place_id}_photo_0.jpg"
-            
+
             photo = Photo(
                 id_etab=etab.id_etab,
                 type_cible=TypeCible.ETABLISSEMENT,
                 path=expected_filename,
                 largeur=400,
-                hauteur=400
+                hauteur=400,
             )
             db.session.add(photo)
             db.session.commit()
@@ -269,7 +272,7 @@ class TestGestionPhotos:
     def test_upload_folder_configuration(self, app):
         """Test : vérifier que UPLOAD_FOLDER est correctement configuré"""
         with app.app_context():
-            upload_folder = app.config.get('UPLOAD_FOLDER')
+            upload_folder = app.config.get("UPLOAD_FOLDER")
 
             # UPLOAD_FOLDER doit être défini
             assert upload_folder is not None
@@ -308,7 +311,7 @@ class TestGestionPhotos:
 
             # Utiliser un dossier temporaire
             temp_uploads = tmp_path / "uploads"
-            app.config['UPLOAD_FOLDER'] = str(temp_uploads)
+            app.config["UPLOAD_FOLDER"] = str(temp_uploads)
 
             # Le dossier ne devrait pas exister au début
             assert not temp_uploads.exists()
@@ -317,7 +320,7 @@ class TestGestionPhotos:
             def mock_get_place_details(place_id, api_key):
                 return None  # Pas de photos disponibles
 
-            monkeypatch.setattr('app.outils.get_place_details', mock_get_place_details)
+            monkeypatch.setattr("app.outils.get_place_details", mock_get_place_details)
 
             # Créer un établissement
             etab = Etablissement(
@@ -329,19 +332,14 @@ class TestGestionPhotos:
                 longitude=2.3522,
                 type_etab=TypeEtab.BOULANGERIE,
                 google_place_id="ChIJTestFolder",
-                id_user=1
+                id_user=1,
             )
             db.session.add(etab)
             db.session.commit()
 
             # Appeler fetch_place_photos
-            result = fetch_place_photos(
-                etab.id_etab,
-                "ChIJTestFolder",
-                "fake_api_key"
-            )
+            result = fetch_place_photos(etab.id_etab, "ChIJTestFolder", "fake_api_key")
 
             # Le dossier devrait avoir été créé (même si pas de photos téléchargées)
             # Note: ce test dépend de l'implémentation actuelle de fetch_place_photos
             # qui crée le dossier s'il n'existe pas
-

@@ -19,11 +19,11 @@ def clean_orphan_photos():
     """Nettoie les photos orphelines (en base sans fichier physique)."""
 
     # Créer l'application avec la config de production
-    os.environ['FLASK_CONFIG'] = 'ConfigProd'
+    os.environ["FLASK_CONFIG"] = "ConfigProd"
     app = create_app()
 
     with app.app_context():
-        upload_folder = app.config.get('UPLOAD_FOLDER')
+        upload_folder = app.config.get("UPLOAD_FOLDER")
 
         print("=" * 70)
         print("NETTOYAGE DES PHOTOS ORPHELINES")
@@ -47,7 +47,9 @@ def clean_orphan_photos():
                 valid.append(photo)
             else:
                 orphans.append(photo)
-                print(f"✗ ORPHELINE: Photo ID {photo.id_photo}, id_etab={photo.id_etab}, path='{photo.path}'")
+                print(
+                    f"✗ ORPHELINE: Photo ID {photo.id_photo}, id_etab={photo.id_etab}, path='{photo.path}'"
+                )
                 print(f"  Fichier attendu: {filepath}")
                 print(f"  Fichier existe: False")
 
@@ -61,19 +63,25 @@ def clean_orphan_photos():
         if orphans:
             print("PHOTOS ORPHELINES À SUPPRIMER:")
             for photo in orphans:
-                print(f"  - ID {photo.id_photo}: {photo.path} (id_etab={photo.id_etab})")
+                print(
+                    f"  - ID {photo.id_photo}: {photo.path} (id_etab={photo.id_etab})"
+                )
             print()
 
-            response = input(f"Supprimer ces {len(orphans)} photo(s) orpheline(s) de la base ? (y/N): ")
+            response = input(
+                f"Supprimer ces {len(orphans)} photo(s) orpheline(s) de la base ? (y/N): "
+            )
 
-            if response.lower() == 'y':
+            if response.lower() == "y":
                 for photo in orphans:
                     db.session.delete(photo)
                     print(f"✓ Supprimée: Photo ID {photo.id_photo}")
 
                 db.session.commit()
                 print()
-                print(f"✅ {len(orphans)} photo(s) orpheline(s) supprimée(s) avec succès")
+                print(
+                    f"✅ {len(orphans)} photo(s) orpheline(s) supprimée(s) avec succès"
+                )
             else:
                 print("❌ Annulé - Aucune photo supprimée")
         else:

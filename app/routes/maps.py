@@ -180,7 +180,9 @@ def ajouter_etablissement():
         # Log de TOUS les champs du formulaire pour diagnostic
         current_app.logger.info("=== TOUS LES CHAMPS DU FORMULAIRE ===")
         for field_name, field_obj in form_ajout._fields.items():
-            current_app.logger.info(f"  {field_name}: '{field_obj.data}' (type: {type(field_obj.data)})")
+            current_app.logger.info(
+                f"  {field_name}: '{field_obj.data}' (type: {type(field_obj.data)})"
+            )
         current_app.logger.info("=== FIN CHAMPS FORMULAIRE ===")
 
         # Validation du formulaire et création de l'établissement
@@ -213,11 +215,19 @@ def ajouter_etablissement():
 
             # Log des valeurs avant création
             current_app.logger.info(f"=== VALEURS AVANT CRÉATION ===")
-            current_app.logger.info(f"  google_place_id from form: '{form_ajout.google_place_id.data}'")
+            current_app.logger.info(
+                f"  google_place_id from form: '{form_ajout.google_place_id.data}'"
+            )
             current_app.logger.info(f"  Type: {type(form_ajout.google_place_id.data)}")
-            current_app.logger.info(f"  Est vide: {not form_ajout.google_place_id.data}")
-            current_app.logger.info(f"  Est None: {form_ajout.google_place_id.data is None}")
-            current_app.logger.info(f"  Est chaîne vide: {form_ajout.google_place_id.data == ''}")
+            current_app.logger.info(
+                f"  Est vide: {not form_ajout.google_place_id.data}"
+            )
+            current_app.logger.info(
+                f"  Est None: {form_ajout.google_place_id.data is None}"
+            )
+            current_app.logger.info(
+                f"  Est chaîne vide: {form_ajout.google_place_id.data == ''}"
+            )
 
             nouvel_etablissement = Etablissement(
                 nom=form_ajout.nom.data,
@@ -255,9 +265,7 @@ def ajouter_etablissement():
             )
 
             # Télécharger les photos depuis Google Places si un place_id est disponible
-            current_app.logger.info(
-                f"=== CHECK AVANT FETCH_PHOTOS ==="
-            )
+            current_app.logger.info(f"=== CHECK AVANT FETCH_PHOTOS ===")
             current_app.logger.info(
                 f"Google Place ID: '{nouvel_etablissement.google_place_id}' (type: {type(nouvel_etablissement.google_place_id)})"
             )

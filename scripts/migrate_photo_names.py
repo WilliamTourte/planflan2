@@ -21,9 +21,11 @@ def migrate_photo_names():
 
     with app.app_context():
         # Récupérer toutes les photos
-        photos = Photo.query.join(Etablissement).filter(
-            Etablissement.google_place_id.isnot(None)
-        ).all()
+        photos = (
+            Photo.query.join(Etablissement)
+            .filter(Etablissement.google_place_id.isnot(None))
+            .all()
+        )
 
         stats = {
             "total": len(photos),
@@ -42,7 +44,9 @@ def migrate_photo_names():
 
             etablissement = db.session.get(Etablissement, photo.id_etab)
             if not etablissement or not etablissement.google_place_id:
-                print(f"⚠️  Photo {photo.id_photo}: pas de Google Place ID pour l'établissement {photo.id_etab}")
+                print(
+                    f"⚠️  Photo {photo.id_photo}: pas de Google Place ID pour l'établissement {photo.id_etab}"
+                )
                 stats["errors"] += 1
                 continue
 

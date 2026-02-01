@@ -28,25 +28,23 @@ parser = argparse.ArgumentParser(
     description="Script de migration pour corriger les chemins des photos"
 )
 parser.add_argument(
-    '--dry-run',
-    action='store_true',
-    help="Affiche les changements sans les appliquer"
+    "--dry-run", action="store_true", help="Affiche les changements sans les appliquer"
 )
 parser.add_argument(
-    '--db-uri',
+    "--db-uri",
     type=str,
-    help="URI de la base de données (par défaut: DATABASE_URL env var)"
+    help="URI de la base de données (par défaut: DATABASE_URL env var)",
 )
 
 args = parser.parse_args()
 
 # Set environment variables BEFORE importing app modules
 if args.db_uri:
-    os.environ['DATABASE_URL'] = args.db_uri
+    os.environ["DATABASE_URL"] = args.db_uri
 
 # NOW we can import app modules after setting environment variables
 # Ajouter le répertoire parent au path pour permettre les imports
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
 from app import create_app, db
 from app.config import Config
@@ -75,44 +73,54 @@ def fix_photo_paths(dry_run=False):
             modified = False
 
             # 1. Retirer le préfixe 'uploads/' si présent
-            if photo.path.startswith('uploads/'):
-                photo.path = photo.path.replace('uploads/', '', 1)
+            if photo.path.startswith("uploads/"):
+                photo.path = photo.path.replace("uploads/", "", 1)
                 modified = True
                 corrected_count += 1
                 print(f"✓ Correction du préfixe: '{original_path}' -> '{photo.path}'")
 
             # 2. Retirer le préfixe 'static/uploads/' si présent
-            if photo.path.startswith('static/uploads/'):
-                photo.path = photo.path.replace('static/uploads/', '', 1)
+            if photo.path.startswith("static/uploads/"):
+                photo.path = photo.path.replace("static/uploads/", "", 1)
                 modified = True
                 corrected_count += 1
                 print(f"✓ Correction du préfixe: '{original_path}' -> '{photo.path}'")
 
             # 3. Renommer les fichiers etab_{id}_photo_{n}.jpg vers {google_place_id}_photo_{n}.jpg
-            if photo.path.startswith('etab_') and photo.id_etab:
+            if photo.path.startswith("etab_") and photo.id_etab:
                 # Récupérer l'établissement associé
                 etab = Etablissement.query.get(photo.id_etab)
                 if etab and etab.google_place_id:
                     # Extraire le numéro de photo (ex: etab_123_photo_0.jpg -> 0)
-                    parts = photo.path.split('_photo_')
+                    parts = photo.path.split("_photo_")
                     if len(parts) == 2:
                         photo_index = parts[1]  # Ex: "0.jpg"
                         new_filename = f"{etab.google_place_id}_photo_{photo_index}"
 
                         # Renommer le fichier physique si nécessaire
-                        old_filepath = os.path.join(app.config.get('UPLOAD_FOLDER', 'app/static/uploads'), photo.path)
-                        new_filepath = os.path.join(app.config.get('UPLOAD_FOLDER', 'app/static/uploads'), new_filename)
+                        old_filepath = os.path.join(
+                            app.config.get("UPLOAD_FOLDER", "app/static/uploads"),
+                            photo.path,
+                        )
+                        new_filepath = os.path.join(
+                            app.config.get("UPLOAD_FOLDER", "app/static/uploads"),
+                            new_filename,
+                        )
 
                         if os.path.exists(old_filepath):
                             if not dry_run:
                                 try:
                                     os.rename(old_filepath, new_filepath)
-                                    print(f"✓ Fichier renommé: '{photo.path}' -> '{new_filename}'")
+                                    print(
+                                        f"✓ Fichier renommé: '{photo.path}' -> '{new_filename}'"
+                                    )
                                 except Exception as e:
                                     print(f"✗ Erreur lors du renommage du fichier: {e}")
                                     continue
                             else:
-                                print(f"[DRY-RUN] Fichier serait renommé: '{photo.path}' -> '{new_filename}'")
+                                print(
+                                    f"[DRY-RUN] Fichier serait renommé: '{photo.path}' -> '{new_filename}'"
+                                )
 
                         photo.path = new_filename
                         modified = True

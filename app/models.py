@@ -374,7 +374,6 @@ class Flan(db.Model):
         return data
 
 
-
 class Evaluation(db.Model):
     """Modèle représentant une évaluation.
 
@@ -557,4 +556,3 @@ def delete_flan_photos(mapper, connection, target):
             current_app.logger.error(
                 f"Erreur lors de la suppression de la photo {photo.path}: {e}"
             )
-
