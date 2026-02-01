@@ -27,10 +27,44 @@ env:
   PYTHON_VERSION: '3.12'
 
 jobs:
+  check-ci-status:
+    name: Check if CI already passed
+    runs-on: ubuntu-latest
+    outputs:
+      ci_passed: ${{ steps.check_ci.outputs.ci_passed }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check CI status
+        id: check_ci
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          CURRENT_COMMIT=$(git rev-parse HEAD)
+          echo "Checking CI status for commit: $CURRENT_COMMIT"
+          
+          # Query GitHub API for CI workflow status
+          CI_STATUS=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github.v3+json" \
+            "https://api.github.com/repos/${{ github.repository }}/commits/$CURRENT_COMMIT/check-runs" \
+            | jq -r '[.check_runs[] | select(.name == "Run Tests" and .app.slug == "github-actions")] | .[0].conclusion // "pending"')
+          
+          echo "CI status: $CI_STATUS"
+          
+          if [ "$CI_STATUS" = "success" ]; then
+            echo "✅ CI already passed for this commit"
+            echo "ci_passed=true" >> $GITHUB_OUTPUT
+          else
+            echo "⚠️ CI not yet successful, running full pre-deploy checks"
+            echo "ci_passed=false" >> $GITHUB_OUTPUT
+          fi
+
   pre-deploy-checks:
     name: Pre-Deploy Verification
     runs-on: ubuntu-latest
-    
+    needs: check-ci-status
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -40,15 +74,25 @@ jobs:
       with:
         python-version: ${{ env.PYTHON_VERSION }}
         cache: 'pip'
-        cache-dependency-path: 'requirements.txt'
+        cache-dependency-path: |
+          requirements.txt
+          requirements-dev.txt
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: 'package-lock.json'
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install --no-cache-dir -r requirements.txt
-        pip install --no-cache-dir bandit safety
+        pip install -r requirements.txt
+        pip install bandit safety
 
     - name: Check Python syntax
+      if: needs.check-ci-status.outputs.ci_passed != 'true'
       run: |
         find app/ -name "*.py" -exec python -m py_compile {} \;
         echo "Python syntax check passed"

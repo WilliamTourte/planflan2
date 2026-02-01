@@ -44,32 +44,47 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # For main branch: check if code is identical to dev
+          # For main branch: check if commit was already validated on dev
           if [ "${{ github.ref }}" = "refs/heads/main" ]; then
-            echo "Checking if main is a fast-forward merge from dev..."
+            echo "Checking if commit was already validated on dev branch..."
             
-            # Check if dev branch exists
-            if git show-ref --verify --quiet refs/heads/dev; then
-              # Get the tree hash of dev and main
-              DEV_TREE=$(git rev-parse dev^{tree} 2>/dev/null)
-              MAIN_TREE=$(git rev-parse main^{tree} 2>/dev/null)
+            CURRENT_COMMIT=$(git rev-parse HEAD)
+            echo "Current commit: $CURRENT_COMMIT"
+            
+            # Check if this exact commit exists on dev branch
+            if git branch -r --contains $CURRENT_COMMIT | grep -q "origin/dev"; then
+              echo "Commit exists on dev branch. Checking CI status..."
               
-              # Get content hashes of relevant directories
-              DEV_CONTENT=$(git ls-tree -r dev -- app tests Dockerfile docker-compose.yml entrypoint.sh | awk '{print $3}' | sort | md5sum | awk '{print $1}')
-              MAIN_CONTENT=$(git ls-tree -r main -- app tests Dockerfile docker-compose.yml entrypoint.sh | awk '{print $3}' | sort | md5sum | awk '{print $1}')
+              # Query GitHub API for commit status
+              CI_STATUS=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+                -H "Accept: application/vnd.github.v3+json" \
+                "https://api.github.com/repos/${{ github.repository }}/commits/$CURRENT_COMMIT/status" \
+                | jq -r '.state')
               
-              echo "dev content hash: $DEV_CONTENT"
-              echo "main content hash: $MAIN_CONTENT"
+              echo "CI status on dev: $CI_STATUS"
               
-              if [ "$DEV_CONTENT" = "$MAIN_CONTENT" ]; then
-                echo "Code is identical to dev branch. Skipping CI..."
-                echo "should_skip=true" >> $GITHUB_OUTPUT
+              if [ "$CI_STATUS" = "success" ]; then
+                # Also check if workflow runs were successful
+                WORKFLOW_STATUS=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+                  -H "Accept: application/vnd.github.v3+json" \
+                  "https://api.github.com/repos/${{ github.repository }}/commits/$CURRENT_COMMIT/check-runs" \
+                  | jq -r '[.check_runs[] | select(.name == "Run Tests" or .name == "Build Docker Image")] | all(.conclusion == "success")')
+                
+                echo "Workflow runs successful: $WORKFLOW_STATUS"
+                
+                if [ "$WORKFLOW_STATUS" = "true" ]; then
+                  echo "✅ Commit already validated on dev. Skipping CI..."
+                  echo "should_skip=true" >> $GITHUB_OUTPUT
+                else
+                  echo "⚠️ Workflow runs not all successful. Running CI..."
+                  echo "should_skip=false" >> $GITHUB_OUTPUT
+                fi
               else
-                echo "Code differs from dev. Running CI..."
+                echo "⚠️ CI status not successful on dev. Running CI..."
                 echo "should_skip=false" >> $GITHUB_OUTPUT
               fi
             else
-              echo "dev branch not found. Running CI..."
+              echo "Commit not found on dev branch. Running CI..."
               echo "should_skip=false" >> $GITHUB_OUTPUT
             fi
           else
@@ -92,12 +107,14 @@ jobs:
       with:
         python-version: ${{ env.PYTHON_VERSION }}
         cache: 'pip'
-        cache-dependency-path: 'requirements.txt'
+        cache-dependency-path: |
+          requirements.txt
+          requirements-dev.txt
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install --no-cache-dir -r requirements.txt
+        pip install -r requirements.txt
 
 
 
@@ -133,18 +150,42 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      uses: docker/setup-buildx-action@v3
+
+    - name: Cache Docker layers
+      uses: actions/cache@v3
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-buildx-
 
     - name: Login to Docker Hub
       if: github.ref == 'refs/heads/main'
-      uses: docker/login-action@v2
+      uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKER_HUB_USERNAME }}
         password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
     - name: Build Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: false
+        load: true
+        tags: ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
+        cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+
+    - name: Move cache
       run: |
-        docker build -t ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }} .
+        rm -rf /tmp/.buildx-cache
+        mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+    - name: Move cache
+      run: |
+        rm -rf /tmp/.buildx-cache
+        mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
     - name: Run Docker container for testing
       run: |
@@ -164,12 +205,12 @@ jobs:
 
     - name: Push Docker image (main branch only)
       if: github.ref == 'refs/heads/main'
-      run: |
-        docker tag ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }} \
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: |
           ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
-        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
-        
-        # Also tag as latest for main branch
-        docker tag ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }} \
           ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest
-        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest
+        cache-from: type=local,src=/tmp/.buildx-cache
+        cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max

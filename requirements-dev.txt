@@ -1,12 +1,12 @@
 # Dépendances de développement pour PlanFlan
 
-# Testing
-pytest==9.0.2
+# Inclure les dépendances de production
+-r requirements.txt
+
+# Testing additionnelles (pytest et coverage sont déjà dans requirements.txt)
 pytest-cov==7.0.0
 pytest-xdist==3.6.1
-coverage
 pylint
-black
 pre-commit
 mistral-vibe
 

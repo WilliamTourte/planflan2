@@ -1,0 +1,38 @@
+name: Setup Python Environment
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        description: 'Python version to use'
+        required: false
+        type: string
+        default: '3.12'
+      install-dev-deps:
+        description: 'Install development dependencies'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ inputs.python-version }}
+          cache: 'pip'
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Install development dependencies
+        if: inputs.install-dev-deps
+        run: |
+          pip install -r requirements-dev.txt
