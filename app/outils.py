@@ -188,27 +188,56 @@ def fetch_place_photos(etablissement_id, place_id, api_key, max_width=400):
     from app.models import Photo, TypeCible
     from app import db
 
+    current_app.logger.info(f"[FETCH_PHOTOS] Début pour établissement {etablissement_id}, place_id={place_id}")
+
     # Vérifier si des photos existent déjà pour cet établissement
     existing_photos = Photo.query.filter_by(id_etab=etablissement_id).all()
     if existing_photos:
+        current_app.logger.info(f"[FETCH_PHOTOS] {len(existing_photos)} photo(s) déjà existante(s) en base")
         return [photo.path for photo in existing_photos]
 
     # Récupérer les détails de l'établissement pour obtenir les photoreferences
     # Utiliser le place_id Google Places pour récupérer les photos
     if not place_id:
         current_app.logger.warning(
-            f"Aucun place_id fourni pour l'établissement {etablissement_id}"
+            f"[FETCH_PHOTOS] Aucun place_id fourni pour l'établissement {etablissement_id}"
         )
         return []
 
+    current_app.logger.info(f"[FETCH_PHOTOS] Appel de get_place_details pour place_id={place_id}")
     place_details = get_place_details(place_id, api_key)
     if not place_details or "photos" not in place_details:
+        current_app.logger.warning(f"[FETCH_PHOTOS] Aucune photo trouvée dans les détails de l'établissement")
         return []
+
+    current_app.logger.info(f"[FETCH_PHOTOS] {len(place_details['photos'])} photo(s) disponible(s) dans l'API Google")
+
+    # Vérifier que le dossier UPLOAD_FOLDER existe et est accessible en écriture
+    upload_folder = current_app.config["UPLOAD_FOLDER"]
+    current_app.logger.info(f"[FETCH_PHOTOS] UPLOAD_FOLDER configuré: {upload_folder}")
+
+    if not os.path.exists(upload_folder):
+        current_app.logger.warning(f"[FETCH_PHOTOS] Dossier {upload_folder} n'existe pas, création...")
+        try:
+            os.makedirs(upload_folder, exist_ok=True)
+            current_app.logger.info(f"[FETCH_PHOTOS] Dossier créé avec succès")
+        except Exception as e:
+            current_app.logger.error(f"[FETCH_PHOTOS] Erreur lors de la création du dossier: {e}")
+            return []
+
+    # Vérifier les permissions d'écriture
+    if not os.access(upload_folder, os.W_OK):
+        current_app.logger.error(f"[FETCH_PHOTOS] ✗ Pas de permission d'écriture sur {upload_folder}")
+        return []
+    else:
+        current_app.logger.info(f"[FETCH_PHOTOS] ✓ Permission d'écriture OK sur {upload_folder}")
 
     # Récupérer les photos depuis l'API
     photo_paths = []
     for idx, photo in enumerate(place_details["photos"][:1]):  # Limiter à une photo
         photo_reference = photo["photo_reference"]
+        current_app.logger.info(f"[FETCH_PHOTOS] Téléchargement photo {idx}, reference={photo_reference[:20]}...")
+
         url = "https://maps.googleapis.com/maps/api/place/photo"
         params = {
             "maxwidth": max_width,
@@ -218,15 +247,26 @@ def fetch_place_photos(etablissement_id, place_id, api_key, max_width=400):
 
         try:
             response = requests.get(url, params=params, stream=True)
+            current_app.logger.info(f"[FETCH_PHOTOS] Réponse API: status_code={response.status_code}")
+
             if response.status_code == 200:
                 # Générer un nom de fichier basé sur le google_place_id
                 filename = f"{place_id}_photo_{idx}.jpg"
-                filepath = os.path.join(current_app.config["UPLOAD_FOLDER"], filename)
+                filepath = os.path.join(upload_folder, filename)
+
+                current_app.logger.info(f"[FETCH_PHOTOS] Sauvegarde dans: {filepath}")
 
                 # Sauvegarder la photo localement
                 with open(filepath, "wb") as f:
                     for chunk in response.iter_content(1024):
                         f.write(chunk)
+
+                # Vérifier que le fichier a bien été créé
+                if os.path.exists(filepath):
+                    file_size = os.path.getsize(filepath)
+                    current_app.logger.info(f"[FETCH_PHOTOS] ✓ Fichier créé avec succès, taille={file_size} octets")
+                else:
+                    current_app.logger.error(f"[FETCH_PHOTOS] ✗ Fichier non créé malgré succès de l'écriture")
 
                 # Enregistrer la photo dans la base de données (UNIQUEMENT le nom du fichier)
                 new_photo = Photo(
@@ -238,8 +278,14 @@ def fetch_place_photos(etablissement_id, place_id, api_key, max_width=400):
                 )
                 db.session.add(new_photo)
                 photo_paths.append(filename)
+                current_app.logger.info(f"[FETCH_PHOTOS] Photo ajoutée en base: {filename}")
+            else:
+                current_app.logger.error(f"[FETCH_PHOTOS] Erreur API Google: status={response.status_code}, response={response.text[:200]}")
         except Exception as e:
-            current_app.logger.error(f"Erreur lors de la récupération de la photo: {e}")
+            current_app.logger.error(f"[FETCH_PHOTOS] Exception lors de la récupération de la photo: {e}")
+            import traceback
+            current_app.logger.error(f"[FETCH_PHOTOS] Traceback: {traceback.format_exc()}")
 
     db.session.commit()
+    current_app.logger.info(f"[FETCH_PHOTOS] Terminé, {len(photo_paths)} photo(s) sauvegardée(s)")
     return photo_paths
