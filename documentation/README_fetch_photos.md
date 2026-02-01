@@ -105,7 +105,7 @@ Trouvé 5 établissements valides avec un google_place_id
 
 Traitement de l'établissement 1: Boulangerie Martin
 Google Place ID: ChIJN1t_tDeuEmsRUsoyG83frY4
-✓ 1 photo(s) récupérée(s): ['/app/static/uploads/etab_1_photo_0.jpg']
+✓ 1 photo(s) récupérée(s): ['/app/static/uploads/ChIJN1t_tDeuEmsRUsoyG83frY4_photo_0.jpg']
 
 Traitement de l'établissement 2: Pâtisserie Dupont
 Google Place ID: ChIJN1t_tDeuEmsRUsoyG83frY5

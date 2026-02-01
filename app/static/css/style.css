@@ -1,620 +1,1563 @@
-/* Déclaration de la police personnalisée */
+
+
+@media (max-width: 768px) {
+
+
+    /* Adapter les filtres pour mobile */
+    #filter-controls {
+        top: 5px !important;
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+    }
+
+    #filter-controls .main-filters {
+        gap: 4px !important;
+    }
+
+    #filter-controls .btn {
+        font-size: 12px !important;
+        padding: 4px 8px !important;
+        min-width: auto !important;
+    }
+
+    /* Bouton proposer adresse en plein largeur sur mobile */
+    .btn-success.w-100 {
+        max-width: 100% !important;
+    }
+}
+
+@media (max-width: 480px) {
+
+
+    /* Adapter les filtres pour très petits écrans */
+    #filter-controls .btn {
+        font-size: 11px !important;
+        padding: 3px 6px !important;
+    }
+
+    /* Bouton proposer adresse avec marge réduite */
+    .row.mt-3.mb-3 {
+        margin-top: 1rem !important;
+        margin-bottom: 1rem !important;
+    }
+}
+
+/* Style pour que le contenu principal + bouton tienne dans l'écran */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main.container {
+    flex: 1;
+}
+=======
+/* =============================================
+   19. RESPONSIVE SPECIFIQUE POUR LISTE_ETABLISSEMENTS
+   ============================================= */
+@media (max-width: 768px) {
+    /* Adapter les filtres pour mobile */
+    #filter-controls {
+        top: 5px !important;
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+    }
+
+    #filter-controls .main-filters {
+        gap: 4px !important;
+    }
+
+    #filter-controls .btn {
+        font-size: 12px !important;
+        padding: 4px 8px !important;
+        min-width: auto !important;
+    }
+
+    /* Bouton proposer adresse en plein largeur sur mobile */
+    .btn-success.w-100 {
+        max-width: 100% !important;
+    }
+
+    /* Conteneur principal pour mobile */
+    .container-fluid.p-0.d-flex.flex-column {
+        height: calc(100vh - 140px) !important;
+    }
+
+    /* Bouton avec hauteur minimale sur mobile */
+    .d-flex.align-items-center.justify-content-center {
+        min-height: 50px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Adapter les filtres pour très petits écrans */
+    #filter-controls .btn {
+        font-size: 11px !important;
+        padding: 3px 6px !important;
+    }
+
+    /* Bouton proposer adresse avec marge réduite */
+    .row.mt-3.mb-3 {
+        margin-top: 1rem !important;
+        margin-bottom: 1rem !important;
+    }
+}
+
+/* Style pour que le contenu principal + bouton tienne dans l'écran */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main.container {
+    flex: 1;
+}
+
+    /* Adapter les filtres pour mobile */
+    #filter-controls {
+        top: 5px !important;
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+    }
+
+    #filter-controls .main-filters {
+        gap: 4px !important;
+    }
+
+    #filter-controls .btn {
+        font-size: 12px !important;
+        padding: 4px 8px !important;
+        min-width: auto !important;
+    }
+
+    /* Bouton proposer adresse en plein largeur sur mobile */
+    .btn-success.w-100 {
+        max-width: 100% !important;
+    }
+}
+
+@media (max-width: 480px) {
+
+
+    /* Adapter les filtres pour très petits écrans */
+    #filter-controls .btn {
+        font-size: 11px !important;
+        padding: 3px 6px !important;
+    }
+
+    /* Bouton proposer adresse avec marge réduite */
+    .row.mt-3.mb-3 {
+        margin-top: 1rem !important;
+        margin-bottom: 1rem !important;
+    }
+}
+
+/* =============================================
+   19. RESPONSIVE SPECIFIQUE POUR LISTE_ETABLISSEMENTS
+   ============================================= */
+@media (max-width: 768px) {
+
+    /* Adapter les filtres pour mobile */
+    #filter-controls {
+        top: 5px !important;
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+    }
+
+    #filter-controls .main-filters {
+        gap: 4px !important;
+    }
+
+    #filter-controls .btn {
+        font-size: 12px !important;
+        padding: 4px 8px !important;
+        min-width: auto !important;
+    }
+
+    /* Bouton proposer adresse en plein largeur sur mobile */
+    .btn-success.w-100 {
+        max-width: 100% !important;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Réduire encore la hauteur de la carte sur très petits écrans */
+
+
+    /* Adapter les filtres pour très petits écrans */
+    #filter-controls .btn {
+        font-size: 11px !important;
+        padding: 3px 6px !important;
+    }
+
+    /* Bouton proposer adresse avec marge réduite */
+    .row.mt-3.mb-3 {
+        margin-top: 1rem !important;
+        margin-bottom: 1rem !important;
+    }
+}
+
+/* Style pour que le contenu principal + bouton tienne dans l'écran */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main.container {
+    flex: 1;
+}
+
+:root {
+    /* Polices */
+    --font-primary: 'Verdana', sans-serif;
+    --font-bubblegum: 'Bubblegum', cursive;
+
+    /* Couleurs */
+    --color-primary: #ffcf40;
+    --color-secondary: #799dcb;
+    --color-danger: red;
+    --color-danger-dark: red;
+    --color-info: #3498db;
+    --color-info-dark: #2980b9;
+    --color-back: red;
+    --color-back-dark: red;
+    --color-text: black;
+    --color-text-light: #7f8c8d;
+    --color-text-lighter: #555;
+    --color-shadow: black;
+    --color-shadow-hover: black;
+
+    /* Espacements & Bordures */
+    --border-radius: 10px;
+    --border-radius-btn: 25px;
+    --max-width: 1200px;
+    --padding-xs: 2px;
+    --padding-sm: 8px;
+    --padding-md: 15px;
+    --padding-lg: 20px;
+    --margin-xs: 2px;
+    --margin-sm: 8px;
+    --margin-md: 15px;
+    --margin-lg: 20px;
+    --gap-xs: 4px;
+    --gap-sm: 8px;
+    --gap-md: 15px;
+    --gap-lg: 25px;
+
+    /* Tailles de texte */
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.9rem;
+    --font-size-md: 1rem;
+    --font-size-lg: 1.3rem;
+
+    /* Effets & Transitions */
+    --transition: all 0.3s ease;
+    --box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    --box-shadow-hover: 0 5px 10px rgba(0, 0, 0, 0.15);
+
+    /* Largeur des infowindows */
+    --infowindow-width: 300px;
+    --infowindow-max-width: 300px;
+}
+
+/* Reset & Base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-primary);
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: var(--color-secondary);
+    color: var(--color-text);
+}
+
+/* =============================================
+   2. POLICES
+   ============================================= */
 @font-face {
     font-family: 'Bubblegum';
     src: url('/static/fonts/Bubblegum.ttf') format('truetype');
     font-weight: bold;
     font-style: normal;
 }
-/* Reset basique et styles globaux */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-bubblegum);
 }
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    line-height: 1.6;
-    margin: 0;
-    padding: 0;
-    background-color: #799dcb;
-    color: #333;
+
+/* =============================================
+   3. LAYOUT & CONTAINERS
+   ============================================= */
+.container {
+    width: 100%;
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 var(--padding-md);
 }
+
+/* =============================================
+   4. HEADER
+   ============================================= */
 header {
-    background-color: #799dcb;
+    background-color: var(--color-primary);
     color: white;
-    padding: 0.3rem 0;
+    width: 100%;
+    padding: 0;
     position: sticky;
     top: 0;
     z-index: 100;
     transition: transform 0.3s ease;
 }
-header.hide {
-    transform: translateY(-100%);
+
+.header-yellow nav {
+    background-color: transparent;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+    border: none;
 }
-header .top-bar {
+
+.header-yellow > nav > div {
+    width: 100%;
+    max-width: 100%;
+    padding: 0 var(--padding-md);
+    margin: 0 auto;
+    background-color: transparent;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
-    padding: 0 20px;
-    margin-bottom: 0.3rem;
-}
-header h1 {
-    font-family: 'Bubblegum', cursive !important;
-    text-align: center;
-    margin: 0;
-    color: white;
-    font-size: 2rem;
-}
-.btn-icon {
-    background: transparent;
-    border: none;
-    color: white;
-    font-size: 1.5rem;
-    padding: 0.3rem;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-.btn-icon:hover {
-    color: #fee10d;
-    transform: scale(1.1);
-}
-/* Barre de recherche */
-.search-bar {
-    background-color: #fee10d;
-    padding: 0.4rem 0;
-    margin-bottom: 0;
-    transition: transform 0.3s ease, opacity 0.3s ease;
-    width: 100%;
-}
-.search-bar.hide {
-    transform: translateY(-100%);
-    opacity: 0;
-}
-.search-bar .container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
     flex-wrap: nowrap;
-    gap: 0.5rem;
-    padding: 0;
-    max-width: 100%;
 }
-.search-bar form {
+
+.header-yellow form {
     display: flex;
     align-items: center;
-    margin: 0;
-    padding: 0;
+    flex-grow: 1;
+    margin: 0 0.5rem;
 }
-.search-bar .form-control {
-    border-radius: 25px;
-    border: none;
-    padding: 0.3rem 1rem;
-    font-size: 1rem;
-    box-shadow: none;
-    height: 34px;
-    width: 220px;
-    margin: 0;
-    line-height: 1.2;
-}
-.btn-search-icon {
-    width: 36px;
-    height: 36px;
-    padding: 0;
-    margin: 0;
-    border-radius: 4px;
-    background-color: #799dcb;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-    flex-shrink: 0;
-}
-.btn-search-icon i {
+
+.header-yellow .btn,
+.header-yellow .btn i {
+    font-size: 1.1rem;
     margin: 0;
     position: relative;
-    top: 1px;
+    top: 0;
 }
-.container {
-    width: 90%;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 10px;
+
+.header-yellow .form-control {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    padding: 0.3rem 1rem;
+    height: 36px;
+    width: 120px;
+    margin-right: 8px;
 }
-main {
-    padding: 20px 0;
-    margin-top: 20px;
+
+.header-yellow .btn:hover {
+    background-color: var(--color-info-dark);
+    transform: scale(1.05);
 }
-footer {
-    background-color: #799dcb;
-    color: white;
-    text-align: center;
-    padding: 1rem 0;
-    bottom: 0;
-    width: 100%;
-}
-h1, h2, h3, h4, h5, h6 {
-    font-family: 'Bubblegum', cursive !important;
-}
-/* Boutons */
-/* ===== STYLES DE BASE POUR TOUS LES BOUTONS ===== */
+
+/* =============================================
+   5. BOUTONS (spécifiques à l'app)
+   ============================================= */
 .btn,
 button,
 input[type="button"],
 input[type="submit"],
-input[type="reset"],
-.a-btn, /* Si tu utilises des liens stylisés en boutons */
-.action-btn {
+input[type="reset"] {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 10px 20px; /* Padding légèrement réduit pour les petits boutons */
+    padding: var(--padding-xs) var(--padding-sm);
     text-decoration: none;
-    border-radius: 25px !important; /* Arrondi forcé */
+    border-radius: var(--border-radius);
     border: none;
     cursor: pointer;
     font-weight: bold;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    font-family: var(--font-primary);
+    transition: var(--transition);
+    box-shadow: var(--box-shadow);
     text-align: center;
-    min-width: 100px; /* Largeur minimale réduite pour les petits boutons */
-    height: 40px; /* Hauteur fixe pour tous */
-    margin: 4px;
+    min-width: 36px;
+    height: 36px;
+    margin: var(--margin-xs);
     line-height: 1;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-/* Boutons dans les grilles ou listes (ex: edit, valider, supprimer) */
-.btn-edit,
-.btn-validate,
-.btn-delete,
-.btn-small {
-    padding: 8px 16px; /* Plus petits */
-    min-width: 80px;
-    height: 36px;
-    font-size: 0.9em;
-}
-
-/* Effets hover/active pour tous les boutons */
 .btn:hover,
 button:hover,
 input[type="button"]:hover,
-input[type="submit"]:hover,
-.a-btn:hover,
-.action-btn:hover {
+input[type="submit"]:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--box-shadow-hover);
 }
+
 .btn:active,
 button:active,
 input[type="button"]:active,
-input[type="submit"]:active,
-.a-btn:active,
-.action-btn:active {
+input[type="submit"]:active {
     transform: translateY(0);
     box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
 }
 
-/* Couleurs par type de bouton */
-.btn-primary,
-button.primary,
-input.primary {
-    background-color:#45a049;
+
+.btn-success {
+    background-color: var(--color-primary);
     color: white;
 }
-.btn-primary:hover,
-button.primary:hover,
-input.primary:hover {
-    background-color: #6a8bc0;
+
+.btn-success:hover {
+    background-color: var(--color-secondary);
 }
 
-.btn-success,
-button.success,
-input.success,
-.btn-validate {
-    background-color: #4CAF50;
-    color: white;
-}
-.btn-success:hover,
-button.success:hover,
-input.success:hover,
-.btn-validate:hover {
-    background-color: #45a049;
+/* Style pour les filtres actifs (persistant) */
+.btn.active {
+    background-color: var(--color-secondary) !important;
+    color: white !important;
+    font-weight: bold !important;
 }
 
-.btn-danger,
-button.danger,
-input.danger,
-.btn-delete {
-    background-color: #e74c3c;
-    color: white;
-}
-.btn-danger:hover,
-button.danger:hover,
-input.danger:hover,
-.btn-delete:hover {
-    background-color: #c0392b;
+/* Style pour les boutons principaux quand un filtre est actif dans leur catégorie */
+#filter-controls .main-filters .btn.active {
+    background-color: var(--color-secondary);
+    color: white !important;
+    font-weight: bold !important;
 }
 
-.btn-info,
-button.info,
-input.info,
-.btn-edit {
-    background-color: #3498db;
-    color: white;
-}
-.btn-info:hover,
-button.info:hover,
-input.info:hover,
-.btn-edit:hover {
-    background-color: #2980b9;
-}
-
-.btn-back,
-button.back,
-input.back {
-    background-color: #7f8c8d;
-    color: white;
-}
-.btn-back:hover,
-button.back:hover,
-input.back:hover {
-    background-color: #6c7a7d;
-}
-
-
-/* Groupe de boutons (pour aligner plusieurs boutons) */
-.btn-group {
+/* Style pour les sous-filtres */
+.filter-group {
     display: flex;
-    justify-content: center;
-    gap: 8px;
     flex-wrap: wrap;
-    margin: 10px 0;
+    gap: 8px;
+    padding: 8px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 8px;
 }
 
-/* Boutons dans les actions de grille (ex: en ligne) */
+.filter-group .btn {
+    flex: 1;
+    min-width: 100px;
+    font-size: 14px;
+    padding: 6px 12px;
+}
+
+.btn-danger {
+    background-color: var(--color-danger);
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: var(--color-danger-dark);
+}
+
+.btn-icon {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-primary);
+    color: white;
+    border-radius: 50%;
+}
+
+.btn-canceledit {
+    background-color: var(--color-back);
+    color: white;
+}
+
+.btn-canceledit:hover {
+    background-color: var(--color-back-dark);
+}
+
 .action-buttons {
     display: flex;
-    gap: 8px;
-    justify-content: flex-end;
-}
-.action-buttons .btn {
-    margin: 0; /* Pas de marge supplémentaire */
+    gap: var(--gap-sm);
+    justify-content: center; /* Corrigé */
+    margin-top: var(--margin-md);
 }
 
-/* Flash messages */
-.alert {
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 4px;
+.action-buttons form {
+    margin: 0;
+    padding: 0;
+    display: contents;
 }
-.alert-success {
-    background-color: #4caf50;
+
+.inline-form {
+    display: inline-block;
+}
+
+/* =============================================
+   6. BARRE DE RECHERCHE
+   ============================================= */
+#search-input {
+    width: 200px;
+}
+
+/* =============================================
+   7. CARTES
+   ============================================= */
+.carte {
+    text-decoration: none;
+    color: inherit;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--box-shadow);
+    transition: var(--transition);
+    background: white;
+    display: block;
+    height: 100%;
+    width: 100%;
+    margin: var(--margin-sm) 0;
+}
+
+.carte:hover {
+    transform: translateY(-7px);
+    box-shadow: var(--box-shadow-hover);
+}
+
+.carte-image-container {
+    position: relative;
+    display: block;
+    height: 200px;
+    overflow: hidden;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+    background-color: #f5f5f5;
+}
+
+.carte-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+
+
+.carte-header {
+    padding: var(--padding-md);
+    border-bottom: 1px solid #eee;
+    background-color: white;
+}
+
+/* =============================================
+   8. FLANS (Cartes spécifiques)
+   ============================================= */
+.flan-price-tag {
+    background: var(--color-secondary);
     color: white;
+    padding: var(--padding-xs) var(--padding-sm);
+    border-radius: var(--border-radius-btn);
+    font-weight: bold;
+    font-size: var(--font-size-sm);
+    width: 70px;
 }
-.alert-danger {
-    background-color: #f44336;
-    color: white;
+
+.flan-details {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-sm);
 }
-/* Badges */
+
+.flan-attribute,
+.flan-description {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-sm);
+    padding: var(--padding-xs) 0;
+    border-bottom: 1px solid #eee;
+}
+
+.flan-attribute:last-child,
+.flan-description:last-child {
+    border-bottom: none;
+}
+
+.attribute-label {
+    width: 90px;
+    font-weight: bold;
+    color: var(--color-text-light);
+}
+
+.attribute-value {
+    flex: 1;
+    color: var(--color-text);
+}
+
+.carte-link {
+    text-decoration: none;
+    color: inherit;
+    flex-grow: 1;
+    display: block;
+}
+
+.moyenne-value {
+    color: var(--color-primary); /* Corrigé (text-decoration → color) */
+}
+
+/* =============================================
+   9. BADGES
+   ============================================= */
 .badge {
     position: absolute;
     display: inline-block;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    font-size: 0.8em;
+    font-family: var(--font-primary);
+    font-size: var(--font-size-sm);
     font-weight: bold;
     text-transform: uppercase;
-    color: #333;
-    padding: 5px 10px;
+    color: var(--color-text);
+    padding: var(--padding-xs) var(--padding-sm);
     border-radius: 15px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    z-index: 20;
+    box-shadow: var(--box-shadow);
+
 }
 
-/* Badge de type d'établissement (en haut à gauche) */
 .badge-type-etab {
-    top: 10px;
-    left: 10px;
-
+    top: var(--margin-sm);
+    left: var(--margin-sm);
 }
 
-/* Badge labellisé (en haut à droite, bleu clair) */
 .badge-labellise {
-    top: 10px;
-    right: 10px;
-    background-color: #87CEEB; /* Bleu clair */
+    top: var(--margin-sm);
+    right: var(--margin-sm);
+    background-color: #87CEEB;
 }
 
-/* Badges de statut */
 .statut-valide {
     background-color: green;
     color: white;
-    top: 10px;
-    right: 10px;
+    top: var(--margin-sm);
+    right: var(--margin-sm);
 }
 
 .statut-en-attente {
     background-color: orange;
     color: white;
-    top: 10px;
-    right: 10px;
+    top: var(--margin-sm);
+    right: var(--margin-sm);
 }
 
-/* Conteneur des badges (ajusté pour éviter les conflits) */
-.card-image-container {
-    position: relative;
-    display: block;
-    height: 180px;
-    overflow: hidden; /* Remis à hidden, mais z-index: 20 permet au badge de dépasser */
-}
-
-/* Cartes */
-.carte {
-    text-decoration: none;
-    color: inherit;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    background: white;
-    display: block;
-    height: 100%;
-}
-.carte:hover {
-    transform: translateY(-7px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
-    color: inherit;
-}
-.card-image-container {
-    position: relative;
-    display: block;
-    height: 180px;
-    overflow: hidden;
-}
-.card-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-.card-image.placeholder {
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #7f8c8d;
-    font-style: italic;
-    height: 100%;
-}
-.card-content {
-    padding: 20px;
-    position: relative;
-    min-height: 160px;
-}
-.card-content-link {
-    text-decoration: none;
-    color: inherit;
-    display: block;
-}
-.card-header {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
-    margin-bottom: 10px;
-}
-.carte h2, .carte h3 {
-    margin: 0 0 8px 0;
-    font-size: 1.3rem;
-    color: #333 !important;
-}
-.type {
-    color: #7f8c8d;
-    font-style: italic;
-    font-size: 0.9rem;
-    margin: 5px 0;
-}
-.adresse {
-    color: #34495e;
-    font-size: 0.9rem;
-    margin: 10px 0;
-    line-height: 1.4;
-}
-.description {
-    color: #555;
-    font-size: 0.9rem;
-    line-height: 1.4;
-    margin: 10px 0;
-}
-.flans-count {
-    color: #e74c3c;
-    font-weight: bold;
-    font-size: 0.9rem;
-    margin: 10px 0;
-}
-.flan-price {
-    color: #e74c3c;
-    font-weight: bold;
-    margin: 10px 0;
-}
-.arrow {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    font-size: 1.5em;
-    color: #3498db;
-    transition: all 0.2s;
-}
-.carte:hover .arrow {
-    transform: translateX(5px);
-}
-/* Grille */
+/* =============================================
+   10. GRILLE
+   ============================================= */
 .grille {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 25px;
-    margin-top: 20px;
+    gap: var(--gap-lg);
+    margin-top: var(--margin-lg);
 }
-/* Formulaires */
+
+/* =============================================
+   11. FORMULAIRES
+   ============================================= */
 .form-container {
     background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    margin-top: 20px;
+    padding: var(--padding-lg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    margin-top: var(--margin-lg);
+    align-content: center;
 }
+
+.form-container button {
+    display: block;
+    margin: 0 auto;
+}
+
 .form-group {
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--margin-sm);
 }
+
 .form-group label {
     display: block;
-    margin-bottom: 5px;
-    color: #333;
+    margin-bottom: var(--margin-xs);
+    color: var(--color-text);
     font-weight: bold;
 }
 
-/* Styles pour les cases à cocher */
 .form-check {
     display: flex;
     align-items: center;
-    margin-bottom: 0.5rem;
-    width: auto;
+    margin-bottom: var(--margin-sm);
 }
-/* Styles pour les cases à cocher (INLINE) */
+
 .form-check-inline {
-    display: inline-flex; /* Affichage en ligne */
-    align-items: center; /* Alignement vertical */
-    margin-right: 20px; /* Espace entre les cases */
-    margin-bottom: 0; /* Pas de marge en bas */
-    vertical-align: middle; /* Alignement vertical */
+    display: inline-flex;
+    align-items: center;
+    margin-right: var(--margin-lg);
+    margin-bottom: 0;
 }
 
 .form-check-input {
-    width: 18px; /* Largeur fixe */
-    height: 18px; /* Hauteur fixe */
-    margin: 0 8px 0 0; /* Marge à droite seulement */
-    vertical-align: middle; /* Alignement vertical */
-    appearance: auto; /* Style natif */
-    -webkit-appearance: checkbox; /* Pour Safari */
+    width: 18px;
+    height: 18px;
+    margin: 0 var(--margin-xs) 0 0;
+    vertical-align: middle;
+    appearance: auto;
+    -webkit-appearance: checkbox;
 }
 
 .form-check-label {
-    display: inline-block; /* Pour un alignement précis */
-    vertical-align: middle; /* Alignement vertical */
-    margin-bottom: 0; /* Pas de marge en bas */
-    line-height: 1; /* Hauteur de ligne ajustée */
-    padding-top: 2px; /* Petit ajustement pour l'alignement */
+    display: inline-block;
+    vertical-align: middle;
+    margin-bottom: 0;
+    line-height: 1;
+    padding-top: 2px;
 }
-
 
 .form-group input:not(.form-check-input),
 .form-group textarea,
 .form-group select {
     width: 100%;
-    padding: 8px;
+    padding: var(--padding-xs);
     border: 1px solid #ddd;
-    border-radius: 4px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    border-radius: var(--border-radius);
+    font-family: var(--font-primary);
 }
+
 .error-message {
-    color: #e74c36;
-    font-size: 0.9rem;
-    margin-top: 5px;
+    color: var(--color-danger);
+    font-size: var(--font-size-sm);
+    margin-top: var(--margin-xs);
 }
-/* Évaluations */
+
+.form-label {
+    display: block;
+    margin-bottom: var(--margin-xs);
+    font-weight: bold;
+    color: var(--color-text);
+}
+
+.form-select {
+    width: 100%;
+    padding: var(--padding-xs);
+    border: 1px solid #ddd;
+    border-radius: var(--border-radius);
+    font-family: var(--font-primary);
+    background-color: white;
+}
+
+.form-check-container {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-sm);
+}
+
+.form-control-lg {
+    padding: var(--padding-md) var(--padding-lg);
+    font-size: var(--font-size-lg);
+}
+
+/* =============================================
+   12. ÉVALUATIONS
+   ============================================= */
 .criteria {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 10px;
-    margin: 15px 0;
+    gap: var(--gap-sm);
+    margin: var(--margin-md) 0;
 }
+
 .criterion {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px 0;
+    padding: var(--padding-xs) 0;
     border-bottom: 1px solid #eee;
 }
+
 .criterion-name {
     font-weight: bold;
-    color: #333;
+    color: var(--color-text);
 }
+
 .criterion-value {
-    color: #3498db;
+    color: var(--color-info);
     font-weight: bold;
 }
+
 .moyenne {
     text-align: center;
-    margin: 15px 0;
+    margin: var(--margin-md) 0;
 }
-.moyenne-value {
-    background: #e8f5e9;
-    padding: 5px 15px;
-    border-radius: 20px;
+
+.flan-moyenne {
+    display: flex;
+    align-items: center;
+    gap: var(--margin-xs);
+    margin-top: var(--margin-sm);
+    padding: var(--padding-xs);
+    background-color: #f5f5f5;
+    border-radius: var(--border-radius-btn);
+}
+
+.flan-moyenne .moyenne-label {
     font-weight: bold;
-    color: #4CAF50;
+    color: var(--color-text);
 }
+
+.flan-moyenne .moyenne-value {
+    background: #e8f5e9;
+    padding: var(--padding-xs);
+    border-radius: var(--border-radius-btn);
+    font-weight: bold;
+    color: var(--color-primary);
+}
+
 .evaluation-date {
-    color: #7f8c8d;
-    font-size: 0.9em;
+    color: var(--color-text-light);
+    font-size: var(--font-size-sm);
     font-weight: normal;
     text-align: left;
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: var(--margin-xs);
 }
-/* No results */
+
+/* =============================================
+   13. ALERTES
+   ============================================= */
+.alert {
+    padding: var(--padding-md);
+    margin: var(--margin-md) 0;
+    border-radius: var(--border-radius);
+}
+
+.alert-success {
+    background-color: var(--color-secondary);
+    color: white;
+}
+
+.alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+/* =============================================
+   14. NO RESULTS
+   ============================================= */
 .no-results {
     grid-column: 1 / -1;
     text-align: center;
-    padding: 40px;
+    padding: var(--padding-lg);
     background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+/* =============================================
+   15. LEAFLET - INFOWINDOWS & EMOJIS
+   ============================================= */
+.leaflet-popup-content-wrapper {
+    width: var(--infowindow-width);
+    max-width: var(--infowindow-max-width);
+    font-size: var(--font-size-md);
+    margin: 0 !important;
+    overflow-y: auto;
+    max-height: 60vh;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-secondary) var(--color-light);
+}
+
+.leaflet-popup-content {
+    background: white;
+    text-align: center;
+    
+
+ 
+    padding : 0 !important;
+}
+
+.leaflet-popup-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.leaflet-popup-content::-webkit-scrollbar-track {
+    background: var(--color-light);
+    border-radius: 4px;
+}
+
+.leaflet-popup-content::-webkit-scrollbar-thumb {
+    background: var(--color-primary);
+    border-radius: 4px;
+}
+
+.leaflet-popup-close-button {
+    font-size: 18px;
+    top: 5px;
+    right: 5px;
+}
+
+
+/* Positionnement de la pointe du popup */
+.leaflet-popup-tip {
+    left: 50% !important;
+    margin-left: -10px !important;
+    top: 5px;
+    right: 5px;
+}
+
+/* Bouton de géolocalisation */
+.leaflet-control-geolocate {
+    width: 50px;
+    height: 50px;
+    background-color: var(--color-primary) !important;
+    border-radius: 50% !important;
+    border: none !important;
+    cursor: pointer;
+    box-shadow: var(--box-shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 5px;
+    margin-right: 5px;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.leaflet-control-geolocate:hover {
+    background-color: var(--color-secondary) !important;
+    transform: scale(1.1);
+}
+
+.leaflet-control-geolocate a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: transparent !important;
+}
+
+.leaflet-control-geolocate i {
+    color: white !important;
+    font-size: 24px;
+    background: transparent !important;
+}
+
+.infowindow-content {
+    font-family: Arial, sans-serif;
+    width: 100%;
+    max-width: 100%;
+   
+    margin: 0 auto;
+    overflow-wrap: break-word;
+    text-align: center;
+}
+
+.infowindow-header {
+    position: relative;
+    min-height: 30px;
+    padding-top: 40px; /* Espace pour les badges */
+    margin-top: 0; /* S'assurer qu'il n'y a pas de marge supplémentaire */
+}
+
+.infowindow-header h3 {
+  
+    font-size: 1em;
+    line-height: 1.2;
+    text-align: center;
+    word-wrap: break-word;
+}
+
+.infowindow-badges {
+    position: absolute;
+    top: 10px; /* Positionner légèrement en dessous du haut */
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+    z-index: 10; /* S'assurer qu'ils sont au-dessus du contenu mais pas du titre */
+    max-height: 30px; /* Limiter la hauteur */
+}
+
+.infowindow-badges .badge {
+    font-size: var(--font-size-xs);
+    padding: 6px 10px;
+    max-width: 110px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 28px; /* Hauteur fixe */
+    line-height: 1; /* Alignement vertical */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Badge labellisé spécifique pour l'infowindow */
+.infowindow-badges .badge-labellise {
+    background-color: #87CEEB;
+    margin-right: 20px;
+}
+
+/* Badge type établissement spécifique pour l'infowindow */
+.infowindow-badges .badge-type-etab {
+    background-color: inherit; /* Conserver la couleur dynamique */
+    padding: 6px 8px; /* Padding légèrement réduit */
+}
+
+
+.infowindow-link {
+    text-decoration: none;
+    color: black;
+    display: block;
+    padding: 10px;
+    margin: -10px;
+}
+
+.infowindow-link:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+    border-radius: 5px;
+}
+
+.emoji-marker {
+    font-size: 24px;
+    text-align: center;
+    line-height: 1;
+    width: auto;
+    height: auto;
+    background: transparent;
+    box-shadow: none;
+    display: inline-block;
+    transform: translateY(-12px);
+}
+
+/* =============================================
+   16. MAP & FILTRES
+   ============================================= */
+#map {
+    height: 80vh;
+    width: 100%;
+    background-color: transparent;
+    transform: translateZ(0);
+    will-change: transform;
+}
+
+/* Légende pour la carte Leaflet */
+.carte-legende {
+    background: white;
+    padding: var(--padding-sm);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    font-family: var(--font-primary), sans-serif;
+    max-width: 300px;
+
+}
+
+.legende-container {
+    display: left;
+    
+    gap: var(--gap-sm);
+
+}
+
+
+
+.legende-text {
+    color: var(--color-text);
+    font-size: var(--font-size-sm);
+
+    align-items: left;
+    gap: var(--gap-sm);
+}
+
+
+/* Style spécifique pour les emojis dans la légende */
+.carte-legende .badge {
+    min-width: 30px;
+    height: 24px;
+    display: flex;
+    align-items: left;
+    justify-content: left;
+    font-size: var(--font-size-sm);
+}
+
+
+#filter-controls {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    background: transparent;
+    padding: 10px;
     border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+    border: none;
 }
-.no-results p {
-    margin-bottom: 15px;
-    color: #7f8c8d;
+
+.main-filters {
+    display: flex;
+    align-items: center;
+    gap: var(--gap-sm);
+    flex-wrap: wrap;
+    background: transparent;
+    justify-content: flex-end;
+    margin-left: auto;
+    width: fit-content;
 }
-/* Responsive */
+
+.main-filters button {
+    padding: var(--padding-xs) var(--padding-sm);
+    font-size: var(--font-size-sm);
+    width: auto;
+    min-width: 0;
+    height: auto;
+    line-height: 2;
+    white-space: nowrap;
+}
+
+
+.sub-filters {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: transparent;
+    padding: var(--padding-xs) var(--padding-sm);
+    margin-top: var(--margin-xs);
+    z-index: 1001;
+    min-width: 160px;
+    color: white;
+}
+
+.sub-filters.show {
+    display: block;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-xs);
+    background: transparent;
+    border: none;
+    padding: 0;
+}
+
+.filter-group label,
+.filter-group button {
+    margin-left: auto;
+    display: block;
+    width: fit-content;
+}
+
+.filter-btn {
+    margin: var(--margin-xs);
+}
+
+/* =============================================
+   17. UTILITAIRES SPÉCIFIQUES À L'APP
+   ============================================= */
+.placeholder {
+    color: var(--color-text-light);
+    font-style: italic;
+}
+
+.upload {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-md);
+    margin-top: var(--margin-md);
+}
+
+.uploads {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: var(--gap-md);
+}
+
+.type {
+    display: inline-block;
+    padding: var(--padding-xs) var(--padding-sm);
+    background-color: #f0f0f0;
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-sm);
+    margin-right: var(--margin-sm);
+}
+
+.category {
+    font-weight: bold;
+    color: var(--color-secondary);
+    margin-bottom: var(--margin-sm);
+}
+
+.classe {
+    display: inline-block;
+    padding: var(--padding-xs) var(--padding-sm);
+    background-color: #e3f2fd;
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-sm);
+    color: var(--color-info);
+}
+
+.adresse {
+    font-style: italic;
+    color: var(--color-text-light);
+    margin:0 !important;
+  
+}
+
+.description {
+    color: var(--color-text);
+    line-height: 1.5;
+    margin-bottom: var(--margin-md);
+}
+
+/* Icônes Bootstrap (à garder si tu utilises bootstrap-icons) */
+.bi {
+    font-family: 'bootstrap-icons' !important;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    vertical-align: -0.125em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* =============================================
+   18. RESPONSIVE
+   ============================================= */
 @media (max-width: 768px) {
     .grille {
         grid-template-columns: 1fr;
     }
+
     .carte {
-        border-radius: 8px;
+        border-radius: var(--border-radius);
     }
-    .card-content {
-        padding: 15px;
+
+    .etablissement-detail {
+        flex-direction: column;
     }
+
+    .detail-left-column {
+        min-width: 100%;
+        margin-bottom: var(--margin-lg);
+    }
+
+    .detail-right-column {
+        min-width: 100%;
+    }
+
+    .flan-detail {
+        flex-direction: column;
+    }
+
+    .flan-detail .detail-left-column {
+        min-width: 100%;
+        margin-bottom: var(--margin-lg);
+    }
+
+    .flan-detail .detail-right-column {
+        min-width: 100%;
+    }
+
     header h1 {
         font-size: 1.5rem;
     }
-    .search-bar .form-control {
-        width: 180px;
+
+
+
+    #map {
+        height: 60vh;
     }
-    .btn-search-icon {
-        width: 32px;
-        height: 32px;
-        font-size: 0.9rem;
+
+    .container {
+        padding: 0 var(--padding-sm);
+    }
+
+    .header-yellow > nav > div {
+        padding: 0 var(--padding-sm);
+    }
+
+    .header-yellow .form-control {
+        width: 120px;
     }
 }
+
 @media (max-width: 480px) {
     .container {
-        padding: 0 5px;
+        padding: 0 var(--padding-xs);
     }
-    .search-bar .container {
-        flex-wrap: wrap;
-        gap: 0.3rem;
+
+    .form-control {
+        padding: var(--padding-xs);
     }
-    .search-bar .form-control {
-        width: 160px;
+
+    .form-container {
+        padding: var(--padding-md);
     }
-    .btn-search-icon {
-        width: 28px;
-        height: 28px;
-        font-size: 0.8rem;
+
+
+
+    .form-group {
+        margin-bottom: var(--margin-md);
     }
 }
+
+/* =============================================
+   17.5. ETABLISSEMENT DETAIL (NOUVEAU)
+   ============================================= */
+.etablissement-detail {
+    display: flex;
+    gap: var(--gap-lg);
+    margin-bottom: var(--margin-lg);
+    background: white;
+    padding: var(--padding-lg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+.detail-left-column {
+    flex: 1;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.detail-right-column {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.detail-left-column .carte-image-container {
+    height: 250px;
+    width: 100%;
+}
+
+.detail-right-column .carte-header {
+    text-align: left;
+    padding: 0;
+    margin-bottom: var(--margin-md);
+}
+
+.detail-right-column .carte-header h2 {
+    margin: 0;
+    font-size: var(--font-size-lg);
+    color: var(--color-text);
+}
+
+.detail-right-column .adresse {
+    font-size: var(--font-size-md);
+    margin-bottom: var(--margin-sm);
+}
+
+.detail-right-column .flans-count {
+    font-weight: bold;
+    color: var(--color-primary);
+    margin-bottom: var(--margin-md);
+}
+
+
+.detail-right-column .description {
+    margin-bottom: var(--margin-lg);
+}
+
+/* =============================================
+   8.5. FLAN DETAIL (NOUVEAU)
+   ============================================= */
+.flan-detail {
+    display: flex;
+    gap: var(--gap-lg);
+    margin-bottom: var(--margin-lg);
+    background: white;
+    padding: var(--padding-lg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+.flan-detail .detail-left-column {
+    flex: 1;
+    min-width: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.flan-detail .detail-right-column {
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.flan-detail .detail-left-column .carte-image-container {
+    height: 250px;
+    width: 100%;
+}
+
+.flan-detail .detail-right-column .carte-header {
+    text-align: left;
+    padding: 0;
+    margin-bottom: var(--margin-md);
+}
+
+.flan-detail .detail-right-column .carte-header h2 {
+    margin: 0;
+    font-size: var(--font-size-lg);
+    color: var(--color-text);
+}
+
+.flan-detail .detail-right-column .flan-details {
+    width: 100%;
+}
+
+.flan-detail .detail-right-column .flan-price-tag {
+    margin-bottom: var(--margin-md);
+}
+
+/* =============================================
+   ATTRIBUTION GOOGLE PHOTOS
+   =============================================
+/* Conteneur pour les photos Google avec attribution */
+.google-photo-container {
+    position: relative;
+    display: inline-block;
+}
+
+.google-photo-attribution {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 3px 8px;
+    font-size: var(--font-size-xs);
+    border-radius: 3px;
+    font-family: var(--font-primary);
+}
+
+/* =============================================
+   19. RESPONSIVE SPECIFIQUE POUR LISTE_ETABLISSEMENTS
+   ============================================= */
+@media (max-width: 768px) {
+
+
+
+    /* Adapter les filtres pour mobile */
+    #filter-controls {
+        top: 5px !important;
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+    }
+
+    #filter-controls .main-filters {
+        gap: 4px !important;
+    }
+
+    #filter-controls .btn {
+        font-size: 12px !important;
+        padding: 4px 8px !important;
+        min-width: auto !important;
+    }
+
+    /* Bouton proposer adresse en plein largeur sur mobile */
+    .btn-success.w-100 {
+        max-width: 100% !important;
+    }
+}
+
+@media (max-width: 480px) {
+
+
+    /* Adapter les filtres pour très petits écrans */
+    #filter-controls .btn {
+        font-size: 11px !important;
+        padding: 3px 6px !important;
+    }
+
+    /* Bouton proposer adresse avec marge réduite */
+    .row.mt-3.mb-3 {
+        margin-top: 1rem !important;
+        margin-bottom: 1rem !important;
+    }
+}
+
+
+  .autocomplete {
+    position: relative;
+    width: 100%;
+  }
+
+  .autocomplete-input {
+    width: 100%;
+    padding: 0.5rem;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: var(--border-radius-btn);
+    border: 1px solid #ddd;
+  }
+
+  .autocomplete-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-top: none;
+    border-radius: 0 0 var(--border-radius-btn) var(--border-radius-btn);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+  }
+
+  .autocomplete-results.show {
+    display: block;
+  }
+
+  .autocomplete-item {
+    padding: 0.5rem;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+  }
+
+  .autocomplete-item:hover {
+    background-color: #f0f0f0;
+  }
+
+  .autocomplete-item:last-child {
+    border-bottom: none;
+  }
+
+  .autocomplete-loading {
+    padding: 0.5rem;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+  }
+
+  .autocomplete-no-results {
+    padding: 0.5rem;
+    text-align: center;
+    color: #999;
+    font-style: italic;
+  }
+
+  .autocomplete-item.active {
+    background-color: #e3f2fd;
+  }

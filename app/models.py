@@ -373,17 +373,6 @@ class Flan(db.Model):
 
         return data
 
-        @event.listens_for(Etablissement, "before_insert")
-        @event.listens_for(Etablissement, "before_update")
-        def validate_etablissement(mapper, connection, target):
-            """Valide automatiquement les contraintes de l'établissement avant insertion ou mise à jour."""
-            target.valider_label_visite()
-
-        @event.listens_for(Evaluation, "before_insert")
-        @event.listens_for(Evaluation, "before_update")
-        def calculate_evaluation_moyenne(mapper, connection, target):
-            """Calcule automatiquement la moyenne de l'évaluation avant insertion ou mise à jour."""
-            target.calc_moyenne()
 
 
 class Evaluation(db.Model):
@@ -509,3 +498,63 @@ class Photo(db.Model):
             "largeur": self.largeur,
             "hauteur": self.hauteur,
         }
+
+
+# Event listeners pour nettoyer les photos orphelines
+@event.listens_for(Etablissement, "before_delete")
+def delete_etablissement_photos(mapper, connection, target):
+    """Supprime les fichiers photos d'un établissement avant sa suppression.
+
+    Args:
+        mapper: Le mapper SQLAlchemy
+        connection: La connexion à la base de données
+        target: L'établissement en cours de suppression
+    """
+    import os
+    from flask import current_app
+
+    # Récupérer les photos associées via l'ORM (avant la suppression)
+    photos = Photo.query.filter_by(id_etab=target.id_etab).all()
+
+    for photo in photos:
+        try:
+            # Construire le chemin complet du fichier
+            filepath = os.path.join(current_app.config["UPLOAD_FOLDER"], photo.path)
+            # Supprimer le fichier s'il existe
+            if os.path.exists(filepath):
+                os.remove(filepath)
+                current_app.logger.info(f"Photo supprimée: {filepath}")
+        except Exception as e:
+            current_app.logger.error(
+                f"Erreur lors de la suppression de la photo {photo.path}: {e}"
+            )
+
+
+@event.listens_for(Flan, "before_delete")
+def delete_flan_photos(mapper, connection, target):
+    """Supprime les fichiers photos d'un flan avant sa suppression.
+
+    Args:
+        mapper: Le mapper SQLAlchemy
+        connection: La connexion à la base de données
+        target: Le flan en cours de suppression
+    """
+    import os
+    from flask import current_app
+
+    # Récupérer les photos associées via l'ORM (avant la suppression)
+    photos = Photo.query.filter_by(id_flan=target.id_flan).all()
+
+    for photo in photos:
+        try:
+            # Construire le chemin complet du fichier
+            filepath = os.path.join(current_app.config["UPLOAD_FOLDER"], photo.path)
+            # Supprimer le fichier s'il existe
+            if os.path.exists(filepath):
+                os.remove(filepath)
+                current_app.logger.info(f"Photo supprimée: {filepath}")
+        except Exception as e:
+            current_app.logger.error(
+                f"Erreur lors de la suppression de la photo {photo.path}: {e}"
+            )
+
