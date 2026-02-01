@@ -219,8 +219,8 @@ def fetch_place_photos(etablissement_id, place_id, api_key, max_width=400):
         try:
             response = requests.get(url, params=params, stream=True)
             if response.status_code == 200:
-                # Générer un nom de fichier unique
-                filename = f"etab_{etablissement_id}_photo_{idx}.jpg"
+                # Générer un nom de fichier basé sur le google_place_id
+                filename = f"{place_id}_photo_{idx}.jpg"
                 filepath = os.path.join(current_app.config["UPLOAD_FOLDER"], filename)
 
                 # Sauvegarder la photo localement
@@ -228,16 +228,16 @@ def fetch_place_photos(etablissement_id, place_id, api_key, max_width=400):
                     for chunk in response.iter_content(1024):
                         f.write(chunk)
 
-                # Enregistrer la photo dans la base de données
+                # Enregistrer la photo dans la base de données (UNIQUEMENT le nom du fichier)
                 new_photo = Photo(
                     id_etab=etablissement_id,
                     type_cible=TypeCible.ETABLISSEMENT,
-                    path=filepath,
+                    path=filename,  # JUSTE le nom, PAS le chemin complet
                     largeur=max_width,
                     hauteur=max_width,  # Supposons des photos carrées pour simplifier
                 )
                 db.session.add(new_photo)
-                photo_paths.append(filepath)
+                photo_paths.append(filename)
         except Exception as e:
             current_app.logger.error(f"Erreur lors de la récupération de la photo: {e}")
 
