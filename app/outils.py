@@ -160,19 +160,11 @@ def get_place_details(place_id, api_key):
     params = {"place_id": place_id, "fields": "photos", "key": api_key}
 
     try:
-        current_app.logger.info(f"[get_place_details] Appel API pour place_id={place_id}")
         response = requests.get(url, params=params)
-        current_app.logger.info(f"[get_place_details] Status code: {response.status_code}")
         if response.status_code == 200:
             data = response.json()
-            current_app.logger.info(f"[get_place_details] Réponse JSON status: {data.get('status')}")
             if data.get("result"):
-                current_app.logger.info(f"[get_place_details] Résultat obtenu, clés: {list(data['result'].keys())}")
                 return data["result"]
-            else:
-                current_app.logger.warning(f"[get_place_details] Pas de 'result' dans la réponse. Data: {data}")
-        else:
-            current_app.logger.error(f"[get_place_details] Erreur HTTP: {response.status_code}, Body: {response.text[:200]}")
     except Exception as e:
         current_app.logger.error(f"Erreur lors de la récupération des détails: {e}")
 
@@ -196,12 +188,9 @@ def fetch_place_photos(etablissement_id, place_id, api_key, max_width=400):
     from app.models import Photo, TypeCible
     from app import db
 
-    current_app.logger.info(f"[fetch_place_photos] Début - etab_id={etablissement_id}, place_id={place_id}")
-
     # Vérifier si des photos existent déjà pour cet établissement
     existing_photos = Photo.query.filter_by(id_etab=etablissement_id).all()
     if existing_photos:
-        current_app.logger.info(f"[fetch_place_photos] Photos déjà existantes: {[p.path for p in existing_photos]}")
         return [photo.path for photo in existing_photos]
 
     # Récupérer les détails de l'établissement pour obtenir les photoreferences
@@ -212,21 +201,14 @@ def fetch_place_photos(etablissement_id, place_id, api_key, max_width=400):
         )
         return []
 
-    current_app.logger.info(f"[fetch_place_photos] Appel get_place_details pour place_id={place_id}")
     place_details = get_place_details(place_id, api_key)
-    if not place_details:
-        current_app.logger.warning(f"[fetch_place_photos] Aucun détail retourné par get_place_details")
-        return []
-    if "photos" not in place_details:
-        current_app.logger.warning(f"[fetch_place_photos] Pas de photos dans place_details. Clés disponibles: {list(place_details.keys())}")
+    if not place_details or "photos" not in place_details:
         return []
 
     # Récupérer les photos depuis l'API
     photo_paths = []
-    current_app.logger.info(f"[fetch_place_photos] Nombre de photos disponibles: {len(place_details['photos'])}")
     for idx, photo in enumerate(place_details["photos"][:1]):  # Limiter à une photo
         photo_reference = photo["photo_reference"]
-        current_app.logger.info(f"[fetch_place_photos] Traitement photo {idx}, reference={photo_reference[:20]}...")
         url = "https://maps.googleapis.com/maps/api/place/photo"
         params = {
             "maxwidth": max_width,
@@ -234,71 +216,30 @@ def fetch_place_photos(etablissement_id, place_id, api_key, max_width=400):
             "key": api_key,
         }
 
-        response = None  # Initialiser pour éviter les erreurs de référence
         try:
-            response = requests.get(url, params=params, stream=True, timeout=10)
-            response.raise_for_status()  # Lève une exception pour les codes 4xx/5xx
-
+            response = requests.get(url, params=params, stream=True)
             if response.status_code == 200:
-                # Générer un nom de fichier unique basé sur le Google Place ID
+                # Générer un nom de fichier basé sur le google_place_id
                 filename = f"{place_id}_photo_{idx}.jpg"
                 filepath = os.path.join(current_app.config["UPLOAD_FOLDER"], filename)
-
-                current_app.logger.info(f"[fetch_place_photos] Sauvegarde photo: {filename}")
 
                 # Sauvegarder la photo localement
                 with open(filepath, "wb") as f:
                     for chunk in response.iter_content(1024):
                         f.write(chunk)
 
-                current_app.logger.info(f"[fetch_place_photos] Photo sauvegardée dans: {filepath}")
-
-                # Récupérer les dimensions réelles de l'image
-                try:
-                    from PIL import Image
-                    with Image.open(filepath) as img:
-                        width, height = img.size
-                    current_app.logger.info(f"[fetch_place_photos] Dimensions: {width}x{height}")
-                except Exception as img_error:
-                    current_app.logger.warning(f"Impossible de lire les dimensions de l'image: {img_error}")
-                    width, height = max_width, max_width  # Fallback
-
-                # Enregistrer la photo dans la base de données
-                # ✅ CORRECTION: Stocke uniquement le nom du fichier, pas le chemin complet
+                # Enregistrer la photo dans la base de données (UNIQUEMENT le nom du fichier)
                 new_photo = Photo(
                     id_etab=etablissement_id,
                     type_cible=TypeCible.ETABLISSEMENT,
-                    path=filename,  # ✅ Uniquement le nom du fichier
-                    largeur=width,
-                    hauteur=height,
+                    path=filename,  # JUSTE le nom, PAS le chemin complet
+                    largeur=max_width,
+                    hauteur=max_width,  # Supposons des photos carrées pour simplifier
                 )
                 db.session.add(new_photo)
-                current_app.logger.info(f"[fetch_place_photos] Photo ajoutée à la session DB: {filename}")
-                photo_paths.append(filepath)
-        except requests.exceptions.Timeout:
-            current_app.logger.error(
-                f"Timeout lors du téléchargement de la photo {idx} pour l'établissement {etablissement_id}"
-            )
-        except requests.exceptions.HTTPError as http_err:
-            if response and response.status_code == 429:
-                current_app.logger.error(
-                    f"Quota Google Places API dépassé pour l'établissement {etablissement_id}"
-                )
-            else:
-                status_code = response.status_code if response else "Unknown"
-                current_app.logger.error(
-                    f"Erreur HTTP {status_code} lors de la récupération de la photo: {http_err}"
-                )
-        except requests.exceptions.RequestException as req_err:
-            current_app.logger.error(
-                f"Erreur réseau lors de la récupération de la photo {idx}: {req_err}"
-            )
+                photo_paths.append(filename)
         except Exception as e:
-            current_app.logger.error(
-                f"Erreur inattendue lors de la récupération de la photo {idx}: {e}"
-            )
+            current_app.logger.error(f"Erreur lors de la récupération de la photo: {e}")
 
-    current_app.logger.info(f"[fetch_place_photos] Commit des {len(photo_paths)} photos en base de données")
     db.session.commit()
-    current_app.logger.info(f"[fetch_place_photos] Fin - Photos sauvegardées: {photo_paths}")
     return photo_paths
