@@ -8,7 +8,7 @@ RUN apt-get install -y --no-install-recommends pkg-config python3-dev default-li
 # Copie de la liste de dépendances
 COPY requirements.txt .
 # Installation des dépendances
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 
 COPY . .
 
