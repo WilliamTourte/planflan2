@@ -60,8 +60,8 @@ docker-compose down
 ### Étape 3 : Reconstruire l'image Docker
 
 ```bash
-# Rebuild avec --no-cache pour forcer la reconstruction complète
-docker-compose build --no-cache planflan-backend
+# Rebuild sans --no-cache pour forcer la reconstruction complète
+docker-compose build planflan-backend
 ```
 
 ### Étape 4 : Démarrer les conteneurs
