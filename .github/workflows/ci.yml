@@ -1,0 +1,175 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ "dev", "main" ]
+    paths:
+      - 'Dockerfile'
+      - 'docker-compose.yml'
+      - 'entrypoint.sh'
+      - 'app/**'
+      - 'tests/**'
+  pull_request:
+    branches: [ "dev", "main" ]
+    paths:
+      - 'Dockerfile'
+      - 'docker-compose.yml'
+      - 'entrypoint.sh'
+      - 'app/**'
+      - 'tests/**'
+
+env:
+  PYTHON_VERSION: '3.12'
+  DOCKER_IMAGE_NAME: 'planflan.backend'
+  DOCKER_IMAGE_TAG: 'ci-${{ github.run_number }}'
+
+jobs:
+  check-commit:
+    name: Check if commit was already processed
+    runs-on: ubuntu-latest
+    outputs:
+      should_skip: ${{ steps.check_commit.outputs.should_skip }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch dev branch
+        if: github.ref == 'refs/heads/main'
+        run: git fetch origin dev:dev
+
+      - name: Check commit status
+        id: check_commit
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # For main branch: check if code is identical to dev
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "Checking if main is a fast-forward merge from dev..."
+            
+            # Check if dev branch exists
+            if git show-ref --verify --quiet refs/heads/dev; then
+              # Get the tree hash of dev and main
+              DEV_TREE=$(git rev-parse dev^{tree} 2>/dev/null)
+              MAIN_TREE=$(git rev-parse main^{tree} 2>/dev/null)
+              
+              # Get content hashes of relevant directories
+              DEV_CONTENT=$(git ls-tree -r dev -- app tests Dockerfile docker-compose.yml entrypoint.sh | awk '{print $3}' | sort | md5sum | awk '{print $1}')
+              MAIN_CONTENT=$(git ls-tree -r main -- app tests Dockerfile docker-compose.yml entrypoint.sh | awk '{print $3}' | sort | md5sum | awk '{print $1}')
+              
+              echo "dev content hash: $DEV_CONTENT"
+              echo "main content hash: $MAIN_CONTENT"
+              
+              if [ "$DEV_CONTENT" = "$MAIN_CONTENT" ]; then
+                echo "Code is identical to dev branch. Skipping CI..."
+                echo "should_skip=true" >> $GITHUB_OUTPUT
+              else
+                echo "Code differs from dev. Running CI..."
+                echo "should_skip=false" >> $GITHUB_OUTPUT
+              fi
+            else
+              echo "dev branch not found. Running CI..."
+              echo "should_skip=false" >> $GITHUB_OUTPUT
+            fi
+          else
+            # For dev branch or other branches: always run CI
+            echo "should_skip=false" >> $GITHUB_OUTPUT
+          fi
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    needs: check-commit
+    if: needs.check-commit.outputs.should_skip == 'false'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+        cache-dependency-path: 'requirements.txt'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install --no-cache-dir -r requirements.txt
+
+
+
+
+
+    - name: Run deployment tests (if enabled)
+      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev'
+      env:
+        RUN_DEPLOYMENT_TESTS: "false"  # Disabled in CI as production site is not accessible
+      run: |
+        python -m pytest tests/test_deployment.py -v --tb=short
+
+
+  docker-build:
+    name: Build Docker Image
+    runs-on: ubuntu-latest
+    needs: [check-commit, test]
+    if: needs.check-commit.outputs.should_skip == 'false'
+    services:
+      mysql:
+        image: mysql:lts
+        env:
+          MYSQL_ROOT_PASSWORD: supermegasecuredpassword
+          MYSQL_DATABASE: planflan_db
+          MYSQL_USER: planflan
+          MYSQL_PASSWORD: supersecuredpassword
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=10
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Login to Docker Hub
+      if: github.ref == 'refs/heads/main'
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+    - name: Build Docker image
+      run: |
+        docker build -t ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }} .
+
+    - name: Run Docker container for testing
+      run: |
+        docker run --name test-container -d -p 5000:5000 \
+          --network host \
+          -e MYSQL_USER=planflan -e MYSQL_PASSWORD=supersecuredpassword \
+          -e MYSQL_DATABASE=planflan_db \
+          -e MYSQL_HOST=localhost \
+          -e MYSQL_ROOT_PASSWORD=supermegasecuredpassword \
+          ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
+
+    - name: Test Docker container health
+      run: |
+        sleep 10
+        docker ps -a
+        docker logs test-container || true
+
+    - name: Push Docker image (main branch only)
+      if: github.ref == 'refs/heads/main'
+      run: |
+        docker tag ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }} \
+          ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
+        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
+        
+        # Also tag as latest for main branch
+        docker tag ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }} \
+          ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest
+        docker push ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest

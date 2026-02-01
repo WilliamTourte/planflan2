@@ -1,47 +1,123 @@
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
-from flask_bcrypt import Bcrypt
-from flask_wtf.csrf import CSRFProtect
-from app.config import Config
-from app.outils import enlever_accents
-from flask_migrate import Migrate
+"""Module principal de l'application PlanFlan.
 
-# Initialisation des extensions (une seule fois)
-db = SQLAlchemy()  # Doit être la SEULE instance de SQLAlchemy
+Ce module initialise l'application Flask et configure les extensions nécessaires.
+Il contient également les fonctions de sécurité et les filtres Jinja personnalisés.
+"""
+
+# Import du module os pour récupérer les variables d'environnement
+import os
+
+from flask import Flask
+from flask_bcrypt import Bcrypt
+from flask_login import LoginManager
+from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
+from flask_wtf.csrf import CSRFProtect
+
+from .config import Config  # Import relatif
+from .outils import enlever_accents
+
+db = SQLAlchemy()
 migrate = Migrate()
 login_manager = LoginManager()
-login_manager.login_view = 'auth.login'  # Route pour la page de login
+login_manager.login_view = "auth.login"
 login_manager.login_message = "Veuillez vous connecter pour accéder à cette page."
 bcrypt = Bcrypt()
 csrf = CSRFProtect()
 
-def create_app():
-    app = Flask(__name__)           # crée l'application
-    app.config.from_object(Config)  # la configure
 
-    # Initialisation des extensions
-    db.init_app(app)            #SQLAlchemy
-    migrate.init_app(app, db)   #Migrate
-    login_manager.init_app(app) #Login_Manager
-    bcrypt.init_app(app)        #Bcrypt
-    csrf.init_app(app)          #CSRF
+def create_app(config_class=None):
+    """
+    Fonction principale de l'application.
+    Deux configurations possibles :
+        - dev
+        - prod
+    Vérification de la variable d'environnement FLASK_CONFIG pour le chargement de l'environnement.
+    """
+
+    if config_class is None:
+        config_name = os.getenv("FLASK_CONFIG", "Config")  # Par défaut : Config (dev)
+        config_class = getattr(
+            __import__("app." + config_name.lower(), fromlist=["Config"]), config_name
+        )
+
+    # Vérification de la configuration utilisée
+    print(f" Configuration utilisée : {config_class}")
+
+    # Création de l'application Flask
+    app = Flask(__name__)
+
+    app.config.from_object(config_class)
+
+    db.init_app(app)
+    migrate.init_app(app, db)
+    login_manager.init_app(app)
+    bcrypt.init_app(app)
+    csrf.init_app(app)
+
+    from sqlalchemy import text
+
+    with app.app_context():
+        try:
+            db.session.execute(text("SELECT 1"))
+            print(
+                "Connexion reussie avec l'URL :",
+                app.config["SQLALCHEMY_DATABASE_URI"],
+            )
+        except Exception as e:
+            print(f"Erreur de connexion : {e}")
+            print(f"URL utilisee : {app.config['SQLALCHEMY_DATABASE_URI']}")
 
     @login_manager.user_loader
     def load_user(user_id):
-        from app.models import Utilisateur
-        return Utilisateur.query.get(int(user_id))  #Pour utiliser user_id plutôt que id tout court
+        """Charge un utilisateur à partir de son ID.
 
-    @app.template_filter('enlever_accents')  # filtre Jinja2 pour enlever les accents
+        Args:
+            user_id (int): L'ID de l'utilisateur à charger
+
+        Returns:
+            Utilisateur: L'objet utilisateur correspondant ou None si non trouvé
+        """
+        from .models import Utilisateur
+
+        return db.session.get(Utilisateur, int(user_id))
+
+    @app.template_filter("enlever_accents")
     def filtre_enlever_accents(text):
+        """Filtre Jinja pour enlever les accents d'un texte.
+
+        Args:
+            text (str): Le texte à traiter
+
+        Returns:
+            str: Le texte sans accents
+        """
         return enlever_accents(text)
 
-    # Enregistre les blueprints dans l'application
-    from app.routes.auth import auth_bp
-    from app.routes.main import main_bp
-    from app.routes.maps import maps_bp
+    # Initialiser les en-têtes de sécurité
+    from .security_headers import init_security_headers
+
+    init_security_headers(app)
+
+    # Configurer la journalisation
+    from .logging_config import (
+        configure_logging,
+        log_request_info,
+        configure_error_handling,
+    )
+
+    configure_logging(app)
+    log_request_info(app)
+    configure_error_handling(app)
+
+    from .routes.auth import auth_bp
+    from .routes.main import main_bp
+    from .routes.maps import maps_bp
+    from .routes.photos import photos_bp
+
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)
     app.register_blueprint(maps_bp)
+    app.register_blueprint(photos_bp)
 
     return app

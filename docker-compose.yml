@@ -1,0 +1,88 @@
+services:
+  planflan-service-db:
+    image: mysql:lts
+    container_name: planflan-container-db
+    restart: always
+    env_file: .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysql -u${MYSQL_USER} -p${MYSQL_PASSWORD} -e 'SELECT 1;' || exit 1"]
+      timeout: 30s
+      retries: 20
+      interval: 5s
+    networks:
+      - backend-network
+
+  planflan-backend:
+    image: planflan.backend:rc1
+    container_name: planflan-container-backend
+    build:
+      context: ./
+    env_file: .env
+    environment:
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_HOST=planflan-container-db
+    restart: always
+    ports:
+      - "5000:5000"
+    volumes:
+      - photos_volume:/app/static/uploads
+      - ./scripts:/scripts
+    depends_on:
+      - planflan-service-db  # Syntax simplifiée
+    networks:
+      - backend-network
+
+  nginx:
+    image: docker.io/nginx:alpine
+    container_name: planflan-container-nginx
+    restart: always
+    cap_add:
+      - NET_BIND_SERVICE
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx:/etc/nginx/conf.d/
+      - letsencrypt:/etc/letsencrypt
+      - certbot-www:/var/www/certbot
+    depends_on:
+      - planflan-backend
+    networks:
+      - backend-network
+      - frontend-network
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - letsencrypt:/etc/letsencrypt
+      - certbot-www:/var/www/certbot
+    depends_on:
+      - nginx
+    networks:
+      - frontend-network
+
+volumes:
+  mysql_data:
+  letsencrypt:
+  certbot-www:
+  photos_volume:
+
+networks:
+  backend-network:
+    driver: bridge
+  frontend-network:
+    driver: bridge
+    enable_ipv6: false

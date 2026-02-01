@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block page_type %}proposer_etablissement{% endblock %}
+{% block scripts_head %}
+<meta name="csrf-token" content="{{ csrf_token() }}" />
+<!-- Leaflet CSS & JS -->
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+  crossorigin=""
+/>
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+  crossorigin=""
+></script>
+<!-- Données pour le script externe -->
+<div id="google-maps-api-key" data-api-key="{{ google_maps_api_key }}"></div>
+
+{% endblock %} {% block content %}
+
+<div class="form-container">
+  <form method="POST" action="{{ action_url }}" class="form-container">
+    {{ form.hidden_tag() }}
+    <!-- Champ de recherche pour l'autocomplete Google Maps -->
+    <div class="form-group">
+      <label for="search" class="form-check-label"
+        >Recherche d'établissement</label
+      >
+      <input
+        type="text"
+        id="search"
+        class="form-control"
+        placeholder="Rechercher un établissement"
+      />
+    </div>
+    <!-- Champs cachés pour les coordonnées, l'adresse et le place_id -->
+    <div class="etablissement-hidden-fields">
+      {{ form.nom(id="ajout-etab-nom") }} {{
+      form.adresse(id="ajout-etab-adresse") }} {{
+      form.latitude(id="ajout-etab-latitude") }} {{
+      form.longitude(id="ajout-etab-longitude") }} {{
+      form.google_place_id(id="ajout-etab-google_place_id") }}
+      <input
+        type="hidden"
+        name="ajout-etab-google_place_id"
+        id="ajout-etab-google_place_id"
+        value="{{ form.google_place_id.data or '' }}"
+      />
+      {{ form.code_postal(id="ajout-etab-code_postal") }} {{
+      form.ville(id="ajout-etab-ville") }}
+    </div>
+    <!-- Type d'établissement -->
+    <div class="form-group">
+      {{ form.type_etab.label(class="form-check-label") }} {{
+      form.type_etab(class="form-select") }}
+    </div>
+    {% if current_user.is_admin %}
+    <div class="form-group etablissement-checkbox-group">
+      <div class="form-check-inline">
+        {{ form.label(class="form-check-input") }} {{
+        form.label.label(class="form-check-label") }}
+      </div>
+      <div class="form-check-inline">
+        {{ form.visite(class="form-check-input") }} {{
+        form.visite.label(class="form-check-label") }}
+      </div>
+    </div>
+    {% endif %}
+
+    <button
+      type="submit"
+      class="btn btn-success"
+      title="Proposer cet établissement"
+    >
+      Enregistrer
+    </button>
+  </form>
+
+</div>
+<!-- Conteneur pour la carte -->
+<div id="map" class="map"></div>
+
+<!-- Le script proposer_etablissement.js n'est plus nécessaire, tout est géré par main.js -->
+{% endblock %}

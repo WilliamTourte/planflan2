@@ -1,19 +1,33 @@
 {% extends "base.html" %}
 {% from "macros.html" import afficher_objet %}
+{%block content %} 
+{% set current_page = 'page_evaluation' %}
+{{afficher_objet('evaluation', evaluation, current_user, form, current_page, delete_form, validate_form) }}
 
-{% block content %}
-  <div class="container">
-      <h1>Evaluation</h1>
-      {% set current_page = 'page_evaluation' %}
-      {{ afficher_objet('evaluation', evaluation, current_user, form, current_page) }}
+<!-- Boutons retour -->
 
-          <!-- Bouton retour -->
-        <div>
-            <a href="{{ url_for('main.afficher_flan_unique', id_flan=evaluation.flan.id_flan) }}" class="btn btn-back btn-with-icon">
-                <i class="fas fa-arrow-left"></i>
-                Retour à {{ evaluation.flan.nom }} de {{ evaluation.flan.etablissement.nom }}
-            </a>
-        </div>
-  </div>
+<div class="action-buttons">
+  <button
+    id="back-button"
+    class="btn btn-danger"
+    title="Retour à la page précédente"
+    data-fallback="{{ url_for('main.afficher_flan_unique', id_flan=evaluation.flan.id_flan) }}"
+  >
+    <i class="bi bi-arrow-return-left"></i> Retour
+  </button>
+  <a
+    href="{{ url_for('main.afficher_flan_unique', id_flan=evaluation.flan.id_flan) }}"
+    class="btn btn-primary"
+    title="Retour au flan"
+  >
+    <i class="bi bi-cake2"></i> Flan
+  </a>
+</div>
+
+<script nonce="{{ csp_nonce }}">
+    // Ajouter l'écouteur d'événement pour le bouton retour
+    document.getElementById('back-button').addEventListener('click', function() {
+        goBackOrRedirect(this.getAttribute('data-fallback'));
+    });
+</script>
 {% endblock %}
-

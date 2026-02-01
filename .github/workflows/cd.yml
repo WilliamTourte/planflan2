@@ -1,0 +1,185 @@
+name: CD Pipeline
+
+on:
+  workflow_run:
+    workflows: ["CI Pipeline"]
+    branches: ["main"]
+    types:
+      - completed
+
+env:
+  DOCKER_IMAGE_NAME: 'planflan.backend'
+  PRODUCTION_SERVER: '${{ secrets.PRODUCTION_SERVER }}'
+  PRODUCTION_USER: '${{ secrets.PRODUCTION_USER }}'
+  PRODUCTION_PORT: 22
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  deploy:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.5.4
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Add server to known hosts
+      run: |
+        mkdir -p ~/.ssh
+        ssh-keyscan -H ${{ env.PRODUCTION_SERVER }} >> ~/.ssh/known_hosts
+
+    - name: Pull latest changes on server
+      run: |
+        ssh -p ${{ env.PRODUCTION_PORT }} ${{ env.PRODUCTION_USER }}@${{ env.PRODUCTION_SERVER }} << 'EOF'
+        cd /home/enkyl/planflan2
+        git fetch origin
+        git checkout main
+        git pull origin main
+        echo "Code pulled successfully"
+        EOF
+
+    - name: Build and restart Docker containers
+      run: |
+        ssh -p ${{ env.PRODUCTION_PORT }} ${{ env.PRODUCTION_USER }}@${{ env.PRODUCTION_SERVER }} << 'EOF'
+        cd /home/enkyl/planflan2
+        
+        # Sauvegarder la base de données avant l'arrêt des containers
+        echo "Sauvegarde de la base de données..."
+        cd docker-db
+        ./backup_db.sh
+        cd ..
+        
+        
+        # Stop existing containers
+        docker compose down || true
+        
+        # Pull latest images for services that use external images
+        docker compose pull nginx certbot || true
+        
+        # Force a complete rebuild without cache to ensure all changes are included
+        docker compose build --no-cache planflan-backend
+        
+        # Start containers
+        docker compose up -d
+        
+        # Attendre que la base de données soit prête
+        echo "Attente que la base de données soit prête..."
+        sleep 10
+        
+        # Restaurer la base de données après le démarrage des containers
+        echo "Restauration de la base de données..."
+        LATEST_BACKUP=$(ls -t docker-db/db/backups/*.sql | head -n 1)
+        if [ -n "$LATEST_BACKUP" ]; then
+          cat "$LATEST_BACKUP" | docker exec -i planflan-container-db mysql -u planflan -psupersecuredpassword planflan_db
+          echo "Restauration réussie depuis : $LATEST_BACKUP"
+        else
+          echo "Aucun fichier de sauvegarde trouvé"
+        fi
+        
+        # Clean up old images
+        docker image prune -f
+        
+        echo "Docker containers updated successfully"
+        EOF
+
+    - name: Verify deployment
+      run: |
+        ssh -p ${{ env.PRODUCTION_PORT }} ${{ env.PRODUCTION_USER }}@${{ env.PRODUCTION_SERVER }} << 'EOF'
+        cd /home/enkyl/planflan2
+        
+        # Check container status
+        echo "=== Container Status ==="
+        docker ps -a
+        
+        # Check specific container logs
+        echo "=== Backend Logs ==="
+        docker compose logs --tail=100 planflan-backend
+        
+        echo "=== Nginx Logs ==="
+        docker compose logs --tail=50 nginx
+        
+        # Test backend connectivity
+        echo "=== Testing Backend Connectivity ==="
+        docker compose exec planflan-backend curl -I http://localhost:5000 || echo "Backend not responding"
+        
+        # Test Nginx connectivity
+        echo "=== Testing Nginx Connectivity ==="
+        curl -I http://localhost || echo "Nginx not responding"
+        
+        echo "Deployment verification completed"
+        EOF
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+        cache-dependency-path: 'requirements.txt'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install --no-cache-dir -r requirements.txt
+
+    - name: Run post-deployment tests
+      env:
+        RUN_DEPLOYMENT_TESTS: "true"
+        DEPLOYMENT_BASE_URL: "https://${{ env.PRODUCTION_SERVER }}"
+        DEPLOYMENT_WWW_BASE_URL: "https://www.${{ env.PRODUCTION_SERVER }}"
+      run: |
+        # Add retry logic for deployment tests as containers may need time to start
+        for i in 1 2 3; do
+          echo "Attempt $i/3: Running deployment tests..."
+          python -m pytest tests/test_deployment.py -v --tb=short && break
+          echo "Attempt failed, waiting 30 seconds before retry..."
+          sleep 30
+        done
+
+    - name: Notify deployment status
+      if: always()
+      run: |
+        echo "Deployment status: ${{ job.status }}"
+        # Here you could add Slack/Email notification
+        # curl -X POST -H 'Content-type: application/json' --data '{"text":"Deployment ${{ job.status }}: ${{ github.repository }}"}' ${{ secrets.SLACK_WEBHOOK }}
+
+  rollback:
+    name: Rollback on Failure
+    runs-on: ubuntu-latest
+    if: failure() && github.ref == 'refs/heads/main'
+    needs: deploy
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up SSH
+      uses: webfactory/ssh-agent@v0.5.4
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+    - name: Rollback to previous version
+      run: |
+        ssh -p ${{ env.PRODUCTION_PORT }} ${{ env.PRODUCTION_USER }}@${{ env.PRODUCTION_SERVER }} << 'EOF'
+        cd /home/enkyl/planflan2
+        
+        # Get previous commit
+        PREV_COMMIT=$(git log --oneline -2 | tail -1 | awk '{print $1}')
+        
+        # Rollback
+        git checkout $PREV_COMMIT
+        docker compose down
+        docker compose up -d --build
+        
+        echo "Rolled back to commit: $PREV_COMMIT"
+        EOF
+
+    - name: Notify rollback
+      run: |
+        echo "Rollback completed"
+        # curl -X POST -H 'Content-type: application/json' --data '{"text":"ROLLBACK: ${{ github.repository }} rolled back to previous version"}' ${{ secrets.SLACK_WEBHOOK }}

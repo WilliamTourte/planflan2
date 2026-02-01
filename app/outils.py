@@ -1,29 +1,245 @@
-from flask import url_for
+"""Module utilitaire contenant des fonctions diverses pour l'application PlanFlan.
+
+Ce module regroupe des fonctions utilitaires utilisées dans différentes parties
+de l'application, notamment pour le traitement de texte, la vérification CSRF,
+et le calcul de distances géographiques.
+"""
+
+import requests
+import os
+from math import radians, sin, cos, sqrt, atan2
+from flask import request, current_app
+from flask_wtf.csrf import validate_csrf
 
 
-def enlever_accents(text): # Enlève les accents parce que la police ne les gère pas bien
+def enlever_accents(
+    text,
+):  # Enlève les accents parce que la police ne les gère pas bien
+    """Enlève les accents d'un texte.
+
+    Cette fonction est utilisée pour normaliser les textes contenant des accents,
+    notamment pour l'affichage avec des polices qui ne gèrent pas bien les accents.
+
+    Args:
+        text (str): Le texte à traiter
+
+    Returns:
+        str: Le texte sans accents, ou une chaîne vide si text est None
+    """
     import unicodedata
+
     if text is None:
-        return ''
-    return unicodedata.normalize('NFD', text).encode('ascii', 'ignore').decode('utf-8')
+        return ""
+    return unicodedata.normalize("NFD", text).encode("ascii", "ignore").decode("utf-8")
+
+
+def verifier_csrf_token():
+    """
+    Vérifie le token CSRF pour les requêtes API et formulaires.
+
+    Cette fonction vérifie le token CSRF dans l'en-tête X-CSRFToken (pour les requêtes AJAX)
+    ou dans le formulaire (pour les requêtes POST classiques).
+
+    Pour les méthodes POST, PUT, DELETE, la vérification CSRF est obligatoire.
+
+    Returns:
+        tuple: (bool, str) - (True, None) si le token est valide, (False, message_erreur) sinon
+    """
+
+    # Pour les méthodes GET, HEAD, OPTIONS, la vérification CSRF n'est pas requise
+    if request.method in ("GET", "HEAD", "OPTIONS"):
+
+        return True, None
+
+    # Si nous sommes en environnement de test, désactiver la vérification CSRF
+    if hasattr(current_app, "config") and current_app.config.get("TESTING", False):
+
+        return True, None
+
+    # Pour POST, PUT, DELETE, la vérification CSRF est obligatoire
+    # Extraire le token CSRF de l'en-tête ou du formulaire
+    csrf_token = request.headers.get("X-CSRFToken") or request.form.get("csrf_token")
+
+    if not csrf_token:
+        # Si aucun token n'est fourni pour une méthode qui en nécessite un, c'est une erreur
+        current_app.logger.warning(
+            f"Token CSRF manquant pour la méthode {request.method} sur {request.path}"
+        )
+        return False, "Token CSRF manquant. Veuillez recharger la page et réessayer."
+
+    try:
+        validate_csrf(csrf_token)
+
+        return True, None
+    except Exception as e:
+        current_app.logger.warning(f"Token CSRF invalide: {e}")
+        return False, "Token CSRF invalide"
+
+
+def verifier_csrf_ou_renvoyer_erreur():
+    """
+    Vérifie le token CSRF et renvoie une réponse d'erreur JSON si invalide.
+
+    Cette fonction est conçue pour être utilisée dans les routes API.
+
+    Returns:
+        tuple: (bool, Response) - (True, None) si le token est valide,
+        (False, response_erreur) si le token est invalide
+    """
+
+    csrf_valide, message = verifier_csrf_token()
+
+    if not csrf_valide:
+        from flask import jsonify
+
+        # Always return a 2-tuple: (bool, Response)
+        error_response = jsonify({"error": message}), 403
+        current_app.logger.warning(
+            f"CSRF verification failed, returning error response: {message}"
+        )
+        return False, error_response
+
+    return True, None
 
 
 def afficher_etablissements(resultats):
-    etablissements = resultats
+    """Convertit les résultats de recherche en listes d'établissements et JSON.
 
-    etablissements_json = [{
-        'id_etab': etab.id_etab,
-        'nom': enlever_accents(etab.nom), # On enlève les accents car la police Bubblegum ne les gère pas
-        'adresse': etab.adresse,
-        'ville': etab.ville,
-        'code_postal': etab.code_postal,
-        'latitude': float(etab.latitude),
-        'longitude': float(etab.longitude),
-        'url': url_for('main.afficher_etablissement_unique', id_etab=etab.id_etab),
-        'visite' : bool(etab.visite),
-        'type_etab': str(etab.type_etab.value),
-        'label' : bool(etab.label),
-        'flans_count': len(etab.flans)  # Ajouter le nombre de flans
-    } for etab in etablissements]
+    Args:
+        resultats: Les résultats de recherche contenant des établissements
 
-    return(etablissements, etablissements_json)
+    Returns:
+        tuple: (list, list) - Une liste d'objets établissement et une liste de dictionnaires JSON
+    """
+    etablissements = []
+    etablissements_json = []
+    for etab in resultats:
+        etablissements.append(etab)
+        etablissements_json.append(etab.to_dict(include_flans=True))
+    return etablissements, etablissements_json
+
+
+def calculer_distance(lat1, lon1, lat2, lon2):
+    """Calcule la distance entre deux points géographiques en kilomètres.
+
+    Cette fonction utilise la formule de Haversine pour calculer la distance
+    entre deux points définis par leurs coordonnées latitude/longitude.
+
+    Args:
+        lat1 (float): Latitude du premier point
+        lon1 (float): Longitude du premier point
+        lat2 (float): Latitude du deuxième point
+        lon2 (float): Longitude du deuxième point
+
+    Returns:
+        float: La distance en kilomètres entre les deux points
+    """
+    R = 6371.0
+    # Convertir toutes les valeurs en float avant de les convertir en radians
+    lat1, lon1, lat2, lon2 = map(float, [lat1, lon1, lat2, lon2])
+    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    return R * c
+
+
+def get_place_details(place_id, api_key):
+    """
+    Récupère les détails d'un lieu depuis l'API Google Places.
+
+    Args:
+        place_id (str): Identifiant du lieu dans Google Places
+        api_key (str): Clé API Google Places
+
+    Returns:
+        dict: Les détails du lieu, ou None en cas d'erreur
+    """
+    url = "https://maps.googleapis.com/maps/api/place/details/json"
+    params = {"place_id": place_id, "fields": "photos", "key": api_key}
+
+    try:
+        response = requests.get(url, params=params)
+        if response.status_code == 200:
+            data = response.json()
+            if data.get("result"):
+                return data["result"]
+    except Exception as e:
+        current_app.logger.error(f"Erreur lors de la récupération des détails: {e}")
+
+    return None
+
+
+def fetch_place_photos(etablissement_id, place_id, api_key, max_width=400):
+    """
+    Récupère les photos pour un établissement depuis l'API Google Places et les sauvegarde localement.
+
+    Args:
+        etablissement_id (int): Identifiant de l'établissement dans la base de données
+        place_id (str): Identifiant Google Places du lieu
+        api_key (str): Clé API Google Places
+        max_width (int): Largeur maximale des photos (par défaut 400)
+
+    Returns:
+        list: Liste des chemins des photos sauvegardées localement
+    """
+    # Importer les modules nécessaires localement pour éviter les imports circulaires
+    from app.models import Photo, TypeCible
+    from app import db
+
+    # Vérifier si des photos existent déjà pour cet établissement
+    existing_photos = Photo.query.filter_by(id_etab=etablissement_id).all()
+    if existing_photos:
+        return [photo.path for photo in existing_photos]
+
+    # Récupérer les détails de l'établissement pour obtenir les photoreferences
+    # Utiliser le place_id Google Places pour récupérer les photos
+    if not place_id:
+        current_app.logger.warning(
+            f"Aucun place_id fourni pour l'établissement {etablissement_id}"
+        )
+        return []
+
+    place_details = get_place_details(place_id, api_key)
+    if not place_details or "photos" not in place_details:
+        return []
+
+    # Récupérer les photos depuis l'API
+    photo_paths = []
+    for idx, photo in enumerate(place_details["photos"][:1]):  # Limiter à une photo
+        photo_reference = photo["photo_reference"]
+        url = "https://maps.googleapis.com/maps/api/place/photo"
+        params = {
+            "maxwidth": max_width,
+            "photoreference": photo_reference,
+            "key": api_key,
+        }
+
+        try:
+            response = requests.get(url, params=params, stream=True)
+            if response.status_code == 200:
+                # Générer un nom de fichier unique
+                filename = f"etab_{etablissement_id}_photo_{idx}.jpg"
+                filepath = os.path.join(current_app.config["UPLOAD_FOLDER"], filename)
+
+                # Sauvegarder la photo localement
+                with open(filepath, "wb") as f:
+                    for chunk in response.iter_content(1024):
+                        f.write(chunk)
+
+                # Enregistrer la photo dans la base de données
+                new_photo = Photo(
+                    id_etab=etablissement_id,
+                    type_cible=TypeCible.ETABLISSEMENT,
+                    path=filepath,
+                    largeur=max_width,
+                    hauteur=max_width,  # Supposons des photos carrées pour simplifier
+                )
+                db.session.add(new_photo)
+                photo_paths.append(filepath)
+        except Exception as e:
+            current_app.logger.error(f"Erreur lors de la récupération de la photo: {e}")
+
+    db.session.commit()
+    return photo_paths

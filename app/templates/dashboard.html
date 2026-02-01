@@ -1,102 +1,179 @@
-
 {% extends "base.html" %}
-
-
+{% block page_type %}dashboard{% endblock %}
 {% block content %}
-  <div class="container">
-      <h1>Tableau de bord</h1>
+<div class="container">
+  <h1>Tableau de bord</h1>
+  <!-- Section Infos Utilisateur -->
 
-      <!-- Section Infos Utilisateur -->
-      <div id="user-info" class="form-container etablissement-header">
-          <p><strong>Pseudo:</strong> {{ current_user.pseudo }}</p>
-          <p><strong>Email:</strong> {{ current_user.email }}</p>
-          <div style="text-align: right; margin-top: 15px;">
-              <button id="edit-profile-btn" class="btn btn-primary">Modifier le profil</button>
-              <form method="POST" action="{{ url_for('auth.supprimer_compte') }}" style="display: inline-block;">
-                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                  <button type="submit" class="btn btn-danger">Supprimer le compte</button>
-              </form>
+  <div id="user-info" class="carte">
+    <p><strong>Pseudo:</strong> {{ current_user.pseudo }}</p>
+    <p><strong>Email:</strong> {{ current_user.email }}</p>
+    <div class="action-buttons">
+      <button
+        id="edit-profile-btn"
+        class="btn btn-success"
+        title="Modifier mon profil"
+      >
+        <i class="bi bi-pencil"></i>
+      </button>
+      <!-- Formulaire de suppression de compte (masqué par défaut) -->
+      <div id="delete-account-section" style="display: none; margin-top: 20px">
+        <h3>Supprimer mon compte</h3>
+        <p style="color: #666">
+          Cette action est irréversible. Veuillez confirmer votre mot de passe
+          pour continuer.
+        </p>
+        <form
+          method="POST"
+          action="{{ url_for('auth.supprimer_compte') }}"
+          class="form"
+        >
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <div class="form-group">
+            <label for="delete-password" class="form-label"
+              >Mot de passe actuel *</label
+            >
+            <input
+              type="password"
+              name="password"
+              id="delete-password"
+              class="form-control"
+              required
+            />
+            {% if request.args.get('error') == 'password' %}
+            <span class="error-message">Mot de passe incorrect</span>
+            {% elif request.args.get('error') == 'csrf' %}
+            <span class="error-message">Token CSRF invalide</span>
+            {% endif %}
           </div>
+          <div class="form-group">
+            <button
+              type="submit"
+              class="btn btn-danger"
+              title="Confirmer la suppression du compte"
+            >
+              Confirmer la suppression
+            </button>
+            <button
+              type="button"
+              class="btn btn-success"
+              id="cancel-delete-btn"
+              title="Annuler la suppression du compte"
+            >
+              Annuler
+            </button>
+          </div>
+        </form>
       </div>
 
-      <!-- Formulaire d'édition du profil (masqué par défaut) -->
-      <div id="edit-profile-form" class="form-container" style="display: none; margin-top: 20px;">
-          <form method="POST" action="" class="form">
-              {{ profile_form.hidden_tag() }}
-              <div class="form-group">
-                  {{ profile_form.pseudo.label(class="form-label") }}
-                  {{ profile_form.pseudo(size=20, class="form-control") }}
-                  {% for error in profile_form.pseudo.errors %}
-                      <span class="error-message">[{{ error }}]</span>
-                  {% endfor %}
-              </div>
-              <div class="form-group">
-                  {{ profile_form.email.label(class="form-label") }}
-                  {{ profile_form.email(size=20, class="form-control") }}
-                  {% for error in profile_form.email.errors %}
-                      <span class="error-message">[{{ error }}]</span>
-                  {% endfor %}
-              </div>
-              <div class="form-group">
-                  {{ profile_form.current_password.label(class="form-label") }}
-                  {{ profile_form.current_password(size=20, class="form-control") }}
-                  {% for error in profile_form.current_password.errors %}
-                      <span class="error-message">[{{ error }}]</span>
-                  {% endfor %}
-              </div>
-              <div class="form-group">
-                  {{ profile_form.new_password.label(class="form-label") }}
-                  {{ profile_form.new_password(size=20, class="form-control") }}
-                  {% for error in profile_form.new_password.errors %}
-                      <span class="error-message">[{{ error }}]</span>
-                  {% endfor %}
-              </div>
-              <div class="form-group">
-                  {{ profile_form.confirm_password.label(class="form-label") }}
-                  {{ profile_form.confirm_password(size=20, class="form-control") }}
-                  {% for error in profile_form.confirm_password.errors %}
-                      <span class="error-message">[{{ error }}]</span>
-                  {% endfor %}
-              </div>
-              <div class="form-group">
-                  {{ profile_form.submit(class="btn btn-submit") }}
-                  <button id="cancel-edit-btn" type="button" class="btn btn-back" style="margin-left: 10px;">Annuler</button>
-              </div>
-          </form>
-      </div>
-
-      <!-- Section Mes Évaluations -->
-      <div class="evaluations-section form-container" style="margin-top: 20px;">
-          <h2 class="evaluations-title">Mes evaluations</h2>
-          {{ afficher_grille('evaluation', current_user.evaluations, current_user) }}
-      </div>
-
-      <!-- Sections Admin (si utilisateur est admin) -->
-      {% if current_user.is_admin %}
-          <div class="evaluations-section form-container" style="margin-top: 20px;">
-              <h2 class="evaluations-title">Evaluations en attente de validation</h2>
-              {{ afficher_grille('evaluation', pending_evaluations, current_user) }}
-          </div>
-          <div class="evaluations-section form-container" style="margin-top: 20px;">
-              <h2 class="evaluations-title">Flans en attente de validation</h2>
-              {{ afficher_grille('flan', pending_flans, current_user) }}
-          </div>
-          <div class="evaluations-section form-container" style="margin-top: 20px;">
-              <h2 class="evaluations-title">Etablissements en attente de validation</h2>
-              {{ afficher_grille('etablissement', pending_etablissements, current_user) }}
-          </div>
-      {% endif %}
+      <button
+        type="button"
+        class="btn btn-danger"
+        id="delete-account-btn"
+        title="Supprimer mon compte"
+      >
+        <i class="bi bi-trash-fill"></i>
+      </button>
+    </div>
   </div>
 
-  <!-- Script pour basculer entre affichage infos et formulaire -->
-  <script>
-      document.getElementById('edit-profile-btn').addEventListener('click', function() {
-          document.getElementById('user-info').style.display = 'none';
-          document.getElementById('edit-profile-form').style.display = 'block';
-      });
-      document.getElementById('cancel-edit-btn').addEventListener('click', function() {
-          document.getElementById('user-info').style.display = 'block';
-          document.getElementById('edit-profile-form').style.display = 'none';
-      });
-  </script>
+  <!-- Formulaire d'édition du profil (masqué par défaut) -->
+  <div
+    id="edit-profile-form"
+    class="form-container"
+    style="display: none; margin-top: 20px"
+  >
+    <form method="POST" action="" class="form">
+      {{ profile_form.hidden_tag() }}
+      <div class="form-group">
+        {{ profile_form.pseudo.label(class="form-label") }} {{
+        profile_form.pseudo(size=20, class="form-control") }} {% for error in
+        profile_form.pseudo.errors %}
+        <span class="error-message">[{{ error }}]</span>
+        {% endfor %}
+      </div>
+      <div class="form-group">
+        {{ profile_form.email.label(class="form-label") }} {{
+        profile_form.email(size=20, class="form-control") }} {% for error in
+        profile_form.email.errors %}
+        <span class="error-message">[{{ error }}]</span>
+        {% endfor %}
+      </div>
+      <div class="form-group">
+        {{ profile_form.current_password.label(class="form-label") }} {{
+        profile_form.current_password(size=20, class="form-control") }} {% for
+        error in profile_form.current_password.errors %}
+        <span class="error-message">[{{ error }}]</span>
+        {% endfor %}
+      </div>
+      <div class="form-group">
+        {{ profile_form.new_password.label(class="form-label") }} {{
+        profile_form.new_password(size=20, class="form-control") }} {% for error
+        in profile_form.new_password.errors %}
+        <span class="error-message">[{{ error }}]</span>
+        {% endfor %}
+      </div>
+      <div class="form-group">
+        {{ profile_form.confirm_password.label(class="form-label") }} {{
+        profile_form.confirm_password(size=20, class="form-control") }} {% for
+        error in profile_form.confirm_password.errors %}
+        <span class="error-message">[{{ error }}]</span>
+        {% endfor %}
+      </div>
+      <div class="form-group">
+        {{ profile_form.submit(class="btn btn-success") }}
+        <button
+          id="cancel-edit-btn"
+          type="button"
+          class="btn btn-canceledit"
+          style="margin-left: 10px"
+          title="Annuler les modifications"
+          data-object-type="profile"
+          data-object-id="1"
+        >
+          Annuler
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Section Mes Évaluations -->
+  <h2 class="section-title" id="mes-evaluations-title">
+    Mes evaluations
+  </h2>
+  <div id="mes-evaluations" class="section-content" style="display: none">
+    {{ afficher_grille('evaluation', current_user.evaluations, current_user) }}
+  </div>
+  <!-- Sections Admin -->
+  {% if current_user.is_admin %}
+
+  <h2 class="section-title" id="evaluations-a-valider-title">
+    Evaluations en attente de validation
+  </h2>
+  <div id="evaluations-a-valider" class="section-content" style="display: none">
+    {{ afficher_grille('evaluation', pending_evaluations, current_user) }}
+  </div>
+
+  <h2 class="section-title" id="flans-a-valider-title">
+    Flans en attente de validation
+  </h2>
+  <div id="flans-a-valider" class="section-content" style="display: none">
+    {{ afficher_grille('flan', pending_flans, current_user) }}
+  </div>
+
+  <h2 class="section-title" id="etablissements-a-valider-title">
+    Etablissements en attente de validation
+  </h2>
+  <div
+    id="etablissements-a-valider"
+    class="section-content"
+    style="display: none"
+  >
+    {{ afficher_grille('flan', pending_etablissements, current_user) }}
+  </div>
+
+  {% endif %}
+</div>
+
+<script src="{{ url_for('static', filename='js/dashboard.js') }}" nonce="{{ csp_nonce }}"></script>
 {% endblock %}

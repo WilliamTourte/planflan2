@@ -1,0 +1,13 @@
+{
+  "app/static/css/**/*.css": [
+    "stylelint --fix",
+    "prettier --write"
+  ],
+  "app/static/js/**/*.js": [
+    "eslint --fix",
+    "prettier --write"
+  ],
+  "app/templates/**/*.html": [
+    "prettier --write"
+  ]
+}

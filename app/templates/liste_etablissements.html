@@ -1,245 +1,87 @@
 {% extends "base.html" %}
-{% from 'macros.html' import afficher_etablissement_infowindow %}
+{% block page_type %}liste_etablissements{% endblock %}
 {% block scripts_head %}
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-<script>
-let autocomplete;
-let map;
-let markers = [];
-let infowindowContents = {};
-let infowindow;
+<meta name="csrf-token" content="{{ csrf_token() }}" />
+<!-- Leaflet CSS & JS -->
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+  crossorigin=""
+/>
+<script
+  src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+  integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+  crossorigin=""
+></script>
 
-function closeInfoWindow() {
-    infowindow.close();
-}
+<!-- Données pour le script externe -->
+<div id="etablissements-data" data-etablissements='{{ etablissements_json|tojson|safe }}'></div>
+<div id="is-admin" data-is-admin="{{ current_user.is_admin|tojson|safe if current_user.is_authenticated else 'false' }}"></div>
+<div id="google-maps-api-key" data-api-key="{{ google_maps_api_key }}"></div>
+{% if user_lat and user_lon %}
+<div id="user-location" data-lat="{{ user_lat }}" data-lon="{{ user_lon }}"></div>
+{% endif %}
+{% if ville_selectionnee %}
+<div id="ville-selectionnee" data-ville="{{ ville_selectionnee }}"></div>
+{% endif %}
 
-// Génération côté serveur du HTML pour chaque infowindow
-{% for etablissement in etablissements %}
-    {% set detailsUrl = '/etablissement/' ~ etablissement.id_etab ~ '?nom=' ~ nom ~ '&visite=' ~ visite ~ '&labellise=' ~ labellise %}
-    infowindowContents[{{ etablissement.id_etab }}] = {{ afficher_etablissement_infowindow(etablissement, detailsUrl)|tojson|safe }};
-{% endfor %}
+<!-- Le script liste_etablissements.js n'est plus nécessaire, tout est géré par main.js -->
+{% endblock %} {% block content %}
+<div class="container-fluid p-0 d-flex flex-column" style="height: calc(100vh - 120px);">
+  <!-- Carte - 90% de la hauteur -->
+  <div class="flex-grow-1" style="height: 90%;">
+    <div id="map-container" class="position-relative w-100 h-100">
+      <div id="map" class="w-100 h-100"></div>
 
-// Fonction pour initialiser l'autocomplétion et la carte
-window.initAll = function() {
-    initAutocomplete();
-    initMap();
-};
-
-window.initAutocomplete = function() {
-    const input = document.getElementById('search');
-    if (!input) {
-        console.error("Élément #search introuvable !");
-        return;
-    }
-    autocomplete = new google.maps.places.Autocomplete(input, {
-        types: ['establishment'],
-        componentRestrictions: {country: 'fr'}
-    });
-    // Écouter les changements dans l'Autocomplete
-    autocomplete.addListener('place_changed', function() {
-        const place = autocomplete.getPlace();
-        if (!place.geometry) return;
-        // Remplir les champs CACHÉS avec le préfixe "ajout-etab-"
-        document.getElementById('ajout-etab-nom').value = place.name || '';
-        document.getElementById('ajout-etab-adresse').value = place.formatted_address || '';
-        document.getElementById('ajout-etab-latitude').value = place.geometry.location.lat();
-        document.getElementById('ajout-etab-longitude').value = place.geometry.location.lng();
-    // Vérifier si le lieu est déjà dans la liste
-    fetch('/verifier_etablissement', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').content
-        },
-        body: JSON.stringify({ nom: place.name }),
-    })
-    .then(async response => {
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Erreur serveur: ${errorText}`);
-        }
-        return response.json();
-    })
-    .then(data => {
-        if (data.error) {
-            console.error("Erreur:", data.error);
-            return;
-        }
-        if (data.exists) {
-            const previousMessages = document.querySelectorAll('.alert-warning');
-            previousMessages.forEach(msg => msg.remove());
-            const message = document.createElement('div');
-            message.className = 'alert alert-warning';
-            message.innerHTML = `Cet établissement est déjà dans la liste. <a href="${data.url}">Voir la page</a>`;
-            document.querySelector('.form-container').prepend(message);
-        }
-    })
-    .catch(error => {
-        console.error('Erreur:', error);
-        const errorMessage = document.createElement('div');
-        errorMessage.className = 'alert alert-danger';
-        errorMessage.textContent = `Erreur: ${error.message}`;
-        document.querySelector('.form-container').prepend(errorMessage);
-    });
-        // Envoyer l'adresse à une route AJAX pour extraire le code postal et la ville
-        fetch('/extraire_infos_adresse', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json',
-            'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').content    },
-            body: JSON.stringify({ adresse: place.formatted_address }),
-        })
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('ajout-etab-code_postal').value = data.code_postal || '';
-            document.getElementById('ajout-etab-ville').value = data.ville || '';
-            document.getElementById('ajout-etab-adresse').value = data.adresse_nettoyee || '';
-        })
-        .catch(error => console.error('Erreur:', error));
-    });
-};
-
-window.initMap = function() {
-    const mapElement = document.getElementById("map");
-    if (!mapElement) {
-        console.error("Élément #map introuvable !");
-        const mapContainer = document.getElementById("map-container");
-        if (mapContainer) {
-            mapContainer.innerHTML = "<p style='color: red;'>Erreur : Impossible de charger la carte.</p>";
-        } else {
-            console.error("Élément #map-container introuvable !");
-        }
-        return;
-    }
-    map = new google.maps.Map(mapElement, {
-        center: { lat: 46.2276, lng: 2.2137 },
-        zoom: 6,
-    });
-    const etablissements = {{ etablissements_json|tojson|safe }};
-    infowindow = new google.maps.InfoWindow();
-    const isAdmin = {{ current_user.is_admin|tojson|safe if current_user.is_authenticated else 'false' }};
-    const bounds = new google.maps.LatLngBounds();
-
-    etablissements.forEach(etablissement => {
-        let icon;
-        if (isAdmin) {
-            if (etablissement.label) {
-                icon = "https://maps.google.com/mapfiles/ms/icons/blue-dot.png"; // Labellisé
-            } else if (etablissement.visite) {
-                icon = "https://maps.google.com/mapfiles/ms/icons/yellow-dot.png"; // Visité
-            } else {
-                icon = "https://maps.google.com/mapfiles/ms/icons/red-dot.png"; // Ni l'un ni l'autre
-            }
-        } else {
-            if (etablissement.label) {
-                icon = "https://maps.google.com/mapfiles/ms/icons/blue-dot.png";
-            } else {
-                icon = "https://maps.google.com/mapfiles/ms/icons/red-dot.png";
-            }
-        }
-        const marker = new google.maps.Marker({
-            position: { lat: etablissement.latitude, lng: etablissement.longitude },
-            map: map,
-            title: etablissement.nom,
-            icon: icon
-        });
-        bounds.extend(marker.position);
-
-        marker.addListener("click", () => {
-            setTimeout(() => {
-                infowindow.setContent(infowindowContents[etablissement.id_etab]);
-                infowindow.open(map, marker);
-            }, 50);
-        });
-        markers.push(marker);
-    });
-
-    if (etablissements.length > 0) {
-        if (etablissements.length === 1) {
-            map.setCenter(markers[0].position);
-            map.setZoom(14);
-        } else {
-            map.fitBounds(bounds);
-        }
-    }
-
-    // Légende
-    const legend = document.createElement('div');
-    legend.style.backgroundColor = 'white';
-    legend.style.padding = '10px';
-    legend.style.margin = '10px';
-    legend.style.border = '1px solid #ccc';
-    if (isAdmin) {
-        legend.innerHTML = `
-            <h3>Legende</h3>
-            <p><img src="https://maps.google.com/mapfiles/ms/icons/blue-dot.png" alt="Labellisé"> Labellisé</p>
-            <p><img src="https://maps.google.com/mapfiles/ms/icons/yellow-dot.png" alt="Visité"> Visité</p>
-            <p><img src="https://maps.google.com/mapfiles/ms/icons/red-dot.png" alt="Non visité"> Non visité</p>
-        `;
-    } else {
-        legend.innerHTML = `
-            <h3><img src="https://maps.google.com/mapfiles/ms/icons/blue-dot.png" alt="Labellisé">Labellise </h3>
-        `;
-    }
-    map.controls[google.maps.ControlPosition.LEFT_BOTTOM].push(legend);
-};
-
-// Chargement de l'API Google Maps
-document.addEventListener('DOMContentLoaded', function() {
-    const mapElement = document.getElementById("map");
-    if (mapElement) {
-        const script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}&libraries=places&callback=initAll&v=weekly&loading=async`;
-        script.async = true;
-        script.defer = true;
-        document.head.appendChild(script);
-    } else {
-        console.error("Élément #map introuvable même après le chargement du DOM !");
-    }
-});
-
-const nom = "{{ request.args.get('nom') }}";
-const visite = "{{ request.args.get('visite') }}";
-const labellise = "{{ request.args.get('labellise') }}";
-</script>
-<style>
-    .form-container { padding: 10px; }
-    .form-group { margin-bottom: 10px; }
-    .form-label { display: block; margin-bottom: 5px; }
-    .form-control { width: 100%; padding: 5px; }
-    .error-message { color: red; }
-    .btn-proposer { background-color: #4CAF50; color: white; padding: 10px 15px; border: none; cursor: pointer; }
-    .btn-proposer:hover { background-color: #45a049; }
-    #map { height: 80vh; width: 100%; background-color: #f5f5f5; }
-    .infowindow-content h3 { margin: 0 0 5px 0; color: #333; }
-    .infowindow-content a { color: #1a73e8; text-decoration: none; }
-    .infowindow-content {
-        position: relative;
-        padding: 10px;
-    }
-    .infowindow-close {
-        position: absolute;
-        bottom: 5px;
-        right: 5px;
-        background-color: #f1f1f1;
-        border: none;
-        border-radius: 3px;
-        padding: 3px 8px;
-        cursor: pointer;
-        font-size: 12px;
-    }
-    .infowindow-close:hover {
-        background-color: #e0e0e0;
-    }
-    .map-container { margin-bottom: 2rem; width: 100%; padding: 0; }
-    @media (max-width: 768px) { #map { height: 60vh; } }
-</style>
-{% endblock %}
-{% block content %}
-<div class="container">
-    <div id="map-container" class="map-container">
-        <div id="map"></div>
+      <!-- Filtres pour établissements (dans la carte) -->
+      <div id="filter-controls" class="position-absolute top-0 start-50 translate-middle-x w-100 px-2">
+        <div class="main-filters d-flex flex-wrap justify-content-center gap-2">
+          <button
+            id="filter-all"
+            class="btn btn-success flex-grow-1 flex-sm-grow-0"
+            title="Afficher tous les établissements"
+          >
+            Tous
+          </button>
+          <button
+            id="filter-pate-btn"
+            class="btn btn-success flex-grow-1 flex-sm-grow-0"
+            title="Filtrer par type de pâte"
+          >
+            Pâte
+          </button>
+          <button
+            id="filter-saveur-btn"
+            class="btn btn-success flex-grow-1 flex-sm-grow-0"
+            title="Filtrer par saveur"
+          >
+            Saveur
+          </button>
+          <button
+            id="filter-statut-btn"
+            class="btn btn-success flex-grow-1 flex-sm-grow-0"
+            title="Filtrer par statut"
+          >
+            Statut
+          </button>
+        </div>
+        <!-- Sous-filtres pour affiner selon les critères choisis -->
+        <div id="sub-filters" class="sub-filters"></div>
+      </div>
     </div>
+  </div>
+
+  <!-- Bouton - 10% de la hauteur -->
+  <div class="d-flex align-items-center justify-content-center" style="height: 10%; min-height: 60px;">
+    <a
+      href="{{ url_for('maps.proposer_etablissement') }}"
+      class="btn btn-success"
+      role="button"
+    >
+      Proposer une adresse
+    </a>
+  </div>
 </div>
-<!-- Grille des établissements -->
-{{ afficher_grille('etablissement', etablissements, current_user, form_edit, form_ajout) }}
+
 {% endblock %}

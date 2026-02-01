@@ -1,23 +1,24 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container">
-    <!-- Détails de l'établissement -->
-    <div class="etablissement-header">
-        {% set current_page = 'page_etablissement' %}
-        {{ afficher_objet('etablissement', etablissement, current_user, form_etab, current_page, delete_form, validate_form) }}
-    </div>
-
-    <!-- Grille des flans avec bouton d'ajout -->
-    <div class="flans-section">
-        <h3>Flans</h3>
-        {{ afficher_grille('flan', etablissement.flans, current_user, None, form_flan, etablissement) }}
-    </div>
-    <!-- Bouton retour -->
-    <div>
-        <a href="{{ url_for('main.index') }}" class="btn btn-back btn-with-icon">
-            <i class="fas fa-arrow-left"></i>
-            Retour à l'accueil
-        </a>
-    </div>
+{% set current_page = 'page_etablissement' %}
+<!-- Détails de l'établissement -->
+{{ afficher_objet('etablissement', etablissement, current_user, form_etab, current_page, delete_form, validate_form, photo_paths, layout='detail') }}
+<!-- Grille des flans avec bouton d'ajout -->
+ <h3>Flans</h3>
+{{ afficher_grille('flan', etablissement.flans, current_user, None, form_flan, etablissement, None, delete_form, validate_form) }}
+<!-- Boutons retour -->
+<div class="action-buttons">
+    <button id="back-button" class="btn btn-danger" title="Retour à la page précédente" data-fallback="{{ url_for('main.liste_etablissements') }}">
+        <i class="bi bi-arrow-return-left"></i> Retour
+    </button>
+    <a href="{{ url_for('main.liste_etablissements') }}" class="btn btn-primary" title="Retour à la carte">
+        <i class="bi bi-map"></i> Carte
+    </a>
 </div>
+<script nonce="{{ csp_nonce }}">
+    // Ajouter l'écouteur d'événement pour le bouton retour
+    document.getElementById('back-button').addEventListener('click', function() {
+        goBackOrRedirect(this.getAttribute('data-fallback'));
+    });
+</script>
 {% endblock %}

@@ -1,27 +1,36 @@
-{% extends "base.html" %}
-{% block content %}
-<div class="container">
-    <!-- Détails du flan -->
-    <div class="etablissement-header">
-        {% set current_page = 'page_flan' %}
-        {{ afficher_objet('flan', flan, current_user, form_flan, current_page) }}
-    </div>
+{% extends "base.html" %} {% block content %}
 
-    <!-- Grille des évaluations avec bouton d'ajout -->
-    <div class="evaluations-section">
-        <h3>Evaluations</h3>
-         {{ afficher_grille('evaluation', flan.evaluations, current_user, eval_forms, form_eval, flan=flan) }}
-    </div>
+<!-- Détails du flan -->
+{% set current_page = 'page_flan' %} {{ afficher_objet('flan', flan,
+current_user, form_flan, current_page, layout='detail') }}
 
-    <!-- Boutons d'action -->
-    <div class="flan-actions">
-        <!-- Bouton retour -->
-        <div>
-            <a href="{{ url_for('main.afficher_etablissement_unique', id_etab=flan.etablissement.id_etab) }}" class="btn btn-back btn-with-icon">
-                <i class="fas fa-arrow-left"></i>
-                Retour à {{ flan.etablissement.nom }}
-            </a>
-        </div>
-    </div>
+<!-- Grille des évaluations avec bouton d'ajout -->
+<h3>Evaluations</h3>
+{{ afficher_grille('evaluation', flan.evaluations, current_user, None,
+form_eval, None, flan, None, None, '', user_evaluation) }}
+
+<!-- Boutons retour -->
+<div class="action-buttons">
+  <button
+    id="back-button"
+    class="btn btn-danger"
+    title="Retour à la page précédente"
+    data-fallback="{{ url_for('main.afficher_etablissement_unique', id_etab=flan.etablissement.id_etab) }}"
+  >
+    <i class="bi bi-arrow-return-left"></i> Retour
+  </button>
+  <a
+    href="{{ url_for('main.afficher_etablissement_unique', id_etab=flan.etablissement.id_etab) }}"
+    class="btn btn-primary"
+    title="Retour à l'établissement"
+  >
+    <i class="bi bi-house"></i> Établissement
+  </a>
 </div>
+<script nonce="{{ csp_nonce }}">
+    // Ajouter l'écouteur d'événement pour le bouton retour
+    document.getElementById('back-button').addEventListener('click', function() {
+        goBackOrRedirect(this.getAttribute('data-fallback'));
+    });
+</script>
 {% endblock %}
