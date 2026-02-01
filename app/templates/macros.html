@@ -7,7 +7,9 @@
         {% endif %}
     {% elif item.photos and item.photos|length > 0 %}
         <img src="{{ url_for('static', filename='uploads/' + item.photos[0].path) }}" alt="{{ item.nom }}" class="{{ class }}">
-        <div class="google-photo-attribution">Photo © Google Maps</div>
+        {% if is_google_photo %}
+            <div class="google-photo-attribution">Photo © Google Maps</div>
+        {% endif %}
     {% else %}
         {% if item.__class__.__name__ == 'Flan' %}
             <img src="{{ url_for('static', filename='uploads/flan-vanille.webp') }}" alt="Flan par défaut" class="{{ class }}">

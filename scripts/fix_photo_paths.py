@@ -5,20 +5,52 @@ Ce script effectue deux opérations:
 2. Renomme les fichiers pour utiliser google_place_id au lieu de id_etab (si applicable)
 
 Usage:
-    python scripts/fix_photo_paths.py [--dry-run]
+    python scripts/fix_photo_paths.py [--dry-run] [--db-uri DATABASE_URI]
     
 Options:
     --dry-run  : Affiche les changements sans les appliquer
+    --db-uri   : URI de la base de données (par défaut: utilise DATABASE_URL env var)
+    
+Example:
+    python scripts/fix_photo_paths.py --dry-run --db-uri sqlite:///planflan.db
 """
 
 import os
 import sys
 import argparse
 
+# Parse arguments FIRST to get database URI
+parser = argparse.ArgumentParser(
+    description="Script de migration pour corriger les chemins des photos"
+)
+parser.add_argument(
+    '--dry-run',
+    action='store_true',
+    help="Affiche les changements sans les appliquer"
+)
+parser.add_argument(
+    '--db-uri',
+    type=str,
+    help="URI de la base de données (par défaut: DATABASE_URL env var ou sqlite:///planflan.db)"
+)
+
+args = parser.parse_args()
+
+# Set environment variables BEFORE importing app modules
+if args.db_uri:
+    os.environ['DATABASE_URL'] = args.db_uri
+elif not os.environ.get('DATABASE_URL'):
+    os.environ['DATABASE_URL'] = 'sqlite:///planflan.db'
+
+if not os.environ.get('SECRET_KEY'):
+    os.environ['SECRET_KEY'] = 'migration-script-secret-key'
+
+# NOW we can import app modules after setting environment variables
 # Ajouter le répertoire parent au path pour permettre les imports
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from app import create_app, db
+from app.config import Config
 from app.models import Photo, Etablissement
 
 
@@ -28,7 +60,8 @@ def fix_photo_paths(dry_run=False):
     Args:
         dry_run (bool): Si True, affiche les changements sans les appliquer
     """
-    app = create_app()
+    # Créer l'app avec la configuration par défaut
+    app = create_app(Config)
     with app.app_context():
         photos = Photo.query.all()
         total_photos = len(photos)
@@ -103,17 +136,6 @@ def fix_photo_paths(dry_run=False):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Script de migration pour corriger les chemins des photos"
-    )
-    parser.add_argument(
-        '--dry-run',
-        action='store_true',
-        help="Affiche les changements sans les appliquer"
-    )
-    
-    args = parser.parse_args()
-    
     print("=" * 60)
     print("Script de migration des chemins de photos")
     print("=" * 60)
