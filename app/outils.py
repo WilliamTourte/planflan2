@@ -190,11 +190,49 @@ def fetch_place_photos(etablissement_id, place_id, api_key, max_width=400):
 
     current_app.logger.info(f"[FETCH_PHOTOS] Début pour établissement {etablissement_id}, place_id={place_id}")
 
-    # Vérifier si des photos existent déjà pour cet établissement
-    existing_photos = Photo.query.filter_by(id_etab=etablissement_id).all()
-    if existing_photos:
-        current_app.logger.info(f"[FETCH_PHOTOS] {len(existing_photos)} photo(s) déjà existante(s) en base")
-        return [photo.path for photo in existing_photos]
+    # Ne plus faire confiance à la base de données - vérifier directement les fichiers physiques
+    # Format attendu: {place_id}_photo_0.jpg, {place_id}_photo_1.jpg, etc.
+    upload_folder = current_app.config["UPLOAD_FOLDER"]
+    current_app.logger.info(f"[FETCH_PHOTOS] UPLOAD_FOLDER configuré: {upload_folder}")
+
+    existing_files = []
+    if place_id:
+        for idx in range(5):  # Vérifier jusqu'à 5 photos possibles
+            filename = f"{place_id}_photo_{idx}.jpg"
+            filepath = os.path.join(upload_folder, filename)
+            if os.path.exists(filepath):
+                existing_files.append(filename)
+                current_app.logger.info(f"[FETCH_PHOTOS] ✓ Fichier physique trouvé: {filename}")
+
+    if existing_files:
+        current_app.logger.info(f"[FETCH_PHOTOS] {len(existing_files)} photo(s) physique(s) déjà présente(s), pas de re-téléchargement")
+
+        # Synchroniser la base de données avec les fichiers physiques
+        # Supprimer toutes les anciennes entrées en base pour cet établissement
+        old_photos = Photo.query.filter_by(id_etab=etablissement_id).all()
+        if old_photos:
+            current_app.logger.info(f"[FETCH_PHOTOS] Nettoyage de {len(old_photos)} entrée(s) obsolète(s) en base")
+            for photo in old_photos:
+                db.session.delete(photo)
+
+        # Ajouter les entrées correspondant aux fichiers physiques trouvés
+        for filename in existing_files:
+            new_photo = Photo(
+                id_etab=etablissement_id,
+                type_cible=TypeCible.ETABLISSEMENT,
+                path=filename,
+                largeur=max_width,
+                hauteur=max_width,
+            )
+            db.session.add(new_photo)
+            current_app.logger.info(f"[FETCH_PHOTOS] Ajout en base: {filename}")
+
+        db.session.commit()
+        current_app.logger.info(f"[FETCH_PHOTOS] Base de données synchronisée avec les fichiers physiques")
+        return existing_files
+
+    # Aucun fichier physique trouvé, continuer pour télécharger depuis Google Places
+    current_app.logger.info(f"[FETCH_PHOTOS] Aucun fichier physique trouvé, téléchargement depuis Google Places...")
 
     # Récupérer les détails de l'établissement pour obtenir les photoreferences
     # Utiliser le place_id Google Places pour récupérer les photos
@@ -213,9 +251,6 @@ def fetch_place_photos(etablissement_id, place_id, api_key, max_width=400):
     current_app.logger.info(f"[FETCH_PHOTOS] {len(place_details['photos'])} photo(s) disponible(s) dans l'API Google")
 
     # Vérifier que le dossier UPLOAD_FOLDER existe et est accessible en écriture
-    upload_folder = current_app.config["UPLOAD_FOLDER"]
-    current_app.logger.info(f"[FETCH_PHOTOS] UPLOAD_FOLDER configuré: {upload_folder}")
-
     if not os.path.exists(upload_folder):
         current_app.logger.warning(f"[FETCH_PHOTOS] Dossier {upload_folder} n'existe pas, création...")
         try:
@@ -289,3 +324,5 @@ def fetch_place_photos(etablissement_id, place_id, api_key, max_width=400):
     db.session.commit()
     current_app.logger.info(f"[FETCH_PHOTOS] Terminé, {len(photo_paths)} photo(s) sauvegardée(s)")
     return photo_paths
+
+

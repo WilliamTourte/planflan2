@@ -40,14 +40,8 @@
       form.adresse(id="ajout-etab-adresse") }} {{
       form.latitude(id="ajout-etab-latitude") }} {{
       form.longitude(id="ajout-etab-longitude") }} {{
-      form.google_place_id(id="ajout-etab-google_place_id") }}
-      <input
-        type="hidden"
-        name="ajout-etab-google_place_id"
-        id="ajout-etab-google_place_id"
-        value="{{ form.google_place_id.data or '' }}"
-      />
-      {{ form.code_postal(id="ajout-etab-code_postal") }} {{
+      form.google_place_id(id="ajout-etab-google_place_id") }} {{
+      form.code_postal(id="ajout-etab-code_postal") }} {{
       form.ville(id="ajout-etab-ville") }}
     </div>
     <!-- Type d'établissement -->

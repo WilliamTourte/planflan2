@@ -177,6 +177,12 @@ def ajouter_etablissement():
             f"Formulaire créé, google_place_id.data: '{form_ajout.google_place_id.data}' (type: {type(form_ajout.google_place_id.data)})"
         )
 
+        # Log de TOUS les champs du formulaire pour diagnostic
+        current_app.logger.info("=== TOUS LES CHAMPS DU FORMULAIRE ===")
+        for field_name, field_obj in form_ajout._fields.items():
+            current_app.logger.info(f"  {field_name}: '{field_obj.data}' (type: {type(field_obj.data)})")
+        current_app.logger.info("=== FIN CHAMPS FORMULAIRE ===")
+
         # Validation du formulaire et création de l'établissement
         # Si le formulaire est valide, les données sont utilisées pour créer un nouvel établissement
         if form_ajout.validate():
@@ -204,6 +210,14 @@ def ajouter_etablissement():
             current_app.logger.info(
                 f"  google_place_id: '{form_ajout.google_place_id.data}' (type: {type(form_ajout.google_place_id.data)})"
             )
+
+            # Log des valeurs avant création
+            current_app.logger.info(f"=== VALEURS AVANT CRÉATION ===")
+            current_app.logger.info(f"  google_place_id from form: '{form_ajout.google_place_id.data}'")
+            current_app.logger.info(f"  Type: {type(form_ajout.google_place_id.data)}")
+            current_app.logger.info(f"  Est vide: {not form_ajout.google_place_id.data}")
+            current_app.logger.info(f"  Est None: {form_ajout.google_place_id.data is None}")
+            current_app.logger.info(f"  Est chaîne vide: {form_ajout.google_place_id.data == ''}")
 
             nouvel_etablissement = Etablissement(
                 nom=form_ajout.nom.data,
@@ -242,14 +256,21 @@ def ajouter_etablissement():
 
             # Télécharger les photos depuis Google Places si un place_id est disponible
             current_app.logger.info(
-                f"Google Place ID de l'établissement créé: '{nouvel_etablissement.google_place_id}' (type: {type(nouvel_etablissement.google_place_id)})"
+                f"=== CHECK AVANT FETCH_PHOTOS ==="
             )
+            current_app.logger.info(
+                f"Google Place ID: '{nouvel_etablissement.google_place_id}' (type: {type(nouvel_etablissement.google_place_id)})"
+            )
+            current_app.logger.info(
+                f"Condition if google_place_id: {bool(nouvel_etablissement.google_place_id)}"
+            )
+
             if nouvel_etablissement.google_place_id:
                 try:
                     from app.outils import fetch_place_photos
 
                     current_app.logger.info(
-                        f"Appel de fetch_place_photos avec id_etab={id_etab}, place_id='{nouvel_etablissement.google_place_id}'"
+                        f"✓ Appel de fetch_place_photos avec id_etab={id_etab}, place_id='{nouvel_etablissement.google_place_id}'"
                     )
                     fetch_place_photos(
                         id_etab,
@@ -257,17 +278,20 @@ def ajouter_etablissement():
                         current_app.config["GOOGLE_MAPS_API_KEY"],
                     )
                     current_app.logger.info(
-                        "Téléchargement des photos Google Places terminé"
+                        "✓ Téléchargement des photos Google Places terminé"
                     )
                 except Exception as e:
                     current_app.logger.error(
-                        f"Erreur lors du téléchargement des photos Google Places: {str(e)}"
+                        f"✗ Erreur lors du téléchargement des photos Google Places: {str(e)}"
                     )
                     current_app.logger.error(traceback.format_exc())
                     # Ne pas échouer la création de l'établissement si les photos ne peuvent pas être téléchargées
             else:
                 current_app.logger.warning(
-                    "⚠️  Aucun Google Place ID disponible, pas de téléchargement de photos"
+                    "⚠️ ATTENTION: Google Place ID est vide ou None, pas de téléchargement de photos!"
+                )
+                current_app.logger.warning(
+                    f"⚠️ Valeur exacte du google_place_id: {repr(nouvel_etablissement.google_place_id)}"
                 )
 
             flash("Établissement ajouté avec succès !", "success")
