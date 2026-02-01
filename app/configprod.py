@@ -88,7 +88,8 @@ class ConfigProd(Config):
     SQLALCHEMY_DATABASE_URI = _database_url
 
     # Configuration de la journalisation
-    LOG_LEVEL = "WARNING"
+    # Changé à INFO pour voir les logs [FETCH_PHOTOS] et diagnostiquer les problèmes de photos
+    LOG_LEVEL = "INFO"
 
     # Configuration de la sécurité
     SESSION_COOKIE_SECURE = True
