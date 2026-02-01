@@ -50,13 +50,16 @@ services:
     cap_add:
       - NET_BIND_SERVICE
     ports:
-      - "80:80"
+      - "81:80"
       - "443:443"
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-      - ./nginx:/etc/nginx/conf.d/
+      # Retirer le montage du répertoire complet qui cause des conflits
+      # - ./nginx:/etc/nginx/conf.d/
       - letsencrypt:/etc/letsencrypt
       - certbot-www:/var/www/certbot
+      # Monter le volume des photos pour servir les images statiques
+      - photos_volume:/var/www/uploads
     depends_on:
       - planflan-backend
     networks:
