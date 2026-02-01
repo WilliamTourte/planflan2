@@ -14,6 +14,22 @@ echo "Export de la variable FLASK_CONFIG"
 export FLASK_CONFIG="ConfigProd"  # Utilise config_prod.py
 
 echo "Connexion DB Ok"
+
+# Vérifier que le dossier uploads est accessible en écriture
+echo "Vérification du dossier uploads..."
+if [ ! -d "/app/static/uploads" ]; then
+  echo "Création du dossier /app/static/uploads"
+  mkdir -p /app/static/uploads
+fi
+chmod -R 777 /app/static/uploads
+echo "Test d'écriture dans /app/static/uploads"
+touch /app/static/uploads/test_write.txt && rm /app/static/uploads/test_write.txt
+if [ $? -eq 0 ]; then
+  echo "✓ Dossier uploads accessible en écriture"
+else
+  echo "✗ ERREUR: Impossible d'écrire dans /app/static/uploads"
+fi
+
 echo "Exécution de la migration DB"
 # appliquer les migrations
 flask db init

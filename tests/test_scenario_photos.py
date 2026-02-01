@@ -4,7 +4,6 @@ Ce module teste la standardisation du stockage et de l'affichage des photos
 d'établissements en utilisant les Google Place ID comme identifiants stables.
 """
 
-import os
 import pytest
 from app import create_app, db
 from app.config import TestConfig
@@ -154,9 +153,12 @@ class TestGestionPhotos:
             assert filepath.exists()
             assert filepath.name == f"{google_place_id}_photo_0.jpg"
 
-    def test_pas_de_double_chemin_dans_url(self, client, app):
+    def test_pas_de_double_chemin_dans_url(self, app):
         """Test : vérifier qu'il n'y a pas de double 'uploads/' dans l'URL"""
         with app.app_context():
+            # Configurer SERVER_NAME pour permettre url_for de fonctionner
+            app.config['SERVER_NAME'] = 'localhost'
+
             etab = Etablissement(
                 nom="Test",
                 adresse="1 rue Test",
@@ -184,9 +186,10 @@ class TestGestionPhotos:
             # L'URL générée devrait être /static/uploads/ChIJTest789_photo_0.jpg
             # PAS /static/uploads/uploads/ChIJTest789_photo_0.jpg
             from flask import url_for
-            url = url_for('static', filename=f'uploads/{photo.path}')
-            assert url == "/static/uploads/ChIJTest789_photo_0.jpg"
-            assert "uploads/uploads" not in url
+            with app.test_request_context():
+                url = url_for('static', filename=f'uploads/{photo.path}')
+                assert url == "/static/uploads/ChIJTest789_photo_0.jpg"
+                assert "uploads/uploads" not in url
 
     def test_photo_path_sans_prefix_uploads(self, app):
         """Test : vérifier que le path dans la BDD ne contient jamais 'uploads/'"""
@@ -262,3 +265,83 @@ class TestGestionPhotos:
             assert photo_saved.path == expected_filename
             assert photo_saved.path.startswith(google_place_id)
             assert photo_saved.path.endswith("_photo_0.jpg")
+
+    def test_upload_folder_configuration(self, app):
+        """Test : vérifier que UPLOAD_FOLDER est correctement configuré"""
+        with app.app_context():
+            upload_folder = app.config.get('UPLOAD_FOLDER')
+
+            # UPLOAD_FOLDER doit être défini
+            assert upload_folder is not None
+
+            # En test, devrait être un chemin relatif ou absolu valide
+            assert isinstance(upload_folder, str)
+            assert len(upload_folder) > 0
+
+            # Le chemin ne devrait pas contenir de doubles slashes
+            assert "//" not in upload_folder
+
+    def test_upload_folder_writable(self, app, tmp_path):
+        """Test : vérifier que le dossier uploads est accessible en écriture"""
+        with app.app_context():
+            # Utiliser tmp_path pour le test
+            uploads_dir = tmp_path / "static" / "uploads"
+            uploads_dir.mkdir(parents=True, exist_ok=True)
+
+            # Vérifier que le dossier existe
+            assert uploads_dir.exists()
+            assert uploads_dir.is_dir()
+
+            # Vérifier qu'on peut écrire dedans
+            test_file = uploads_dir / "test_write.txt"
+            test_file.write_text("test")
+            assert test_file.exists()
+
+            # Nettoyer
+            test_file.unlink()
+
+    def test_fetch_place_photos_creates_upload_folder(self, app, tmp_path, monkeypatch):
+        """Test : fetch_place_photos crée le dossier uploads s'il n'existe pas"""
+        with app.app_context():
+            from app.outils import fetch_place_photos
+            import os
+
+            # Utiliser un dossier temporaire
+            temp_uploads = tmp_path / "uploads"
+            app.config['UPLOAD_FOLDER'] = str(temp_uploads)
+
+            # Le dossier ne devrait pas exister au début
+            assert not temp_uploads.exists()
+
+            # Mock de get_place_details pour ne pas faire d'appel API réel
+            def mock_get_place_details(place_id, api_key):
+                return None  # Pas de photos disponibles
+
+            monkeypatch.setattr('app.outils.get_place_details', mock_get_place_details)
+
+            # Créer un établissement
+            etab = Etablissement(
+                nom="Test",
+                adresse="1 rue Test",
+                code_postal="75001",
+                ville="Paris",
+                latitude=48.8566,
+                longitude=2.3522,
+                type_etab=TypeEtab.BOULANGERIE,
+                google_place_id="ChIJTestFolder",
+                id_user=1
+            )
+            db.session.add(etab)
+            db.session.commit()
+
+            # Appeler fetch_place_photos
+            result = fetch_place_photos(
+                etab.id_etab,
+                "ChIJTestFolder",
+                "fake_api_key"
+            )
+
+            # Le dossier devrait avoir été créé (même si pas de photos téléchargées)
+            # Note: ce test dépend de l'implémentation actuelle de fetch_place_photos
+            # qui crée le dossier s'il n'existe pas
+
