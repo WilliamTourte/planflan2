@@ -6,8 +6,11 @@
 # Testing additionnelles (pytest et coverage sont déjà dans requirements.txt)
 pytest-cov==7.0.0
 pytest-xdist==3.6.1
-pylint
-pre-commit
+
+# Linting et Formatting
+pylint==3.0.3
+black==24.1.1
+pre-commit==3.6.0
 mistral-vibe
 
 # flake8==7.0.0

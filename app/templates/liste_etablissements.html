@@ -1,6 +1,5 @@
-{% extends "base.html" %}
-{% block page_type %}liste_etablissements{% endblock %}
-{% block scripts_head %}
+{% extends "base.html" %} {% block page_type %}liste_etablissements{% endblock
+%} {% block scripts_head %}
 <meta name="csrf-token" content="{{ csrf_token() }}" />
 <!-- Leaflet CSS & JS -->
 <link
@@ -16,26 +15,41 @@
 ></script>
 
 <!-- Données pour le script externe -->
-<div id="etablissements-data" data-etablissements='{{ etablissements_json|tojson|safe }}'></div>
-<div id="is-admin" data-is-admin="{{ current_user.is_admin|tojson|safe if current_user.is_authenticated else 'false' }}"></div>
+<div
+  id="etablissements-data"
+  data-etablissements="{{ etablissements_json|tojson|safe }}"
+></div>
+<div
+  id="is-admin"
+  data-is-admin="{{ current_user.is_admin|tojson|safe if current_user.is_authenticated else 'false' }}"
+></div>
 <div id="google-maps-api-key" data-api-key="{{ google_maps_api_key }}"></div>
 {% if user_lat and user_lon %}
-<div id="user-location" data-lat="{{ user_lat }}" data-lon="{{ user_lon }}"></div>
-{% endif %}
-{% if ville_selectionnee %}
+<div
+  id="user-location"
+  data-lat="{{ user_lat }}"
+  data-lon="{{ user_lon }}"
+></div>
+{% endif %} {% if ville_selectionnee %}
 <div id="ville-selectionnee" data-ville="{{ ville_selectionnee }}"></div>
 {% endif %}
 
 <!-- Le script liste_etablissements.js n'est plus nécessaire, tout est géré par main.js -->
 {% endblock %} {% block content %}
-<div class="container-fluid p-0 d-flex flex-column" style="height: calc(100vh - 120px);">
+<div
+  class="container-fluid p-0 d-flex flex-column"
+  style="height: calc(100vh - 120px)"
+>
   <!-- Carte - 90% de la hauteur -->
-  <div class="flex-grow-1" style="height: 90%;">
+  <div class="flex-grow-1" style="height: 90%">
     <div id="map-container" class="position-relative w-100 h-100">
       <div id="map" class="w-100 h-100"></div>
 
       <!-- Filtres pour établissements (dans la carte) -->
-      <div id="filter-controls" class="position-absolute top-0 start-50 translate-middle-x w-100 px-2">
+      <div
+        id="filter-controls"
+        class="position-absolute top-0 start-50 translate-middle-x w-100 px-2"
+      >
         <div class="main-filters d-flex flex-wrap justify-content-center gap-2">
           <button
             id="filter-all"
@@ -73,7 +87,10 @@
   </div>
 
   <!-- Bouton - 10% de la hauteur -->
-  <div class="d-flex align-items-center justify-content-center" style="height: 10%; min-height: 60px;">
+  <div
+    class="d-flex align-items-center justify-content-center"
+    style="height: 10%; min-height: 60px"
+  >
     <a
       href="{{ url_for('maps.proposer_etablissement') }}"
       class="btn btn-success"

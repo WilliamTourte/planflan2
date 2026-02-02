@@ -1,4 +1,11 @@
 {
+  "app/**/*.py": [
+    "black --line-length 100",
+    "pylint"
+  ],
+  "tests/**/*.py": [
+    "black --line-length 100"
+  ],
   "app/static/css/**/*.css": [
     "stylelint --fix",
     "prettier --write"

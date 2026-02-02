@@ -1,43 +1,71 @@
 [MASTER]
+# Charger les plugins
+load-plugins=pylint_flask
 
-# Activer/désactiver les messages
-# C = Convention
-# R = Refactor
-# W = Warning
-# E = Error
-# F = Fatal
-disable=all
-enable=C0301,  # Line too long
-       C0303,  # Trailing whitespace
-       C0114,  # Missing module docstring
-       C0115,  # Missing class docstring
-       C0116,  # Missing function docstring
-       R1705,  # Unnecessary "elif" after "return"
-       R1720,  # Unnecessary "elif" after "raise"
-       W0707,  # Consider explicitly re-raising
-       W0613   # Unused argument
-
-[FORMAT]
-
-# Longueur maximale des lignes
-max-line-length=100
+# Ignorer les répertoires
+ignore=
+    CVS,
+    .git,
+    __pycache__,
+    .venv,
+    env,
+    node_modules
 
 [MESSAGES CONTROL]
 
-# Désactiver les messages spécifiques
-# disable=missing-docstring
+# Désactiver les messages trop stricts
+disable=
+    missing-docstring,
+    too-many-arguments,
+    too-many-instance-attributes,
+    too-many-locals,
+    too-few-public-methods,
+    line-too-long,
+    fixme,
+    protected-access
+
+# Activer spécifiquement
+enable=
+    C0301,  # Line too long (100 max)
+    C0303,  # Trailing whitespace
+    W0707,  # Consider explicitly re-raising
+    W0613   # Unused argument
+
+[FORMAT]
+
+# Longueur maximale des lignes (cohérent avec Black/Prettier)
+max-line-length = 100
+
+# Indentation
+indent-string = '    '
+indent-after-paren = 4
 
 [REPORTS]
 
 # Format du rapport
-output-format=text
+output-format = colorized
+
+# Seuil de note
+fail-under = 7.0
 
 [TYPECHECK]
 
-# Désactiver les vérifications de type
-# disable=all
+# Extensions de modules à ignorer
+extension-pkg-whitelist = sqlalchemy,flask
+
+# Ignorer les modules non trouvés
+ignored-modules = flask_sqlalchemy
 
 [VARIABLES]
 
-# Désactiver les vérifications de variables
-# disable=all
+# Noms autorisés pour les fonctions sans utilisation
+dummy-variables-rgx = ^_
+
+[DESIGN]
+
+# Limites de complexité
+max-attributes = 10
+max-branches = 15
+max-locals = 20
+max-statements = 60
+

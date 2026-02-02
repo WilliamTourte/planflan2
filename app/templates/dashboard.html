@@ -1,13 +1,18 @@
-{% extends "base.html" %}
-{% block page_type %}dashboard{% endblock %}
-{% block content %}
+{% extends "base.html" %} {% block page_type %}dashboard{% endblock %} {% block
+content %}
 <div class="container">
   <h1>Tableau de bord</h1>
   <!-- Section Infos Utilisateur -->
 
   <div id="user-info" class="carte">
-    <p><strong>Pseudo:</strong> {{ current_user.pseudo }}</p>
-    <p><strong>Email:</strong> {{ current_user.email }}</p>
+    <p>
+      <strong>Pseudo:</strong>
+      {{ current_user.pseudo }}
+    </p>
+    <p>
+      <strong>Email:</strong>
+      {{ current_user.email }}
+    </p>
     <div class="action-buttons">
       <button
         id="edit-profile-btn"
@@ -30,9 +35,9 @@
         >
           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
           <div class="form-group">
-            <label for="delete-password" class="form-label"
-              >Mot de passe actuel *</label
-            >
+            <label for="delete-password" class="form-label">
+              Mot de passe actuel *
+            </label>
             <input
               type="password"
               name="password"
@@ -138,9 +143,7 @@
   </div>
 
   <!-- Section Mes Évaluations -->
-  <h2 class="section-title" id="mes-evaluations-title">
-    Mes evaluations
-  </h2>
+  <h2 class="section-title" id="mes-evaluations-title">Mes evaluations</h2>
   <div id="mes-evaluations" class="section-content" style="display: none">
     {{ afficher_grille('evaluation', current_user.evaluations, current_user) }}
   </div>
@@ -175,5 +178,8 @@
   {% endif %}
 </div>
 
-<script src="{{ url_for('static', filename='js/dashboard.js') }}" nonce="{{ csp_nonce }}"></script>
+<script
+  src="{{ url_for('static', filename='js/dashboard.js') }}"
+  nonce="{{ csp_nonce }}"
+></script>
 {% endblock %}

@@ -1,0 +1,47 @@
+# Dépendances
+node_modules/
+venv/
+env/
+.venv/
+__pycache__/
+*.egg-info/
+
+# Fichiers de build
+dist/
+build/
+*.min.js
+*.min.css
+coverage/
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Fichiers générés
+*.bundle.js
+*.bundle.css
+coverage-js/
+
+# Dossiers Git
+.git/
+.github/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Fichiers de système
+.DS_Store
+Thumbs.db
+
+# Spécifique au projet
+docker-db/
+migrations/
+logs/
+letsencrypt/
+
+# Documentation générée
+docs/
+documentation/

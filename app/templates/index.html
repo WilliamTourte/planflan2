@@ -1,12 +1,7 @@
-{% extends "base.html" %}
-{% block page_type %}home{% endblock %}
-{% block scripts_head %}
+{% extends "base.html" %} {% block page_type %}home{% endblock %} {% block
+scripts_head %}
 <meta name="csrf-token" content="{{ csrf_token() }}" />
-{% endblock %}
-{% block styles %}
-{% endblock %}
-
-{% block content %}
+{% endblock %} {% block styles %} {% endblock %} {% block content %}
 <div
   class="container d-flex flex-column align-items-center justify-content-center"
   style="min-height: 85vh; padding: var(--padding-sm)"
@@ -23,39 +18,39 @@
     PLANFLAN
   </h1>
 
-<form
-  action="{{ url_for('main.liste_etablissements') }}"
-  method="POST"
-  class="form-container"
->
-  {{ form_recherche.hidden_tag() }} {{ form_recherche.ville(class="d-none") }}
-  {# Champ caché pour le formulaire #} {{
-  form_recherche.latitude(class="d-none") }} {# Champ caché pour la latitude
-  #} {{ form_recherche.longitude(class="d-none") }} {# Champ caché pour la
-  longitude #}
-  <div class="d-flex gap-2">
-    <div class="form-group autocomplete flex-grow-1">
-      <input
-        type="text"
-        id="ville-autocomplete"
-        class="autocomplete-input py-2"
-        placeholder="Ville"
-        autocomplete="off"
-        style="height: 38px;"
-      />
-      <div id="autocomplete-results" class="autocomplete-results"></div>
+  <form
+    action="{{ url_for('main.liste_etablissements') }}"
+    method="POST"
+    class="form-container"
+  >
+    {{ form_recherche.hidden_tag() }} {{ form_recherche.ville(class="d-none") }}
+    {# Champ caché pour le formulaire #} {{
+    form_recherche.latitude(class="d-none") }} {# Champ caché pour la latitude
+    #} {{ form_recherche.longitude(class="d-none") }} {# Champ caché pour la
+    longitude #}
+    <div class="d-flex gap-2">
+      <div class="form-group autocomplete flex-grow-1">
+        <input
+          type="text"
+          id="ville-autocomplete"
+          class="autocomplete-input py-2"
+          placeholder="Ville"
+          autocomplete="off"
+          style="height: 38px"
+        />
+        <div id="autocomplete-results" class="autocomplete-results"></div>
+      </div>
+      <button
+        type="button"
+        id="geoloc-button"
+        class="btn btn-success"
+        title="Géolocalisation"
+        style="height: 38px"
+      >
+        <i class="bi bi-geo-alt"></i>
+      </button>
     </div>
-    <button
-      type="button"
-      id="geoloc-button"
-      class="btn btn-success"
-      title="Géolocalisation"
-      style="height: 38px;"
-    >
-      <i class="bi bi-geo-alt"></i>
-    </button>
-  </div>
-</form>
+  </form>
 
   <a
     href="{{ url_for('maps.proposer_etablissement') }}"
@@ -67,7 +62,9 @@
   </a>
 </div>
 
-{% endblock %}
-{% block scripts %}
-<script src="{{ url_for('static', filename='js/index.js') }}" nonce="{{ csp_nonce }}"></script>
+{% endblock %} {% block scripts %}
+<script
+  src="{{ url_for('static', filename='js/index.js') }}"
+  nonce="{{ csp_nonce }}"
+></script>
 {% endblock %}

@@ -1,0 +1,94 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "planflan3"
+version = "1.0.0"
+description = "PlanFlan - Application Flask pour trouver et noter les flans"
+authors = [{name = "William Tourte"}]
+
+[tool.black]
+line-length = 100
+target-version = ['py310', 'py311', 'py312']
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | env
+  | venv
+  | node_modules
+)/
+'''
+
+[tool.pylint.messages_control]
+disable = [
+    "missing-docstring",
+    "too-many-arguments",
+    "too-many-instance-attributes",
+    "too-many-locals",
+    "too-few-public-methods",
+]
+max-line-length = 100
+
+[tool.isort]
+profile = "black"
+line_length = 100
+skip_gitignore = true
+known_first_party = ["app"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-v --tb=short"
+markers = [
+    "auth: tests d'authentification",
+    "admin: tests d'administration",
+    "main: tests des routes principales",
+    "forms: tests de validation des formulaires",
+    "utils: tests des fonctions utilitaires",
+    "maps: tests des fonctionnalités de carte",
+    "scenarios: tests de scénarios complexes",
+    "unitary: tests unitaires",
+    "app: tests d'application",
+    "slow: tests lents",
+    "critical: tests critiques",
+    "performance: tests de performance",
+    "csrf: tests de protection CSRF",
+    "integration: tests d'intégration complets",
+    "smoke: tests smoke",
+    "routes: tests des routes",
+    "api: tests des API",
+    "regression: tests de régression",
+    "deployment: tests de déploiement",
+]
+
+[tool.coverage.run]
+source = ["app"]
+omit = [
+    "app/static/*",
+    "app/templates/*",
+    "*/__init__.py",
+    "*/__pycache__/*",
+    "app/config_prod.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]

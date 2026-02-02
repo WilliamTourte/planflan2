@@ -1,6 +1,5 @@
-{% extends "base.html" %}
-{% block page_type %}proposer_etablissement{% endblock %}
-{% block scripts_head %}
+{% extends "base.html" %} {% block page_type %}proposer_etablissement{% endblock
+%} {% block scripts_head %}
 <meta name="csrf-token" content="{{ csrf_token() }}" />
 <!-- Leaflet CSS & JS -->
 <link
@@ -24,9 +23,9 @@
     {{ form.hidden_tag() }}
     <!-- Champ de recherche pour l'autocomplete Google Maps -->
     <div class="form-group">
-      <label for="search" class="form-check-label"
-        >Recherche d'établissement</label
-      >
+      <label for="search" class="form-check-label">
+        Recherche d'établissement
+      </label>
       <input
         type="text"
         id="search"
@@ -71,7 +70,6 @@
       Enregistrer
     </button>
   </form>
-
 </div>
 <!-- Conteneur pour la carte -->
 <div id="map" class="map"></div>
