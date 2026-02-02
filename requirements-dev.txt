@@ -11,7 +11,7 @@ coverage==7.13.0
 
 # Linting et Formatting
 pylint==4.0.4
-black==25.12.0
+black>=25.12.0
 isort==7.0.0
 autoflake==2.3.1
 pre-commit==4.5.1
@@ -23,10 +23,5 @@ safety==3.2.11
 # Documentation
 sphinx==7.2.6
 sphinx-rtd-theme==2.0.0
-sphinx-js==3.2.2
-nodeenv>=1.8.0  # For Node.js in virtual environment (JSDoc support)
-
-# Type checking (optionnel)
-# mypy==1.9.0
-# types-flask==1.1.11
-# types-flask-sqlalchemy==2.5.7
+sphinx-js==5.0.2
+nodeenv>=1.8.0  # For Node.js in virtual environment
