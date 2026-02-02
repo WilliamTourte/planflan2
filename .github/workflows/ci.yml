@@ -60,32 +60,32 @@ jobs:
             if git branch -r --contains $CURRENT_COMMIT | grep -q "origin/dev"; then
               echo "Commit exists on dev branch. Checking CI status..."
               
-              # Query GitHub API for commit status
-              CI_STATUS=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
+              # Query GitHub API for workflow runs that completed on dev branch
+              # We filter by head_branch=dev to get only runs from dev, not from main
+              WORKFLOW_RUNS=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
                 -H "Accept: application/vnd.github.v3+json" \
-                "https://api.github.com/repos/${{ github.repository }}/commits/$CURRENT_COMMIT/status" \
-                | jq -r '.state')
+                "https://api.github.com/repos/${{ github.repository }}/actions/runs?head_sha=$CURRENT_COMMIT&branch=dev&status=completed" \
+                | jq -r '.workflow_runs')
               
-              echo "CI status on dev: $CI_STATUS"
+              # Check if there are completed workflow runs on dev
+              WORKFLOW_COUNT=$(echo "$WORKFLOW_RUNS" | jq 'length')
+              echo "Found $WORKFLOW_COUNT completed workflow runs on dev branch for this commit"
               
-              if [ "$CI_STATUS" = "success" ]; then
-                # Also check if workflow runs were successful
-                WORKFLOW_STATUS=$(curl -s -H "Authorization: token $GITHUB_TOKEN" \
-                  -H "Accept: application/vnd.github.v3+json" \
-                  "https://api.github.com/repos/${{ github.repository }}/commits/$CURRENT_COMMIT/check-runs" \
-                  | jq -r '[.check_runs[] | select(.name == "Run Tests" or .name == "Build Docker Image")] | all(.conclusion == "success")')
+              if [ "$WORKFLOW_COUNT" -gt 0 ]; then
+                # Check if all completed workflows on dev were successful
+                ALL_SUCCESS=$(echo "$WORKFLOW_RUNS" | jq -r 'all(.conclusion == "success")')
                 
-                echo "Workflow runs successful: $WORKFLOW_STATUS"
+                echo "All workflows successful on dev: $ALL_SUCCESS"
                 
-                if [ "$WORKFLOW_STATUS" = "true" ]; then
+                if [ "$ALL_SUCCESS" = "true" ]; then
                   echo "✅ Commit already validated on dev. Skipping CI..."
                   echo "should_skip=true" >> $GITHUB_OUTPUT
                 else
-                  echo "⚠️ Workflow runs not all successful. Running CI..."
+                  echo "⚠️ Some workflows failed on dev. Running CI..."
                   echo "should_skip=false" >> $GITHUB_OUTPUT
                 fi
               else
-                echo "⚠️ CI status not successful on dev. Running CI..."
+                echo "⚠️ No completed workflow runs found on dev. Running CI..."
                 echo "should_skip=false" >> $GITHUB_OUTPUT
               fi
             else
