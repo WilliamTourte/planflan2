@@ -39,8 +39,11 @@ def test_geolocation_handler_class():
     # Vérifier que le fichier geoloc.js existe
     import os
 
-    geoloc_js_path = os.path.join("app", "static", "js", "geolocation.js")
-    assert os.path.exists(geoloc_js_path), "Le fichier geoloc.js devrait exister"
+    # Utiliser un chemin basé sur le répertoire courant du fichier de test
+    # Cela fonctionne peu importe le working directory
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    geoloc_js_path = os.path.join(project_root, "app", "static", "js", "geolocation.js")
+    assert os.path.exists(geoloc_js_path), f"Le fichier geoloc.js devrait exister à {geoloc_js_path}"
 
     # Vérifier que le fichier contient la classe GeolocationHandler
     with open(geoloc_js_path, "r", encoding="utf-8") as f:
