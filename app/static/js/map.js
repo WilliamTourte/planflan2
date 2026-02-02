@@ -244,6 +244,52 @@ export function addGeolocateControl(map) {
 }
 
 /**
+ * Initialise la carte Leaflet avec un marqueur unique pour un établissement.
+ * Utilisée sur la page de proposition d'établissement.
+ * @param {number} lat - Latitude de l'établissement
+ * @param {number} lng - Longitude de l'établissement
+ * @param {string} nom - Nom de l'établissement
+ * @returns {object} Instance de la carte Leaflet
+ */
+export function initMapWithMarker(lat, lng, nom) {
+    const mapElement = document.getElementById("map");
+    if (!mapElement) {
+        console.error("Élément #map introuvable !");
+        return;
+    }
+
+    // Réutiliser la carte si elle existe déjà
+    if (map) {
+        console.log("Carte existante détectée, réutilisation et nettoyage des marqueurs");
+        // Supprimer les marqueurs existants
+        map.eachLayer(layer => {
+            if (layer instanceof L.Marker) {
+                map.removeLayer(layer);
+            }
+        });
+        // Centrer sur la nouvelle position
+        map.setView([lat, lng], 15);
+    } else {
+        console.log("Création d'une nouvelle carte pour proposer_etablissement");
+        // Créer une nouvelle carte
+        map = L.map('map').setView([lat, lng], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+    }
+
+    // Ajouter un marqueur pour l'établissement
+    const marker = L.marker([lat, lng])
+        .addTo(map)
+        .bindPopup(`<b>${nom}</b>`)
+        .openPopup();
+
+    console.log(`Marqueur ajouté pour ${nom} à [${lat}, ${lng}]`);
+
+    return map;
+}
+
+/**
  * Initialise la carte Leaflet avec les paramètres par défaut.
  * Configure la vue initiale et les contrôles de base.
  * @param {object} options - Options de configuration
@@ -489,6 +535,7 @@ export function saveCompleteStateToUrl() {
 // Export pour compatibilité avec les anciens scripts
 document.map = {
     initMap,
+    initMapWithMarker,
     createEtablissementMarker,
     zoomOnVille,
     createUserMarker,

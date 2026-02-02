@@ -30,29 +30,38 @@ def add_security_headers(response):
     # Le nonce devrait toujours être disponible car généré dans before_request
     if csp_nonce:
         nonce_directive = f"'nonce-{csp_nonce}'"
-        script_src = f"script-src 'self' {nonce_directive} "
+        # Google Maps nécessite 'unsafe-eval' pour fonctionner correctement
+        script_src = f"script-src 'self' {nonce_directive} 'unsafe-eval' "
     else:
         # Si pas de nonce (ne devrait pas arriver), ne pas autoriser les scripts inline
         nonce_directive = ""
-        script_src = "script-src 'self' "
+        script_src = "script-src 'self' 'unsafe-eval' "
 
     csp = (
         "default-src 'self' http://localhost; "
         f"{script_src}"
-        "https://maps.googleapis.com https://www.googletagmanager.com "
+        "https://maps.googleapis.com https://*.googleapis.com "
+        "https://www.googletagmanager.com "
         "cdn.jsdelivr.net unpkg.com http://localhost; "
-        "style-src 'self' 'unsafe-inline' "  # 'unsafe-inline' nécessaire pour les styles inline de Bootstrap/Leaflet
-        "https://fonts.googleapis.com cdn.jsdelivr.net unpkg.com "
+        "style-src 'self' 'unsafe-inline' "  # 'unsafe-inline' nécessaire pour les styles inline de Bootstrap/Leaflet/Google Maps
+        "https://fonts.googleapis.com https://*.googleapis.com "
+        "cdn.jsdelivr.net unpkg.com "
         "http://localhost; "
-        "img-src 'self' data: blob: http://localhost https://maps.googleapis.com "
-        "https://maps.gstatic.com cdn.jsdelivr.net unpkg.com "
-        "a.tile.openstreetmap.org b.tile.openstreetmap.org "
-        "c.tile.openstreetmap.org; "
+        "img-src 'self' data: blob: http://localhost "
+        "https://maps.googleapis.com https://*.googleapis.com "
+        "https://maps.gstatic.com https://*.gstatic.com "
+        "cdn.jsdelivr.net unpkg.com "
+        "*.tile.openstreetmap.org; "  # Wildcard pour tous les subdomains OpenStreetMap
         "font-src 'self' https://fonts.gstatic.com "
         "cdn.jsdelivr.net unpkg.com; "
-        "connect-src 'self' https://maps.googleapis.com "
+        "connect-src 'self' "
+        "https://maps.googleapis.com https://*.googleapis.com "
+        "https://maps.gstatic.com https://*.gstatic.com "
+        "https://*.google.com "  # Nécessaire pour gen_204 et autres endpoints Google
         "cdn.jsdelivr.net unpkg.com http://localhost; "
         "frame-src https://maps.googleapis.com; "
+        "worker-src 'self' blob:; "  # Nécessaire pour certaines fonctionnalités de Google Maps
+        "child-src 'self' blob:; "
         "object-src 'none'; "
         "base-uri 'self'; "
         "form-action 'self' http://localhost; "

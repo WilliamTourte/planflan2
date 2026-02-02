@@ -5,6 +5,7 @@
  */
 
 import { debounce, showLoading, hideLoading, showToast } from './utils.js';
+import { initMapWithMarker } from './map.js';
 
 /**
  * Initialise le système d'autocomplétion pour la recherche de villes.
@@ -370,14 +371,13 @@ function initializeAutocomplete(inputId, apiKey, resolve, reject) {
                             document.getElementById("ajout-etab-adresse").value =
                                 data.adresse_nettoyee || "";
                             
-                            // Initialiser la carte
-                            if (typeof initMap === 'function') {
-                                initMap(
-                                    place.geometry.location.lat(),
-                                    place.geometry.location.lng(),
-                                    place.name,
-                                );
-                            }
+                            // Initialiser la carte avec le marqueur de l'établissement
+                            console.log("Appel de initMapWithMarker pour afficher l'établissement");
+                            initMapWithMarker(
+                                place.geometry.location.lat(),
+                                place.geometry.location.lng(),
+                                place.name
+                            );
                         })
                         .catch((error) => {
                             console.error("Erreur:", error);
