@@ -15,22 +15,16 @@
 ></script>
 
 <!-- Données pour le script externe -->
-<div
-  id="etablissements-data"
-  data-etablissements="{{ etablissements_json|tojson|safe }}"
-></div>
-<div
-  id="is-admin"
-  data-is-admin="{{ current_user.is_admin|tojson|safe if current_user.is_authenticated else 'false' }}"
-></div>
+<!-- prettier-ignore -->
+<div id="etablissements-data" data-etablissements="{{ etablissements_json }}"></div>
+<!-- prettier-ignore -->
+<div id="is-admin" data-is-admin="{{ current_user.is_admin|tojson|safe if current_user.is_authenticated else 'false' }}"></div>
 <div id="google-maps-api-key" data-api-key="{{ google_maps_api_key }}"></div>
 {% if user_lat and user_lon %}
-<div
-  id="user-location"
-  data-lat="{{ user_lat }}"
-  data-lon="{{ user_lon }}"
-></div>
+<!-- prettier-ignore -->
+<div id="user-location" data-lat="{{ user_lat }}" data-lon="{{ user_lon }}"></div>
 {% endif %} {% if ville_selectionnee %}
+<!-- prettier-ignore -->
 <div id="ville-selectionnee" data-ville="{{ ville_selectionnee }}"></div>
 {% endif %}
 

@@ -99,7 +99,7 @@ describe('CSP Integration Tests', () => {
     global.showDeleteAccountForm = dashboard.showDeleteAccountForm;
     global.cancelDeleteAccount = dashboard.cancelDeleteAccount;
     global.toggleSection = dashboard.toggleSection;
-    global.goBackOrRedirect = base.goBackOrRedirect;
+    // base.js assigns goBackOrRedirect to global/window directly, so it's already available
     global.editEtablissement = macros.editEtablissement;
     global.editFlan = macros.editFlan;
     global.editEvaluation = macros.editEvaluation;

@@ -5,6 +5,7 @@ la page d'accueil, les pages de recherche, les pages d'établissements,
 et les fonctionnalités principales accessibles aux utilisateurs.
 """
 
+import json
 from flask import (
     Blueprint,
     render_template,
@@ -328,10 +329,13 @@ def liste_etablissements():
     # 5. Préparation pour le template
     etablissements, etablissements_json = afficher_etablissements(etablissements)
 
+    # Sérialiser le JSON correctement en Python pour éviter les problèmes d'échappement
+    etablissements_json_str = json.dumps(etablissements_json, ensure_ascii=False)
+
     return render_template(
         "liste_etablissements.html",
         etablissements=etablissements,
-        etablissements_json=etablissements_json,
+        etablissements_json=etablissements_json_str,
         google_maps_api_key=current_app.config["GOOGLE_MAPS_API_KEY"],
         form_recherche=form_recherche,
         form_ajout=form_ajout,

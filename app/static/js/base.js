@@ -24,8 +24,6 @@ function goBackOrRedirect(fallbackUrl) {
 // Ajouter la fonction au scope global pour compatibilité avec les scripts inline
 window.goBackOrRedirect = goBackOrRedirect;
 
-// Export pour les modules ES6
-export { goBackOrRedirect };
 
 // Logique pour alterner entre recherche simple et complexe
 document.addEventListener('DOMContentLoaded', function() {
