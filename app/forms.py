@@ -31,6 +31,47 @@ from app import bcrypt
 from app.models import TypeEtab, TypePate, TypeSaveur, TypeTexture, Utilisateur
 
 
+def convertir_statut_etablissement(statut_value):
+    """Convertit la valeur du RadioField statut_etablissement en tuple (visite, label).
+
+    Args:
+        statut_value (str): La valeur du RadioField ("non_visite", "visite", ou "labellise")
+
+    Returns:
+        tuple: (visite: bool, label: bool)
+            - "non_visite" -> (False, False)
+            - "visite" -> (True, False)
+            - "labellise" -> (True, True)
+    """
+    if statut_value == "labellise":
+        return True, True
+    elif statut_value == "visite":
+        return True, False
+    else:  # "non_visite" ou par défaut
+        return False, False
+
+
+def convertir_boolean_vers_statut(visite, label):
+    """Convertit les booléens visite et label en valeur RadioField.
+
+    Args:
+        visite (bool): Si l'établissement a été visité
+        label (bool): Si l'établissement est labellisé
+
+    Returns:
+        str: La valeur du RadioField ("non_visite", "visite", ou "labellise")
+            - Si label=True -> "labellise" (implique visite=True)
+            - Si visite=True et label=False -> "visite"
+            - Sinon -> "non_visite"
+    """
+    if label:
+        return "labellise"
+    elif visite:
+        return "visite"
+    else:
+        return "non_visite"
+
+
 # Formulaire pour créer un compte
 class RegistrationForm(FlaskForm):
     """Formulaire d'inscription pour les nouveaux utilisateurs.
@@ -226,8 +267,16 @@ class EtabForm(FlaskForm):
             ),
         ],
     )
-    label = BooleanField("Labellisé")
-    visite = BooleanField("Visité")
+    statut_etablissement = RadioField(
+        "Statut de l'établissement",
+        choices=[
+            ("non_visite", "Non visité"),
+            ("visite", "Visité"),
+            ("labellise", "Labellisé"),
+        ],
+        default="non_visite",
+        validators=[Optional()],
+    )
     latitude = HiddenField("Latitude")
     longitude = HiddenField("Longitude")
     google_place_id = HiddenField("Google Place ID", default="")

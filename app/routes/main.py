@@ -29,6 +29,8 @@ from app.forms import (
     EtabForm,
     DeleteForm,
     ValidateForm,
+    convertir_statut_etablissement,
+    convertir_boolean_vers_statut,
 )
 from app.models import Etablissement, Flan, Evaluation, Utilisateur
 from app.models import Photo, TypeCible
@@ -515,6 +517,10 @@ def afficher_etablissement_unique(id_etab):
     validate_form = ValidateForm()
     form_flan = NewFlanForm(prefix="ajout-flan")
 
+    # Pré-remplissage du RadioField statut_etablissement si c'est un GET
+    if request.method == "GET":
+        form_etab.statut_etablissement.data = convertir_boolean_vers_statut(etablissement.visite, etablissement.label)
+
     # Récupérer ou télécharger les photos pour l'établissement
     photo_paths = fetch_place_photos(
         id_etab,
@@ -527,18 +533,8 @@ def afficher_etablissement_unique(id_etab):
         form_etab = EtabForm(prefix="edit-etab", formdata=request.form)
 
         if form_etab.validate_on_submit():
-            # Vérifier la logique métier : label ne peut être True que si visite est True
-            label_value = form_etab.label.data == "Oui"
-            visite_value = form_etab.visite.data == "Oui"
-
-            if label_value and not visite_value:
-                flash(
-                    "Un établissement ne peut être labellisé que s'il a été visité.",
-                    "error",
-                )
-                return redirect(
-                    url_for("main.afficher_etablissement_unique", id_etab=id_etab)
-                )
+            # Convertir la valeur du RadioField en boolean
+            visite_value, label_value = convertir_statut_etablissement(form_etab.statut_etablissement.data)
 
             # Si la validation a réussi, procéder à la mise à jour
             try:

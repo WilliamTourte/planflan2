@@ -236,16 +236,20 @@
                 <div class="form-group">
                     <label class="form-label">{{ form_edit.type_etab.label }}</label>
                     {{ form_edit.type_etab(class="form-control") }}
-                </div>
+                {{ afficher_champ_formulaire(form_edit.type_etab) }}
 
                 {% if current_user.is_admin %}
+                    <!-- Statut de l'établissement (radios) -->
                     <div class="form-group">
-                        <label class="form-label">{{ form_edit.label.label }}</label>
-                        {{ form_edit.label(class="form-check-input") }} Oui
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">{{ form_edit.visite.label }}</label>
-                        {{ form_edit.visite(class="form-check-input") }} Visité
+                        <label class="form-label">{{ form_edit.statut_etablissement.label }}</label>
+                        <div style="display: flex; align-items: center; gap: 20px">
+                            {% for subfield in form_edit.statut_etablissement %}
+                            <div style="display: flex; align-items: center">
+                                {{ subfield(style="margin-right: 5px;") }}
+                                <label style="font-weight: normal">{{ subfield.label.text }}</label>
+                            </div>
+                            {% endfor %}
+                        </div>
                     </div>
                 {% endif %}
                 <button type="submit" class="btn btn-success" title="Valider les modifications">Valider</button>
@@ -645,17 +649,16 @@
 
         </div>
         {% if current_user.is_admin %}
-            <!-- Utilise une div conteneur pour regrouper les cases -->
-            <div class="form-check-container">
-                <div class="form-check-inline">
-                    <input type="checkbox" id="{{ form.label.id }}" name="{{ form.label.name }}"
-                           class="form-check-input" {{ form.label() }}>
-                    <label class="form-check-label" for="{{ form.label.id }}">{{ form.label.label }}</label>
-                </div>
-                <div class="form-check-inline">
-                    <input type="checkbox" id="{{ form.visite.id }}" name="{{ form.visite.name }}"
-                           class="form-check-input" {{ form.visite() }}>
-                    <label class="form-check-label" for="{{ form.visite.id }}">{{ form.visite.label }}</label>
+            <!-- Statut de l'établissement (radios) -->
+            <div class="form-group">
+                <label class="form-label">{{ form.statut_etablissement.label }}</label>
+                <div style="display: flex; align-items: center; gap: 20px">
+                    {% for subfield in form.statut_etablissement %}
+                    <div style="display: flex; align-items: center">
+                        {{ subfield(style="margin-right: 5px;") }}
+                        <label style="font-weight: normal">{{ subfield.label.text }}</label>
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
 
@@ -699,33 +702,16 @@
         {{ afficher_champ_formulaire(form.type_etab) }}
 
         {% if current_user.is_admin %}
-            <!-- Labellisé (radios en ligne) -->
+            <!-- Statut de l'établissement (radios) -->
             <div class="form-group">
-                <label class="form-label">Labellisé</label>
-                <div class="form-check form-check-inline">
-                    <input type="radio" id="label-oui" name="label" value="Oui" class="form-check-input"
-                           {% if form.label.data == 'Oui' %}checked{% endif %}>
-                    <label class="form-check-label" for="label-oui">Oui</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input type="radio" id="label-non" name="label" value="Non" class="form-check-input"
-                           {% if form.label.data == 'Non' %}checked{% endif %}>
-                    <label class="form-check-label" for="label-non">Non</label>
-                </div>
-            </div>
-
-            <!-- Visité (radios en ligne) -->
-            <div class="form-group">
-                <label class="form-label">Visité</label>
-                <div class="form-check form-check-inline">
-                    <input type="radio" id="visite-oui" name="visite" value="Oui" class="form-check-input"
-                           {% if form.visite.data == 'Oui' %}checked{% endif %}>
-                    <label class="form-check-label" for="visite-oui">Oui</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input type="radio" id="visite-non" name="visite" value="Non" class="form-check-input"
-                           {% if form.visite.data == 'Non' %}checked{% endif %}>
-                    <label class="form-check-label" for="visite-non">Non</label>
+                <label class="form-label">{{ form.statut_etablissement.label }}</label>
+                <div style="display: flex; align-items: center; gap: 20px">
+                    {% for subfield in form.statut_etablissement %}
+                    <div style="display: flex; align-items: center">
+                        {{ subfield(style="margin-right: 5px;") }}
+                        <label style="font-weight: normal">{{ subfield.label.text }}</label>
+                    </div>
+                    {% endfor %}
                 </div>
             </div>
         {% endif %}

@@ -22,7 +22,7 @@ from flask import (
 from flask_login import login_required, current_user
 from flask_wtf.csrf import validate_csrf
 
-from app.forms import EtabForm
+from app.forms import EtabForm, convertir_statut_etablissement, convertir_boolean_vers_statut
 from app.models import Etablissement, TypeEtab
 from app import db
 from app.outils import verifier_csrf_ou_renvoyer_erreur
@@ -190,21 +190,8 @@ def ajouter_etablissement():
         if form_ajout.validate():
             current_app.logger.info("✓ Formulaire validé avec succès")
 
-            # Vérifier la logique métier : label ne peut être True que si visite est True
-            label_value = form_ajout.label.data
-            visite_value = form_ajout.visite.data
-
-            if label_value and not visite_value:
-                current_app.logger.error(
-                    "✗ Un établissement ne peut être labellisé que s'il a été visité"
-                )
-                flash(
-                    "Un établissement ne peut être labellisé que s'il a été visité.",
-                    "error",
-                )
-                return render_template(
-                    "page_proposer_etablissement.html", form=form_ajout
-                )
+            # Convertir la valeur du RadioField en boolean
+            visite_value, label_value = convertir_statut_etablissement(form_ajout.statut_etablissement.data)
 
             current_app.logger.info("=== CRÉATION DE L'ÉTABLISSEMENT ===")
             current_app.logger.info(f"Valeurs utilisées pour la création:")
@@ -364,26 +351,16 @@ def modifier_etablissement(id_etab):
         form_edit.latitude.data = etablissement.latitude
         form_edit.longitude.data = etablissement.longitude
         form_edit.type_etab.data = etablissement.type_etab.name
-        form_edit.label.data = "Oui" if etablissement.label else "Non"
-        form_edit.visite.data = "Oui" if etablissement.visite else "Non"
+        # Convertir boolean vers statut RadioField
+        form_edit.statut_etablissement.data = convertir_boolean_vers_statut(etablissement.visite, etablissement.label)
         form_edit.description.data = etablissement.description
 
     elif request.method == "POST":
         # Recréation du formulaire d'édition avec les données POST
         form_edit = EtabForm(prefix="edit-etab", formdata=request.form)
         if form_edit.validate_on_submit():
-            # Vérifier la logique métier : label ne peut être True que si visite est True
-            label_value = form_edit.label.data == "Oui"
-            visite_value = form_edit.visite.data == "Oui"
-
-            if label_value and not visite_value:
-                flash(
-                    "Un établissement ne peut être labellisé que s'il a été visité.",
-                    "error",
-                )
-                return redirect(
-                    url_for("main.afficher_etablissement_unique", id_etab=id_etab)
-                )
+            # Convertir la valeur du RadioField en boolean
+            visite_value, label_value = convertir_statut_etablissement(form_edit.statut_etablissement.data)
 
             # Mise à jour des données de l'établissement
             etablissement.nom = form_edit.nom.data

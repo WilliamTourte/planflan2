@@ -51,13 +51,14 @@
     </div>
     {% if current_user.is_admin %}
     <div class="form-group etablissement-checkbox-group">
-      <div class="form-check-inline">
-        {{ form.label(class="form-check-input") }} {{
-        form.label.label(class="form-check-label") }}
-      </div>
-      <div class="form-check-inline">
-        {{ form.visite(class="form-check-input") }} {{
-        form.visite.label(class="form-check-label") }}
+      <label class="form-label">{{ form.statut_etablissement.label }}</label>
+      <div style="display: flex; align-items: center; gap: 20px">
+        {% for subfield in form.statut_etablissement %}
+        <div style="display: flex; align-items: center">
+          {{ subfield(style="margin-right: 5px;") }}
+          <label style="font-weight: normal">{{ subfield.label.text }}</label>
+        </div>
+        {% endfor %}
       </div>
     </div>
     {% endif %}

@@ -789,8 +789,7 @@ def test_afficher_etablissement_unique_post_update(client):
             "edit-etab-latitude": "45.75",
             "edit-etab-longitude": "4.85",
             "edit-etab-type_etab": "BOULANGERIE",
-            "edit-etab-label": True,
-            "edit-etab-visite": True,
+            "edit-etab-statut_etablissement": "labellise",
         },
         follow_redirects=True,
     )
