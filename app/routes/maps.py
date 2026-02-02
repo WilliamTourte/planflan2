@@ -22,7 +22,11 @@ from flask import (
 from flask_login import login_required, current_user
 from flask_wtf.csrf import validate_csrf
 
-from app.forms import EtabForm, convertir_statut_etablissement, convertir_boolean_vers_statut
+from app.forms import (
+    EtabForm,
+    convertir_statut_etablissement,
+    convertir_boolean_vers_statut,
+)
 from app.models import Etablissement, TypeEtab
 from app import db
 from app.outils import verifier_csrf_ou_renvoyer_erreur
@@ -191,7 +195,9 @@ def ajouter_etablissement():
             current_app.logger.info("✓ Formulaire validé avec succès")
 
             # Convertir la valeur du RadioField en boolean
-            visite_value, label_value = convertir_statut_etablissement(form_ajout.statut_etablissement.data)
+            visite_value, label_value = convertir_statut_etablissement(
+                form_ajout.statut_etablissement.data
+            )
 
             current_app.logger.info("=== CRÉATION DE L'ÉTABLISSEMENT ===")
             current_app.logger.info(f"Valeurs utilisées pour la création:")
@@ -352,7 +358,9 @@ def modifier_etablissement(id_etab):
         form_edit.longitude.data = etablissement.longitude
         form_edit.type_etab.data = etablissement.type_etab.name
         # Convertir boolean vers statut RadioField
-        form_edit.statut_etablissement.data = convertir_boolean_vers_statut(etablissement.visite, etablissement.label)
+        form_edit.statut_etablissement.data = convertir_boolean_vers_statut(
+            etablissement.visite, etablissement.label
+        )
         form_edit.description.data = etablissement.description
 
     elif request.method == "POST":
@@ -360,7 +368,9 @@ def modifier_etablissement(id_etab):
         form_edit = EtabForm(prefix="edit-etab", formdata=request.form)
         if form_edit.validate_on_submit():
             # Convertir la valeur du RadioField en boolean
-            visite_value, label_value = convertir_statut_etablissement(form_edit.statut_etablissement.data)
+            visite_value, label_value = convertir_statut_etablissement(
+                form_edit.statut_etablissement.data
+            )
 
             # Mise à jour des données de l'établissement
             etablissement.nom = form_edit.nom.data

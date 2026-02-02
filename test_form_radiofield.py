@@ -24,21 +24,25 @@ try:
         form = EtabForm()
 
         # Vérifier que statut_etablissement existe
-        if hasattr(form, 'statut_etablissement'):
+        if hasattr(form, "statut_etablissement"):
             print("✓ Champ statut_etablissement trouvé dans EtabForm")
         else:
             print("✗ Champ statut_etablissement MANQUANT dans EtabForm")
             sys.exit(1)
 
         # Vérifier que les anciens champs n'existent plus
-        if hasattr(form, 'label'):
-            print("✗ Champ label TOUJOURS PRÉSENT dans EtabForm (devrait être supprimé)")
+        if hasattr(form, "label"):
+            print(
+                "✗ Champ label TOUJOURS PRÉSENT dans EtabForm (devrait être supprimé)"
+            )
             sys.exit(1)
         else:
             print("✓ Champ label correctement supprimé")
 
-        if hasattr(form, 'visite'):
-            print("✗ Champ visite TOUJOURS PRÉSENT dans EtabForm (devrait être supprimé)")
+        if hasattr(form, "visite"):
+            print(
+                "✗ Champ visite TOUJOURS PRÉSENT dans EtabForm (devrait être supprimé)"
+            )
             sys.exit(1)
         else:
             print("✓ Champ visite correctement supprimé")
@@ -47,11 +51,17 @@ try:
         choices = form.statut_etablissement.choices
         print(f"✓ Choix du RadioField: {choices}")
 
-        expected_choices = [("non_visite", "Non visité"), ("visite", "Visité"), ("labellise", "Labellisé")]
+        expected_choices = [
+            ("non_visite", "Non visité"),
+            ("visite", "Visité"),
+            ("labellise", "Labellisé"),
+        ]
         if choices == expected_choices:
             print("✓ Choix du RadioField corrects")
         else:
-            print(f"✗ Choix du RadioField incorrects. Attendu: {expected_choices}, Obtenu: {choices}")
+            print(
+                f"✗ Choix du RadioField incorrects. Attendu: {expected_choices}, Obtenu: {choices}"
+            )
             sys.exit(1)
 
         print("\n=== Tous les tests de formulaire réussis ! ===")
@@ -59,5 +69,6 @@ try:
 except Exception as e:
     print(f"✗ Erreur: {e}")
     import traceback
+
     traceback.print_exc()
     sys.exit(1)

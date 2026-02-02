@@ -519,7 +519,9 @@ def afficher_etablissement_unique(id_etab):
 
     # Pré-remplissage du RadioField statut_etablissement si c'est un GET
     if request.method == "GET":
-        form_etab.statut_etablissement.data = convertir_boolean_vers_statut(etablissement.visite, etablissement.label)
+        form_etab.statut_etablissement.data = convertir_boolean_vers_statut(
+            etablissement.visite, etablissement.label
+        )
 
     # Récupérer ou télécharger les photos pour l'établissement
     photo_paths = fetch_place_photos(
@@ -534,7 +536,9 @@ def afficher_etablissement_unique(id_etab):
 
         if form_etab.validate_on_submit():
             # Convertir la valeur du RadioField en boolean
-            visite_value, label_value = convertir_statut_etablissement(form_etab.statut_etablissement.data)
+            visite_value, label_value = convertir_statut_etablissement(
+                form_etab.statut_etablissement.data
+            )
 
             # Si la validation a réussi, procéder à la mise à jour
             try:

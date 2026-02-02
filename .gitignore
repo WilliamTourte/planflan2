@@ -1667,3 +1667,5 @@ coverage-js/lcov-report/main.js.html
 /source/_build/
 logs/http_requests.log.1
 logs/http_requests.log.2
+/logs/
+/app/static/uploads/
