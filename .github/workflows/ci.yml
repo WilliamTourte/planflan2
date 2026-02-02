@@ -201,6 +201,10 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Set repository name to lowercase
+      run: |
+        echo "REPO_LOWERCASE=$(echo ${{ github.repository }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
@@ -228,8 +232,8 @@ jobs:
         push: false
         load: true
         tags: ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
-        cache-from: type=registry,ref=ghcr.io/${{ github.repository }}/cache:buildcache
-        cache-to: type=registry,ref=ghcr.io/${{ github.repository }}/cache:buildcache,mode=max
+        cache-from: type=registry,ref=ghcr.io/${{ env.REPO_LOWERCASE }}/cache:buildcache
+        cache-to: type=registry,ref=ghcr.io/${{ env.REPO_LOWERCASE }}/cache:buildcache,mode=max
 
     - name: End timing - Docker build
       run: |
@@ -251,8 +255,8 @@ jobs:
         tags: |
           ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
           ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest
-        cache-from: type=registry,ref=ghcr.io/${{ github.repository }}/cache:buildcache
-        cache-to: type=registry,ref=ghcr.io/${{ github.repository }}/cache:buildcache,mode=max
+        cache-from: type=registry,ref=ghcr.io/${{ env.REPO_LOWERCASE }}/cache:buildcache
+        cache-to: type=registry,ref=ghcr.io/${{ env.REPO_LOWERCASE }}/cache:buildcache,mode=max
 
     - name: Workflow timing summary
       if: always()
