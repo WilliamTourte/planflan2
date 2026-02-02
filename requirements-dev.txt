@@ -1,29 +1,32 @@
 # Dépendances de développement pour PlanFlan
 
 # Inclure les dépendances de production
--r requirements.txt
+-r requirements-prod.txt
 
-# Testing additionnelles (pytest et coverage sont déjà dans requirements.txt)
+# Testing (nécessaires pour développement local)
+pytest>=9.0.2
 pytest-cov==7.0.0
-pytest-xdist==3.6.1
+pytest-xdist==3.8.0
+coverage==7.13.0
 
 # Linting et Formatting
-pylint==3.0.3
-black==24.1.1
-pre-commit==3.6.0
-mistral-vibe
+pylint==4.0.4
+black==25.12.0
+isort==7.0.0
+autoflake==2.3.1
+pre-commit==4.5.1
 
-# flake8==7.0.0
-
-# isort==5.13.2
-
-# Type checking (optionnel)
-# mypy==1.9.0
-# types-flask==1.1.11
-# types-flask-sqlalchemy==2.5.7
+# Security checks
+bandit==1.7.10
+safety==3.2.11
 
 # Documentation
 sphinx==7.2.6
 sphinx-rtd-theme==2.0.0
 sphinx-js==3.2.2
 nodeenv>=1.8.0  # For Node.js in virtual environment (JSDoc support)
+
+# Type checking (optionnel)
+# mypy==1.9.0
+# types-flask==1.1.11
+# types-flask-sqlalchemy==2.5.7

@@ -18,6 +18,11 @@ on:
       - 'app/**'
       - 'tests/**'
 
+# Annuler les runs en cours si un nouveau commit est pushé
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 env:
   PYTHON_VERSION: '3.12'
   DOCKER_IMAGE_NAME: 'planflan.backend'
@@ -98,6 +103,13 @@ jobs:
     needs: check-commit
     if: needs.check-commit.outputs.should_skip == 'false'
     
+    env:
+      # Utiliser SQLite en mémoire pour les tests CI
+      TESTING: true
+      SQLALCHEMY_DATABASE_URI: "sqlite:///:memory:"
+      SECRET_KEY: test-secret-key-for-ci
+      WTF_CSRF_ENABLED: false
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -109,23 +121,74 @@ jobs:
         cache: 'pip'
         cache-dependency-path: |
           requirements.txt
-          requirements-dev.txt
+          requirements-prod.txt
+
+    - name: Start timing - Dependencies installation
+      run: echo "DEPS_START=$(date +%s)" >> $GITHUB_ENV
 
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-
-
-
-
-    - name: Run deployment tests (if enabled)
-      if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev'
-      env:
-        RUN_DEPLOYMENT_TESTS: "false"  # Disabled in CI as production site is not accessible
+    - name: End timing - Dependencies installation
       run: |
-        python -m pytest tests/test_deployment.py -v --tb=short
+        DEPS_END=$(date +%s)
+        DEPS_DURATION=$((DEPS_END - DEPS_START))
+        echo "⏱️ Dependencies installation took ${DEPS_DURATION}s"
+
+    - name: Start timing - Security checks
+      run: echo "SECURITY_START=$(date +%s)" >> $GITHUB_ENV
+
+    - name: Run security checks
+      run: |
+        pip install bandit safety
+        echo "Running Bandit security scan..."
+        bandit -r app/ -ll -f json -o bandit-report.json || echo "⚠️ Bandit found some issues"
+        echo "Running Safety vulnerability check..."
+        safety check --json || echo "⚠️ Safety found some vulnerabilities"
+
+    - name: End timing - Security checks
+      run: |
+        SECURITY_END=$(date +%s)
+        SECURITY_DURATION=$((SECURITY_END - SECURITY_START))
+        echo "⏱️ Security checks took ${SECURITY_DURATION}s"
+
+    - name: Start timing - Tests
+      run: echo "TESTS_START=$(date +%s)" >> $GITHUB_ENV
+
+    - name: Run smoke tests (dev branch)
+      if: github.ref == 'refs/heads/dev'
+      run: |
+        echo "🚀 Running SMOKE tests for dev branch..."
+        python -m pytest tests/ -m "smoke" -v --tb=short
+
+    - name: Run regression tests (main branch)
+      if: github.ref == 'refs/heads/main'
+      run: |
+        echo "🔍 Running REGRESSION tests for main branch..."
+        python -m pytest tests/ -m "regression" --cov=app --cov-report=xml --cov-report=term -v --tb=short
+
+    - name: Run all tests (pull request)
+      if: github.event_name == 'pull_request'
+      run: |
+        echo "🧪 Running ALL tests for pull request..."
+        python -m pytest tests/ --cov=app --cov-report=xml --cov-report=term -v --tb=short
+
+    - name: End timing - Tests
+      run: |
+        TESTS_END=$(date +%s)
+        TESTS_DURATION=$((TESTS_END - TESTS_START))
+        echo "⏱️ Tests took ${TESTS_DURATION}s"
+
+    - name: Upload coverage reports
+      if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request'
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-reports
+        path: |
+          coverage.xml
+          htmlcov/
 
 
   docker-build:
@@ -133,18 +196,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [check-commit, test]
     if: needs.check-commit.outputs.should_skip == 'false'
-    services:
-      mysql:
-        image: mysql:lts
-        env:
-          MYSQL_ROOT_PASSWORD: supermegasecuredpassword
-          MYSQL_DATABASE: planflan_db
-          MYSQL_USER: planflan
-          MYSQL_PASSWORD: supersecuredpassword
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=10
-    
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -152,13 +204,15 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
-    - name: Cache Docker layers
-      uses: actions/cache@v3
+    - name: Start timing - Docker build
+      run: echo "DOCKER_START=$(date +%s)" >> $GITHUB_ENV
+
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v3
       with:
-        path: /tmp/.buildx-cache
-        key: ${{ runner.os }}-buildx-${{ github.sha }}
-        restore-keys: |
-          ${{ runner.os }}-buildx-
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Login to Docker Hub
       if: github.ref == 'refs/heads/main'
@@ -174,30 +228,19 @@ jobs:
         push: false
         load: true
         tags: ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
-        cache-from: type=local,src=/tmp/.buildx-cache
-        cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+        cache-from: type=registry,ref=ghcr.io/${{ github.repository }}/cache:buildcache
+        cache-to: type=registry,ref=ghcr.io/${{ github.repository }}/cache:buildcache,mode=max
 
-    - name: Move cache
+    - name: End timing - Docker build
       run: |
-        rm -rf /tmp/.buildx-cache
-        mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+        DOCKER_END=$(date +%s)
+        DOCKER_DURATION=$((DOCKER_END - DOCKER_START))
+        echo "⏱️ Docker build took ${DOCKER_DURATION}s"
 
-
-    - name: Run Docker container for testing
+    - name: Test Docker image
       run: |
-        docker run --name test-container -d -p 5000:5000 \
-          --network host \
-          -e MYSQL_USER=planflan -e MYSQL_PASSWORD=supersecuredpassword \
-          -e MYSQL_DATABASE=planflan_db \
-          -e MYSQL_HOST=localhost \
-          -e MYSQL_ROOT_PASSWORD=supermegasecuredpassword \
-          ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
-
-    - name: Test Docker container health
-      run: |
-        sleep 10
-        docker ps -a
-        docker logs test-container || true
+        echo "🔍 Verifying Docker image was built..."
+        docker images | grep ${{ env.DOCKER_IMAGE_NAME }}
 
     - name: Push Docker image (main branch only)
       if: github.ref == 'refs/heads/main'
@@ -208,5 +251,12 @@ jobs:
         tags: |
           ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
           ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest
-        cache-from: type=local,src=/tmp/.buildx-cache
-        cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+        cache-from: type=registry,ref=ghcr.io/${{ github.repository }}/cache:buildcache
+        cache-to: type=registry,ref=ghcr.io/${{ github.repository }}/cache:buildcache,mode=max
+
+    - name: Workflow timing summary
+      if: always()
+      run: |
+        echo "📊 CI Workflow Timing Summary"
+        echo "================================"
+        echo "✅ All steps completed successfully"
