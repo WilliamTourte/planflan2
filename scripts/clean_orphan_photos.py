@@ -63,9 +63,7 @@ def clean_orphan_photos():
         if orphans:
             print("PHOTOS ORPHELINES À SUPPRIMER:")
             for photo in orphans:
-                print(
-                    f"  - ID {photo.id_photo}: {photo.path} (id_etab={photo.id_etab})"
-                )
+                print(f"  - ID {photo.id_photo}: {photo.path} (id_etab={photo.id_etab})")
             print()
 
             response = input(
@@ -79,9 +77,7 @@ def clean_orphan_photos():
 
                 db.session.commit()
                 print()
-                print(
-                    f"✅ {len(orphans)} photo(s) orpheline(s) supprimée(s) avec succès"
-                )
+                print(f"✅ {len(orphans)} photo(s) orpheline(s) supprimée(s) avec succès")
             else:
                 print("❌ Annulé - Aucune photo supprimée")
         else:

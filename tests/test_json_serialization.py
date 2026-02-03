@@ -114,9 +114,7 @@ class TestJSONSerialization:
             parsed = json.loads(json_str)
             assert parsed["nom"] == etab.nom
 
-    def test_etablissements_with_special_characters_serializable(
-        self, app, setup_test_data
-    ):
+    def test_etablissements_with_special_characters_serializable(self, app, setup_test_data):
         """Vérifier que les établissements avec caractères spéciaux sont sérialisables."""
         with app.app_context():
             etablissements = Etablissement.query.all()
@@ -152,18 +150,13 @@ class TestJSONSerialization:
 
         # La regex doit trouver: data-etablissements='...' ou data-etablissements="..."
         # On utilise une approche plus robuste en cherchant la balise entière
-        match = re.search(
-            r"data-etablissements=['\"](.+?)['\"]",
-            html,
-            re.DOTALL
-        )
+        match = re.search(r"data-etablissements=['\"](.+?)['\"]", html, re.DOTALL)
 
         # Alternative si la première ne marche pas: chercher après l'attribut
         if not match:
             # Chercher la div spécifique
             match = re.search(
-                r'<div[^>]*id="etablissements-data"[^>]*data-etablissements="([^"]+)"[^>]*>',
-                html
+                r'<div[^>]*id="etablissements-data"[^>]*data-etablissements="([^"]+)"[^>]*>', html
             )
 
         assert match is not None, "Attribut data-etablissements non trouvé dans le HTML"
@@ -247,7 +240,7 @@ class TestJSONSerialization:
                 latitude=48.8566,
                 longitude=2.3522,
                 type_etab="CAFE",
-                description='Café avec <img src=x onerror="alert(\'xss\')">',
+                description="Café avec <img src=x onerror=\"alert('xss')\">",
                 visite=True,
                 label=False,
                 id_user=user.id_user,
@@ -321,8 +314,7 @@ class TestJSONSerialization:
             json.loads(json_str)
         except json.JSONDecodeError as e:
             pytest.fail(
-                f"Impossible de parser le JSON: {e}\n"
-                f"Première partie du JSON: {json_str[:100]}"
+                f"Impossible de parser le JSON: {e}\n" f"Première partie du JSON: {json_str[:100]}"
             )
 
 

@@ -52,9 +52,7 @@ class TestGestionPhotos:
             db.session.commit()
 
             # Vérifier que le google_place_id est sauvegardé
-            etab_saved = Etablissement.query.filter_by(
-                google_place_id="ChIJTest123"
-            ).first()
+            etab_saved = Etablissement.query.filter_by(google_place_id="ChIJTest123").first()
             assert etab_saved is not None
             assert etab_saved.google_place_id == "ChIJTest123"
 

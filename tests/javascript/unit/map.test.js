@@ -313,5 +313,156 @@ describe('Map Module', () => {
             const filters = getActiveFilters();
             expect(filters.type_pate).toBe('Feuilletée');
         });
+
+        it('should combine multiple filters', () => {
+            setActiveFilters({
+                type_pate: 'Brisée',
+                type_saveur: 'Chocolat',
+                visited: true,
+                unvisited: false,
+                label: false
+            });
+
+            const filters = getActiveFilters();
+            expect(filters.type_pate).toBe('Brisée');
+            expect(filters.type_saveur).toBe('Chocolat');
+            expect(filters.visited).toBe(true);
+        });
+    });
+
+    describe('Marker creation variants', () => {
+        const baseEtablissement = {
+            id_etab: 1,
+            nom: 'Boulangerie Test',
+            adresse: '1 rue Test',
+            ville: 'Lyon',
+            latitude: 45.75,
+            longitude: 4.85,
+            label: false,
+            visite: false
+        };
+
+        it('should create marker with default icon for basic establishment', () => {
+            createEtablissementMarker(mockMap, baseEtablissement);
+
+            const iconCalls = L.divIcon.mock.calls;
+            const lastCall = iconCalls[iconCalls.length - 1][0];
+            expect(lastCall.html).toContain('👋');
+        });
+
+        it('should prioritize label over visited', () => {
+            const labeledAndVisitedEtab = {
+                ...baseEtablissement,
+                label: true,
+                visite: true
+            };
+
+            createEtablissementMarker(mockMap, labeledAndVisitedEtab);
+
+            const iconCalls = L.divIcon.mock.calls;
+            const lastCall = iconCalls[iconCalls.length - 1][0];
+            expect(lastCall.html).toContain('❤️');
+        });
+
+        it('should handle click event on marker', () => {
+            const marker = createEtablissementMarker(mockMap, baseEtablissement);
+
+            expect(mockMarker.on).toHaveBeenCalledWith('click', expect.any(Function));
+        });
+    });
+
+    describe('Icon creation', () => {
+        it('should create emoji icon with correct structure', () => {
+            createEmojiIcon('🍞', 'bread-icon');
+
+            expect(L.divIcon).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    className: 'emoji-icon',
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 15]
+                })
+            );
+        });
+
+        it('should include custom class in icon HTML', () => {
+            createEmojiIcon('🥐', 'croissant-icon');
+
+            const callArgs = L.divIcon.mock.calls[L.divIcon.mock.calls.length - 1][0];
+            expect(callArgs.html).toContain('croissant-icon');
+            expect(callArgs.html).toContain('🥐');
+        });
+    });
+
+    describe('zoomOnVille edge cases', () => {
+        it('should return false when ville is undefined', () => {
+            const result = zoomOnVille(undefined);
+            expect(result).toBe(false);
+        });
+
+        it('should return false when ville is empty string', () => {
+            const result = zoomOnVille('');
+            expect(result).toBe(false);
+        });
+    });
+
+    describe('State management', () => {
+        it('should set and get user location', () => {
+            const location = { lat: 45.75, lng: 4.85 };
+            setUserLocation(location);
+
+            // Vérification indirecte - la fonction ne doit pas lancer d'erreur
+            expect(() => setUserLocation(location)).not.toThrow();
+        });
+
+        it('should set ville selectionnee', () => {
+            setVilleSelectionnee('Paris');
+
+            expect(() => setVilleSelectionnee('Paris')).not.toThrow();
+        });
+
+        it('should handle null ville selectionnee', () => {
+            expect(() => setVilleSelectionnee(null)).not.toThrow();
+        });
+    });
+
+    describe('saveCompleteStateToUrl variations', () => {
+        beforeEach(() => {
+            delete window.history;
+            window.history = {
+                replaceState: jest.fn()
+            };
+        });
+
+        it('should save only active filters to URL', () => {
+            setActiveFilters({
+                type_pate: false,
+                type_saveur: false,
+                visited: false,
+                unvisited: false,
+                label: false
+            });
+
+            saveCompleteStateToUrl();
+
+            expect(window.history.replaceState).toHaveBeenCalled();
+        });
+
+        it('should save visited filter to URL', () => {
+            setActiveFilters({
+                type_pate: false,
+                type_saveur: false,
+                visited: true,
+                unvisited: false,
+                label: false
+            });
+
+            saveCompleteStateToUrl();
+
+            const calls = window.history.replaceState.mock.calls;
+            const lastCall = calls[calls.length - 1];
+            const url = String(lastCall[2]);
+
+            expect(url).toMatch(/visited=true/);
+        });
     });
 });

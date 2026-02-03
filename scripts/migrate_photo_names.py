@@ -22,9 +22,7 @@ def migrate_photo_names():
     with app.app_context():
         # Récupérer toutes les photos
         photos = (
-            Photo.query.join(Etablissement)
-            .filter(Etablissement.google_place_id.isnot(None))
-            .all()
+            Photo.query.join(Etablissement).filter(Etablissement.google_place_id.isnot(None)).all()
         )
 
         stats = {

@@ -99,9 +99,7 @@ class RegistrationForm(FlaskForm):
         """
         user = Utilisateur.query.filter_by(pseudo=pseudo.data).first()
         if user:
-            raise ValidationError(
-                "Ce pseudo est déjà pris. Veuillez en choisir un autre."
-            )
+            raise ValidationError("Ce pseudo est déjà pris. Veuillez en choisir un autre.")
 
     def validate_email(self, email):
         """Valide que l'email n'est pas déjà utilisé.
@@ -114,9 +112,7 @@ class RegistrationForm(FlaskForm):
         """
         email = Utilisateur.query.filter_by(email=email.data).first()
         if email:
-            raise ValidationError(
-                "Cet email est déjà utilisé. Veuillez en choisir un autre."
-            )
+            raise ValidationError("Cet email est déjà utilisé. Veuillez en choisir un autre.")
 
 
 # Formulaire pour se connecter
@@ -529,15 +525,9 @@ class RechercheForm(FlaskForm):
     la saveur, la pâte, la texture, le prix, etc.
     """
 
-    latitude = (
-        HiddenField()
-    )  # Champ caché pour la latitude (sans validateur par défaut)
-    longitude = (
-        HiddenField()
-    )  # Champ caché pour la longitude (sans validateur par défaut)
-    rayon = StringField(
-        "Rayon (km)", default="5.0"
-    )  # Optionnel : laisser l'utilisateur
+    latitude = HiddenField()  # Champ caché pour la latitude (sans validateur par défaut)
+    longitude = HiddenField()  # Champ caché pour la longitude (sans validateur par défaut)
+    rayon = StringField("Rayon (km)", default="5.0")  # Optionnel : laisser l'utilisateur
     # choisir le rayon
     nom = StringField(
         "Nom",
@@ -556,20 +546,17 @@ class RechercheForm(FlaskForm):
     )
     type_saveur = SelectField(
         "Saveur",
-        choices=[("tous", "Tous")]
-        + [(choice.name, choice.value) for choice in TypeSaveur],
+        choices=[("tous", "Tous")] + [(choice.name, choice.value) for choice in TypeSaveur],
         default="tous",
     )
     type_pate = SelectField(
         "Pâte",
-        choices=[("tous", "Tous")]
-        + [(choice.name, choice.value) for choice in TypePate],
+        choices=[("tous", "Tous")] + [(choice.name, choice.value) for choice in TypePate],
         default="tous",
     )
     type_texture = SelectField(
         "Texture",
-        choices=[("tous", "Tous")]
-        + [(choice.name, choice.value) for choice in TypeTexture],
+        choices=[("tous", "Tous")] + [(choice.name, choice.value) for choice in TypeTexture],
         default="tous",
     )
     prix = SelectField(
@@ -605,9 +592,7 @@ class RechercheForm(FlaskForm):
         Raises:
             ValidationError: Si la latitude n'est pas valide
         """
-        validate_optional_number(
-            self, field, -90, 90, "Doit être compris entre -90 et 90."
-        )
+        validate_optional_number(self, field, -90, 90, "Doit être compris entre -90 et 90.")
 
     def validate_longitude(self, field):
         """Valide que la longitude est dans une plage valide.
@@ -618,9 +603,7 @@ class RechercheForm(FlaskForm):
         Raises:
             ValidationError: Si la longitude n'est pas valide
         """
-        validate_optional_number(
-            self, field, -180, 180, "Doit être compris entre -180 et 180."
-        )
+        validate_optional_number(self, field, -180, 180, "Doit être compris entre -180 et 180.")
 
     def validate_rayon(self, field):
         """Valide que le rayon est un nombre valide.
@@ -667,15 +650,11 @@ class UpdateProfileForm(FlaskForm):
     )
     new_password = PasswordField(
         "Nouveau mot de passe",
-        validators=[
-            Length(min=8, message="Doit contenir au moins %(min)d caractères.")
-        ],
+        validators=[Length(min=8, message="Doit contenir au moins %(min)d caractères.")],
     )
     confirm_password = PasswordField(
         "Confirmer mot de passe",
-        validators=[
-            EqualTo("new_password", message="Les mots de passe doivent correspondre.")
-        ],
+        validators=[EqualTo("new_password", message="Les mots de passe doivent correspondre.")],
     )
     submit = SubmitField("Mettre à jour le profil")
 

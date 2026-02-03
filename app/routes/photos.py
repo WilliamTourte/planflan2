@@ -5,7 +5,6 @@ otamment pour les établissements et les flans.
 """
 
 from flask import (
-    Flask,
     render_template,
     request,
     redirect,
@@ -100,9 +99,7 @@ def upload_file():
         # Vérifier que l'extension correspond au type détecté
         filename_lower = file.filename.lower()
         extension_map = {"png": (".png",), "jpg": (".jpg", ".jpeg"), "gif": (".gif",)}
-        if detected_ext and not filename_lower.endswith(
-            extension_map.get(detected_ext, ())
-        ):
+        if detected_ext and not filename_lower.endswith(extension_map.get(detected_ext, ())):
             flash(
                 "L'extension du fichier ne correspond pas au type de fichier détecté.",
                 "danger",
@@ -125,5 +122,9 @@ def show_uploads():
     Returns:
         Response: Rendered HTML template with list of uploaded files
     """
-    uploads = os.listdir(current_app.config["UPLOAD_FOLDER"])
+    upload_folder = current_app.config["UPLOAD_FOLDER"]
+    if os.path.exists(upload_folder):
+        uploads = os.listdir(upload_folder)
+    else:
+        uploads = []
     return render_template("upload.html", uploads=uploads)

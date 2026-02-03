@@ -110,9 +110,7 @@ def importer_lieux(fichier_json):
                         code_postal = extraire_code_postal(adresse_complete)
                         ville = extraire_ville(adresse_complete)
 
-                        if not Etablissement.query.filter_by(
-                            nom=nom, adresse=adresse
-                        ).first():
+                        if not Etablissement.query.filter_by(nom=nom, adresse=adresse).first():
                             lieu = Etablissement(
                                 nom=nom,
                                 adresse=adresse,
@@ -169,9 +167,7 @@ def creer_flans_et_evaluations():
     logger.info("Tous les flans existants ont été supprimés")
 
     # Ajouter un log pour indiquer que les données ont été supprimées
-    logger.warning(
-        "ATTENTION : Toutes les données des flans et des évaluations ont été supprimées"
-    )
+    logger.warning("ATTENTION : Toutes les données des flans et des évaluations ont été supprimées")
 
     # Récupérer tous les établissements
     query = select(etablissements)
@@ -235,9 +231,7 @@ def creer_flans_et_evaluations():
 
     # Valider les modifications
     session.commit()
-    print(
-        f"✅ {len(etablissement_records)} établissements mis à jour avec des flans aléatoires."
-    )
+    print(f"✅ {len(etablissement_records)} établissements mis à jour avec des flans aléatoires.")
 
     # 4. Créer des évaluations aléatoires pour les flans des établissements visités
     # Récupérer les établissements avec visite = True
@@ -282,9 +276,7 @@ def creer_flans_et_evaluations():
 
     # Valider les modifications des évaluations
     session.commit()
-    print(
-        f"✅ {evaluations_crees} évaluations aléatoires créées pour les établissements visités."
-    )
+    print(f"✅ {evaluations_crees} évaluations aléatoires créées pour les établissements visités.")
 
     session.close()
 
@@ -324,9 +316,7 @@ def mettre_a_jour_visite_label():
 
     # Valider les modifications
     session.commit()
-    print(
-        f"{len(etablissement_records)} etablissements mis a jour avec visite/label aleatoires."
-    )
+    print(f"{len(etablissement_records)} etablissements mis a jour avec visite/label aleatoires.")
     logger.info(
         f"{len(etablissement_records)} établissements mis à jour avec visite/label aléatoires"
     )
@@ -369,9 +359,7 @@ with app.app_context():
         if not admin:
             print("👤 Création de l'utilisateur flan_admin...")
             logger.info("Création de l'utilisateur flan_admin")
-            admin = Utilisateur(
-                pseudo="flan_admin", email="admin@example.com", is_admin=True
-            )
+            admin = Utilisateur(pseudo="flan_admin", email="admin@example.com", is_admin=True)
             admin.set_password("flan_password", bcrypt)
             db.session.add(admin)
         else:
@@ -397,9 +385,7 @@ with app.app_context():
 
     if os.path.exists(chemin_lieux_json):
         print(f"Fichier lieux_test.json trouve dans jeux_essai : {chemin_lieux_json}")
-        logger.info(
-            f"Fichier lieux_test.json trouvé dans jeux_essai : {chemin_lieux_json}"
-        )
+        logger.info(f"Fichier lieux_test.json trouvé dans jeux_essai : {chemin_lieux_json}")
         importer_lieux(chemin_lieux_json)
     else:
         print("Aucun fichier lieux_test.json trouve dans jeux_essai")

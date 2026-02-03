@@ -63,9 +63,7 @@ def mettre_a_jour_google_place_ids(fichier_json):
     """
     Met à jour les google_place_id dans la base de données
     """
-    logger.info(
-        "🚀 Début de la mise à jour des google_place_id dans la base de données"
-    )
+    logger.info("🚀 Début de la mise à jour des google_place_id dans la base de données")
 
     if not os.path.exists(fichier_json):
         logger.error(f"❌ Fichier introuvable : {fichier_json}")
@@ -98,9 +96,7 @@ def mettre_a_jour_google_place_ids(fichier_json):
                     google_place_id = properties.get("google_place_id")
 
                     if not google_place_id:
-                        logger.warning(
-                            f"⚠️ Aucun google_place_id pour {nom}, passage au suivant"
-                        )
+                        logger.warning(f"⚠️ Aucun google_place_id pour {nom}, passage au suivant")
                         continue
 
                     # Nettoyer l'adresse pour la recherche
@@ -109,29 +105,21 @@ def mettre_a_jour_google_place_ids(fichier_json):
                     ville = extraire_ville(adresse_complete)
 
                     # Rechercher l'établissement dans la base de données
-                    etablissement = Etablissement.query.filter_by(
-                        nom=nom, adresse=adresse
-                    ).first()
+                    etablissement = Etablissement.query.filter_by(nom=nom, adresse=adresse).first()
 
                     if etablissement:
                         # Vérifier si le google_place_id est déjà défini
                         if etablissement.google_place_id == google_place_id:
-                            logger.info(
-                                f"✓ Déjà à jour : {nom} (ID: {google_place_id})"
-                            )
+                            logger.info(f"✓ Déjà à jour : {nom} (ID: {google_place_id})")
                             etablissements_deja_a_jour += 1
                         else:
                             # Mettre à jour le google_place_id
                             etablissement.google_place_id = google_place_id
                             db.session.add(etablissement)
-                            logger.info(
-                                f"✅ Mis à jour : {nom} (ID: {google_place_id})"
-                            )
+                            logger.info(f"✅ Mis à jour : {nom} (ID: {google_place_id})")
                             etablissements_mis_a_jour += 1
                     else:
-                        logger.warning(
-                            f"⚠️ Non trouvé dans la base : {nom} (adresse: {adresse})"
-                        )
+                        logger.warning(f"⚠️ Non trouvé dans la base : {nom} (adresse: {adresse})")
                         etablissements_non_trouves += 1
 
                 except Exception as e:
@@ -142,9 +130,7 @@ def mettre_a_jour_google_place_ids(fichier_json):
             # Commit des changements
             if etablissements_mis_a_jour > 0:
                 db.session.commit()
-                logger.info(
-                    f"💾 Commit effectué pour {etablissements_mis_a_jour} établissements"
-                )
+                logger.info(f"💾 Commit effectué pour {etablissements_mis_a_jour} établissements")
 
             # Résumé
             logger.info(f"📊 Résumé de la mise à jour:")

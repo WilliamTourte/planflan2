@@ -120,9 +120,7 @@ def main():
         with open(BACKUP_FILE, "r", encoding="utf-8") as f:
             data = json.load(f)
 
-        logger.info(
-            f"✓ Fichier chargé avec {len(data.get('features', []))} établissements"
-        )
+        logger.info(f"✓ Fichier chargé avec {len(data.get('features', []))} établissements")
     except Exception as e:
         logger.error(f"❌ Impossible de charger le fichier JSON: {str(e)}")
         sys.exit(1)
@@ -162,15 +160,11 @@ def main():
             # Respecter les limites de quota (50 requêtes/seconde max)
             # On fait une pause toutes les 40 requêtes pour être prudent
             if (i + 1) % 40 == 0 and i < total_etablissements - 1:
-                logger.info(
-                    "⏳ Pause de 3 secondes pour respecter les limites de quota API..."
-                )
+                logger.info("⏳ Pause de 3 secondes pour respecter les limites de quota API...")
                 sleep(3)
 
         except KeyError as e:
-            logger.error(
-                f"❌ Structure JSON inattendue pour l'établissement {i+1}: {str(e)}"
-            )
+            logger.error(f"❌ Structure JSON inattendue pour l'établissement {i+1}: {str(e)}")
             continue
         except Exception as e:
             logger.error(f"❌ Erreur inattendue pour l'établissement {i+1}: {str(e)}")
@@ -186,9 +180,7 @@ def main():
         logger.info(f"   - Établissements traités: {total_etablissements}")
         logger.info(f"   - Place IDs trouvés: {etablissements_trouves}")
         logger.info(f"   - Place IDs non trouvés: {etablissements_non_trouves}")
-        logger.info(
-            f"   - Taux de succès: {etablissements_trouves/total_etablissements*100:.1f}%"
-        )
+        logger.info(f"   - Taux de succès: {etablissements_trouves/total_etablissements*100:.1f}%")
 
         # Restaurer le fichier original
         if os.path.exists(INPUT_FILE):

@@ -58,9 +58,7 @@ def check_env_file():
             if line.startswith("GOOGLE_MAPS_API_KEY"):
                 key = line.split("=", 1)[1].strip().strip("\"'")
                 if key:
-                    print_ok(
-                        f"GOOGLE_MAPS_API_KEY définie (longueur: {len(key)} caractères)"
-                    )
+                    print_ok(f"GOOGLE_MAPS_API_KEY définie (longueur: {len(key)} caractères)")
                     print_info(f"Préfixe: {key[:10]}...")
                     return True
                 else:
@@ -105,20 +103,12 @@ def check_config_files():
                 print_ok("  - GOOGLE_MAPS_API_KEY configurée")
             if "UPLOAD_FOLDER" in content:
                 for line in content.split("\n"):
-                    if (
-                        "UPLOAD_FOLDER" in line
-                        and "=" in line
-                        and not line.strip().startswith("#")
-                    ):
+                    if "UPLOAD_FOLDER" in line and "=" in line and not line.strip().startswith("#"):
                         print_info(f"  - {line.strip()}")
             if "LOG_LEVEL" in content:
                 log_levels = []
                 for line in content.split("\n"):
-                    if (
-                        "LOG_LEVEL" in line
-                        and "=" in line
-                        and not line.strip().startswith("#")
-                    ):
+                    if "LOG_LEVEL" in line and "=" in line and not line.strip().startswith("#"):
                         log_levels.append(line.strip())
                 for log_line in log_levels:
                     if "WARNING" in log_line:
@@ -241,15 +231,9 @@ def analyse_probleme():
     """Analyse les causes probables du problème"""
     print_section("6. ANALYSE DES CAUSES PROBABLES")
 
-    print(
-        f"{YELLOW}┌─────────────────────────────────────────────────────────────────┐{NC}"
-    )
-    print(
-        f"{YELLOW}│ CAUSES PROBABLES PAR ORDRE DE PROBABILITÉ                       │{NC}"
-    )
-    print(
-        f"{YELLOW}└─────────────────────────────────────────────────────────────────┘{NC}\n"
-    )
+    print(f"{YELLOW}┌─────────────────────────────────────────────────────────────────┐{NC}")
+    print(f"{YELLOW}│ CAUSES PROBABLES PAR ORDRE DE PROBABILITÉ                       │{NC}")
+    print(f"{YELLOW}└─────────────────────────────────────────────────────────────────┘{NC}\n")
 
     print(f"{CYAN}1. LOG_LEVEL = 'WARNING' en production (80% probable){NC}")
     print("   → Conséquence: Les logs [FETCH_PHOTOS] (logger.info) ne s'affichent pas")
@@ -285,17 +269,13 @@ def recommandations():
     print("  1. Aller sur https://console.cloud.google.com/apis/credentials")
     print("  2. Cliquer sur votre clé API")
     print("  3. Dans 'API restrictions': vérifier que Places API est incluse")
-    print(
-        "  4. Dans 'Application restrictions': retirer temporairement les restrictions"
-    )
+    print("  4. Dans 'Application restrictions': retirer temporairement les restrictions")
     print()
 
     print(f"{GREEN}Étape 3: Tester en production{NC}")
     print("  1. Ajouter un établissement via l'interface web")
     print("  2. Immédiatement après, consulter les logs:")
-    print(
-        "     docker logs planflan-container-backend 2>&1 | grep FETCH_PHOTOS | tail -50"
-    )
+    print("     docker logs planflan-container-backend 2>&1 | grep FETCH_PHOTOS | tail -50")
     print()
 
     print(f"{GREEN}Étape 4: Analyser les logs{NC}")
@@ -308,18 +288,10 @@ def recommandations():
 
 
 def main():
-    print(
-        f"{BLUE}╔════════════════════════════════════════════════════════════════╗{NC}"
-    )
-    print(
-        f"{BLUE}║  ANALYSE DES DIFFÉRENCES LOCAL vs PRODUCTION                  ║{NC}"
-    )
-    print(
-        f"{BLUE}║  Photos Google Places                                          ║{NC}"
-    )
-    print(
-        f"{BLUE}╚════════════════════════════════════════════════════════════════╝{NC}"
-    )
+    print(f"{BLUE}╔════════════════════════════════════════════════════════════════╗{NC}")
+    print(f"{BLUE}║  ANALYSE DES DIFFÉRENCES LOCAL vs PRODUCTION                  ║{NC}")
+    print(f"{BLUE}║  Photos Google Places                                          ║{NC}")
+    print(f"{BLUE}╚════════════════════════════════════════════════════════════════╝{NC}")
 
     # Vérifier qu'on est dans le bon dossier
     if not Path("app").exists():
@@ -334,15 +306,9 @@ def main():
     analyse_probleme()
     recommandations()
 
-    print(
-        f"\n{GREEN}╔════════════════════════════════════════════════════════════════╗{NC}"
-    )
-    print(
-        f"{GREEN}║  ANALYSE TERMINÉE                                              ║{NC}"
-    )
-    print(
-        f"{GREEN}╚════════════════════════════════════════════════════════════════╝{NC}\n"
-    )
+    print(f"\n{GREEN}╔════════════════════════════════════════════════════════════════╗{NC}")
+    print(f"{GREEN}║  ANALYSE TERMINÉE                                              ║{NC}")
+    print(f"{GREEN}╚════════════════════════════════════════════════════════════════╝{NC}\n")
 
 
 if __name__ == "__main__":

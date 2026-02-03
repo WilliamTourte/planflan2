@@ -27,9 +27,7 @@ class PlanFlanUser(HttpUser):
         """Test de chargement de la page d'accueil"""
         with self.client.get("/", catch_response=True) as response:
             if response.status_code != 200:
-                response.failure(
-                    f"Échec chargement page d'accueil: {response.status_code}"
-                )
+                response.failure(f"Échec chargement page d'accueil: {response.status_code}")
             else:
                 # Vérification basique du contenu
                 if b"PlanFlan" not in response.content:
@@ -40,14 +38,11 @@ class PlanFlanUser(HttpUser):
         """Test de chargement de la liste des établissements"""
         with self.client.get("/liste_etablissements", catch_response=True) as response:
             if response.status_code != 200:
-                response.failure(
-                    f"Échec chargement liste établissements: {response.status_code}"
-                )
+                response.failure(f"Échec chargement liste établissements: {response.status_code}")
             else:
                 # Vérification basique du contenu
                 content_check = (
-                    b"etablissement" in response.content
-                    or b"etablissement" in response.content
+                    b"etablissement" in response.content or b"etablissement" in response.content
                 )
                 if not content_check:
                     response.failure("Contenu inattendu sur la page des établissements")
@@ -60,9 +55,7 @@ class PlanFlanUser(HttpUser):
         # Accès à la page d'accueil
         with self.client.get("/", catch_response=True) as response:
             if response.status_code != 200:
-                response.failure(
-                    f"Échec chargement page d'accueil: {response.status_code}"
-                )
+                response.failure(f"Échec chargement page d'accueil: {response.status_code}")
                 return
 
         # Accès à la liste avec filtre ville
@@ -76,9 +69,7 @@ class PlanFlanUser(HttpUser):
             else:
                 # Vérification que la ville apparaît dans la réponse
                 if city.lower() not in response.text.lower():
-                    response.failure(
-                        f"La ville {city} n'apparaît pas dans les résultats"
-                    )
+                    response.failure(f"La ville {city} n'apparaît pas dans les résultats")
 
     @task(2)
     def test_api_endpoints(self):
@@ -88,20 +79,14 @@ class PlanFlanUser(HttpUser):
             :3
         ].lower()  # Prendre les 3 premières lettres
 
-        with self.client.get(
-            f"/api/villes?q={test_city}", catch_response=True
-        ) as response:
+        with self.client.get(f"/api/villes?q={test_city}", catch_response=True) as response:
             if response.status_code != 200:
-                response.failure(
-                    f"Échec API villes avec q={test_city}: {response.status_code}"
-                )
+                response.failure(f"Échec API villes avec q={test_city}: {response.status_code}")
             else:
                 try:
                     data = response.json()
                     if not isinstance(data, list):
-                        response.failure(
-                            "Réponse API villes non valide (pas une liste)"
-                        )
+                        response.failure("Réponse API villes non valide (pas une liste)")
                 except:
                     response.failure("Réponse API villes non valide (pas du JSON)")
 
@@ -115,13 +100,9 @@ class PlanFlanUser(HttpUser):
                 try:
                     data = response.json()
                     if not isinstance(data, list):
-                        response.failure(
-                            "Réponse API établissements non valide (pas une liste)"
-                        )
+                        response.failure("Réponse API établissements non valide (pas une liste)")
                 except:
-                    response.failure(
-                        "Réponse API établissements non valide (pas du JSON)"
-                    )
+                    response.failure("Réponse API établissements non valide (pas du JSON)")
 
     @task(1)
     def complete_browse_scenario(self):
@@ -129,9 +110,7 @@ class PlanFlanUser(HttpUser):
         # 1. Page d'accueil
         with self.client.get("/", catch_response=True) as response:
             if response.status_code != 200:
-                response.failure(
-                    f"Échec chargement page d'accueil: {response.status_code}"
-                )
+                response.failure(f"Échec chargement page d'accueil: {response.status_code}")
                 return
 
         # 2. Liste des établissements
@@ -149,9 +128,7 @@ class PlanFlanUser(HttpUser):
                 # Simulation d'accès à un établissement (avec un ID fictif mais plausible)
                 # Dans un environnement réel, nous utiliserions des IDs existants
                 test_id = random.choice([1, 2, 3, 4, 5])  # IDs probables
-                with self.client.get(
-                    f"/etablissement/{test_id}", catch_response=True
-                ) as response:
+                with self.client.get(f"/etablissement/{test_id}", catch_response=True) as response:
                     if response.status_code == 404:
                         # C'est normal si l'ID n'existe pas
                         pass

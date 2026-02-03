@@ -26,8 +26,7 @@ class Config:
 
     # Configuration de la base de données
     SQLALCHEMY_DATABASE_URI = (
-        os.getenv("DATABASE_URL")
-        or "mysql+pymysql://flask_user:flanflask@localhost/planflan_db"
+        os.getenv("DATABASE_URL") or "mysql+pymysql://flask_user:flanflask@localhost/planflan_db"
     )
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False

@@ -222,4 +222,218 @@ describe('API Module', () => {
       expect(result).toEqual(mockVilles);
     });
   });
+
+  describe('checkEtablissementExists', () => {
+    it('should check if establishment exists successfully', async () => {
+      const { checkEtablissementExists } = await import('../../../app/static/js/api.js');
+      const mockResponse = { exists: true, id_etab: 1 };
+
+      global.fetch = jest.fn(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve(mockResponse)
+        })
+      );
+
+      const result = await checkEtablissementExists('Boulangerie Test');
+      expect(result).toEqual(mockResponse);
+      expect(global.fetch).toHaveBeenCalledWith('/verifier_etablissement', expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ nom: 'Boulangerie Test' })
+      }));
+    });
+
+    it('should handle establishment not found', async () => {
+      const { checkEtablissementExists } = await import('../../../app/static/js/api.js');
+      const mockResponse = { exists: false };
+
+      global.fetch = jest.fn(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve(mockResponse)
+        })
+      );
+
+      const result = await checkEtablissementExists('Unknown');
+      expect(result.exists).toBe(false);
+    });
+  });
+
+  describe('extractAddressInfo', () => {
+    it('should extract address information successfully', async () => {
+      const { extractAddressInfo } = await import('../../../app/static/js/api.js');
+      const mockResponse = {
+        ville: 'Paris',
+        code_postal: '75001',
+        rue: '1 rue de Rivoli'
+      };
+
+      global.fetch = jest.fn(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve(mockResponse)
+        })
+      );
+
+      const result = await extractAddressInfo('1 rue de Rivoli, 75001 Paris');
+      expect(result).toEqual(mockResponse);
+      expect(global.fetch).toHaveBeenCalledWith('/extraire_infos_adresse', expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ adresse: '1 rue de Rivoli, 75001 Paris' })
+      }));
+    });
+  });
+
+  describe('fetchInfowindowContent', () => {
+    it('should fetch infowindow content successfully', async () => {
+      const { fetchInfowindowContent } = await import('../../../app/static/js/api.js');
+      const mockContent = '<div class="infowindow-content"><h3>Boulangerie</h3></div>';
+
+      global.fetch = jest.fn(() =>
+        Promise.resolve({
+          ok: true,
+          text: () => Promise.resolve(mockContent)
+        })
+      );
+
+      const result = await fetchInfowindowContent(1);
+      expect(result).toBe(mockContent);
+      expect(global.fetch).toHaveBeenCalledWith('/get_infowindow_content?id_etab=1');
+    });
+
+    it('should handle infowindow fetch error', async () => {
+      const { fetchInfowindowContent } = await import('../../../app/static/js/api.js');
+
+      global.fetch = jest.fn(() =>
+        Promise.resolve({
+          ok: false,
+          status: 404
+        })
+      );
+
+      const result = await fetchInfowindowContent(999);
+      expect(result).toContain('Impossible de charger les détails');
+    });
+
+    it('should handle network error for infowindow', async () => {
+      const { fetchInfowindowContent } = await import('../../../app/static/js/api.js');
+
+      global.fetch = jest.fn(() =>
+        Promise.reject(new Error('Network error'))
+      );
+
+      const result = await fetchInfowindowContent(1);
+      expect(result).toContain('Impossible de charger les détails');
+    });
+  });
+
+  describe('submitEtablissement', () => {
+    it('should submit establishment successfully', async () => {
+      const { submitEtablissement } = await import('../../../app/static/js/api.js');
+      const etablissementData = {
+        nom: 'Nouvelle Boulangerie',
+        adresse: '123 rue Test',
+        ville: 'Paris'
+      };
+      const mockResponse = { success: true, id_etab: 10 };
+
+      global.fetch = jest.fn(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve(mockResponse)
+        })
+      );
+
+      const result = await submitEtablissement(etablissementData);
+      expect(result).toEqual(mockResponse);
+      expect(global.fetch).toHaveBeenCalledWith('/proposer_etablissement', expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify(etablissementData)
+      }));
+    });
+
+    it('should handle submission error', async () => {
+      const { submitEtablissement } = await import('../../../app/static/js/api.js');
+
+      global.fetch = jest.fn(() =>
+        Promise.resolve({
+          ok: false,
+          status: 400,
+          json: () => Promise.resolve({ message: 'Données invalides' })
+        })
+      );
+
+      await expect(submitEtablissement({})).rejects.toThrow();
+    });
+  });
+
+  describe('updateEtablissement', () => {
+    it('should update establishment successfully', async () => {
+      const { updateEtablissement } = await import('../../../app/static/js/api.js');
+      const updateData = { nom: 'Boulangerie Modifiée' };
+      const mockResponse = { success: true };
+
+      global.fetch = jest.fn(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve(mockResponse)
+        })
+      );
+
+      const result = await updateEtablissement(1, updateData);
+      expect(result).toEqual(mockResponse);
+      expect(global.fetch).toHaveBeenCalledWith('/etablissement/1/update', expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify(updateData)
+      }));
+    });
+
+    it('should handle update error', async () => {
+      const { updateEtablissement } = await import('../../../app/static/js/api.js');
+
+      global.fetch = jest.fn(() =>
+        Promise.resolve({
+          ok: false,
+          status: 404,
+          json: () => Promise.resolve({ message: 'Établissement non trouvé' })
+        })
+      );
+
+      await expect(updateEtablissement(999, {})).rejects.toThrow();
+    });
+  });
+
+  describe('deleteEtablissement', () => {
+    it('should delete establishment successfully', async () => {
+      const { deleteEtablissement } = await import('../../../app/static/js/api.js');
+      const mockResponse = { success: true };
+
+      global.fetch = jest.fn(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve(mockResponse)
+        })
+      );
+
+      const result = await deleteEtablissement(1);
+      expect(result).toEqual(mockResponse);
+      expect(global.fetch).toHaveBeenCalledWith('/etablissement/1/delete', expect.objectContaining({
+        method: 'DELETE'
+      }));
+    });
+
+    it('should handle delete error', async () => {
+      const { deleteEtablissement } = await import('../../../app/static/js/api.js');
+
+      global.fetch = jest.fn(() =>
+        Promise.resolve({
+          ok: false,
+          status: 403,
+          json: () => Promise.resolve({ message: 'Non autorisé' })
+        })
+      );
+
+      await expect(deleteEtablissement(1)).rejects.toThrow();
+    });
+  });
 });

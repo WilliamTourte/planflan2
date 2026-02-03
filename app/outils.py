@@ -94,9 +94,7 @@ def verifier_csrf_ou_renvoyer_erreur():
 
         # Always return a 2-tuple: (bool, Response)
         error_response = jsonify({"error": message}), 403
-        current_app.logger.warning(
-            f"CSRF verification failed, returning error response: {message}"
-        )
+        current_app.logger.warning(f"CSRF verification failed, returning error response: {message}")
         return False, error_response
 
     return True, None
@@ -204,9 +202,7 @@ def fetch_place_photos(etablissement_id, place_id, api_key, max_width=400):
             filepath = os.path.join(upload_folder, filename)
             if os.path.exists(filepath):
                 existing_files.append(filename)
-                current_app.logger.info(
-                    f"[FETCH_PHOTOS] ✓ Fichier physique trouvé: {filename}"
-                )
+                current_app.logger.info(f"[FETCH_PHOTOS] ✓ Fichier physique trouvé: {filename}")
 
     if existing_files:
         current_app.logger.info(
@@ -254,9 +250,7 @@ def fetch_place_photos(etablissement_id, place_id, api_key, max_width=400):
         )
         return []
 
-    current_app.logger.info(
-        f"[FETCH_PHOTOS] Appel de get_place_details pour place_id={place_id}"
-    )
+    current_app.logger.info(f"[FETCH_PHOTOS] Appel de get_place_details pour place_id={place_id}")
     place_details = get_place_details(place_id, api_key)
     if not place_details or "photos" not in place_details:
         current_app.logger.warning(
@@ -277,9 +271,7 @@ def fetch_place_photos(etablissement_id, place_id, api_key, max_width=400):
             os.makedirs(upload_folder, exist_ok=True)
             current_app.logger.info(f"[FETCH_PHOTOS] Dossier créé avec succès")
         except Exception as e:
-            current_app.logger.error(
-                f"[FETCH_PHOTOS] Erreur lors de la création du dossier: {e}"
-            )
+            current_app.logger.error(f"[FETCH_PHOTOS] Erreur lors de la création du dossier: {e}")
             return []
 
     # Vérifier les permissions d'écriture
@@ -289,9 +281,7 @@ def fetch_place_photos(etablissement_id, place_id, api_key, max_width=400):
         )
         return []
     else:
-        current_app.logger.info(
-            f"[FETCH_PHOTOS] ✓ Permission d'écriture OK sur {upload_folder}"
-        )
+        current_app.logger.info(f"[FETCH_PHOTOS] ✓ Permission d'écriture OK sur {upload_folder}")
 
     # Récupérer les photos depuis l'API
     photo_paths = []
@@ -347,9 +337,7 @@ def fetch_place_photos(etablissement_id, place_id, api_key, max_width=400):
                 )
                 db.session.add(new_photo)
                 photo_paths.append(filename)
-                current_app.logger.info(
-                    f"[FETCH_PHOTOS] Photo ajoutée en base: {filename}"
-                )
+                current_app.logger.info(f"[FETCH_PHOTOS] Photo ajoutée en base: {filename}")
             else:
                 current_app.logger.error(
                     f"[FETCH_PHOTOS] Erreur API Google: status={response.status_code}, response={response.text[:200]}"
@@ -360,12 +348,8 @@ def fetch_place_photos(etablissement_id, place_id, api_key, max_width=400):
             )
             import traceback
 
-            current_app.logger.error(
-                f"[FETCH_PHOTOS] Traceback: {traceback.format_exc()}"
-            )
+            current_app.logger.error(f"[FETCH_PHOTOS] Traceback: {traceback.format_exc()}")
 
     db.session.commit()
-    current_app.logger.info(
-        f"[FETCH_PHOTOS] Terminé, {len(photo_paths)} photo(s) sauvegardée(s)"
-    )
+    current_app.logger.info(f"[FETCH_PHOTOS] Terminé, {len(photo_paths)} photo(s) sauvegardée(s)")
     return photo_paths

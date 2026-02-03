@@ -141,9 +141,7 @@ def setup_full_data(app):
         db.session.commit()
 
         # Créer des flans
-        flan_user = Flan(
-            nom="Flan User", prix=3.5, id_etab=etab_user.id_etab, id_user=user.id_user
-        )
+        flan_user = Flan(nom="Flan User", prix=3.5, id_etab=etab_user.id_etab, id_user=user.id_user)
 
         flan_admin = Flan(
             nom="Flan Admin",
@@ -296,9 +294,7 @@ def test_utilisateur_regular_acces_route_admin(client, setup_full_data):
         )
 
 
-def test_utilisateur_regular_modification_ressource_autre_utilisateur(
-    client, setup_full_data
-):
+def test_utilisateur_regular_modification_ressource_autre_utilisateur(client, setup_full_data):
     """Test qu'un utilisateur ne peut pas modifier les ressources d'un autre utilisateur."""
     # Se connecter en tant qu'utilisateur regular
     client.post(
@@ -337,9 +333,7 @@ def test_utilisateur_regular_modification_ressource_autre_utilisateur(
         assert flan_verif.nom == "Flan Admin"  # Nom inchangé
 
 
-def test_utilisateur_regular_suppression_ressource_autre_utilisateur(
-    client, setup_full_data
-):
+def test_utilisateur_regular_suppression_ressource_autre_utilisateur(client, setup_full_data):
     """Test qu'un utilisateur ne peut pas supprimer les ressources d'un autre utilisateur."""
     # Se connecter en tant qu'utilisateur regular
     client.post(
@@ -351,9 +345,7 @@ def test_utilisateur_regular_suppression_ressource_autre_utilisateur(
     # Essayer de supprimer un flan qui appartient à l'admin
     with client.application.app_context():
         flan_admin = Flan.query.filter_by(nom="Flan Admin").first()
-        response = client.post(
-            f"/supprimer_flan/{flan_admin.id_flan}", follow_redirects=True
-        )
+        response = client.post(f"/supprimer_flan/{flan_admin.id_flan}", follow_redirects=True)
 
         # Devrait être redirigé ou recevoir un message d'erreur
         assert response.status_code == 200
@@ -532,9 +524,7 @@ def test_injection_html_dans_formulaire(client, setup_full_data):
 
         # Vérifier que les données ont été stockées (l'échappement HTML est géré par les templates)
         etab_verif = db.session.get(Etablissement, etab.id_etab)
-        assert (
-            html_payload in etab_verif.nom
-        )  # Les données sont stockées telles quelles
+        assert html_payload in etab_verif.nom  # Les données sont stockées telles quelles
         # Note: L'échappement HTML est géré automatiquement par Jinja2 lors de l'affichage
 
 
@@ -680,10 +670,7 @@ def test_session_utilisateur_isolee(client, setup_full_data):
     with client:
         response = client.get("/dashboard")
         assert b"testuser" in response.data or b"test@example.com" in response.data
-        assert (
-            b"admin" not in response.data.lower()
-            or b"admin@example.com" not in response.data
-        )
+        assert b"admin" not in response.data.lower() or b"admin@example.com" not in response.data
 
 
 # Tests de sécurité des routes API
@@ -809,9 +796,5 @@ def test_en_tetes_securite(client):
 
     # Vérifier que certains en-têtes de sécurité sont présents
     # (ces vérifications peuvent varier selon la configuration)
-    assert (
-        "X-Content-Type-Options" in headers or True
-    )  # Peut ne pas être présent en développement
-    assert (
-        "X-Frame-Options" in headers or True
-    )  # Peut ne pas être présent en développement
+    assert "X-Content-Type-Options" in headers or True  # Peut ne pas être présent en développement
+    assert "X-Frame-Options" in headers or True  # Peut ne pas être présent en développement

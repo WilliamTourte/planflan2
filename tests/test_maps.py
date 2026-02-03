@@ -43,7 +43,9 @@ def test_geolocation_handler_class():
     # Cela fonctionne peu importe le working directory
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     geoloc_js_path = os.path.join(project_root, "app", "static", "js", "geolocation.js")
-    assert os.path.exists(geoloc_js_path), f"Le fichier geoloc.js devrait exister à {geoloc_js_path}"
+    assert os.path.exists(
+        geoloc_js_path
+    ), f"Le fichier geoloc.js devrait exister à {geoloc_js_path}"
 
     # Vérifier que le fichier contient la classe GeolocationHandler
     with open(geoloc_js_path, "r", encoding="utf-8") as f:
@@ -51,9 +53,7 @@ def test_geolocation_handler_class():
         assert (
             "class GeolocationHandler" in content
         ), "La classe GeolocationHandler devrait être définie"
-        assert (
-            "calculateDistance" in content
-        ), "La méthode calculateDistance devrait être définie"
+        assert "calculateDistance" in content, "La méthode calculateDistance devrait être définie"
         assert "activate" in content, "La méthode activate devrait être définie"
 
 
@@ -151,9 +151,7 @@ def test_verifier_etablissement_route(client):
         etab_id = etab.id_etab
 
     # Tester la vérification - la route attend un JSON avec le nom, pas un ID
-    response = client.post(
-        "/verifier_etablissement", json={"nom": "Etablissement à vérifier"}
-    )
+    response = client.post("/verifier_etablissement", json={"nom": "Etablissement à vérifier"})
     assert response.status_code == 200
     data = response.get_json()
     assert data["exists"] == True
@@ -164,9 +162,7 @@ def test_verifier_etablissement_route(client):
 def test_verifier_etablissement_not_found(client):
     """Test de la route /verifier_etablissement quand l'établissement n'existe pas"""
     # Tester avec un nom d'établissement qui n'existe pas
-    response = client.post(
-        "/verifier_etablissement", json={"nom": "Établissement Inexistant"}
-    )
+    response = client.post("/verifier_etablissement", json={"nom": "Établissement Inexistant"})
     assert response.status_code == 200
     data = response.get_json()
     assert data["exists"] == False
@@ -212,9 +208,7 @@ def test_verifier_etablissement_contains_url(client):
         db.session.commit()
 
     # Tester la vérification
-    response = client.post(
-        "/verifier_etablissement", json={"nom": "Établissement avec URL"}
-    )
+    response = client.post("/verifier_etablissement", json={"nom": "Établissement avec URL"})
     assert response.status_code == 200
     data = response.get_json()
     assert data["exists"] == True
@@ -300,9 +294,7 @@ def test_modifier_etablissement_route(client):
     with client.application.app_context():
         updated_etab = db.session.get(Etablissement, etab_id)
         assert updated_etab.nom == "Etablissement Modifié", "Le nom n'a pas été modifié"
-        assert (
-            updated_etab.adresse == "2 rue Modifiée"
-        ), "L'adresse n'a pas été modifiée"
+        assert updated_etab.adresse == "2 rue Modifiée", "L'adresse n'a pas été modifiée"
 
 
 @pytest.mark.maps

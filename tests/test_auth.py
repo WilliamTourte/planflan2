@@ -116,9 +116,7 @@ def test_register_post_parametrize(
                 assert sess["_user_id"] == str(new_user.id_user)
         else:
             # Pour les échecs, vérifier que l'utilisateur n'a pas été créé
-            user_count = Utilisateur.query.filter_by(
-                **{check_field: check_value}
-            ).count()
+            user_count = Utilisateur.query.filter_by(**{check_field: check_value}).count()
             assert user_count == 1  # Seul l'utilisateur existant doit être présent
 
 
@@ -154,9 +152,7 @@ def test_login_get(client):
         ),
     ],
 )
-def test_login_post_parametrize(
-    client, test_name, setup_user, login_data, expected_success
-):
+def test_login_post_parametrize(client, test_name, setup_user, login_data, expected_success):
     """Test la connexion avec différents scénarios (paramétrisé)"""
     # Créer un utilisateur pour le test si nécessaire
     if setup_user:
@@ -192,9 +188,7 @@ def test_logout(client):
     """Test la déconnexion"""
     # D'abord, connecter un utilisateur
     with client.application.app_context():
-        user = Utilisateur(
-            pseudo="testlogout", email="testlogout@example.com", is_admin=False
-        )
+        user = Utilisateur(pseudo="testlogout", email="testlogout@example.com", is_admin=False)
         user.set_password("testpassword", bcrypt)
         db.session.add(user)
         db.session.commit()

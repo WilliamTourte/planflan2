@@ -111,9 +111,7 @@ def fix_photo_paths(dry_run=False):
                             if not dry_run:
                                 try:
                                     os.rename(old_filepath, new_filepath)
-                                    print(
-                                        f"✓ Fichier renommé: '{photo.path}' -> '{new_filename}'"
-                                    )
+                                    print(f"✓ Fichier renommé: '{photo.path}' -> '{new_filename}'")
                                 except Exception as e:
                                     print(f"✗ Erreur lors du renommage du fichier: {e}")
                                     continue

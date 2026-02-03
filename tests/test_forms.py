@@ -371,9 +371,7 @@ def test_updateprofileform_donnees_invalides(client):
         # Remplir le formulaire avec des données invalides
         form.pseudo.data = ""  # Pseudo vide
         form.email.data = "email_invalide"  # Email invalide
-        form.current_password.data = (
-            "a" * 50
-        )  # Mot de passe trop long pour la validation WTForms
+        form.current_password.data = "a" * 50  # Mot de passe trop long pour la validation WTForms
         form.new_password.data = "court"  # Mot de passe trop court
         form.confirm_password.data = "different"  # Confirmation différente
 
@@ -592,18 +590,10 @@ def test_formulaire_evaluation_avec_evaluation_existante(client):
         # car les SelectField attendent des chaînes, pas des floats
         # Les choix du formulaire utilisent maintenant "4.0", "5.0", etc. pour uniformité
         form = EvalForm()
-        form.visuel.data = (
-            "4.0"  # Convertir explicitement en chaîne avec le format attendu
-        )
-        form.texture.data = (
-            "5.0"  # Convertir explicitement en chaîne avec le format attendu
-        )
-        form.pate.data = (
-            "3.0"  # Convertir explicitement en chaîne avec le format attendu
-        )
-        form.gout.data = (
-            "4.5"  # Convertir explicitement en chaîne avec le format attendu
-        )
+        form.visuel.data = "4.0"  # Convertir explicitement en chaîne avec le format attendu
+        form.texture.data = "5.0"  # Convertir explicitement en chaîne avec le format attendu
+        form.pate.data = "3.0"  # Convertir explicitement en chaîne avec le format attendu
+        form.gout.data = "4.5"  # Convertir explicitement en chaîne avec le format attendu
         form.description.data = eval.description
 
         # Le formulaire devrait être valide avec les données existantes

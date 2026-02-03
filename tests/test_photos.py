@@ -117,9 +117,7 @@ class TestUploadFileRoute:
         app = create_app(TestConfig)
         app.config["TESTING"] = True
         app.config["WTF_CSRF_ENABLED"] = False
-        app.config["UPLOAD_FOLDER"] = os.path.join(
-            os.path.dirname(__file__), "test_uploads"
-        )
+        app.config["UPLOAD_FOLDER"] = os.path.join(os.path.dirname(__file__), "test_uploads")
 
         # Créer le dossier d'upload temporaire
         os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
@@ -133,6 +131,7 @@ class TestUploadFileRoute:
 
         # Nettoyer le dossier d'upload
         import shutil
+
         if os.path.exists(app.config["UPLOAD_FOLDER"]):
             shutil.rmtree(app.config["UPLOAD_FOLDER"])
 
@@ -231,9 +230,7 @@ class TestShowUploadsRoute:
         app = create_app(TestConfig)
         app.config["TESTING"] = True
         app.config["WTF_CSRF_ENABLED"] = False
-        app.config["UPLOAD_FOLDER"] = os.path.join(
-            os.path.dirname(__file__), "test_uploads_show"
-        )
+        app.config["UPLOAD_FOLDER"] = os.path.join(os.path.dirname(__file__), "test_uploads_show")
 
         # Créer le dossier d'upload temporaire
         os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
@@ -247,6 +244,7 @@ class TestShowUploadsRoute:
 
         # Nettoyer le dossier d'upload
         import shutil
+
         if os.path.exists(app.config["UPLOAD_FOLDER"]):
             shutil.rmtree(app.config["UPLOAD_FOLDER"])
 
@@ -301,6 +299,7 @@ class TestPhotosIntegration:
                 db.drop_all()
 
         import shutil
+
         if os.path.exists(app.config["UPLOAD_FOLDER"]):
             shutil.rmtree(app.config["UPLOAD_FOLDER"])
 

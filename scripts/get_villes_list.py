@@ -57,12 +57,7 @@ def extract_relevant_data(raw_data: Dict) -> List[Dict]:
         population = commune.get("population")
 
         # Filtrer les données incomplètes
-        if (
-            nom
-            and latitude is not None
-            and longitude is not None
-            and population is not None
-        ):
+        if nom and latitude is not None and longitude is not None and population is not None:
             villes.append(
                 {
                     "nom": nom,
@@ -95,9 +90,7 @@ def main():
     parser = argparse.ArgumentParser(
         description="Extraire les données des villes françaises depuis un fichier local."
     )
-    parser.add_argument(
-        "--limit", type=int, help="Limite le nombre de villes à traiter"
-    )
+    parser.add_argument("--limit", type=int, help="Limite le nombre de villes à traiter")
     parser.add_argument("--output", default="app/data", help="Répertoire de sortie")
 
     args = parser.parse_args()

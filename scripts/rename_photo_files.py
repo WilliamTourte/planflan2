@@ -42,9 +42,7 @@ def rename_photo_files(dry_run=False):
 
         # Lister tous les fichiers dans le dossier uploads
         all_files = os.listdir(upload_folder)
-        etab_files = [
-            f for f in all_files if f.startswith("etab_") and f.endswith(".jpg")
-        ]
+        etab_files = [f for f in all_files if f.startswith("etab_") and f.endswith(".jpg")]
 
         print(f"Fichiers trouvés avec le format 'etab_X': {len(etab_files)}")
         print("-" * 60)
@@ -73,16 +71,12 @@ def rename_photo_files(dry_run=False):
             etab = Etablissement.query.get(id_etab)
 
             if not etab:
-                print(
-                    f"⚠ Établissement {id_etab} non trouvé dans la base de données: {filename}"
-                )
+                print(f"⚠ Établissement {id_etab} non trouvé dans la base de données: {filename}")
                 error_count += 1
                 continue
 
             if not etab.google_place_id:
-                print(
-                    f"⚠ Pas de google_place_id pour l'établissement {id_etab}: {filename}"
-                )
+                print(f"⚠ Pas de google_place_id pour l'établissement {id_etab}: {filename}")
                 error_count += 1
                 continue
 

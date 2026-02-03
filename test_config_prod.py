@@ -34,19 +34,13 @@ def test_config():
             print("-" * 70)
             print(f"LOG_LEVEL: {app.config.get('LOG_LEVEL')}")
             print(f"UPLOAD_FOLDER: {app.config.get('UPLOAD_FOLDER')}")
-            print(
-                f"Dossier existe: {os.path.exists(app.config.get('UPLOAD_FOLDER', ''))}"
-            )
-            print(
-                f"Écriture possible: {os.access(app.config.get('UPLOAD_FOLDER', ''), os.W_OK)}"
-            )
+            print(f"Dossier existe: {os.path.exists(app.config.get('UPLOAD_FOLDER', ''))}")
+            print(f"Écriture possible: {os.access(app.config.get('UPLOAD_FOLDER', ''), os.W_OK)}")
 
             # Tester la clé API
             api_key = app.config.get("GOOGLE_MAPS_API_KEY")
             if api_key:
-                print(
-                    f"GOOGLE_MAPS_API_KEY: {api_key[:10]}... (longueur: {len(api_key)})"
-                )
+                print(f"GOOGLE_MAPS_API_KEY: {api_key[:10]}... (longueur: {len(api_key)})")
             else:
                 print("GOOGLE_MAPS_API_KEY: ✗ NON DÉFINIE")
 
@@ -91,9 +85,7 @@ def test_config():
                 if photos_count > 0:
                     photos = Photo.query.filter_by(id_etab=etab.id_etab).all()
                     for photo in photos:
-                        photo_path = os.path.join(
-                            app.config["UPLOAD_FOLDER"], photo.path
-                        )
+                        photo_path = os.path.join(app.config["UPLOAD_FOLDER"], photo.path)
                         exists = os.path.exists(photo_path)
                         symbol = "✓" if exists else "✗"
                         size = os.path.getsize(photo_path) if exists else 0
@@ -123,14 +115,10 @@ def test_config():
                     data = response.json()
                     if data.get("status") == "OK":
                         print(f"✓ Connexion à l'API Google Places: OK")
-                        print(
-                            f"  Test avec Sydney Opera House: {data['result'].get('name')}"
-                        )
+                        print(f"  Test avec Sydney Opera House: {data['result'].get('name')}")
                     else:
                         print(f"✗ API retourne status: {data.get('status')}")
-                        print(
-                            f"  Message: {data.get('error_message', 'Aucun message')}"
-                        )
+                        print(f"  Message: {data.get('error_message', 'Aucun message')}")
                 else:
                     print(f"✗ Erreur HTTP {response.status_code}")
                     print(f"  Response: {response.text[:200]}")

@@ -28,9 +28,7 @@ def client():
             bcrypt = Bcrypt()
             from app.models import Utilisateur
 
-            user = Utilisateur(
-                pseudo="testuser", email="test@example.com", is_admin=True
-            )
+            user = Utilisateur(pseudo="testuser", email="test@example.com", is_admin=True)
             user.set_password("password", bcrypt)
             db.session.add(user)
             db.session.commit()
@@ -141,9 +139,7 @@ def setup_full_data(app):
         db.session.commit()
 
         # Créer des flans
-        flan_user = Flan(
-            nom="Flan User", prix=3.5, id_etab=etab_user.id_etab, id_user=user.id_user
-        )
+        flan_user = Flan(nom="Flan User", prix=3.5, id_etab=etab_user.id_etab, id_user=user.id_user)
 
         flan_admin = Flan(
             nom="Flan Admin",

@@ -32,17 +32,13 @@ try:
 
         # Vérifier que les anciens champs n'existent plus
         if hasattr(form, "label"):
-            print(
-                "✗ Champ label TOUJOURS PRÉSENT dans EtabForm (devrait être supprimé)"
-            )
+            print("✗ Champ label TOUJOURS PRÉSENT dans EtabForm (devrait être supprimé)")
             sys.exit(1)
         else:
             print("✓ Champ label correctement supprimé")
 
         if hasattr(form, "visite"):
-            print(
-                "✗ Champ visite TOUJOURS PRÉSENT dans EtabForm (devrait être supprimé)"
-            )
+            print("✗ Champ visite TOUJOURS PRÉSENT dans EtabForm (devrait être supprimé)")
             sys.exit(1)
         else:
             print("✓ Champ visite correctement supprimé")

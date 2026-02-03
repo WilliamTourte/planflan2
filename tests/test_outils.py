@@ -48,9 +48,7 @@ def test_calculer_distance_parametrize(
 
     # Pour les cas où la distance devrait être exactement 0
     if expected_min == expected_max == 0.0:
-        assert (
-            distance == 0.0
-        ), f"Test {test_name} failed: expected exact 0.0, got {distance}"
+        assert distance == 0.0, f"Test {test_name} failed: expected exact 0.0, got {distance}"
 
 
 @pytest.mark.utils
@@ -185,9 +183,7 @@ def test_enlever_accents_cas_mixte_et_speciaux():
 def test_enlever_accents_avec_nombres():
     """Test enlever_accents avec des nombres et caractères spéciaux"""
     assert enlever_accents("12345") == "12345"
-    assert (
-        enlever_accents("Prix: 3,50€") == "Prix: 3,50"
-    )  # Le symbole € est supprimé car non ASCII
+    assert enlever_accents("Prix: 3,50€") == "Prix: 3,50"  # Le symbole € est supprimé car non ASCII
     assert enlever_accents("Taux: 10%") == "Taux: 10%"
 
 
@@ -347,11 +343,7 @@ class TestGetPlaceDetails:
         mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.json.return_value = {
-            "result": {
-                "photos": [
-                    {"photo_reference": "ref123", "width": 400, "height": 300}
-                ]
-            }
+            "result": {"photos": [{"photo_reference": "ref123", "width": 400, "height": 300}]}
         }
 
         with client.application.app_context():
@@ -432,9 +424,7 @@ class TestFetchPlacePhotos:
                 f.write(b"fake image content")
 
             try:
-                result = fetch_place_photos(
-                    etab.id_etab, "ChIJExisting123", "fake-api-key"
-                )
+                result = fetch_place_photos(etab.id_etab, "ChIJExisting123", "fake-api-key")
                 assert len(result) == 1
                 assert "ChIJExisting123_photo_0.jpg" in result
             finally:
@@ -539,5 +529,3 @@ def test_afficher_etablissements_avec_evaluations(client):
         db.session.delete(flan)
         db.session.delete(etab)
         db.session.commit()
-
-

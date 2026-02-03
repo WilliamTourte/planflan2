@@ -184,4 +184,180 @@ describe('Dashboard Functionality', () => {
       expect(consoleErrorSpy).not.toHaveBeenCalled();
     });
   });
+
+  describe('toggleSection', () => {
+    beforeEach(() => {
+      document.body.innerHTML += `
+        <div id="mes-evaluations" style="display: none;">
+          <p>Mes évaluations</p>
+        </div>
+        <div id="evaluations-a-valider" style="display: block;">
+          <p>Évaluations à valider</p>
+        </div>
+        <h3 id="mes-evaluations-title">Mes évaluations</h3>
+        <h3 id="evaluations-a-valider-title">Évaluations à valider</h3>
+      `;
+    });
+
+    it('should show a hidden section', () => {
+      const section = document.getElementById('mes-evaluations');
+      expect(section.style.display).toBe('none');
+
+      toggleSection('mes-evaluations');
+
+      expect(section.style.display).toBe('block');
+    });
+
+    it('should hide a visible section', () => {
+      const section = document.getElementById('evaluations-a-valider');
+      expect(section.style.display).toBe('block');
+
+      toggleSection('evaluations-a-valider');
+
+      expect(section.style.display).toBe('none');
+    });
+
+    it('should toggle section multiple times', () => {
+      const section = document.getElementById('mes-evaluations');
+
+      toggleSection('mes-evaluations');
+      expect(section.style.display).toBe('block');
+
+      toggleSection('mes-evaluations');
+      expect(section.style.display).toBe('none');
+
+      toggleSection('mes-evaluations');
+      expect(section.style.display).toBe('block');
+    });
+  });
+
+  describe('Edit Profile Functionality', () => {
+    it('should show edit profile form when edit button is clicked', () => {
+      initDashboardEventListeners();
+
+      const editProfileBtn = document.getElementById('edit-profile-btn');
+      const userInfo = document.getElementById('user-info');
+      const editProfileForm = document.getElementById('edit-profile-form');
+
+      expect(userInfo.style.display).toBe('block');
+      expect(editProfileForm.style.display).toBe('none');
+
+      editProfileBtn.click();
+
+      expect(userInfo.style.display).toBe('none');
+      expect(editProfileForm.style.display).toBe('block');
+    });
+
+    it('should hide edit profile form when cancel is clicked', () => {
+      initDashboardEventListeners();
+
+      const editProfileBtn = document.getElementById('edit-profile-btn');
+      const cancelEditBtn = document.getElementById('cancel-edit-btn');
+      const userInfo = document.getElementById('user-info');
+      const editProfileForm = document.getElementById('edit-profile-form');
+
+      // D'abord afficher le formulaire d'édition
+      editProfileBtn.click();
+      expect(editProfileForm.style.display).toBe('block');
+
+      // Puis annuler
+      cancelEditBtn.click();
+
+      expect(userInfo.style.display).toBe('block');
+      expect(editProfileForm.style.display).toBe('none');
+    });
+
+    it('should handle missing edit profile button gracefully', () => {
+      document.getElementById('edit-profile-btn').remove();
+
+      initDashboardEventListeners();
+
+      expect(consoleErrorSpy).not.toHaveBeenCalled();
+    });
+
+    it('should handle missing cancel edit button gracefully', () => {
+      document.getElementById('cancel-edit-btn').remove();
+
+      initDashboardEventListeners();
+
+      expect(consoleErrorSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Error Handling', () => {
+    it('should log error when delete account section is missing', () => {
+      document.getElementById('delete-account-section').remove();
+
+      showDeleteAccountForm();
+
+      expect(consoleErrorSpy).toHaveBeenCalled();
+    });
+
+    it('should log error when delete password input is missing', () => {
+      document.getElementById('delete-password').remove();
+
+      showDeleteAccountForm();
+
+      expect(consoleErrorSpy).toHaveBeenCalled();
+    });
+
+    it('should log error when cancel delete section is missing', () => {
+      document.getElementById('delete-account-section').remove();
+
+      cancelDeleteAccount();
+
+      expect(consoleErrorSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('Section Title Click Handlers', () => {
+    beforeEach(() => {
+      document.body.innerHTML += `
+        <div id="mes-evaluations" style="display: none;">Mes évaluations</div>
+        <div id="evaluations-a-valider" style="display: none;">Évaluations à valider</div>
+        <div id="flans-a-valider" style="display: none;">Flans à valider</div>
+        <div id="etablissements-a-valider" style="display: none;">Établissements à valider</div>
+        <h3 id="mes-evaluations-title">Mes évaluations</h3>
+        <h3 id="evaluations-a-valider-title">Évaluations à valider</h3>
+        <h3 id="flans-a-valider-title">Flans à valider</h3>
+        <h3 id="etablissements-a-valider-title">Établissements à valider</h3>
+      `;
+    });
+
+    it('should setup click handlers for section titles', () => {
+      initDashboardEventListeners();
+
+      const title = document.getElementById('mes-evaluations-title');
+      const section = document.getElementById('mes-evaluations');
+
+      expect(title.style.cursor).toBe('pointer');
+      expect(section.style.display).toBe('none');
+
+      title.click();
+
+      expect(section.style.display).toBe('block');
+    });
+
+    it('should toggle all section types', () => {
+      initDashboardEventListeners();
+
+      const sectionTitles = [
+        { id: 'mes-evaluations-title', section: 'mes-evaluations' },
+        { id: 'evaluations-a-valider-title', section: 'evaluations-a-valider' },
+        { id: 'flans-a-valider-title', section: 'flans-a-valider' },
+        { id: 'etablissements-a-valider-title', section: 'etablissements-a-valider' }
+      ];
+
+      sectionTitles.forEach(({ id, section }) => {
+        const titleElement = document.getElementById(id);
+        const sectionElement = document.getElementById(section);
+
+        titleElement.click();
+        expect(sectionElement.style.display).toBe('block');
+
+        titleElement.click();
+        expect(sectionElement.style.display).toBe('none');
+      });
+    });
+  });
 });

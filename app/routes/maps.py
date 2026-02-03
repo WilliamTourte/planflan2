@@ -212,15 +212,9 @@ def ajouter_etablissement():
                 f"  google_place_id from form: '{form_ajout.google_place_id.data}'"
             )
             current_app.logger.info(f"  Type: {type(form_ajout.google_place_id.data)}")
-            current_app.logger.info(
-                f"  Est vide: {not form_ajout.google_place_id.data}"
-            )
-            current_app.logger.info(
-                f"  Est None: {form_ajout.google_place_id.data is None}"
-            )
-            current_app.logger.info(
-                f"  Est chaîne vide: {form_ajout.google_place_id.data == ''}"
-            )
+            current_app.logger.info(f"  Est vide: {not form_ajout.google_place_id.data}")
+            current_app.logger.info(f"  Est None: {form_ajout.google_place_id.data is None}")
+            current_app.logger.info(f"  Est chaîne vide: {form_ajout.google_place_id.data == ''}")
 
             nouvel_etablissement = Etablissement(
                 nom=form_ajout.nom.data,
@@ -278,9 +272,7 @@ def ajouter_etablissement():
                         nouvel_etablissement.google_place_id,
                         current_app.config["GOOGLE_MAPS_API_KEY"],
                     )
-                    current_app.logger.info(
-                        "✓ Téléchargement des photos Google Places terminé"
-                    )
+                    current_app.logger.info("✓ Téléchargement des photos Google Places terminé")
                 except Exception as e:
                     current_app.logger.error(
                         f"✗ Erreur lors du téléchargement des photos Google Places: {str(e)}"
@@ -300,9 +292,7 @@ def ajouter_etablissement():
                 f"=== FIN ajouter_etablissement - Redirection vers id_etab={id_etab} ==="
             )
             # Redirige vers la page de l'établissement
-            return redirect(
-                url_for("main.afficher_etablissement_unique", id_etab=id_etab)
-            )
+            return redirect(url_for("main.afficher_etablissement_unique", id_etab=id_etab))
 
         else:
             print("\n9. ERREURS DE VALIDATION:")
@@ -336,12 +326,8 @@ def modifier_etablissement(id_etab):
     form_ajout = EtabForm(prefix="ajout-etab")
 
     # Définition des choix pour les deux formulaires
-    form_edit.type_etab.choices = [
-        (type_etab.name, type_etab.value) for type_etab in TypeEtab
-    ]
-    form_ajout.type_etab.choices = [
-        (type_etab.name, type_etab.value) for type_etab in TypeEtab
-    ]
+    form_edit.type_etab.choices = [(type_etab.name, type_etab.value) for type_etab in TypeEtab]
+    form_ajout.type_etab.choices = [(type_etab.name, type_etab.value) for type_etab in TypeEtab]
 
     # Vérification des droits
     if current_user.id_user != etablissement.id_user and not current_user.is_admin:
@@ -389,9 +375,7 @@ def modifier_etablissement(id_etab):
             etablissement.description = form_edit.description.data
             db.session.commit()
             flash("Établissement mis à jour avec succès !", "success")
-            return redirect(
-                url_for("main.afficher_etablissement_unique", id_etab=id_etab)
-            )
+            return redirect(url_for("main.afficher_etablissement_unique", id_etab=id_etab))
 
     # Récupération de tous les établissements pour l'affichage
     etablissements = Etablissement.query.all()

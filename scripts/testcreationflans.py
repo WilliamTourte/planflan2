@@ -109,9 +109,7 @@ for etablissement in etablissement_records:
 
 # Valider les modifications
 session.commit()
-print(
-    f"✅ {len(etablissement_records)} établissements mis à jour avec des flans aléatoires."
-)
+print(f"✅ {len(etablissement_records)} établissements mis à jour avec des flans aléatoires.")
 
 # 4. Créer des évaluations aléatoires pour les flans des établissements visités
 # Récupérer les établissements avec visite = True
@@ -152,8 +150,6 @@ for etablissement in etablissements_visites:
 
 # Valider les modifications des évaluations
 session.commit()
-print(
-    f"✅ {evaluations_crees} évaluations aléatoires créées pour les établissements visités."
-)
+print(f"✅ {evaluations_crees} évaluations aléatoires créées pour les établissements visités.")
 
 session.close()

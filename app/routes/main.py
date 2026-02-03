@@ -88,9 +88,7 @@ def get_villes():
         # Recherche ultra-rapide dans la liste statique
         if search_term:
             results = [
-                ville
-                for ville in get_villes.villes_cache
-                if search_term in ville["nom"].lower()
+                ville for ville in get_villes.villes_cache if search_term in ville["nom"].lower()
             ]
         else:
             results = get_villes.villes_cache[:]  # Copier toutes les villes
@@ -105,8 +103,7 @@ def get_villes():
         if with_gps:
             # Retourner les noms avec les coordonnées GPS (format: "nom|latitude|longitude")
             formatted_results = [
-                f"{ville['nom']}|{ville['latitude']}|{ville['longitude']}"
-                for ville in results
+                f"{ville['nom']}|{ville['latitude']}|{ville['longitude']}" for ville in results
             ]
 
             return jsonify(formatted_results)
@@ -413,9 +410,7 @@ def get_infowindow_content():
     if not etablissement:
         return "Détails non disponibles", 404
 
-    details_url = url_for(
-        "main.afficher_etablissement_unique", id_etab=etablissement.id_etab
-    )
+    details_url = url_for("main.afficher_etablissement_unique", id_etab=etablissement.id_etab)
     return render_template(
         "infowindow_template.html", etablissement=etablissement, details_url=details_url
     )
@@ -568,9 +563,7 @@ def afficher_etablissement_unique(id_etab):
                 db.session.rollback()
                 flash(str(e), "error")
 
-            return redirect(
-                url_for("main.afficher_etablissement_unique", id_etab=id_etab)
-            )
+            return redirect(url_for("main.afficher_etablissement_unique", id_etab=id_etab))
 
     return render_template(
         "page_etablissement.html",
@@ -657,9 +650,7 @@ def proposer_flan(id_etab):
         db.session.commit()
         flash("Votre flan a été proposé avec succès !", "success")
         return redirect(url_for("main.afficher_etablissement_unique", id_etab=id_etab))
-    return render_template(
-        "page_etablissement.html", form=form, etablissement=etablissement
-    )
+    return render_template("page_etablissement.html", form=form, etablissement=etablissement)
 
 
 @main_bp.route("/valider_flan/<int:id_flan>", methods=["POST"])
@@ -705,9 +696,7 @@ def modifier_flan(id_flan):
         db.session.commit()
         flash("Le flan a été mis à jour avec succès!", "success")
     else:
-        flash(
-            "Le formulaire n'a pas été validé. Veuillez vérifier les erreurs.", "danger"
-        )
+        flash("Le formulaire n'a pas été validé. Veuillez vérifier les erreurs.", "danger")
     return redirect(url_for("main.afficher_flan_unique", id_flan=id_flan))
 
 
@@ -737,9 +726,7 @@ def supprimer_flan(id_flan):
 def evaluer_flan(id_flan):
 
     form = EvalForm(prefix="flan-eval")
-    evaluation = Evaluation.query.filter_by(
-        id_flan=id_flan, id_user=current_user.id_user
-    ).first()
+    evaluation = Evaluation.query.filter_by(id_flan=id_flan, id_user=current_user.id_user).first()
 
     if request.method == "GET" and evaluation:
         form.visuel.data = str(evaluation.visuel)
@@ -797,8 +784,7 @@ def evaluer_flan(id_flan):
             except Exception as e:
                 print("Error during form submission:", e)
                 flash(
-                    "Une erreur est survenue lors de la création de l'évaluation: "
-                    + str(e),
+                    "Une erreur est survenue lors de la création de l'évaluation: " + str(e),
                     "danger",
                 )
     else:
@@ -905,9 +891,7 @@ def modifier_evaluation(id_eval):
         db.session.commit()
         flash("L'évaluation a été mise à jour avec succès!", "success")
     else:
-        flash(
-            "Le formulaire n'a pas été validé. Veuillez vérifier les erreurs.", "danger"
-        )
+        flash("Le formulaire n'a pas été validé. Veuillez vérifier les erreurs.", "danger")
     return redirect(url_for("main.afficher_evaluation_unique", id_eval=id_eval))
 
 
@@ -928,9 +912,7 @@ def valider_evaluation(id_eval):
         flash("L'évaluation a été validée avec succès!", "success")
     except IntegrityError:
         db.session.rollback()
-        flash(
-            "Une erreur est survenue lors de la validation de l'évaluation.", "danger"
-        )
+        flash("Une erreur est survenue lors de la validation de l'évaluation.", "danger")
     return redirect(url_for("main.dashboard"))
 
 
@@ -951,9 +933,7 @@ def supprimer_evaluation(id_eval):
         flash("L'évaluation a été supprimée avec succès!", "success")
     except IntegrityError:
         db.session.rollback()
-        flash(
-            "Une erreur est survenue lors de la suppression de l'évaluation.", "danger"
-        )
+        flash("Une erreur est survenue lors de la suppression de l'évaluation.", "danger")
     return redirect(url_for("main.dashboard"))
 
 

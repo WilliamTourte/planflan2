@@ -223,9 +223,7 @@ def configure_error_handling(app):
                     "request_method": request.method,
                     "request_path": request.path,
                     "remote_addr": request.remote_addr,
-                    "user_agent": (
-                        request.user_agent.string if request.user_agent else "Unknown"
-                    ),
+                    "user_agent": (request.user_agent.string if request.user_agent else "Unknown"),
                 },
             )
         except Exception as log_error:  # pylint: disable=unused-argument

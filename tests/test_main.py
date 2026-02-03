@@ -132,12 +132,8 @@ def test_proposer_flan(client):
         assert (
             nouveau_flan is not None
         ), "Le nouveau flan n'a pas été trouvé dans la base de données"
-        assert (
-            nouveau_flan.prix == 2.5
-        ), f"Le prix du flan est incorrect: {nouveau_flan.prix}"
-        assert (
-            nouveau_flan.id_user == user.id_user
-        ), "L'ID de l'utilisateur n'est pas correct"
+        assert nouveau_flan.prix == 2.5, f"Le prix du flan est incorrect: {nouveau_flan.prix}"
+        assert nouveau_flan.id_user == user.id_user, "L'ID de l'utilisateur n'est pas correct"
 
     # Récupérer et afficher les messages flash
     flashed_messages = get_flashed_messages(with_categories=True)
@@ -175,9 +171,7 @@ def test_valider_flan(client):
         db.session.add(etab)
         db.session.commit()
 
-        flan = Flan(
-            nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user
-        )
+        flan = Flan(nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user)
         db.session.add(flan)
         db.session.commit()
 
@@ -217,9 +211,7 @@ def test_modifier_flan(client):
         db.session.add(etab)
         db.session.commit()
 
-        flan = Flan(
-            nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user
-        )
+        flan = Flan(nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user)
         db.session.add(flan)
         db.session.commit()
         flan_id = flan.id_flan
@@ -277,9 +269,7 @@ def test_supprimer_flan(client):
         db.session.add(etab)
         db.session.commit()
 
-        flan = Flan(
-            nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user
-        )
+        flan = Flan(nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user)
         db.session.add(flan)
         db.session.commit()
         flan_id = flan.id_flan
@@ -291,9 +281,7 @@ def test_supprimer_flan(client):
     # Vérifier que le flan a été supprimé de la base de données
     with client.application.app_context():
         deleted_flan = db.session.get(Flan, flan_id)
-        assert (
-            deleted_flan is None
-        ), "Le flan n'a pas été supprimé de la base de données"
+        assert deleted_flan is None, "Le flan n'a pas été supprimé de la base de données"
 
 
 @pytest.mark.main
@@ -315,9 +303,7 @@ def test_evaluer_flan(client):
         db.session.add(etab)
         db.session.commit()
 
-        flan = Flan(
-            nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user
-        )
+        flan = Flan(nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user)
         db.session.add(flan)
         db.session.commit()
         flan_id = flan.id_flan
@@ -341,9 +327,7 @@ def test_evaluer_flan(client):
 
     # Vérifier que l'évaluation a été créée dans la base de données
     with client.application.app_context():
-        evaluations = Evaluation.query.filter_by(
-            id_flan=flan_id, id_user=user.id_user
-        ).all()
+        evaluations = Evaluation.query.filter_by(id_flan=flan_id, id_user=user.id_user).all()
         assert len(evaluations) > 0, "Aucune évaluation n'a été créée"
 
         # Vérifier les valeurs de l'évaluation
@@ -360,8 +344,7 @@ def test_evaluer_flan(client):
     flashed_messages = get_flashed_messages(with_categories=True)
     messages = [message for category, message in flashed_messages]
     assert any(
-        "évaluation" in message.lower() and "succès" in message.lower()
-        for message in messages
+        "évaluation" in message.lower() and "succès" in message.lower() for message in messages
     ), f"Aucun message de succès trouvé: {messages}"
 
 
@@ -383,9 +366,7 @@ def test_evaluer_flan_duplicate_prevention(client):
         db.session.add(etab)
         db.session.commit()
 
-        flan = Flan(
-            nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user
-        )
+        flan = Flan(nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user)
         db.session.add(flan)
         db.session.commit()
         flan_id = flan.id_flan
@@ -408,9 +389,7 @@ def test_evaluer_flan_duplicate_prevention(client):
 
     # Vérifier que la première évaluation a été créée
     with client.application.app_context():
-        evaluations = Evaluation.query.filter_by(
-            id_flan=flan_id, id_user=user.id_user
-        ).all()
+        evaluations = Evaluation.query.filter_by(id_flan=flan_id, id_user=user.id_user).all()
         assert len(evaluations) == 1, "Une seule évaluation devrait exister"
         first_eval_id = evaluations[0].id_eval
 
@@ -430,12 +409,8 @@ def test_evaluer_flan_duplicate_prevention(client):
 
     # Vérifier que la deuxième évaluation a été rejetée
     with client.application.app_context():
-        evaluations = Evaluation.query.filter_by(
-            id_flan=flan_id, id_user=user.id_user
-        ).all()
-        assert (
-            len(evaluations) == 1
-        ), "Une seule évaluation devrait exister (création bloquée)"
+        evaluations = Evaluation.query.filter_by(id_flan=flan_id, id_user=user.id_user).all()
+        assert len(evaluations) == 1, "Une seule évaluation devrait exister (création bloquée)"
 
         # Vérifier que l'évaluation n'a pas été modifiée par la tentative
         eval_obj = evaluations[0]
@@ -462,9 +437,7 @@ def test_afficher_evaluation_unique(client):
         db.session.add(etab)
         db.session.commit()
 
-        flan = Flan(
-            nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user
-        )
+        flan = Flan(nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user)
         db.session.add(flan)
         db.session.commit()
 
@@ -507,9 +480,7 @@ def test_valider_evaluation(client):
         db.session.add(etab)
         db.session.commit()
 
-        flan = Flan(
-            nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user
-        )
+        flan = Flan(nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user)
         db.session.add(flan)
         db.session.commit()
 
@@ -556,9 +527,7 @@ def test_supprimer_evaluation(client):
         db.session.add(etab)
         db.session.commit()
 
-        flan = Flan(
-            nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user
-        )
+        flan = Flan(nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user)
         db.session.add(flan)
         db.session.commit()
 
@@ -582,9 +551,7 @@ def test_supprimer_evaluation(client):
     # Vérifier que l'évaluation a été supprimée de la base de données
     with client.application.app_context():
         deleted_eval = db.session.get(Evaluation, eval_id)
-        assert (
-            deleted_eval is None
-        ), "L'évaluation n'a pas été supprimée de la base de données"
+        assert deleted_eval is None, "L'évaluation n'a pas été supprimée de la base de données"
 
 
 def test_moyenne_evaluations_avec_calcul_automatique(client):
@@ -701,9 +668,7 @@ def test_moyenne_evaluations_avec_calcul_automatique(client):
         # Vérifier que la moyenne est correcte
         expected_moyenne_eval3 = round((3.0 + 3.5 + 3.5 + 4.0) / 4, 1)
         # La moyenne globale devrait inclure cette nouvelle évaluation
-        expected_global_final = round(
-            (expected_moyenne + 4.9 + expected_moyenne_eval3) / 3, 1
-        )
+        expected_global_final = round((expected_moyenne + 4.9 + expected_moyenne_eval3) / 3, 1)
         assert (
             abs(moyenne_avec_manquants - expected_global_final) < 0.1
         ), f"Moyenne globale finale attendue: {expected_global_final}, obtenue: {moyenne_avec_manquants}"
@@ -819,9 +784,7 @@ def test_afficher_flan_unique_get(client):
         db.session.add(etab)
         db.session.commit()
 
-        flan = Flan(
-            nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user
-        )
+        flan = Flan(nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user)
         db.session.add(flan)
         db.session.commit()
         flan_id = flan.id_flan
@@ -848,9 +811,7 @@ def test_afficher_flan_unique_post_update(client):
         db.session.add(etab)
         db.session.commit()
 
-        flan = Flan(
-            nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user
-        )
+        flan = Flan(nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user)
         db.session.add(flan)
         db.session.commit()
         flan_id = flan.id_flan
@@ -1047,9 +1008,7 @@ def test_liste_etablissements_post_recherche(client):
         db.session.commit()
 
     # Rechercher avec une requête POST
-    response = client.post(
-        "/liste_etablissements", data={"nom": "Boulangerie", "ville": "Lyon"}
-    )
+    response = client.post("/liste_etablissements", data={"nom": "Boulangerie", "ville": "Lyon"})
     assert response.status_code == 200
     assert b"Boulangerie Test" in response.data
 
@@ -1112,16 +1071,12 @@ def test_liste_etablissements_cas_limites_caracteres_speciaux(client):
         db.session.commit()
 
     # Test recherche avec caractères spéciaux
-    response = client.get(
-        "/liste_etablissements", query_string={"recherche_simple": "Épi"}
-    )
+    response = client.get("/liste_etablissements", query_string={"recherche_simple": "Épi"})
     assert response.status_code == 200
     # Vérifier que l'établissement est présent dans la réponse (le nom peut être légèrement différent)
     assert b"Boulangerie" in response.data
 
-    response = client.get(
-        "/liste_etablissements", query_string={"recherche_simple": "Café"}
-    )
+    response = client.get("/liste_etablissements", query_string={"recherche_simple": "Café"})
     assert response.status_code == 200
     # Vérifier que l'établissement est présent dans la réponse (le nom peut être légèrement différent)
     assert b"Caf" in response.data or b"Restaurant" in response.data
@@ -1940,9 +1895,7 @@ def test_api_etablissements_aucune_correspondance(client):
         db.session.commit()
 
     # Appeler l'API avec des filtres qui ne correspondent à rien
-    response = client.post(
-        "/api/etablissements", json={"ville": "Marseille", "visite": "oui"}
-    )
+    response = client.post("/api/etablissements", json={"ville": "Marseille", "visite": "oui"})
     assert response.status_code == 200
     assert response.is_json
 
@@ -2195,9 +2148,7 @@ def test_api_etablissements_aucune_correspondance(client):
         db.session.commit()
 
         query = Etablissement.query.join(Flan)
-        filtered = filtrer_etablissements(
-            query, ville="Paris", type_pate="BRISEE", prix="2.5"
-        )
+        filtered = filtrer_etablissements(query, ville="Paris", type_pate="BRISEE", prix="2.5")
         results = filtered.all()
 
         # Devrait retourner Boulangerie Martin (Flan Vanille)

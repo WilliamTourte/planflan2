@@ -73,9 +73,7 @@ def test_fetch_photos(etablissement_id, api_key):
 if __name__ == "__main__":
     # Vérifier les arguments
     if len(sys.argv) < 3:
-        print(
-            "Usage: python test_fetch_photos.py <ETABLISSEMENT_ID> <GOOGLE_PLACES_API_KEY>"
-        )
+        print("Usage: python test_fetch_photos.py <ETABLISSEMENT_ID> <GOOGLE_PLACES_API_KEY>")
         print("Exemple: python test_fetch_photos.py 1 AIzaSyD...")
         sys.exit(1)
 

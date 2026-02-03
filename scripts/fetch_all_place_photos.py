@@ -48,9 +48,7 @@ def fetch_photos_for_all_etablissements(api_key):
         )
 
         for etablissement in etablissements:
-            print(
-                f"\nTraitement de l'établissement {etablissement.id_etab}: {etablissement.nom}"
-            )
+            print(f"\nTraitement de l'établissement {etablissement.id_etab}: {etablissement.nom}")
             print(f"Google Place ID: {etablissement.google_place_id}")
 
             try:

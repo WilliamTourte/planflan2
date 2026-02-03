@@ -392,9 +392,7 @@ def test_filtrer_etablissements_parametrize(
         results = filtered_query.all()
 
         # Vérifier que nous avons des résultats
-        assert (
-            len(results) > 0
-        ), f"Aucun établissement trouvé avec {filter_name}={filter_param}"
+        assert len(results) > 0, f"Aucun établissement trouvé avec {filter_name}={filter_param}"
 
         # Vérifier la condition attendue
         assert expected_condition(
@@ -415,9 +413,7 @@ def test_filtrer_etablissements_par_ville(client):
         # Vérifier que nous avons des résultats de Lyon
         assert len(results) > 0, "Aucun établissement trouvé à Lyon"
         for result in results:
-            assert (
-                result.ville == "Lyon"
-            ), f"L'établissement {result.nom} n'est pas à Lyon"
+            assert result.ville == "Lyon", f"L'établissement {result.nom} n'est pas à Lyon"
 
 
 @pytest.mark.unitary
@@ -546,9 +542,7 @@ def test_filtrer_etablissements_jointure_flan(client):
         results = filtered_query.all()
 
         # Devrait retourner tous les établissements qui ont des flans
-        assert (
-            len(results) == 3
-        )  # Boulangerie Martin, Patisserie Dubois et Cafe des Amis
+        assert len(results) == 3  # Boulangerie Martin, Patisserie Dubois et Cafe des Amis
 
         # Test 2: Jointure avec filtre sur Flan
         query = Etablissement.query.join(Flan)
@@ -825,17 +819,13 @@ def test_api_etablissements_format_html(client):
     # Devrait contenir du HTML avec les établissements
     assert b"<div" in response.data or b"<table" in response.data
     # Vérifier que le HTML contient bien nos établissements
-    assert (
-        b"Boulangerie Martin" in response.data or b"Patisserie Dubois" in response.data
-    )
+    assert b"Boulangerie Martin" in response.data or b"Patisserie Dubois" in response.data
 
 
 @pytest.mark.unitary
 def test_api_etablissements_post(client):
     """Test l'API etablissements avec une requête POST."""
-    response = client.post(
-        "/api/etablissements", json={"ville": "Paris", "format": "json"}
-    )
+    response = client.post("/api/etablissements", json={"ville": "Paris", "format": "json"})
     assert response.status_code == 200
 
     data = response.get_json()
@@ -849,9 +839,7 @@ def test_api_etablissements_erreur(client):
     """Test l'API etablissements avec une erreur."""
     # Envoyer une requête POST avec des données invalides
     response = client.post("/api/etablissements", json={"format": "json"})
-    assert (
-        response.status_code == 200
-    )  # Devrait toujours retourner 200 même avec des filtres vides
+    assert response.status_code == 200  # Devrait toujours retourner 200 même avec des filtres vides
 
     data = response.get_json()
     assert isinstance(data, list)
@@ -954,9 +942,7 @@ def test_afficher_badge_type_etab_complet(client):
 
     with client.application.app_context():
         # Test 1: Boulangerie
-        etab_boulangerie = Etablissement.query.filter_by(
-            nom="Boulangerie Martin"
-        ).first()
+        etab_boulangerie = Etablissement.query.filter_by(nom="Boulangerie Martin").first()
         badge = afficher_badge_type_etab(etab_boulangerie)
         assert "badge-type-etab" in badge
         assert "Boulangerie" in badge  # Libellé au lieu de la valeur
@@ -970,9 +956,7 @@ def test_afficher_badge_type_etab_complet(client):
         assert "#FFB6C1" in badge  # Couleur pour pâtisserie
 
         # Test 3: Restaurant
-        etab_restaurant = Etablissement.query.filter_by(
-            nom="Restaurant Gourmet"
-        ).first()
+        etab_restaurant = Etablissement.query.filter_by(nom="Restaurant Gourmet").first()
         badge = afficher_badge_type_etab(etab_restaurant)
         assert "badge-type-etab" in badge
         assert "Restaurant" in badge  # Libellé au lieu de la valeur
@@ -1045,9 +1029,7 @@ def test_flan_get_moyenne_evaluations(app):
         )
 
         moyenne_sans_eval = flan_sans_eval.get_moyenne_evaluations()
-        assert (
-            moyenne_sans_eval is None
-        ), "Un flan sans évaluations devrait retourner None"
+        assert moyenne_sans_eval is None, "Un flan sans évaluations devrait retourner None"
 
         # Test 4: Flan avec une seule évaluation valide
         flan_unique = Flan(
@@ -1071,6 +1053,4 @@ def test_flan_get_moyenne_evaluations(app):
         flan_unique.evaluations = [eval_unique]
 
         moyenne_unique = flan_unique.get_moyenne_evaluations()
-        assert (
-            moyenne_unique == 5.0
-        ), f"Moyenne attendue: 5.0, obtenue: {moyenne_unique}"
+        assert moyenne_unique == 5.0, f"Moyenne attendue: 5.0, obtenue: {moyenne_unique}"

@@ -62,9 +62,7 @@ def importer_lieux(fichier_json):
             with open(fichier_json, "r", encoding="utf-8") as f:
                 data = json.load(f)
                 print(f"📊 Nombre de lieux : {len(data.get('features', []))}")
-                logger.info(
-                    f"Nombre de lieux à importer : {len(data.get('features', []))}"
-                )
+                logger.info(f"Nombre de lieux à importer : {len(data.get('features', []))}")
                 for feature in data["features"]:
                     try:
                         nom = feature["properties"]["location"]["name"]
@@ -74,9 +72,7 @@ def importer_lieux(fichier_json):
                         adresse = nettoyer_adresse(adresse_complete)
                         code_postal = extraire_code_postal(adresse_complete)
                         ville = extraire_ville(adresse_complete)
-                        if not Etablissement.query.filter_by(
-                            nom=nom, adresse=adresse
-                        ).first():
+                        if not Etablissement.query.filter_by(nom=nom, adresse=adresse).first():
                             lieu = Etablissement(
                                 nom=nom,
                                 adresse=adresse,
@@ -122,12 +118,8 @@ if __name__ == "__main__":
         fichier_json = sys.argv[1]
     else:
         fichier_json = chemin_par_defaut
-        print(
-            f"📝 Aucun fichier spécifié, recherche dans le dossier scripts : {fichier_json}"
-        )
-        logger.info(
-            f"Aucun fichier spécifié, recherche dans le dossier scripts : {fichier_json}"
-        )
+        print(f"📝 Aucun fichier spécifié, recherche dans le dossier scripts : {fichier_json}")
+        logger.info(f"Aucun fichier spécifié, recherche dans le dossier scripts : {fichier_json}")
         print(
             "   Pour spécifier un autre fichier : python import_lieux_essai.py chemin/vers/fichier.json"
         )

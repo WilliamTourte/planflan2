@@ -22,6 +22,7 @@ try:
     # Importer le module de test pour vérifier la syntaxe
     try:
         import tests.test_json_serialization as test_module
+
         print("✅ Module de test importé avec succès")
     except ImportError as e:
         print(f"⚠️  Import warning (normal si pytest n'est pas chargé): {e}")
@@ -53,5 +54,6 @@ try:
 except Exception as e:
     print(f"❌ Erreur: {e}")
     import traceback
+
     traceback.print_exc()
     sys.exit(1)

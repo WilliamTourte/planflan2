@@ -170,9 +170,7 @@ class Etablissement(db.Model):
 
     __tablename__ = "etablissements"
     id_etab = db.Column(db.Integer, primary_key=True)
-    type_etab = db.Column(
-        db.Enum(TypeEtab), nullable=False, default=TypeEtab.BOULANGERIE
-    )
+    type_etab = db.Column(db.Enum(TypeEtab), nullable=False, default=TypeEtab.BOULANGERIE)
     nom = db.Column(db.String(100), nullable=False)
     adresse = db.Column(db.String(200), nullable=False)
     code_postal = db.Column(db.String(5), nullable=False)
@@ -185,9 +183,7 @@ class Etablissement(db.Model):
     label = db.Column(db.Boolean, nullable=True, default=False)
     visite = db.Column(db.Boolean, nullable=True, default=False)
     google_place_id = db.Column(db.String(255), nullable=True)
-    statut = db.Column(
-        db.Enum(StatutModeration), nullable=False, server_default="EN_ATTENTE"
-    )
+    statut = db.Column(db.Enum(StatutModeration), nullable=False, server_default="EN_ATTENTE")
 
     # Clé étrangère pour l'utilisateur
     id_user = db.Column(
@@ -202,9 +198,7 @@ class Etablissement(db.Model):
     flans = db.relationship(
         "Flan", back_populates="etablissement", lazy=True, cascade="all, delete-orphan"
     )
-    photos = db.relationship(
-        "Photo", back_populates="etablissement", foreign_keys="Photo.id_etab"
-    )
+    photos = db.relationship("Photo", back_populates="etablissement", foreign_keys="Photo.id_etab")
     utilisateur = db.relationship("Utilisateur", back_populates="etablissements")
 
     def valider_label_visite(self):
@@ -214,9 +208,7 @@ class Etablissement(db.Model):
             ValueError: Si label est True et visite est False
         """
         if self.label and not self.visite:
-            raise ValueError(
-                "Un établissement ne peut être labellisé que s'il a été visité."
-            )
+            raise ValueError("Un établissement ne peut être labellisé que s'il a été visité.")
 
     def to_dict(self, include_flans=True, include_photos=False):
         """Convertit l'établissement en dictionnaire pour la sérialisation.
@@ -249,9 +241,7 @@ class Etablissement(db.Model):
         }
 
         if include_flans:
-            data["flans"] = [
-                flan.to_dict(include_etablissement=False) for flan in self.flans
-            ]
+            data["flans"] = [flan.to_dict(include_etablissement=False) for flan in self.flans]
 
         if include_photos:
             data["photos"] = [photo.to_dict() for photo in self.photos]
@@ -269,18 +259,14 @@ class Flan(db.Model):
 
     __tablename__ = "flans"
     id_flan = db.Column(db.Integer, primary_key=True)
-    id_etab = db.Column(
-        db.Integer, db.ForeignKey("etablissements.id_etab"), nullable=False
-    )
+    id_etab = db.Column(db.Integer, db.ForeignKey("etablissements.id_etab"), nullable=False)
     nom = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=True)
     prix = db.Column(db.Float, nullable=True)
     type_saveur = db.Column(db.Enum(TypeSaveur), nullable=True)
     type_pate = db.Column(db.Enum(TypePate), nullable=True)
     type_texture = db.Column(db.Enum(TypeTexture), nullable=True)
-    statut = db.Column(
-        db.Enum(StatutModeration), nullable=False, server_default="EN_ATTENTE"
-    )
+    statut = db.Column(db.Enum(StatutModeration), nullable=False, server_default="EN_ATTENTE")
 
     # Clé étrangère pour l'utilisateur
     id_user = db.Column(
@@ -295,9 +281,7 @@ class Flan(db.Model):
     evaluations = db.relationship(
         "Evaluation", back_populates="flan", lazy=True, cascade="all, delete-orphan"
     )
-    photos = db.relationship(
-        "Photo", back_populates="flan", foreign_keys="Photo.id_flan"
-    )
+    photos = db.relationship("Photo", back_populates="flan", foreign_keys="Photo.id_flan")
     etablissement = db.relationship("Etablissement", back_populates="flans")
     utilisateur = db.relationship("Utilisateur", back_populates="flans")
 
@@ -319,9 +303,7 @@ class Flan(db.Model):
             else:
                 # Calculer la moyenne à la volée si possible
                 valeurs = [
-                    v
-                    for v in [eval.visuel, eval.texture, eval.pate, eval.gout]
-                    if v is not None
+                    v for v in [eval.visuel, eval.texture, eval.pate, eval.gout] if v is not None
                 ]
                 if valeurs:  # Au moins un critère est rempli
                     moyenne_calculee = sum(float(v) for v in valeurs) / len(valeurs)
@@ -334,9 +316,7 @@ class Flan(db.Model):
         somme = sum(moyennes)
         return round(somme / len(moyennes), 1)
 
-    def to_dict(
-        self, include_etablissement=True, include_evaluations=True, include_photos=False
-    ):
+    def to_dict(self, include_etablissement=True, include_evaluations=True, include_photos=False):
         """Convertit le flan en dictionnaire pour la sérialisation.
 
         Args:
@@ -364,9 +344,7 @@ class Flan(db.Model):
             data["etablissement"] = self.etablissement.to_dict(include_flans=False)
 
         if include_evaluations:
-            data["evaluations"] = [
-                eval.to_dict(include_flan=False) for eval in self.evaluations
-            ]
+            data["evaluations"] = [eval.to_dict(include_flan=False) for eval in self.evaluations]
 
         if include_photos:
             data["photos"] = [photo.to_dict() for photo in self.photos]
@@ -383,14 +361,10 @@ class Evaluation(db.Model):
     """
 
     __tablename__ = "evaluations"
-    __table_args__ = (
-        db.UniqueConstraint("id_user", "id_flan", name="uq_user_flan_evaluation"),
-    )
+    __table_args__ = (db.UniqueConstraint("id_user", "id_flan", name="uq_user_flan_evaluation"),)
 
     id_eval = db.Column(db.Integer, primary_key=True)
-    id_user = db.Column(
-        db.Integer, db.ForeignKey("utilisateurs.id_user"), nullable=False
-    )
+    id_user = db.Column(db.Integer, db.ForeignKey("utilisateurs.id_user"), nullable=False)
     id_flan = db.Column(db.Integer, db.ForeignKey("flans.id_flan"), nullable=False)
     visuel = db.Column(db.Numeric(2, 1), nullable=False)
     texture = db.Column(db.Numeric(2, 1), nullable=False)
@@ -398,9 +372,7 @@ class Evaluation(db.Model):
     gout = db.Column(db.Numeric(2, 1), nullable=False)
     description = db.Column(db.Text, nullable=True)
     photo = db.Column(db.String(255), nullable=True)
-    statut = db.Column(
-        db.Enum(StatutModeration), nullable=False, server_default="EN_ATTENTE"
-    )
+    statut = db.Column(db.Enum(StatutModeration), nullable=False, server_default="EN_ATTENTE")
     date_creation = db.Column(
         db.DateTime, nullable=False, server_default=db.func.current_timestamp()
     )
@@ -412,14 +384,9 @@ class Evaluation(db.Model):
 
     def calc_moyenne(self):
         """Calcule la note moyenne à partir des 4 critères d'évaluation."""
-        if all(
-            v is not None for v in [self.visuel, self.texture, self.pate, self.gout]
-        ):
+        if all(v is not None for v in [self.visuel, self.texture, self.pate, self.gout]):
             self.moyenne = (
-                float(self.visuel)
-                + float(self.texture)
-                + float(self.pate)
-                + float(self.gout)
+                float(self.visuel) + float(self.texture) + float(self.pate) + float(self.gout)
             ) / 4
         return self.moyenne
 
@@ -444,9 +411,7 @@ class Evaluation(db.Model):
             "description": self.description,
             "photo": self.photo,
             "statut": self.statut.value if self.statut else None,
-            "date_creation": (
-                self.date_creation.isoformat() if self.date_creation else None
-            ),
+            "date_creation": (self.date_creation.isoformat() if self.date_creation else None),
             "moyenne": float(self.moyenne) if self.moyenne else None,
         }
 
@@ -470,9 +435,7 @@ class Photo(db.Model):
     __tablename__ = "photos"
     id_photo = db.Column(db.Integer, primary_key=True)
     id_flan = db.Column(db.Integer, db.ForeignKey("flans.id_flan"), nullable=True)
-    id_etab = db.Column(
-        db.Integer, db.ForeignKey("etablissements.id_etab"), nullable=True
-    )
+    id_etab = db.Column(db.Integer, db.ForeignKey("etablissements.id_etab"), nullable=True)
     type_cible = db.Column(db.Enum(TypeCible), nullable=False)
     path = db.Column(db.String(255), nullable=False)
     largeur = db.Column(db.Integer, nullable=False)
@@ -524,9 +487,7 @@ def delete_etablissement_photos(mapper, connection, target):
                 os.remove(filepath)
                 current_app.logger.info(f"Photo supprimée: {filepath}")
         except Exception as e:
-            current_app.logger.error(
-                f"Erreur lors de la suppression de la photo {photo.path}: {e}"
-            )
+            current_app.logger.error(f"Erreur lors de la suppression de la photo {photo.path}: {e}")
 
 
 @event.listens_for(Flan, "before_delete")
@@ -553,6 +514,4 @@ def delete_flan_photos(mapper, connection, target):
                 os.remove(filepath)
                 current_app.logger.info(f"Photo supprimée: {filepath}")
         except Exception as e:
-            current_app.logger.error(
-                f"Erreur lors de la suppression de la photo {photo.path}: {e}"
-            )
+            current_app.logger.error(f"Erreur lors de la suppression de la photo {photo.path}: {e}")

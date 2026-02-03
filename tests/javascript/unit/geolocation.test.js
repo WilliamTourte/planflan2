@@ -327,5 +327,143 @@ describe('Geolocation Module', () => {
             // Vérifier que bindPopup a été appelé
             expect(mockMarker.bindPopup).toHaveBeenCalled();
         });
+
+        it('should create accuracy circle when accuracy is valid', async () => {
+            const mockPosition = {
+                coords: {
+                    latitude: 45.75,
+                    longitude: 4.85,
+                    accuracy: 500 // Moins que maxAccuracyRadius de 1000
+                }
+            };
+
+            navigator.geolocation.getCurrentPosition.mockImplementation(
+                (success) => success(mockPosition)
+            );
+
+            const handler = new GeolocationHandler(mockMap);
+            await handler.activate();
+
+            // Vérifier que le cercle a été créé
+            expect(L.circle).toHaveBeenCalled();
+        });
+
+        it('should not create accuracy circle when accuracy exceeds max', async () => {
+            // Reset le mock de L.circle pour ce test
+            L.circle.mockClear();
+
+            const mockPosition = {
+                coords: {
+                    latitude: 45.75,
+                    longitude: 4.85,
+                    accuracy: 2000 // Plus que maxAccuracyRadius de 1000
+                }
+            };
+
+            navigator.geolocation.getCurrentPosition.mockImplementation(
+                (success) => success(mockPosition)
+            );
+
+            const handler = new GeolocationHandler(mockMap);
+            await handler.activate();
+
+            // Le cercle ne devrait pas être créé
+            expect(L.circle).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('clear method', () => {
+        it('should remove user marker when clear is called', async () => {
+            const mockPosition = {
+                coords: {
+                    latitude: 45.75,
+                    longitude: 4.85,
+                    accuracy: 100
+                }
+            };
+
+            navigator.geolocation.getCurrentPosition.mockImplementation(
+                (success) => success(mockPosition)
+            );
+
+            const handler = new GeolocationHandler(mockMap);
+            await handler.activate();
+
+            handler.clear();
+
+            expect(mockMap.removeLayer).toHaveBeenCalled();
+            expect(handler.userMarker).toBeNull();
+        });
+
+        it('should handle clear when no markers exist', () => {
+            const handler = new GeolocationHandler(mockMap);
+
+            expect(() => handler.clear()).not.toThrow();
+        });
+    });
+
+    describe('calculateDistance static method', () => {
+        it('should calculate distance between two points', () => {
+            // Distance entre Paris et Lyon (environ 400km)
+            const distance = GeolocationHandler.calculateDistance(
+                48.8566, 2.3522,  // Paris
+                45.7640, 4.8357   // Lyon
+            );
+
+            // La distance devrait être environ 400km (avec une marge d'erreur)
+            expect(distance).toBeGreaterThan(350);
+            expect(distance).toBeLessThan(450);
+        });
+
+        it('should return 0 for same location', () => {
+            const distance = GeolocationHandler.calculateDistance(
+                45.75, 4.85,
+                45.75, 4.85
+            );
+
+            expect(distance).toBe(0);
+        });
+    });
+
+    describe('_toRad static method', () => {
+        it('should convert degrees to radians', () => {
+            const radians = GeolocationHandler._toRad(180);
+
+            expect(radians).toBeCloseTo(Math.PI, 5);
+        });
+
+        it('should handle 0 degrees', () => {
+            const radians = GeolocationHandler._toRad(0);
+
+            expect(radians).toBe(0);
+        });
+
+        it('should handle 90 degrees', () => {
+            const radians = GeolocationHandler._toRad(90);
+
+            expect(radians).toBeCloseTo(Math.PI / 2, 5);
+        });
+    });
+
+    describe('update marker position', () => {
+        it('should update existing marker position on subsequent calls', async () => {
+            const mockPosition1 = {
+                coords: { latitude: 45.75, longitude: 4.85, accuracy: 100 }
+            };
+            const mockPosition2 = {
+                coords: { latitude: 45.76, longitude: 4.86, accuracy: 100 }
+            };
+
+            navigator.geolocation.getCurrentPosition
+                .mockImplementationOnce((success) => success(mockPosition1))
+                .mockImplementationOnce((success) => success(mockPosition2));
+
+            const handler = new GeolocationHandler(mockMap);
+            await handler.activate();
+            await handler.activate();
+
+            // Le marqueur devrait être mis à jour, pas recréé
+            expect(mockMarker.setLatLng).toHaveBeenCalled();
+        });
     });
 });

@@ -95,12 +95,9 @@ def add_security_headers(response):
 
     # 8. Cache-Control pour les pages sensibles
     if request.endpoint and any(
-        secure_endpoint in request.endpoint
-        for secure_endpoint in ["auth.", "dashboard", "profile"]
+        secure_endpoint in request.endpoint for secure_endpoint in ["auth.", "dashboard", "profile"]
     ):
-        response.headers["Cache-Control"] = (
-            "no-store, no-cache, must-revalidate, max-age=0"
-        )
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
         response.headers["Pragma"] = "no-cache"
         response.headers["Expires"] = "0"
 

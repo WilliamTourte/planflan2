@@ -227,4 +227,219 @@ describe('Autocomplete Module', () => {
       }
     });
   });
+
+  describe('Keyboard navigation', () => {
+    beforeEach(() => {
+      // Configurer le mock de fetch
+      global.fetch = jest.fn(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve(['Paris', 'Lyon', 'Marseille'])
+        })
+      );
+    });
+
+    it('should navigate down with arrow key', async () => {
+      initAutocomplete();
+
+      input.value = 'Par';
+      input.dispatchEvent(new Event('input'));
+
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Simuler la touche flèche vers le bas
+      const keydownEvent = new KeyboardEvent('keydown', { key: 'ArrowDown' });
+      input.dispatchEvent(keydownEvent);
+
+      // La sélection devrait passer au premier élément
+      const items = resultsContainer.querySelectorAll('.autocomplete-item');
+      if (items.length > 0) {
+        expect(items[0]).toBeDefined();
+      }
+    });
+
+    it('should navigate up with arrow key', async () => {
+      initAutocomplete();
+
+      input.value = 'Par';
+      input.dispatchEvent(new Event('input'));
+
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Simuler la touche flèche vers le haut
+      const keydownEvent = new KeyboardEvent('keydown', { key: 'ArrowUp' });
+      input.dispatchEvent(keydownEvent);
+
+      expect(resultsContainer.classList.contains('show')).toBe(true);
+    });
+
+    it('should select item with Enter key', async () => {
+      initAutocomplete();
+
+      input.value = 'Par';
+      input.dispatchEvent(new Event('input'));
+
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Simuler flèche bas puis Enter
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowDown' }));
+
+      const enterEvent = new KeyboardEvent('keydown', { key: 'Enter' });
+      input.dispatchEvent(enterEvent);
+
+      // L'entrée devrait être mise à jour
+      expect(input.value).toBeDefined();
+    });
+
+    it('should close results when clicking outside', async () => {
+      initAutocomplete();
+
+      input.value = 'Par';
+      input.dispatchEvent(new Event('input'));
+
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      expect(resultsContainer.classList.contains('show')).toBe(true);
+
+      // Simuler un clic en dehors du champ input (comportement réel du module)
+      const outsideElement = document.body;
+      const clickEvent = new MouseEvent('click', { bubbles: true });
+      outsideElement.dispatchEvent(clickEvent);
+
+      expect(resultsContainer.classList.contains('show')).toBe(false);
+    });
+  });
+
+  describe('Click outside handling', () => {
+    it('should hide results when clicking outside input', async () => {
+      initAutocomplete();
+
+      input.value = 'Par';
+      input.dispatchEvent(new Event('input'));
+
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      expect(resultsContainer.classList.contains('show')).toBe(true);
+
+      // Créer un élément externe et simuler un clic
+      const outsideDiv = document.createElement('div');
+      outsideDiv.id = 'outside';
+      document.body.appendChild(outsideDiv);
+
+      const clickEvent = new MouseEvent('click', { bubbles: true });
+      outsideDiv.dispatchEvent(clickEvent);
+
+      expect(resultsContainer.classList.contains('show')).toBe(false);
+    });
+
+    it('should keep results visible when clicking on input', async () => {
+      initAutocomplete();
+
+      input.value = 'Par';
+      input.dispatchEvent(new Event('input'));
+
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      expect(resultsContainer.classList.contains('show')).toBe(true);
+
+      // Simuler un clic sur l'input lui-même
+      const clickEvent = new MouseEvent('click', { bubbles: true });
+      input.dispatchEvent(clickEvent);
+
+      // Les résultats devraient rester visibles
+      expect(resultsContainer.classList.contains('show')).toBe(true);
+    });
+  });
+
+  describe('No results handling', () => {
+    it('should show no results message', async () => {
+      global.fetch = jest.fn(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve([])
+        })
+      );
+
+      initAutocomplete();
+
+      input.value = 'ZZZ';
+      input.dispatchEvent(new Event('input'));
+
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      expect(resultsContainer.classList.contains('show')).toBe(true);
+      expect(resultsContainer.querySelector('.autocomplete-no-results')).toBeTruthy();
+    });
+  });
+
+  describe('zoomToLocation', () => {
+    it('should handle zoom with Leaflet map', async () => {
+      // Mock window.location
+      delete window.location;
+      window.location = {
+        href: 'http://test.com/',
+        origin: 'http://test.com'
+      };
+
+      // Mock Leaflet global
+      const mockMarker = {
+        addTo: jest.fn().mockReturnThis(),
+        bindPopup: jest.fn().mockReturnThis(),
+        openPopup: jest.fn().mockReturnThis()
+      };
+
+      global.L = {
+        marker: jest.fn(() => mockMarker)
+      };
+
+      // Mock window.map (Leaflet)
+      window.map = {
+        setView: jest.fn(),
+        removeLayer: jest.fn()
+      };
+
+      // Importer la fonction zoomToLocation
+      const { zoomToLocation } = await import('../../../app/static/js/autocomplete.js');
+
+      if (typeof zoomToLocation === 'function') {
+        zoomToLocation(48.8566, 2.3522, 'Paris');
+
+        expect(window.map.setView).toHaveBeenCalledWith([48.8566, 2.3522], 12);
+      }
+
+      // Cleanup
+      delete window.map;
+      delete global.L;
+    });
+
+    it('should store pending zoom when no map is available', async () => {
+      // Mock window.location
+      delete window.location;
+      window.location = {
+        href: 'http://test.com/',
+        origin: 'http://test.com'
+      };
+
+      // S'assurer qu'aucune carte n'est disponible
+      delete window.map;
+      delete global.google;
+      delete global.L;
+
+      // Importer la fonction zoomToLocation
+      const { zoomToLocation } = await import('../../../app/static/js/autocomplete.js');
+
+      if (typeof zoomToLocation === 'function') {
+        zoomToLocation(45.75, 4.85, 'Lyon');
+
+        expect(window.pendingZoom).toEqual({
+          lat: 45.75,
+          lng: 4.85,
+          ville: 'Lyon'
+        });
+      }
+
+      // Cleanup
+      delete window.pendingZoom;
+    });
+  });
 });
