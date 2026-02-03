@@ -13,7 +13,9 @@
     "test:unit": "jest tests/javascript/unit",
     "test:integration": "jest tests/javascript/integration",
     "lint": "eslint app/static/js/",
-    "lint:fix": "eslint app/static/js/ --fix"
+    "lint:fix": "eslint app/static/js/ --fix",
+    "lint:css": "stylelint app/static/css/**/*.css",
+    "lint:css:fix": "stylelint app/static/css/**/*.css --fix"
   },
   "repository": {
     "type": "git",

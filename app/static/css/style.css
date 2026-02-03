@@ -1,215 +1,18 @@
-
-
-@media (max-width: 768px) {
-
-
-    /* Adapter les filtres pour mobile */
-    #filter-controls {
-        top: 5px !important;
-        padding-left: 5px !important;
-        padding-right: 5px !important;
-    }
-
-    #filter-controls .main-filters {
-        gap: 4px !important;
-    }
-
-    #filter-controls .btn {
-        font-size: 12px !important;
-        padding: 4px 8px !important;
-        min-width: auto !important;
-    }
-
-    /* Bouton proposer adresse en plein largeur sur mobile */
-    .btn-success.w-100 {
-        max-width: 100% !important;
-    }
-}
-
-@media (max-width: 480px) {
-
-
-    /* Adapter les filtres pour très petits écrans */
-    #filter-controls .btn {
-        font-size: 11px !important;
-        padding: 3px 6px !important;
-    }
-
-    /* Bouton proposer adresse avec marge réduite */
-    .row.mt-3.mb-3 {
-        margin-top: 1rem !important;
-        margin-bottom: 1rem !important;
-    }
-}
-
-/* Style pour que le contenu principal + bouton tienne dans l'écran */
-body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
-main.container {
-    flex: 1;
-}
-=======
 /* =============================================
-   19. RESPONSIVE SPECIFIQUE POUR LISTE_ETABLISSEMENTS
+   PLANFLAN - FEUILLE DE STYLES PRINCIPALE
+   ✅ APPROCHE MOBILE-FIRST
+
+   Breakpoints:
+   - Base: Mobile (<480px)
+   - sm: min-width: 480px (Grands mobiles)
+   - md: min-width: 768px (Tablettes)
+   - lg: min-width: 1024px (Desktop)
+   - xl: min-width: 1200px (Grands écrans)
    ============================================= */
-@media (max-width: 768px) {
-    /* Adapter les filtres pour mobile */
-    #filter-controls {
-        top: 5px !important;
-        padding-left: 5px !important;
-        padding-right: 5px !important;
-    }
-
-    #filter-controls .main-filters {
-        gap: 4px !important;
-    }
-
-    #filter-controls .btn {
-        font-size: 12px !important;
-        padding: 4px 8px !important;
-        min-width: auto !important;
-    }
-
-    /* Bouton proposer adresse en plein largeur sur mobile */
-    .btn-success.w-100 {
-        max-width: 100% !important;
-    }
-
-    /* Conteneur principal pour mobile */
-    .container-fluid.p-0.d-flex.flex-column {
-        height: calc(100vh - 140px) !important;
-    }
-
-    /* Bouton avec hauteur minimale sur mobile */
-    .d-flex.align-items-center.justify-content-center {
-        min-height: 50px !important;
-    }
-}
-
-@media (max-width: 480px) {
-    /* Adapter les filtres pour très petits écrans */
-    #filter-controls .btn {
-        font-size: 11px !important;
-        padding: 3px 6px !important;
-    }
-
-    /* Bouton proposer adresse avec marge réduite */
-    .row.mt-3.mb-3 {
-        margin-top: 1rem !important;
-        margin-bottom: 1rem !important;
-    }
-}
-
-/* Style pour que le contenu principal + bouton tienne dans l'écran */
-body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
-main.container {
-    flex: 1;
-}
-
-    /* Adapter les filtres pour mobile */
-    #filter-controls {
-        top: 5px !important;
-        padding-left: 5px !important;
-        padding-right: 5px !important;
-    }
-
-    #filter-controls .main-filters {
-        gap: 4px !important;
-    }
-
-    #filter-controls .btn {
-        font-size: 12px !important;
-        padding: 4px 8px !important;
-        min-width: auto !important;
-    }
-
-    /* Bouton proposer adresse en plein largeur sur mobile */
-    .btn-success.w-100 {
-        max-width: 100% !important;
-    }
-}
-
-@media (max-width: 480px) {
-
-
-    /* Adapter les filtres pour très petits écrans */
-    #filter-controls .btn {
-        font-size: 11px !important;
-        padding: 3px 6px !important;
-    }
-
-    /* Bouton proposer adresse avec marge réduite */
-    .row.mt-3.mb-3 {
-        margin-top: 1rem !important;
-        margin-bottom: 1rem !important;
-    }
-}
 
 /* =============================================
-   19. RESPONSIVE SPECIFIQUE POUR LISTE_ETABLISSEMENTS
+   1. VARIABLES CSS & CONFIGURATION
    ============================================= */
-@media (max-width: 768px) {
-
-    /* Adapter les filtres pour mobile */
-    #filter-controls {
-        top: 5px !important;
-        padding-left: 5px !important;
-        padding-right: 5px !important;
-    }
-
-    #filter-controls .main-filters {
-        gap: 4px !important;
-    }
-
-    #filter-controls .btn {
-        font-size: 12px !important;
-        padding: 4px 8px !important;
-        min-width: auto !important;
-    }
-
-    /* Bouton proposer adresse en plein largeur sur mobile */
-    .btn-success.w-100 {
-        max-width: 100% !important;
-    }
-}
-
-@media (max-width: 480px) {
-    /* Réduire encore la hauteur de la carte sur très petits écrans */
-
-
-    /* Adapter les filtres pour très petits écrans */
-    #filter-controls .btn {
-        font-size: 11px !important;
-        padding: 3px 6px !important;
-    }
-
-    /* Bouton proposer adresse avec marge réduite */
-    .row.mt-3.mb-3 {
-        margin-top: 1rem !important;
-        margin-bottom: 1rem !important;
-    }
-}
-
-/* Style pour que le contenu principal + bouton tienne dans l'écran */
-body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
-main.container {
-    flex: 1;
-}
-
 :root {
     /* Polices */
     --font-primary: 'Verdana', sans-serif;
@@ -229,29 +32,30 @@ main.container {
     --color-text-lighter: #555;
     --color-shadow: black;
     --color-shadow-hover: black;
+    --color-light: #f5f5f5;
 
-    /* Espacements & Bordures */
+    /* Espacements & Bordures - Valeurs MOBILE par défaut */
     --border-radius: 10px;
     --border-radius-btn: 25px;
-    --max-width: 1200px;
+    --max-width: 100%;
     --padding-xs: 2px;
-    --padding-sm: 8px;
-    --padding-md: 15px;
-    --padding-lg: 20px;
+    --padding-sm: 6px;
+    --padding-md: 10px;
+    --padding-lg: 15px;
     --margin-xs: 2px;
-    --margin-sm: 8px;
-    --margin-md: 15px;
-    --margin-lg: 20px;
+    --margin-sm: 6px;
+    --margin-md: 12px;
+    --margin-lg: 16px;
     --gap-xs: 4px;
-    --gap-sm: 8px;
-    --gap-md: 15px;
-    --gap-lg: 25px;
+    --gap-sm: 6px;
+    --gap-md: 12px;
+    --gap-lg: 16px;
 
     /* Tailles de texte */
     --font-size-xs: 0.75rem;
-    --font-size-sm: 0.9rem;
+    --font-size-sm: 0.85rem;
     --font-size-md: 1rem;
-    --font-size-lg: 1.3rem;
+    --font-size-lg: 1.2rem;
 
     /* Effets & Transitions */
     --transition: all 0.3s ease;
@@ -259,8 +63,8 @@ main.container {
     --box-shadow-hover: 0 5px 10px rgba(0, 0, 0, 0.15);
 
     /* Largeur des infowindows */
-    --infowindow-width: 300px;
-    --infowindow-max-width: 300px;
+    --infowindow-width: 280px;
+    --infowindow-max-width: 280px;
 }
 
 /* Reset & Base */
@@ -277,6 +81,13 @@ body {
     padding: 0;
     background-color: var(--color-secondary);
     color: var(--color-text);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main.container {
+    flex: 1;
 }
 
 /* =============================================
@@ -284,7 +95,7 @@ body {
    ============================================= */
 @font-face {
     font-family: 'Bubblegum';
-    src: url('/static/fonts/Bubblegum.ttf') format('truetype');
+    src: url('../fonts/Bubblegum.ttf') format('truetype');
     font-weight: bold;
     font-style: normal;
 }
@@ -298,9 +109,9 @@ h1, h2, h3, h4, h5, h6 {
    ============================================= */
 .container {
     width: 100%;
-    max-width: var(--max-width);
+    max-width: 100%;
     margin: 0 auto;
-    padding: 0 var(--padding-md);
+    padding: 0 var(--padding-sm);
 }
 
 /* =============================================
@@ -317,7 +128,12 @@ header {
     transition: transform 0.3s ease;
 }
 
-.header-yellow nav {
+/* Style pour .header (classe utilisée dans base.html) */
+.header {
+    background-color: var(--color-primary);
+}
+
+.header nav {
     background-color: transparent;
     padding: 0;
     margin: 0;
@@ -325,46 +141,48 @@ header {
     border: none;
 }
 
-.header-yellow > nav > div {
+.header > nav > div,
+.header nav > div {
     width: 100%;
     max-width: 100%;
-    padding: 0 var(--padding-md);
+    padding: 0 var(--padding-sm);
     margin: 0 auto;
     background-color: transparent;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 0.5rem;
-    padding-bottom: 0.5rem;
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
     flex-wrap: nowrap;
 }
 
-.header-yellow form {
+.header form {
     display: flex;
     align-items: center;
     flex-grow: 1;
     margin: 0 0.5rem;
 }
 
-.header-yellow .btn,
-.header-yellow .btn i {
+.header .btn,
+.header .btn i {
     font-size: 1.1rem;
     margin: 0;
     position: relative;
     top: 0;
 }
 
-.header-yellow .form-control {
+.header .form-control {
     background-color: white;
     border: 1px solid #ddd;
     border-radius: 25px;
-    padding: 0.3rem 1rem;
-    height: 36px;
-    width: 120px;
-    margin-right: 8px;
+    padding: 0.25rem 0.75rem;
+    height: 32px;
+    width: 100px;
+    margin-right: 4px;
+    font-size: var(--font-size-sm);
 }
 
-.header-yellow .btn:hover {
+.header .btn:hover {
     background-color: var(--color-info-dark);
     transform: scale(1.05);
 }
@@ -414,7 +232,6 @@ input[type="submit"]:active {
     transform: translateY(0);
     box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
 }
-
 
 .btn-success {
     background-color: var(--color-primary);
@@ -490,7 +307,7 @@ input[type="submit"]:active {
 .action-buttons {
     display: flex;
     gap: var(--gap-sm);
-    justify-content: center; /* Corrigé */
+    justify-content: center;
     margin-top: var(--margin-md);
 }
 
@@ -548,8 +365,6 @@ input[type="submit"]:active {
     object-fit: cover;
     border-radius: var(--border-radius) var(--border-radius) 0 0;
 }
-
-
 
 .carte-header {
     padding: var(--padding-md);
@@ -609,7 +424,61 @@ input[type="submit"]:active {
 }
 
 .moyenne-value {
-    color: var(--color-primary); /* Corrigé (text-decoration → color) */
+    color: var(--color-primary);
+}
+
+/* =============================================
+   8.5. FLAN DETAIL
+   ============================================= */
+.flan-detail {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-md);
+    margin-bottom: var(--margin-md);
+    background: white;
+    padding: var(--padding-md);
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+.flan-detail .detail-left-column {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: var(--margin-md);
+}
+
+.flan-detail .detail-right-column {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.flan-detail .detail-left-column .carte-image-container {
+    height: 200px;
+    width: 100%;
+}
+
+.flan-detail .detail-right-column .carte-header {
+    text-align: left;
+    padding: 0;
+    margin-bottom: var(--margin-md);
+}
+
+.flan-detail .detail-right-column .carte-header h2 {
+    margin: 0;
+    font-size: var(--font-size-lg);
+    color: var(--color-text);
+}
+
+.flan-detail .detail-right-column .flan-details {
+    width: 100%;
+}
+
+.flan-detail .detail-right-column .flan-price-tag {
+    margin-bottom: var(--margin-md);
 }
 
 /* =============================================
@@ -626,7 +495,6 @@ input[type="submit"]:active {
     padding: var(--padding-xs) var(--padding-sm);
     border-radius: 15px;
     box-shadow: var(--box-shadow);
-
 }
 
 .badge-type-etab {
@@ -659,9 +527,9 @@ input[type="submit"]:active {
    ============================================= */
 .grille {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: var(--gap-lg);
-    margin-top: var(--margin-lg);
+    grid-template-columns: 1fr;
+    gap: var(--gap-md);
+    margin-top: var(--margin-md);
 }
 
 /* =============================================
@@ -879,10 +747,7 @@ input[type="submit"]:active {
 .leaflet-popup-content {
     background: white;
     text-align: center;
-    
-
- 
-    padding : 0 !important;
+    padding: 0 !important;
 }
 
 .leaflet-popup-content::-webkit-scrollbar {
@@ -904,7 +769,6 @@ input[type="submit"]:active {
     top: 5px;
     right: 5px;
 }
-
 
 /* Positionnement de la pointe du popup */
 .leaflet-popup-tip {
@@ -955,7 +819,6 @@ input[type="submit"]:active {
     font-family: Arial, sans-serif;
     width: 100%;
     max-width: 100%;
-   
     margin: 0 auto;
     overflow-wrap: break-word;
     text-align: center;
@@ -964,12 +827,11 @@ input[type="submit"]:active {
 .infowindow-header {
     position: relative;
     min-height: 30px;
-    padding-top: 40px; /* Espace pour les badges */
-    margin-top: 0; /* S'assurer qu'il n'y a pas de marge supplémentaire */
+    padding-top: 40px;
+    margin-top: 0;
 }
 
 .infowindow-header h3 {
-  
     font-size: 1em;
     line-height: 1.2;
     text-align: center;
@@ -978,14 +840,14 @@ input[type="submit"]:active {
 
 .infowindow-badges {
     position: absolute;
-    top: 10px; /* Positionner légèrement en dessous du haut */
+    top: 10px;
     left: 0;
     right: 0;
     display: flex;
     justify-content: space-between;
     pointer-events: none;
-    z-index: 10; /* S'assurer qu'ils sont au-dessus du contenu mais pas du titre */
-    max-height: 30px; /* Limiter la hauteur */
+    z-index: 10;
+    max-height: 30px;
 }
 
 .infowindow-badges .badge {
@@ -995,8 +857,8 @@ input[type="submit"]:active {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    height: 28px; /* Hauteur fixe */
-    line-height: 1; /* Alignement vertical */
+    height: 28px;
+    line-height: 1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1010,10 +872,9 @@ input[type="submit"]:active {
 
 /* Badge type établissement spécifique pour l'infowindow */
 .infowindow-badges .badge-type-etab {
-    background-color: inherit; /* Conserver la couleur dynamique */
-    padding: 6px 8px; /* Padding légèrement réduit */
+    background-color: inherit;
+    padding: 6px 8px;
 }
-
 
 .infowindow-link {
     text-decoration: none;
@@ -1044,7 +905,7 @@ input[type="submit"]:active {
    16. MAP & FILTRES
    ============================================= */
 #map {
-    height: 80vh;
+    height: 55vh;
     width: 100%;
     background-color: transparent;
     transform: translateZ(0);
@@ -1059,23 +920,17 @@ input[type="submit"]:active {
     box-shadow: var(--box-shadow);
     font-family: var(--font-primary), sans-serif;
     max-width: 300px;
-
 }
 
 .legende-container {
-    display: left;
-    
+    display: flex;
     gap: var(--gap-sm);
-
 }
-
-
 
 .legende-text {
     color: var(--color-text);
     font-size: var(--font-size-sm);
-
-    align-items: left;
+    align-items: flex-start;
     gap: var(--gap-sm);
 }
 
@@ -1085,47 +940,45 @@ input[type="submit"]:active {
     min-width: 30px;
     height: 24px;
     display: flex;
-    align-items: left;
-    justify-content: left;
+    align-items: flex-start;
+    justify-content: flex-start;
     font-size: var(--font-size-sm);
 }
 
-
 #filter-controls {
     position: absolute;
-    top: 10px;
+    top: 5px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 1000;
     background: transparent;
-    padding: 10px;
-    border-radius: 10px;
+    padding: 5px;
+    border-radius: 8px;
     width: 100%;
-    max-width: 500px;
+    max-width: 95%;
     border: none;
 }
 
 .main-filters {
     display: flex;
     align-items: center;
-    gap: var(--gap-sm);
+    gap: var(--gap-xs);
     flex-wrap: wrap;
     background: transparent;
-    justify-content: flex-end;
-    margin-left: auto;
+    justify-content: center;
+    margin: 0 auto;
     width: fit-content;
 }
 
 .main-filters button {
-    padding: var(--padding-xs) var(--padding-sm);
-    font-size: var(--font-size-sm);
+    padding: 3px 6px;
+    font-size: 11px;
     width: auto;
     min-width: 0;
     height: auto;
-    line-height: 2;
+    line-height: 1.8;
     white-space: nowrap;
 }
-
 
 .sub-filters {
     display: none;
@@ -1144,7 +997,8 @@ input[type="submit"]:active {
     display: block;
 }
 
-.filter-group {
+/* Override filter-group pour les sous-filtres */
+.sub-filters .filter-group {
     display: flex;
     flex-direction: column;
     gap: var(--gap-xs);
@@ -1153,8 +1007,8 @@ input[type="submit"]:active {
     padding: 0;
 }
 
-.filter-group label,
-.filter-group button {
+.sub-filters .filter-group label,
+.sub-filters .filter-group button {
     margin-left: auto;
     display: block;
     width: fit-content;
@@ -1212,8 +1066,7 @@ input[type="submit"]:active {
 .adresse {
     font-style: italic;
     color: var(--color-text-light);
-    margin:0 !important;
-  
+    margin: 0 !important;
 }
 
 .description {
@@ -1222,7 +1075,7 @@ input[type="submit"]:active {
     margin-bottom: var(--margin-md);
 }
 
-/* Icônes Bootstrap (à garder si tu utilises bootstrap-icons) */
+/* Icônes Bootstrap */
 .bi {
     font-family: 'bootstrap-icons' !important;
     font-style: normal;
@@ -1236,116 +1089,36 @@ input[type="submit"]:active {
 }
 
 /* =============================================
-   18. RESPONSIVE
-   ============================================= */
-@media (max-width: 768px) {
-    .grille {
-        grid-template-columns: 1fr;
-    }
-
-    .carte {
-        border-radius: var(--border-radius);
-    }
-
-    .etablissement-detail {
-        flex-direction: column;
-    }
-
-    .detail-left-column {
-        min-width: 100%;
-        margin-bottom: var(--margin-lg);
-    }
-
-    .detail-right-column {
-        min-width: 100%;
-    }
-
-    .flan-detail {
-        flex-direction: column;
-    }
-
-    .flan-detail .detail-left-column {
-        min-width: 100%;
-        margin-bottom: var(--margin-lg);
-    }
-
-    .flan-detail .detail-right-column {
-        min-width: 100%;
-    }
-
-    header h1 {
-        font-size: 1.5rem;
-    }
-
-
-
-    #map {
-        height: 60vh;
-    }
-
-    .container {
-        padding: 0 var(--padding-sm);
-    }
-
-    .header-yellow > nav > div {
-        padding: 0 var(--padding-sm);
-    }
-
-    .header-yellow .form-control {
-        width: 120px;
-    }
-}
-
-@media (max-width: 480px) {
-    .container {
-        padding: 0 var(--padding-xs);
-    }
-
-    .form-control {
-        padding: var(--padding-xs);
-    }
-
-    .form-container {
-        padding: var(--padding-md);
-    }
-
-
-
-    .form-group {
-        margin-bottom: var(--margin-md);
-    }
-}
-
-/* =============================================
-   17.5. ETABLISSEMENT DETAIL (NOUVEAU)
+   17.5. ETABLISSEMENT DETAIL
    ============================================= */
 .etablissement-detail {
     display: flex;
-    gap: var(--gap-lg);
-    margin-bottom: var(--margin-lg);
+    flex-direction: column;
+    gap: var(--gap-md);
+    margin-bottom: var(--margin-md);
     background: white;
-    padding: var(--padding-lg);
+    padding: var(--padding-md);
     border-radius: var(--border-radius);
     box-shadow: var(--box-shadow);
 }
 
 .detail-left-column {
-    flex: 1;
-    min-width: 300px;
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-bottom: var(--margin-md);
 }
 
 .detail-right-column {
-    flex: 2;
+    width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
 }
 
 .detail-left-column .carte-image-container {
-    height: 250px;
+    height: 200px;
     width: 100%;
 }
 
@@ -1372,67 +1145,13 @@ input[type="submit"]:active {
     margin-bottom: var(--margin-md);
 }
 
-
 .detail-right-column .description {
     margin-bottom: var(--margin-lg);
 }
 
 /* =============================================
-   8.5. FLAN DETAIL (NOUVEAU)
-   ============================================= */
-.flan-detail {
-    display: flex;
-    gap: var(--gap-lg);
-    margin-bottom: var(--margin-lg);
-    background: white;
-    padding: var(--padding-lg);
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
-}
-
-.flan-detail .detail-left-column {
-    flex: 1;
-    min-width: 300px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.flan-detail .detail-right-column {
-    flex: 2;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.flan-detail .detail-left-column .carte-image-container {
-    height: 250px;
-    width: 100%;
-}
-
-.flan-detail .detail-right-column .carte-header {
-    text-align: left;
-    padding: 0;
-    margin-bottom: var(--margin-md);
-}
-
-.flan-detail .detail-right-column .carte-header h2 {
-    margin: 0;
-    font-size: var(--font-size-lg);
-    color: var(--color-text);
-}
-
-.flan-detail .detail-right-column .flan-details {
-    width: 100%;
-}
-
-.flan-detail .detail-right-column .flan-price-tag {
-    margin-bottom: var(--margin-md);
-}
-
-/* =============================================
    ATTRIBUTION GOOGLE PHOTOS
-   =============================================
+   ============================================= */
 /* Conteneur pour les photos Google avec attribution */
 .google-photo-container {
     position: relative;
@@ -1452,66 +1171,22 @@ input[type="submit"]:active {
 }
 
 /* =============================================
-   19. RESPONSIVE SPECIFIQUE POUR LISTE_ETABLISSEMENTS
+   AUTOCOMPLETE
    ============================================= */
-@media (max-width: 768px) {
-
-
-
-    /* Adapter les filtres pour mobile */
-    #filter-controls {
-        top: 5px !important;
-        padding-left: 5px !important;
-        padding-right: 5px !important;
-    }
-
-    #filter-controls .main-filters {
-        gap: 4px !important;
-    }
-
-    #filter-controls .btn {
-        font-size: 12px !important;
-        padding: 4px 8px !important;
-        min-width: auto !important;
-    }
-
-    /* Bouton proposer adresse en plein largeur sur mobile */
-    .btn-success.w-100 {
-        max-width: 100% !important;
-    }
-}
-
-@media (max-width: 480px) {
-
-
-    /* Adapter les filtres pour très petits écrans */
-    #filter-controls .btn {
-        font-size: 11px !important;
-        padding: 3px 6px !important;
-    }
-
-    /* Bouton proposer adresse avec marge réduite */
-    .row.mt-3.mb-3 {
-        margin-top: 1rem !important;
-        margin-bottom: 1rem !important;
-    }
-}
-
-
-  .autocomplete {
+.autocomplete {
     position: relative;
     width: 100%;
-  }
+}
 
-  .autocomplete-input {
+.autocomplete-input {
     width: 100%;
     padding: 0.5rem;
     background-color: rgba(255, 255, 255, 0.9);
     border-radius: var(--border-radius-btn);
     border: 1px solid #ddd;
-  }
+}
 
-  .autocomplete-results {
+.autocomplete-results {
     position: absolute;
     top: 100%;
     left: 0;
@@ -1524,40 +1199,228 @@ input[type="submit"]:active {
     overflow-y: auto;
     z-index: 1000;
     display: none;
-  }
+}
 
-  .autocomplete-results.show {
+.autocomplete-results.show {
     display: block;
-  }
+}
 
-  .autocomplete-item {
+.autocomplete-item {
     padding: 0.5rem;
     cursor: pointer;
     border-bottom: 1px solid #eee;
-  }
+}
 
-  .autocomplete-item:hover {
+.autocomplete-item:hover {
     background-color: #f0f0f0;
-  }
+}
 
-  .autocomplete-item:last-child {
+.autocomplete-item:last-child {
     border-bottom: none;
-  }
+}
 
-  .autocomplete-loading {
+.autocomplete-loading {
     padding: 0.5rem;
     text-align: center;
     color: #666;
     font-style: italic;
-  }
+}
 
-  .autocomplete-no-results {
+.autocomplete-no-results {
     padding: 0.5rem;
     text-align: center;
     color: #999;
     font-style: italic;
-  }
+}
 
-  .autocomplete-item.active {
+.autocomplete-item.active {
     background-color: #e3f2fd;
-  }
+}
+
+/* =============================================
+   18. RESPONSIVE - GRANDS MOBILES (min-width: 480px)
+   ============================================= */
+@media (min-width: 480px) {
+    /* Variables adaptées */
+    :root {
+        --padding-sm: 8px;
+        --padding-md: 12px;
+        --gap-sm: 8px;
+        --gap-md: 14px;
+    }
+
+    /* Grille 2 colonnes */
+    .grille {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Filtres légèrement plus grands */
+    .main-filters button {
+        padding: 4px 8px;
+        font-size: 12px;
+    }
+
+    #filter-controls {
+        max-width: 400px;
+    }
+
+    /* Map légèrement plus haute */
+    #map {
+        height: 60vh;
+    }
+}
+
+/* =============================================
+   19. RESPONSIVE - TABLETTES (min-width: 768px)
+   ============================================= */
+@media (min-width: 768px) {
+    /* Variables adaptées desktop */
+    :root {
+        --max-width: 1200px;
+        --padding-sm: 8px;
+        --padding-md: 15px;
+        --padding-lg: 20px;
+        --margin-sm: 8px;
+        --margin-md: 15px;
+        --margin-lg: 20px;
+        --gap-sm: 8px;
+        --gap-md: 15px;
+        --gap-lg: 25px;
+        --font-size-sm: 0.9rem;
+        --font-size-lg: 1.3rem;
+        --infowindow-width: 300px;
+        --infowindow-max-width: 300px;
+    }
+
+    /* Container avec max-width */
+    .container {
+        padding: 0 var(--padding-md);
+        max-width: var(--max-width);
+    }
+
+    /* Header desktop */
+    .header > nav > div {
+        padding: 0 var(--padding-md);
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
+
+    .header .form-control {
+        width: 150px;
+        height: 36px;
+        padding: 0.3rem 1rem;
+        margin-right: 8px;
+    }
+
+    /* Grille multi-colonnes */
+    .grille {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: var(--gap-lg);
+        margin-top: var(--margin-lg);
+    }
+
+    /* Flan detail en row */
+    .flan-detail {
+        flex-direction: row;
+        gap: var(--gap-lg);
+        padding: var(--padding-lg);
+    }
+
+    .flan-detail .detail-left-column {
+        flex: 1;
+        min-width: 300px;
+        margin-bottom: 0;
+    }
+
+    .flan-detail .detail-right-column {
+        flex: 2;
+    }
+
+    .flan-detail .detail-left-column .carte-image-container {
+        height: 250px;
+    }
+
+    /* Etablissement detail en row */
+    .etablissement-detail {
+        flex-direction: row;
+        gap: var(--gap-lg);
+        padding: var(--padding-lg);
+    }
+
+    .detail-left-column {
+        flex: 1;
+        min-width: 300px;
+        margin-bottom: 0;
+    }
+
+    .detail-right-column {
+        flex: 2;
+    }
+
+    .detail-left-column .carte-image-container {
+        height: 250px;
+    }
+
+    /* Map plus haute */
+    #map {
+        height: 75vh;
+    }
+
+    /* Filtres desktop */
+    #filter-controls {
+        top: 10px;
+        padding: 10px;
+        max-width: 500px;
+    }
+
+    .main-filters {
+        gap: var(--gap-sm);
+        justify-content: flex-end;
+        margin-left: auto;
+    }
+
+    .main-filters button {
+        padding: var(--padding-xs) var(--padding-sm);
+        font-size: var(--font-size-sm);
+        line-height: 2;
+    }
+}
+
+/* =============================================
+   20. RESPONSIVE - DESKTOP (min-width: 1024px)
+   ============================================= */
+@media (min-width: 1024px) {
+    /* Map pleine hauteur */
+    #map {
+        height: 80vh;
+    }
+
+    /* Header form-control plus large */
+    .header .form-control {
+        width: 200px;
+    }
+
+    /* Plus d'espace dans les filtres */
+    #filter-controls {
+        max-width: 600px;
+    }
+
+    .main-filters button {
+        padding: 6px 12px;
+        font-size: 14px;
+    }
+}
+
+/* =============================================
+   21. RESPONSIVE - GRANDS ÉCRANS (min-width: 1200px)
+   ============================================= */
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1400px;
+    }
+
+    .header .form-control {
+        width: 250px;
+    }
+}
+
