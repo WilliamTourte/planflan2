@@ -59,8 +59,8 @@
 
     /* Effets & Transitions */
     --transition: all 0.3s ease;
-    --box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    --box-shadow-hover: 0 5px 10px rgba(0, 0, 0, 0.15);
+    --box-shadow: 0 2px 5px rgb(0 0 0 / 10%);
+    --box-shadow-hover: 0 5px 10px rgb(0 0 0 / 15%);
 
     /* Largeur des infowindows */
     --infowindow-width: 280px;
@@ -94,7 +94,7 @@ main.container {
    2. POLICES
    ============================================= */
 @font-face {
-    font-family: 'Bubblegum';
+    font-family: Bubblegum;
     src: url('../fonts/Bubblegum.ttf') format('truetype');
     font-weight: bold;
     font-style: normal;
@@ -163,14 +163,6 @@ header {
     margin: 0 0.5rem;
 }
 
-.header .btn,
-.header .btn i {
-    font-size: 1.1rem;
-    margin: 0;
-    position: relative;
-    top: 0;
-}
-
 .header .form-control {
     background-color: white;
     border: 1px solid #ddd;
@@ -180,11 +172,6 @@ header {
     width: 100px;
     margin-right: 4px;
     font-size: var(--font-size-sm);
-}
-
-.header .btn:hover {
-    background-color: var(--color-info-dark);
-    transform: scale(1.05);
 }
 
 /* =============================================
@@ -230,7 +217,7 @@ button:active,
 input[type="button"]:active,
 input[type="submit"]:active {
     transform: translateY(0);
-    box-shadow: 0 2px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 3px rgb(0 0 0 / 10%);
 }
 
 .btn-success {
@@ -262,9 +249,9 @@ input[type="submit"]:active {
     flex-wrap: wrap;
     gap: 8px;
     padding: 8px;
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgb(255 255 255 / 90%);
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
     margin-top: 8px;
 }
 
@@ -319,6 +306,39 @@ input[type="submit"]:active {
 
 .inline-form {
     display: inline-block;
+}
+
+/* Styles spécifiques header après les styles génériques btn */
+.header .btn {
+    font-size: 1.1rem;
+    margin: 0;
+    position: relative;
+    top: 0;
+}
+
+.header .btn i {
+    font-size: 1.1rem;
+    margin: 0;
+    position: relative;
+    top: 0;
+}
+
+/* Styles des icônes leaflet - ordre: moins spécifique d'abord (i seul), puis plus spécifique (a i) */
+.leaflet-control.leaflet-control-geolocate i {
+    color: white !important;
+    font-size: 24px;
+    background: transparent !important;
+}
+
+.leaflet-control.leaflet-control-geolocate a i {
+    color: white !important;
+    font-size: 24px;
+    background: transparent !important;
+}
+
+.header .btn:hover {
+    background-color: var(--color-info-dark);
+    transform: scale(1.05);
 }
 
 /* =============================================
@@ -428,7 +448,42 @@ input[type="submit"]:active {
 }
 
 /* =============================================
-   8.5. FLAN DETAIL
+   8.5. COLONNES DE DÉTAIL (communes)
+   ============================================= */
+.detail-left-column {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: var(--margin-md);
+}
+
+.detail-right-column {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.detail-left-column .carte-image-container {
+    height: 200px;
+    width: 100%;
+}
+
+.detail-right-column .carte-header {
+    text-align: left;
+    padding: 0;
+    margin-bottom: var(--margin-md);
+}
+
+.detail-right-column .carte-header h2 {
+    margin: 0;
+    font-size: var(--font-size-lg);
+    color: var(--color-text);
+}
+
+/* =============================================
+   8.6. FLAN DETAIL
    ============================================= */
 .flan-detail {
     display: flex;
@@ -579,7 +634,6 @@ input[type="submit"]:active {
     margin: 0 var(--margin-xs) 0 0;
     vertical-align: middle;
     appearance: auto;
-    -webkit-appearance: checkbox;
 }
 
 .form-check-label {
@@ -809,11 +863,6 @@ input[type="submit"]:active {
     background: transparent !important;
 }
 
-.leaflet-control-geolocate i {
-    color: white !important;
-    font-size: 24px;
-    background: transparent !important;
-}
 
 .infowindow-content {
     font-family: Arial, sans-serif;
@@ -835,7 +884,7 @@ input[type="submit"]:active {
     font-size: 1em;
     line-height: 1.2;
     text-align: center;
-    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .infowindow-badges {
@@ -885,7 +934,7 @@ input[type="submit"]:active {
 }
 
 .infowindow-link:hover {
-    background-color: rgba(0, 0, 0, 0.05);
+    background-color: rgb(0 0 0 / 5%);
     border-radius: 5px;
 }
 
@@ -1077,7 +1126,7 @@ input[type="submit"]:active {
 
 /* Icônes Bootstrap */
 .bi {
-    font-family: 'bootstrap-icons' !important;
+    font-family: bootstrap-icons, sans-serif !important;
     font-style: normal;
     font-weight: normal;
     font-variant: normal;
@@ -1102,37 +1151,6 @@ input[type="submit"]:active {
     box-shadow: var(--box-shadow);
 }
 
-.detail-left-column {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: var(--margin-md);
-}
-
-.detail-right-column {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.detail-left-column .carte-image-container {
-    height: 200px;
-    width: 100%;
-}
-
-.detail-right-column .carte-header {
-    text-align: left;
-    padding: 0;
-    margin-bottom: var(--margin-md);
-}
-
-.detail-right-column .carte-header h2 {
-    margin: 0;
-    font-size: var(--font-size-lg);
-    color: var(--color-text);
-}
 
 .detail-right-column .adresse {
     font-size: var(--font-size-md);
@@ -1152,6 +1170,7 @@ input[type="submit"]:active {
 /* =============================================
    ATTRIBUTION GOOGLE PHOTOS
    ============================================= */
+
 /* Conteneur pour les photos Google avec attribution */
 .google-photo-container {
     position: relative;
@@ -1162,7 +1181,7 @@ input[type="submit"]:active {
     position: absolute;
     bottom: 5px;
     right: 5px;
-    background-color: rgba(0, 0, 0, 0.6);
+    background-color: rgb(0 0 0 / 60%);
     color: white;
     padding: 3px 8px;
     font-size: var(--font-size-xs);
@@ -1181,7 +1200,7 @@ input[type="submit"]:active {
 .autocomplete-input {
     width: 100%;
     padding: 0.5rem;
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgb(255 255 255 / 90%);
     border-radius: var(--border-radius-btn);
     border: 1px solid #ddd;
 }
@@ -1240,7 +1259,7 @@ input[type="submit"]:active {
 /* =============================================
    18. RESPONSIVE - GRANDS MOBILES (min-width: 480px)
    ============================================= */
-@media (min-width: 480px) {
+@media (width >= 480px) {
     /* Variables adaptées */
     :root {
         --padding-sm: 8px;
@@ -1273,7 +1292,7 @@ input[type="submit"]:active {
 /* =============================================
    19. RESPONSIVE - TABLETTES (min-width: 768px)
    ============================================= */
-@media (min-width: 768px) {
+@media (width >= 768px) {
     /* Variables adaptées desktop */
     :root {
         --max-width: 1200px;
@@ -1319,6 +1338,21 @@ input[type="submit"]:active {
         margin-top: var(--margin-lg);
     }
 
+    /* Colonnes de détail - styles génériques d'abord */
+    .detail-left-column {
+        flex: 1;
+        min-width: 300px;
+        margin-bottom: 0;
+    }
+
+    .detail-right-column {
+        flex: 2;
+    }
+
+    .detail-left-column .carte-image-container {
+        height: 250px;
+    }
+
     /* Flan detail en row */
     .flan-detail {
         flex-direction: row;
@@ -1347,19 +1381,6 @@ input[type="submit"]:active {
         padding: var(--padding-lg);
     }
 
-    .detail-left-column {
-        flex: 1;
-        min-width: 300px;
-        margin-bottom: 0;
-    }
-
-    .detail-right-column {
-        flex: 2;
-    }
-
-    .detail-left-column .carte-image-container {
-        height: 250px;
-    }
 
     /* Map plus haute */
     #map {
@@ -1389,7 +1410,7 @@ input[type="submit"]:active {
 /* =============================================
    20. RESPONSIVE - DESKTOP (min-width: 1024px)
    ============================================= */
-@media (min-width: 1024px) {
+@media (width >= 1024px) {
     /* Map pleine hauteur */
     #map {
         height: 80vh;
@@ -1414,7 +1435,7 @@ input[type="submit"]:active {
 /* =============================================
    21. RESPONSIVE - GRANDS ÉCRANS (min-width: 1200px)
    ============================================= */
-@media (min-width: 1200px) {
+@media (width >= 1200px) {
     .container {
         max-width: 1400px;
     }
