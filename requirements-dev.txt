@@ -18,12 +18,13 @@ pre-commit==4.5.1
 
 # Security checks
 bandit==1.7.10
-safety==3.2.11
+safety>=3.3.0
 
 # Documentation
-sphinx==7.2.6
-sphinx-rtd-theme==2.0.0
-sphinx-js==3.2.2
+sphinx>=7.2.6
+sphinx-rtd-theme>=2.0.0
+sphinx-js>=5.0.0
+sphinxcontrib-httpdomain>=1.8.1
 nodeenv>=1.8.0  # For Node.js in virtual environment (JSDoc support)
 
 # Type checking (optionnel)
