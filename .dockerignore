@@ -43,6 +43,7 @@ documentation/
 source/
 *.md
 *.txt
+!requirements*.txt
 
 # Logs
 logs/
