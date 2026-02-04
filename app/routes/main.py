@@ -150,14 +150,9 @@ def api_etablissements_search():
     # Charger le cache si nécessaire
     if not hasattr(api_etablissements_search, "cache"):
         # Charger tous les établissements avec leurs infos essentielles
-        etablissements = (
-            db.session.query(
-                Etablissement.id_etab,
-                Etablissement.nom,
-                Etablissement.ville
-            )
-            .all()
-        )
+        etablissements = db.session.query(
+            Etablissement.id_etab, Etablissement.nom, Etablissement.ville
+        ).all()
         # Construire le cache
         api_etablissements_search.cache = [
             {
@@ -171,7 +166,8 @@ def api_etablissements_search():
 
     # Recherche dans le cache (nom ou ville)
     results = [
-        etab for etab in api_etablissements_search.cache
+        etab
+        for etab in api_etablissements_search.cache
         if search_term in etab["nom"].lower() or search_term in etab["ville"].lower()
     ]
 
@@ -375,10 +371,7 @@ def liste_etablissements():
         # Recherche par nom OU ville
         search_pattern = f"%{recherche_simple}%"
         query = query.filter(
-            or_(
-                Etablissement.nom.ilike(search_pattern),
-                Etablissement.ville.ilike(search_pattern)
-            )
+            or_(Etablissement.nom.ilike(search_pattern), Etablissement.ville.ilike(search_pattern))
         )
 
         # Compter les résultats pour la redirection automatique
@@ -387,7 +380,9 @@ def liste_etablissements():
         # Si un seul résultat, rediriger directement vers l'établissement
         if count == 1:
             etablissement = query.first()
-            return redirect(url_for("main.afficher_etablissement_unique", id_etab=etablissement.id_etab))
+            return redirect(
+                url_for("main.afficher_etablissement_unique", id_etab=etablissement.id_etab)
+            )
 
     # et utiliser le zoom JavaScript pour la ville sélectionnée
     ville_selectionnee = None

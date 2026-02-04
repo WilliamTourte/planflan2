@@ -278,7 +278,10 @@ describe('Header Autocomplete Module', () => {
     });
 
     describe('Debounce functionality', () => {
-        it('should debounce API calls', () => {
+        it('should debounce API calls', async () => {
+            // Utiliser les vrais timers pour ce test
+            jest.useRealTimers();
+
             const mockFetch = jest.fn();
 
             function debounce(func, timeout = 300) {
@@ -302,8 +305,8 @@ describe('Header Autocomplete Module', () => {
             // Avant le timeout, aucun appel
             expect(mockFetch).not.toHaveBeenCalled();
 
-            // Exécuter tous les timers en attente
-            jest.runAllTimers();
+            // Attendre que le debounce soit terminé (300ms + marge)
+            await new Promise(resolve => setTimeout(resolve, 400));
 
             // Après le timeout, un seul appel avec la dernière valeur
             expect(mockFetch).toHaveBeenCalledTimes(1);

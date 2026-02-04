@@ -261,6 +261,7 @@ def invalidate_etablissements_cache(mapper, connection, target):
     """
     try:
         from app.routes.main import invalidate_etablissements_search_cache
+
         invalidate_etablissements_search_cache()
     except ImportError:
         # En cas d'import circulaire lors de l'initialisation

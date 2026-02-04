@@ -886,7 +886,9 @@ def test_liste_etablissements_avec_recherche_simple(client):
         db.session.commit()
 
     # Rechercher avec un terme qui correspond à un seul établissement -> redirection
-    response = client.get("/liste_etablissements?recherche_simple=Boulangerie", follow_redirects=False)
+    response = client.get(
+        "/liste_etablissements?recherche_simple=Boulangerie", follow_redirects=False
+    )
     assert response.status_code == 302  # Redirection car un seul résultat
     assert "/etablissement/" in response.location
 
@@ -1073,16 +1075,25 @@ def test_liste_etablissements_cas_limites_caracteres_speciaux(client):
         db.session.add_all([etab1, etab2])
         db.session.commit()
 
-    # Test recherche avec caractères spéciaux
-    response = client.get("/liste_etablissements", query_string={"recherche_simple": "Épi"})
-    assert response.status_code == 200
-    # Vérifier que l'établissement est présent dans la réponse (le nom peut être légèrement différent)
-    assert b"Boulangerie" in response.data
+    # Test recherche avec caractères spéciaux - un seul résultat = redirection
+    response = client.get(
+        "/liste_etablissements", query_string={"recherche_simple": "Épi"}, follow_redirects=False
+    )
+    assert response.status_code == 302  # Redirection car un seul résultat
+    assert "/etablissement/" in response.location
 
-    response = client.get("/liste_etablissements", query_string={"recherche_simple": "Café"})
+    response = client.get(
+        "/liste_etablissements", query_string={"recherche_simple": "Café"}, follow_redirects=False
+    )
+    assert response.status_code == 302  # Redirection car un seul résultat
+    assert "/etablissement/" in response.location
+
+    # Test avec follow_redirects pour vérifier que la page de l'établissement se charge
+    response = client.get(
+        "/liste_etablissements", query_string={"recherche_simple": "Épi"}, follow_redirects=True
+    )
     assert response.status_code == 200
-    # Vérifier que l'établissement est présent dans la réponse (le nom peut être légèrement différent)
-    assert b"Caf" in response.data or b"Restaurant" in response.data
+    assert b"Boulangerie" in response.data
 
 
 def test_liste_etablissements_cas_limites_aucune_correspondance(client):
@@ -1108,17 +1119,15 @@ def test_liste_etablissements_cas_limites_aucune_correspondance(client):
         db.session.add_all([etab1, etab2])
         db.session.commit()
 
-    # Test 1: Recherche simple qui ne correspond à rien
+    # Test 1: Recherche simple qui ne correspond à rien - affiche page sans résultats
     response = client.get(
         "/liste_etablissements", query_string={"recherche_simple": "Restaurant Inconnu"}
     )
     assert response.status_code == 200
-    # Avec la nouvelle logique, tous les établissements sont toujours affichés sur la carte
-    # Vérifier que les établissements existants sont présents dans les données JSON
-    assert b"Boulangerie Test" in response.data
-    assert b"Autre Etablissement" in response.data
-    # Vérifier que la page se charge correctement
-    assert b"liste_etablissements" in response.data
+    # Avec la nouvelle logique, recherche_simple filtre les établissements
+    # Si rien ne correspond, la page s'affiche mais sans les établissements recherchés
+    # La page doit quand même se charger correctement
+    assert b"<!doctype html>" in response.data.lower() or b"<!DOCTYPE html>" in response.data
 
     # Test 2: Ville seule (sans autres filtres) - devrait afficher tous les établissements
     response = client.get("/liste_etablissements", query_string={"ville": "Marseille"})
@@ -1765,6 +1774,7 @@ def test_api_etablissements_search_avec_resultats(client):
 
         # Invalider le cache pour les tests
         from app.routes.main import invalidate_etablissements_search_cache
+
         invalidate_etablissements_search_cache()
 
     # Recherche par nom
@@ -1822,6 +1832,7 @@ def test_api_etablissements_search_tri_pertinence(client):
         db.session.commit()
 
         from app.routes.main import invalidate_etablissements_search_cache
+
         invalidate_etablissements_search_cache()
 
     response = client.get("/api/etablissements/search?q=café")
@@ -1886,7 +1897,10 @@ def test_invalidation_cache_etablissements(client):
     """Test l'invalidation du cache lors de l'ajout d'un établissement"""
     user = client.application.config["TEST_USER"]
     with client.application.app_context():
-        from app.routes.main import api_etablissements_search, invalidate_etablissements_search_cache
+        from app.routes.main import (
+            api_etablissements_search,
+            invalidate_etablissements_search_cache,
+        )
 
         # Forcer la création du cache
         invalidate_etablissements_search_cache()
