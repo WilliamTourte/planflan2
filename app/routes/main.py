@@ -128,6 +128,99 @@ def get_villes():
         return jsonify(sorted(villes))
 
 
+@main_bp.route("/api/etablissements/search")
+def api_etablissements_search():
+    """Route API pour rechercher des établissements pour l'autocomplete du header.
+
+    Utilise un cache au niveau du module pour optimiser les performances.
+    Le cache est invalidé automatiquement via des signaux SQLAlchemy dans models.py.
+
+    Paramètres:
+        q: Terme de recherche (recherche dans nom et ville)
+
+    Returns:
+        JSON: Liste d'établissements avec id_etab, nom, ville, url et total_count
+    """
+    search_term = request.args.get("q", "").strip().lower()
+
+    # Minimum 2 caractères pour lancer la recherche
+    if len(search_term) < 2:
+        return jsonify([])
+
+    # Charger le cache si nécessaire
+    if not hasattr(api_etablissements_search, "cache"):
+        # Charger tous les établissements avec leurs infos essentielles
+        etablissements = (
+            db.session.query(
+                Etablissement.id_etab,
+                Etablissement.nom,
+                Etablissement.ville
+            )
+            .all()
+        )
+        # Construire le cache
+        api_etablissements_search.cache = [
+            {
+                "id_etab": etab.id_etab,
+                "nom": etab.nom,
+                "ville": etab.ville,
+            }
+            for etab in etablissements
+        ]
+        print(f"Cache établissements créé avec {len(api_etablissements_search.cache)} entrées")
+
+    # Recherche dans le cache (nom ou ville)
+    results = [
+        etab for etab in api_etablissements_search.cache
+        if search_term in etab["nom"].lower() or search_term in etab["ville"].lower()
+    ]
+
+    # Nombre total de résultats avant limitation
+    total_count = len(results)
+
+    # Trier par pertinence : d'abord ceux qui commencent par le terme
+    def sort_key(etab):
+        nom_lower = etab["nom"].lower()
+        ville_lower = etab["ville"].lower()
+        # Priorité : commence par le terme dans le nom, puis dans la ville
+        if nom_lower.startswith(search_term):
+            return (0, nom_lower)
+        elif ville_lower.startswith(search_term):
+            return (1, nom_lower)
+        else:
+            return (2, nom_lower)
+
+    results.sort(key=sort_key)
+
+    # Limiter à 10 résultats
+    results = results[:10]
+
+    # Ajouter l'URL et le total_count à chaque résultat
+    formatted_results = [
+        {
+            "id_etab": etab["id_etab"],
+            "nom": etab["nom"],
+            "ville": etab["ville"],
+            "url": url_for("main.afficher_etablissement_unique", id_etab=etab["id_etab"]),
+            "total_count": total_count,
+        }
+        for etab in results
+    ]
+
+    return jsonify(formatted_results)
+
+
+def invalidate_etablissements_search_cache():
+    """Invalide le cache de recherche des établissements.
+
+    Cette fonction est appelée par les signaux SQLAlchemy dans models.py
+    lors de l'ajout, modification ou suppression d'un établissement.
+    """
+    if hasattr(api_etablissements_search, "cache"):
+        delattr(api_etablissements_search, "cache")
+        print("Cache établissements invalidé")
+
+
 def extraire_parametres_filtre(source=None, request=None, form=None):
     """Extraire les paramètres de filtre depuis différentes sources.
 
@@ -275,6 +368,26 @@ def liste_etablissements():
 
     # toujours chercher tous les établissements
     query = Etablissement.query
+
+    # Traitement de la recherche simple (depuis le header)
+    recherche_simple = request.args.get("recherche_simple", "").strip()
+    if recherche_simple:
+        # Recherche par nom OU ville
+        search_pattern = f"%{recherche_simple}%"
+        query = query.filter(
+            or_(
+                Etablissement.nom.ilike(search_pattern),
+                Etablissement.ville.ilike(search_pattern)
+            )
+        )
+
+        # Compter les résultats pour la redirection automatique
+        count = query.count()
+
+        # Si un seul résultat, rediriger directement vers l'établissement
+        if count == 1:
+            etablissement = query.first()
+            return redirect(url_for("main.afficher_etablissement_unique", id_etab=etablissement.id_etab))
 
     # et utiliser le zoom JavaScript pour la ville sélectionnée
     ville_selectionnee = None

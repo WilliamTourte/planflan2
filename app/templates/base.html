@@ -51,27 +51,32 @@ afficher_objet %} {% from "macros.html" import afficher_bouton_ajout %}
           </a>
           <!-- Formulaire unique avec logique conditionnelle -->
           {% if request.path != url_for('main.index') %}
-          <form
-            action="{{ url_for('main.liste_etablissements') }}"
-            method="GET"
-            class="d-flex align-items-center flex-grow-1 mx-2"
-          >
-            <input
-              type="text"
-              name="recherche_simple"
-              placeholder="Rechercher..."
-              class="form-control"
-              id="search-input"
-            />
-            <button
-              type="submit"
-              class="btn btn-icon"
-              id="search-button"
-              title="Rechercher"
+          <div class="header-search-container">
+            <form
+              action="{{ url_for('main.liste_etablissements') }}"
+              method="GET"
+              class="d-flex align-items-center flex-grow-1"
+              id="header-search-form"
             >
-              <i class="bi bi-search"></i>
-            </button>
-          </form>
+              <input
+                type="text"
+                name="recherche_simple"
+                placeholder="Rechercher un établissement..."
+                class="form-control"
+                id="search-input"
+                autocomplete="off"
+              />
+              <button
+                type="submit"
+                class="btn btn-icon"
+                id="search-button"
+                title="Rechercher"
+              >
+                <i class="bi bi-search"></i>
+              </button>
+            </form>
+            <div id="header-autocomplete-results" class="autocomplete-results"></div>
+          </div>
           {% endif %} {% if current_user.is_authenticated %}
           <a class="btn btn-icon" href="{{ url_for('main.dashboard') }}">
             <i class="bi bi-person-square"></i>
