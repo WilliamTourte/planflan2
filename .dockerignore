@@ -1,0 +1,73 @@
+# Git
+.git/
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+.pytest_cache/
+*.egg-info/
+.eggs/
+
+# Coverage & Tests
+.coverage
+.coveragerc
+coverage/
+coverage-js/
+htmlcov/
+coverage.xml
+tests/
+pytest.ini
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Node
+node_modules/
+
+# Build artifacts
+build/
+
+# Documentation
+documentation/
+source/
+*.md
+*.txt
+
+# Logs
+logs/
+*.log
+
+# Docker (avoid recursive)
+docker-db/
+
+# Local config
+.env
+.env.*
+*.local
+
+# Misc
+.husky/
+.babelrc
+.eslintrc.js
+.lintstagedrc
+.prettierignore
+.prettierrc
+.pylintrc
+.stylelintignore
+*.bat
+*.sh
+!entrypoint.sh
+*.mjs
+*.exe
+Makefile

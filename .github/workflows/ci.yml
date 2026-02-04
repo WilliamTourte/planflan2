@@ -204,14 +204,6 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
-    - name: Cache Docker layers
-      uses: actions/cache@v4
-      with:
-        path: /tmp/.buildx-cache
-        key: ${{ runner.os }}-buildx-${{ hashFiles('**/requirements-prod.txt', '**/Dockerfile') }}
-        restore-keys: |
-          ${{ runner.os }}-buildx-
-
     - name: Start timing - Docker build
       run: echo "DOCKER_START=$(date +%s)" >> $GITHUB_ENV
 
@@ -229,8 +221,8 @@ jobs:
         push: false
         load: true
         tags: ${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
-        cache-from: type=local,src=/tmp/.buildx-cache
-        cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
 
     - name: End timing - Docker build
       run: |
@@ -238,10 +230,6 @@ jobs:
         DOCKER_DURATION=$((DOCKER_END - DOCKER_START))
         echo "⏱️ Docker build took ${DOCKER_DURATION}s"
 
-    - name: Rotate Docker cache
-      run: |
-        rm -rf /tmp/.buildx-cache
-        mv /tmp/.buildx-cache-new /tmp/.buildx-cache || true
 
     - name: Test Docker image
       run: |
@@ -257,8 +245,8 @@ jobs:
         tags: |
           ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:${{ env.DOCKER_IMAGE_TAG }}
           ${{ secrets.DOCKER_HUB_USERNAME }}/${{ env.DOCKER_IMAGE_NAME }}:latest
-        cache-from: type=local,src=/tmp/.buildx-cache
-        cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
 
     - name: Workflow timing summary
       if: always()
