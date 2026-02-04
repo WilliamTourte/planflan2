@@ -107,8 +107,17 @@ def test_scenario_recherche_et_evaluation(client):
         db.session.commit()
         flan_id = flan.id_flan
 
-    # Étape 2 : Rechercher l'établissement
-    response = client.get("/liste_etablissements?recherche_simple=Evaluation")
+    # Étape 2 : Rechercher l'établissement - un seul résultat = redirection automatique
+    response = client.get(
+        "/liste_etablissements?recherche_simple=Evaluation", follow_redirects=False
+    )
+    assert response.status_code == 302  # Redirection car un seul résultat
+    assert "/etablissement/" in response.location
+
+    # Suivre la redirection pour vérifier que l'établissement est bien affiché
+    response = client.get(
+        "/liste_etablissements?recherche_simple=Evaluation", follow_redirects=True
+    )
     assert response.status_code == 200
     assert b"Etablissement Evaluation" in response.data
 

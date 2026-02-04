@@ -1669,3 +1669,4 @@ logs/http_requests.log.1
 logs/http_requests.log.2
 /logs/
 /app/static/uploads/
+/htmlcov/

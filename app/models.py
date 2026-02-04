@@ -249,6 +249,25 @@ class Etablissement(db.Model):
         return data
 
 
+# Signaux SQLAlchemy pour invalider le cache de recherche des établissements
+@event.listens_for(Etablissement, "after_insert")
+@event.listens_for(Etablissement, "after_update")
+@event.listens_for(Etablissement, "after_delete")
+def invalidate_etablissements_cache(mapper, connection, target):
+    """Invalide le cache de recherche des établissements après modification.
+
+    Ce signal est déclenché après chaque insertion, mise à jour ou suppression
+    d'un établissement pour garantir que le cache reste synchronisé.
+    """
+    try:
+        from app.routes.main import invalidate_etablissements_search_cache
+
+        invalidate_etablissements_search_cache()
+    except ImportError:
+        # En cas d'import circulaire lors de l'initialisation
+        pass
+
+
 class Flan(db.Model):
     """Modèle représentant un flan.
 

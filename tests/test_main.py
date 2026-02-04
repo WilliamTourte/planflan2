@@ -869,14 +869,14 @@ def test_liste_etablissements_avec_recherche_simple(client):
     # Créer des établissements de test
     with client.application.app_context():
         etab1 = Etablissement(
-            nom="Boulangerie Test",
+            nom="Boulangerie ABC",
             adresse="Test Adresse",
             code_postal="69001",
             ville="Lyon",
             id_user=user.id_user,
         )
         etab2 = Etablissement(
-            nom="Autre Etablissement",
+            nom="Patisserie ABC",
             adresse="Autre Adresse",
             code_postal="69002",
             ville="Paris",
@@ -885,15 +885,20 @@ def test_liste_etablissements_avec_recherche_simple(client):
         db.session.add_all([etab1, etab2])
         db.session.commit()
 
-    # Rechercher avec un terme qui correspond à un établissement
-    response = client.get("/liste_etablissements?recherche_simple=Boulangerie")
-    assert response.status_code == 200
-    assert b"Boulangerie Test" in response.data
+    # Rechercher avec un terme qui correspond à un seul établissement -> redirection
+    response = client.get(
+        "/liste_etablissements?recherche_simple=Boulangerie", follow_redirects=False
+    )
+    assert response.status_code == 302  # Redirection car un seul résultat
+    assert "/etablissement/" in response.location
 
-    # Rechercher avec un terme qui correspond à une ville
-    response = client.get("/liste_etablissements?recherche_simple=Lyon")
-    assert response.status_code == 200
-    assert b"Boulangerie Test" in response.data
+    # Rechercher avec un terme qui correspond à une ville avec un seul établissement -> redirection
+    response = client.get("/liste_etablissements?recherche_simple=Lyon", follow_redirects=False)
+    assert response.status_code == 302  # Redirection car un seul résultat
+
+    # Rechercher avec un terme qui correspond aux deux établissements -> liste
+    response = client.get("/liste_etablissements?recherche_simple=ABC", follow_redirects=False)
+    assert response.status_code == 200  # Pas de redirection car plusieurs résultats
 
 
 @pytest.mark.main
@@ -1070,16 +1075,25 @@ def test_liste_etablissements_cas_limites_caracteres_speciaux(client):
         db.session.add_all([etab1, etab2])
         db.session.commit()
 
-    # Test recherche avec caractères spéciaux
-    response = client.get("/liste_etablissements", query_string={"recherche_simple": "Épi"})
-    assert response.status_code == 200
-    # Vérifier que l'établissement est présent dans la réponse (le nom peut être légèrement différent)
-    assert b"Boulangerie" in response.data
+    # Test recherche avec caractères spéciaux - un seul résultat = redirection
+    response = client.get(
+        "/liste_etablissements", query_string={"recherche_simple": "Épi"}, follow_redirects=False
+    )
+    assert response.status_code == 302  # Redirection car un seul résultat
+    assert "/etablissement/" in response.location
 
-    response = client.get("/liste_etablissements", query_string={"recherche_simple": "Café"})
+    response = client.get(
+        "/liste_etablissements", query_string={"recherche_simple": "Café"}, follow_redirects=False
+    )
+    assert response.status_code == 302  # Redirection car un seul résultat
+    assert "/etablissement/" in response.location
+
+    # Test avec follow_redirects pour vérifier que la page de l'établissement se charge
+    response = client.get(
+        "/liste_etablissements", query_string={"recherche_simple": "Épi"}, follow_redirects=True
+    )
     assert response.status_code == 200
-    # Vérifier que l'établissement est présent dans la réponse (le nom peut être légèrement différent)
-    assert b"Caf" in response.data or b"Restaurant" in response.data
+    assert b"Boulangerie" in response.data
 
 
 def test_liste_etablissements_cas_limites_aucune_correspondance(client):
@@ -1105,17 +1119,15 @@ def test_liste_etablissements_cas_limites_aucune_correspondance(client):
         db.session.add_all([etab1, etab2])
         db.session.commit()
 
-    # Test 1: Recherche simple qui ne correspond à rien
+    # Test 1: Recherche simple qui ne correspond à rien - affiche page sans résultats
     response = client.get(
         "/liste_etablissements", query_string={"recherche_simple": "Restaurant Inconnu"}
     )
     assert response.status_code == 200
-    # Avec la nouvelle logique, tous les établissements sont toujours affichés sur la carte
-    # Vérifier que les établissements existants sont présents dans les données JSON
-    assert b"Boulangerie Test" in response.data
-    assert b"Autre Etablissement" in response.data
-    # Vérifier que la page se charge correctement
-    assert b"liste_etablissements" in response.data
+    # Avec la nouvelle logique, recherche_simple filtre les établissements
+    # Si rien ne correspond, la page s'affiche mais sans les établissements recherchés
+    # La page doit quand même se charger correctement
+    assert b"<!doctype html>" in response.data.lower() or b"<!DOCTYPE html>" in response.data
 
     # Test 2: Ville seule (sans autres filtres) - devrait afficher tous les établissements
     response = client.get("/liste_etablissements", query_string={"ville": "Marseille"})
@@ -1715,6 +1727,203 @@ def test_api_villes_aucune_correspondance(client):
     data = response.get_json()
     assert isinstance(data, list)
     assert len(data) == 0  # Aucune correspondance
+
+
+@pytest.mark.api
+def test_api_etablissements_search_sans_parametre(client):
+    """Test l'API /api/etablissements/search sans paramètre de recherche"""
+    response = client.get("/api/etablissements/search")
+    assert response.status_code == 200
+    assert response.is_json
+    data = response.get_json()
+    assert isinstance(data, list)
+    assert len(data) == 0  # Minimum 2 caractères requis
+
+
+@pytest.mark.api
+def test_api_etablissements_search_query_trop_courte(client):
+    """Test l'API /api/etablissements/search avec une requête trop courte"""
+    response = client.get("/api/etablissements/search?q=a")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert len(data) == 0  # Minimum 2 caractères requis
+
+
+@pytest.mark.api
+def test_api_etablissements_search_avec_resultats(client):
+    """Test l'API /api/etablissements/search avec des résultats"""
+    user = client.application.config["TEST_USER"]
+    with client.application.app_context():
+        # Créer des établissements de test
+        etab1 = Etablissement(
+            nom="Boulangerie du Marché",
+            ville="Lyon",
+            adresse="123 Rue Test",
+            code_postal="69001",
+            id_user=user.id_user,
+        )
+        etab2 = Etablissement(
+            nom="Pâtisserie Parisienne",
+            ville="Paris",
+            adresse="456 Rue Test",
+            code_postal="75001",
+            id_user=user.id_user,
+        )
+        db.session.add_all([etab1, etab2])
+        db.session.commit()
+
+        # Invalider le cache pour les tests
+        from app.routes.main import invalidate_etablissements_search_cache
+
+        invalidate_etablissements_search_cache()
+
+    # Recherche par nom
+    response = client.get("/api/etablissements/search?q=boulangerie")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert len(data) >= 1
+    assert any("Boulangerie" in etab["nom"] for etab in data)
+    # Vérifier la structure des données
+    assert "id_etab" in data[0]
+    assert "nom" in data[0]
+    assert "ville" in data[0]
+    assert "url" in data[0]
+    assert "total_count" in data[0]
+
+    # Recherche par ville
+    response = client.get("/api/etablissements/search?q=paris")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert len(data) >= 1
+    assert any("Paris" in etab["ville"] for etab in data)
+
+
+@pytest.mark.api
+def test_api_etablissements_search_aucun_resultat(client):
+    """Test l'API /api/etablissements/search quand aucun établissement ne correspond"""
+    response = client.get("/api/etablissements/search?q=zzzzzzz")
+    assert response.status_code == 200
+    data = response.get_json()
+    assert isinstance(data, list)
+    assert len(data) == 0
+
+
+@pytest.mark.api
+def test_api_etablissements_search_tri_pertinence(client):
+    """Test le tri par pertinence dans /api/etablissements/search"""
+    user = client.application.config["TEST_USER"]
+    with client.application.app_context():
+        # Créer des établissements avec différentes correspondances
+        etab1 = Etablissement(
+            nom="Café Central",
+            ville="Lyon",
+            adresse="1 Rue Test",
+            code_postal="69001",
+            id_user=user.id_user,
+        )
+        etab2 = Etablissement(
+            nom="Restaurant Le Café",
+            ville="Paris",
+            adresse="2 Rue Test",
+            code_postal="75001",
+            id_user=user.id_user,
+        )
+        db.session.add_all([etab1, etab2])
+        db.session.commit()
+
+        from app.routes.main import invalidate_etablissements_search_cache
+
+        invalidate_etablissements_search_cache()
+
+    response = client.get("/api/etablissements/search?q=café")
+    assert response.status_code == 200
+    data = response.get_json()
+    # Les établissements commençant par "Café" devraient être en premier
+    if len(data) >= 2:
+        first_nom = data[0]["nom"].lower()
+        assert first_nom.startswith("café")
+
+
+def test_recherche_simple_redirection_unique(client):
+    """Test la redirection automatique vers l'établissement unique"""
+    user = client.application.config["TEST_USER"]
+    with client.application.app_context():
+        # Créer un établissement avec un nom unique
+        etab = Etablissement(
+            nom="Établissement Unique XYZ123",
+            ville="Marseille",
+            adresse="789 Rue Unique",
+            code_postal="13001",
+            id_user=user.id_user,
+        )
+        db.session.add(etab)
+        db.session.commit()
+        etab_id = etab.id_etab
+
+    # Rechercher avec un terme qui ne correspond qu'à cet établissement
+    response = client.get("/liste_etablissements?recherche_simple=XYZ123", follow_redirects=False)
+    assert response.status_code == 302  # Redirection
+    assert f"/etablissement/{etab_id}" in response.location
+
+
+def test_recherche_simple_plusieurs_resultats(client):
+    """Test que la recherche simple ne redirige pas s'il y a plusieurs résultats"""
+    user = client.application.config["TEST_USER"]
+    with client.application.app_context():
+        # Créer plusieurs établissements avec un terme commun
+        etab1 = Etablissement(
+            nom="Boulangerie Test Multiple A",
+            ville="Lyon",
+            adresse="1 Rue Test",
+            code_postal="69001",
+            id_user=user.id_user,
+        )
+        etab2 = Etablissement(
+            nom="Boulangerie Test Multiple B",
+            ville="Paris",
+            adresse="2 Rue Test",
+            code_postal="75001",
+            id_user=user.id_user,
+        )
+        db.session.add_all([etab1, etab2])
+        db.session.commit()
+
+    # Rechercher avec un terme qui correspond à plusieurs établissements
+    response = client.get("/liste_etablissements?recherche_simple=Multiple", follow_redirects=False)
+    assert response.status_code == 200  # Pas de redirection, affiche la liste
+
+
+def test_invalidation_cache_etablissements(client):
+    """Test l'invalidation du cache lors de l'ajout d'un établissement"""
+    user = client.application.config["TEST_USER"]
+    with client.application.app_context():
+        from app.routes.main import (
+            api_etablissements_search,
+            invalidate_etablissements_search_cache,
+        )
+
+        # Forcer la création du cache
+        invalidate_etablissements_search_cache()
+
+        # Créer un établissement unique
+        etab = Etablissement(
+            nom="Nouveau Test Cache ABC",
+            ville="Bordeaux",
+            adresse="999 Rue Cache",
+            code_postal="33000",
+            id_user=user.id_user,
+        )
+        db.session.add(etab)
+        db.session.commit()
+
+        # Le cache devrait avoir été invalidé par le signal SQLAlchemy
+        # Vérifier en faisant une recherche
+
+    response = client.get("/api/etablissements/search?q=Cache ABC")
+    assert response.status_code == 200
+    data = response.get_json()
+    # Le nouvel établissement devrait être trouvé
+    assert any("Cache ABC" in etab["nom"] for etab in data)
 
 
 @pytest.mark.api
