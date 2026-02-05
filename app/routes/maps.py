@@ -194,6 +194,18 @@ def ajouter_etablissement():
         if form_ajout.validate():
             current_app.logger.info("✓ Formulaire validé avec succès")
 
+            # Vérification supplémentaire des doublons côté serveur
+            etablissement_existant = Etablissement.query.filter_by(
+                nom=form_ajout.nom.data,
+                adresse=form_ajout.adresse.data
+            ).first()
+
+            if etablissement_existant:
+                current_app.logger.warning(f"⚠️ Tentative d'ajout d'un établissement déjà existant: {form_ajout.nom.data}")
+                flash("⚠️ Cet établissement existe déjà !", "warning")
+                return redirect(url_for("main.afficher_etablissement_unique",
+                                      id_etab=etablissement_existant.id_etab))
+
             # Convertir la valeur du RadioField en boolean
             visite_value, label_value = convertir_statut_etablissement(
                 form_ajout.statut_etablissement.data
@@ -299,17 +311,10 @@ def ajouter_etablissement():
             for field_name, errors in form_ajout.errors.items():
                 print(f"   {field_name}: {errors}")
 
-    # Pour une requête GET (ne devrait pas servir)
-    resultats = Etablissement.query.all()
-    etablissements, etablissements_json = afficher_etablissements(resultats)
-    return render_template(
-        "liste_etablissements.html",
-        etablissements=etablissements,
-        etablissements_json=etablissements_json,
-        form_ajout=form_ajout,
-        form_edit=EtabForm(prefix="edit-etab"),
-        google_maps_api_key=current_app.config["GOOGLE_MAPS_API_KEY"],
-    )
+    # Pour une requête GET (ne devrait pas servir normalement)
+    # Rediriger vers la page de proposition d'établissement
+    current_app.logger.warning("Requête GET reçue sur /ajouter_etablissement - redirection vers /proposer_etablissement")
+    return redirect(url_for("maps.proposer_etablissement"))
 
 
 @maps_bp.route("/modifier_etablissement/<int:id_etab>", methods=["GET", "POST"])

@@ -169,6 +169,9 @@ class Etablissement(db.Model):
     """
 
     __tablename__ = "etablissements"
+    __table_args__ = (
+        db.UniqueConstraint('nom', 'adresse', name='uq_etablissement_nom_adresse'),
+    )
     id_etab = db.Column(db.Integer, primary_key=True)
     type_etab = db.Column(db.Enum(TypeEtab), nullable=False, default=TypeEtab.BOULANGERIE)
     nom = db.Column(db.String(100), nullable=False)

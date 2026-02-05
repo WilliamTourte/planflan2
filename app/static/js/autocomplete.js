@@ -350,6 +350,13 @@ function initializeAutocomplete(inputId, apiKey, resolve, reject) {
                         message.className = "alert alert-warning";
                         message.innerHTML = `Déjà présent : <a href="${data.url}">Voir la page</a>`;
                         document.querySelector(".form-container").prepend(message);
+                        
+                        // Désactiver le bouton de soumission pour empêcher l'ajout de doublon
+                        const submitButton = document.querySelector('button[type="submit"]');
+                        if (submitButton) {
+                            submitButton.disabled = true;
+                            submitButton.title = "Cet établissement existe déjà";
+                        }
                     }
                     
                     // Appeler initMap ici, après avoir défini etablissementId
