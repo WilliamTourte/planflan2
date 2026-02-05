@@ -11,7 +11,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 
 # Importer les modules de configuration avant les tests
 from app.config import TestConfig
-from app.configprod import ConfigProd
 
 @pytest.fixture
 def temp_upload_env():
@@ -39,48 +38,52 @@ def test_no_real_database_used():
     # Ce test vérifie que nous utilisons bien TestConfig avec SQLite en mémoire
     # au lieu de ConfigProd qui utiliserait une vraie base de données
 
-    # Les imports sont déjà faits en haut du fichier
+    # Importer ConfigProd localement avec mock pour DATABASE_URL
+    with patch.dict(os.environ, {'DATABASE_URL': 'mysql+pymysql://test:test@localhost/test_db'}):
+        from app.configprod import ConfigProd
 
-    # Vérifier que TestConfig utilise SQLite en mémoire (pas de vraie DB)
-    assert TestConfig.TESTING == True, \
-        "TestConfig doit avoir TESTING=True pour éviter les opérations réelles"
-    assert "sqlite" in TestConfig.SQLALCHEMY_DATABASE_URI.lower(), \
-        "TestConfig doit utiliser SQLite pour éviter la vraie base de données"
-    assert ":memory:" in TestConfig.SQLALCHEMY_DATABASE_URI, \
-        "TestConfig doit utiliser une base de données en mémoire"
+        # Vérifier que TestConfig utilise SQLite en mémoire (pas de vraie DB)
+        assert TestConfig.TESTING == True, \
+            "TestConfig doit avoir TESTING=True pour éviter les opérations réelles"
+        assert "sqlite" in TestConfig.SQLALCHEMY_DATABASE_URI.lower(), \
+            "TestConfig doit utiliser SQLite pour éviter la vraie base de données"
+        assert ":memory:" in TestConfig.SQLALCHEMY_DATABASE_URI, \
+            "TestConfig doit utiliser une base de données en mémoire"
 
-    # Vérifier que ConfigProd utilise bien une URI différente (MySQL en production)
-    assert ConfigProd.SQLALCHEMY_DATABASE_URI != TestConfig.SQLALCHEMY_DATABASE_URI, \
-        "ConfigProd doit utiliser une base de données différente de TestConfig"
-    assert "mysql" in ConfigProd.SQLALCHEMY_DATABASE_URI.lower() or \
-           "postgresql" in ConfigProd.SQLALCHEMY_DATABASE_URI.lower(), \
-        "ConfigProd doit utiliser MySQL ou PostgreSQL en production"
+        # Vérifier que ConfigProd utilise bien une URI différente (MySQL en production)
+        assert ConfigProd.SQLALCHEMY_DATABASE_URI != TestConfig.SQLALCHEMY_DATABASE_URI, \
+            "ConfigProd doit utiliser une base de données différente de TestConfig"
+        assert "mysql" in ConfigProd.SQLALCHEMY_DATABASE_URI.lower() or \
+               "postgresql" in ConfigProd.SQLALCHEMY_DATABASE_URI.lower(), \
+            "ConfigProd doit utiliser MySQL ou PostgreSQL en production"
 
-    # Vérifier que nous pouvons accéder à la configuration sans connexion DB
-    assert hasattr(TestConfig, 'UPLOAD_FOLDER'), \
-        "La configuration de test doit être accessible sans base de données"
-    assert TestConfig.UPLOAD_FOLDER is not None, \
-        "La configuration de test doit avoir un UPLOAD_FOLDER valide"
+        # Vérifier que nous pouvons accéder à la configuration sans connexion DB
+        assert hasattr(TestConfig, 'UPLOAD_FOLDER'), \
+            "La configuration de test doit être accessible sans base de données"
+        assert TestConfig.UPLOAD_FOLDER is not None, \
+            "La configuration de test doit avoir un UPLOAD_FOLDER valide"
 
 def test_upload_folder_consistency():
     """Test que le chemin UPLOAD_FOLDER est cohérent entre configprod.py et Dockerfile."""
-    # Les imports sont déjà faits en haut du fichier
+    # Importer ConfigProd localement avec mock pour DATABASE_URL
+    with patch.dict(os.environ, {'DATABASE_URL': 'mysql+pymysql://test:test@localhost/test_db'}):
+        from app.configprod import ConfigProd
 
-    # Vérifier que le chemin dans configprod.py correspond à celui du Dockerfile
-    expected_path = "/app/static/uploads"
-    assert ConfigProd.UPLOAD_FOLDER == expected_path, \
-        "Le chemin UPLOAD_FOLDER doit être /app/static/uploads"
+        # Vérifier que le chemin dans configprod.py correspond à celui du Dockerfile
+        expected_path = "/app/static/uploads"
+        assert ConfigProd.UPLOAD_FOLDER == expected_path, \
+            "Le chemin UPLOAD_FOLDER doit être /app/static/uploads"
 
-    # Vérifier que le chemin est absolu dans un contexte Docker/Linux
-    # Sur Windows, les chemins Unix comme /app/static/uploads ne sont pas considérés
-    # comme absolus, mais ils le seraient dans un conteneur Docker Linux
-    # On vérifie donc juste que le chemin commence par / (convention Unix)
-    assert expected_path.startswith("/"), \
-        "Le chemin UPLOAD_FOLDER doit être un chemin absolu Unix (commencer par /)"
-    
-    # Vérifier que la configuration de test a aussi un chemin uploads défini
-    assert hasattr(TestConfig, 'UPLOAD_FOLDER'), \
-        "La configuration de test doit aussi avoir UPLOAD_FOLDER défini"
+        # Vérifier que le chemin est absolu dans un contexte Docker/Linux
+        # Sur Windows, les chemins Unix comme /app/static/uploads ne sont pas considérés
+        # comme absolus, mais ils le seraient dans un conteneur Docker Linux
+        # On vérifie donc juste que le chemin commence par / (convention Unix)
+        assert expected_path.startswith("/"), \
+            "Le chemin UPLOAD_FOLDER doit être un chemin absolu Unix (commencer par /)"
+        
+        # Vérifier que la configuration de test a aussi un chemin uploads défini
+        assert hasattr(TestConfig, 'UPLOAD_FOLDER'), \
+            "La configuration de test doit aussi avoir UPLOAD_FOLDER défini"
 
 def test_upload_folder_permissions(temp_upload_env):
     """Test que le dossier uploads a les bonnes permissions (simulé)."""
@@ -110,35 +113,37 @@ def test_upload_folder_permissions(temp_upload_env):
 
 def test_photos_route_uses_correct_config():
     """Test que les routes de photos utilisent la bonne configuration."""
-    # Les imports sont déjà faits en haut du fichier
-    
-    # Créer une application Flask avec la configuration de test
-    from app import create_app
-    app = create_app(TestConfig)
-    
-    with app.app_context():
-        # Vérifier que la configuration est correctement chargée
-        assert app.config['UPLOAD_FOLDER'] == TestConfig.UPLOAD_FOLDER, \
-            "La configuration doit avoir le bon UPLOAD_FOLDER"
+    # Importer ConfigProd localement avec mock pour DATABASE_URL
+    with patch.dict(os.environ, {'DATABASE_URL': 'mysql+pymysql://test:test@localhost/test_db'}):
+        from app.configprod import ConfigProd
         
-        assert app.config['ALLOWED_EXTENSIONS'] == TestConfig.ALLOWED_EXTENSIONS, \
-            "La configuration doit avoir les bonnes extensions autorisées"
+        # Créer une application Flask avec la configuration de test
+        from app import create_app
+        app = create_app(TestConfig)
         
-        # Vérifier que la taille maximale est correcte
-        assert app.config['MAX_CONTENT_LENGTH'] == TestConfig.MAX_CONTENT_LENGTH, \
-            "La configuration doit avoir la bonne taille maximale"
-        
-        # Vérifier que les valeurs correspondent à celles de configprod.py (production)
-        assert TestConfig.ALLOWED_EXTENSIONS == ConfigProd.ALLOWED_EXTENSIONS, \
-            "Les extensions autorisées doivent être cohérentes entre test et production"
-        assert TestConfig.MAX_CONTENT_LENGTH == ConfigProd.MAX_CONTENT_LENGTH, \
-            "La taille maximale doit être cohérente entre test et production"
-        
-        # Importer le module photos dans le contexte de l'application
-        from app.routes.photos import photos_bp
-        
-        # Vérifier que le blueprint est correctement configuré
-        assert photos_bp is not None, "Le blueprint photos doit être importé avec succès"
+        with app.app_context():
+            # Vérifier que la configuration est correctement chargée
+            assert app.config['UPLOAD_FOLDER'] == TestConfig.UPLOAD_FOLDER, \
+                "La configuration doit avoir le bon UPLOAD_FOLDER"
+            
+            assert app.config['ALLOWED_EXTENSIONS'] == TestConfig.ALLOWED_EXTENSIONS, \
+                "La configuration doit avoir les bonnes extensions autorisées"
+            
+            # Vérifier que la taille maximale est correcte
+            assert app.config['MAX_CONTENT_LENGTH'] == TestConfig.MAX_CONTENT_LENGTH, \
+                "La configuration doit avoir la bonne taille maximale"
+            
+            # Vérifier que les valeurs correspondent à celles de configprod.py (production)
+            assert TestConfig.ALLOWED_EXTENSIONS == ConfigProd.ALLOWED_EXTENSIONS, \
+                "Les extensions autorisées doivent être cohérentes entre test et production"
+            assert TestConfig.MAX_CONTENT_LENGTH == ConfigProd.MAX_CONTENT_LENGTH, \
+                "La taille maximale doit être cohérente entre test et production"
+            
+            # Importer le module photos dans le contexte de l'application
+            from app.routes.photos import photos_bp
+            
+            # Vérifier que le blueprint est correctement configuré
+            assert photos_bp is not None, "Le blueprint photos doit être importé avec succès"
 
 def test_dockerfile_upload_folder_creation(temp_upload_env):
     """Test que le Dockerfile crée correctement le dossier uploads."""
@@ -161,46 +166,50 @@ def test_dockerfile_upload_folder_creation(temp_upload_env):
 
 def test_config_values_match_dockerfile():
     """Test que les valeurs de configuration correspondent aux attentes du Dockerfile."""
-    # Les imports sont déjà faits en haut du fichier
+    # Importer ConfigProd localement avec mock pour DATABASE_URL
+    with patch.dict(os.environ, {'DATABASE_URL': 'mysql+pymysql://test:test@localhost/test_db'}):
+        from app.configprod import ConfigProd
 
-    # Vérifier les valeurs attendues dans le Dockerfile pour la production
-    assert ConfigProd.UPLOAD_FOLDER == "/app/static/uploads", \
-        "UPLOAD_FOLDER doit être /app/static/uploads comme dans le Dockerfile"
+        # Vérifier les valeurs attendues dans le Dockerfile pour la production
+        assert ConfigProd.UPLOAD_FOLDER == "/app/static/uploads", \
+            "UPLOAD_FOLDER doit être /app/static/uploads comme dans le Dockerfile"
 
-    assert ConfigProd.ALLOWED_EXTENSIONS == {"png", "jpg", "jpeg", "gif"}, \
-        "Les extensions autorisées doivent correspondre à celles attendues"
+        assert ConfigProd.ALLOWED_EXTENSIONS == {"png", "jpg", "jpeg", "gif"}, \
+            "Les extensions autorisées doivent correspondre à celles attendues"
 
-    assert ConfigProd.MAX_CONTENT_LENGTH == 16 * 1024 * 1024, \
-        "La taille maximale doit être 16 Mo comme configuré"
-    
-    # Vérifier que la configuration de test a des valeurs cohérentes
-    assert TestConfig.UPLOAD_FOLDER is not None and len(TestConfig.UPLOAD_FOLDER) > 0, \
-        "La configuration de test doit avoir un UPLOAD_FOLDER valide"
+        assert ConfigProd.MAX_CONTENT_LENGTH == 16 * 1024 * 1024, \
+            "La taille maximale doit être 16 Mo comme configuré"
+        
+        # Vérifier que la configuration de test a des valeurs cohérentes
+        assert TestConfig.UPLOAD_FOLDER is not None and len(TestConfig.UPLOAD_FOLDER) > 0, \
+            "La configuration de test doit avoir un UPLOAD_FOLDER valide"
 
 def test_config_constants_defined():
     """Test que toutes les constantes de configuration nécessaires sont définies."""
-    # Les imports sont déjà faits en haut du fichier
+    # Importer ConfigProd localement avec mock pour DATABASE_URL
+    with patch.dict(os.environ, {'DATABASE_URL': 'mysql+pymysql://test:test@localhost/test_db'}):
+        from app.configprod import ConfigProd
 
-    # Vérifier que toutes les constantes nécessaires pour le Dockerfile sont définies
-    required_attrs = [
-        'UPLOAD_FOLDER',
-        'ALLOWED_EXTENSIONS', 
-        'MAX_CONTENT_LENGTH',
-        'SECRET_KEY',
-        'SQLALCHEMY_DATABASE_URI'
-    ]
-    
-    for attr in required_attrs:
-        assert hasattr(ConfigProd, attr), f"La constante {attr} doit être définie dans ConfigProd"
-        assert hasattr(TestConfig, attr), f"La constante {attr} doit être définie dans TestConfig"
+        # Vérifier que toutes les constantes nécessaires pour le Dockerfile sont définies
+        required_attrs = [
+            'UPLOAD_FOLDER',
+            'ALLOWED_EXTENSIONS', 
+            'MAX_CONTENT_LENGTH',
+            'SECRET_KEY',
+            'SQLALCHEMY_DATABASE_URI'
+        ]
+        
+        for attr in required_attrs:
+            assert hasattr(ConfigProd, attr), f"La constante {attr} doit être définie dans ConfigProd"
+            assert hasattr(TestConfig, attr), f"La constante {attr} doit être définie dans TestConfig"
 
-    # Vérifier que les valeurs ne sont pas None ou vides
-    assert ConfigProd.UPLOAD_FOLDER, "UPLOAD_FOLDER ne doit pas être vide"
-    assert ConfigProd.ALLOWED_EXTENSIONS, "ALLOWED_EXTENSIONS ne doit pas être vide"
-    assert ConfigProd.MAX_CONTENT_LENGTH > 0, "MAX_CONTENT_LENGTH doit être positif"
-    
-    # Vérifier que la configuration de test utilise bien SQLite en mémoire
-    assert "sqlite" in TestConfig.SQLALCHEMY_DATABASE_URI.lower(), \
-        "La configuration de test doit utiliser SQLite pour éviter la vraie base de données"
-    assert ":memory:" in TestConfig.SQLALCHEMY_DATABASE_URI, \
-        "La configuration de test doit utiliser une base de données en mémoire"
+        # Vérifier que les valeurs ne sont pas None ou vides
+        assert ConfigProd.UPLOAD_FOLDER, "UPLOAD_FOLDER ne doit pas être vide"
+        assert ConfigProd.ALLOWED_EXTENSIONS, "ALLOWED_EXTENSIONS ne doit pas être vide"
+        assert ConfigProd.MAX_CONTENT_LENGTH > 0, "MAX_CONTENT_LENGTH doit être positif"
+        
+        # Vérifier que la configuration de test utilise bien SQLite en mémoire
+        assert "sqlite" in TestConfig.SQLALCHEMY_DATABASE_URI.lower(), \
+            "La configuration de test doit utiliser SQLite pour éviter la vraie base de données"
+        assert ":memory:" in TestConfig.SQLALCHEMY_DATABASE_URI, \
+            "La configuration de test doit utiliser une base de données en mémoire"
