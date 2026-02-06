@@ -530,18 +530,13 @@
 
 {% macro afficher_grille(objet_type, objets, current_user=None, form_edit=None, form_ajout=None, etablissement=None, flan=None, delete_form=None, validate_form=None, current_page='', user_evaluation=None) %}
     <div class="grille">
-        {% if not objets %}
-            Vide
-        {% endif %}
         {% for objet in objets %}
             <div class="carte">
                 {{ afficher_objet(objet_type, objet, current_user, form_edit, current_page, delete_form, validate_form) }}
             </div>
         {% endfor %}
         <!-- Bouton ou formulaire d'ajout -->
-
         {{ afficher_bouton_ajout(objet_type, current_user, etablissement, form_ajout, flan, user_evaluation) }}
-
     </div>
 {% endmacro %}
 
@@ -565,25 +560,15 @@
 
 
 {% macro afficher_bouton_ajout(objet_type, current_user, etablissement=None, form_ajout=None, flan=None, user_evaluation=None) %}
-    {% if objet_type == 'etablissement' %}
-        <div>
 
-            {% if current_user.is_authenticated %}
-                {{ proposer_etablissement(form_ajout, url_for('maps.ajouter_etablissement'), current_user) }}
-            {% else %}
-                <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn btn-success">
-                    Ajouter un etablissement (connectez-vous)
-                </a>
-            {% endif %}
-        </div>
-    {% elif objet_type == 'flan' and etablissement %}
+    {% if objet_type == 'flan' and etablissement %}
         <div>
 
             {% if current_user.is_authenticated %}
                 {{ proposer_flan(form_ajout, url_for('main.proposer_flan', id_etab=etablissement.id_etab)) }}
             {% else %}
                 <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn btn-success">
-                    Ajouter un flan (connectez-vous)
+                    Ajouter un flan
                 </a>
             {% endif %}
         </div>
@@ -603,7 +588,7 @@
                 {% endif %}
             {% else %}
                 <a href="{{ url_for('auth.login', next=request.full_path) }}" class="btn btn-success">
-                    Ajouter une evaluation (connectez-vous)
+                    Ajouter une évaluation
                 </a>
             {% endif %}
         </div>
