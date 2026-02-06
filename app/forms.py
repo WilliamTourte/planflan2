@@ -12,7 +12,6 @@ from wtforms import (
     StringField,
     PasswordField,
     SubmitField,
-    BooleanField,
     SelectField,
     RadioField,
     HiddenField,
@@ -27,7 +26,7 @@ from wtforms.validators import (
     Optional,
     Regexp,
 )
-from app import bcrypt
+from app.extensions import bcrypt
 from app.models import TypeEtab, TypePate, TypeSaveur, TypeTexture, Utilisateur
 
 
@@ -45,10 +44,10 @@ def convertir_statut_etablissement(statut_value):
     """
     if statut_value == "labellise":
         return True, True
-    elif statut_value == "visite":
+    if statut_value == "visite":
         return True, False
-    else:  # "non_visite" ou par défaut
-        return False, False
+    # "non_visite" ou par défaut
+    return False, False
 
 
 def convertir_boolean_vers_statut(visite, label):
@@ -66,10 +65,9 @@ def convertir_boolean_vers_statut(visite, label):
     """
     if label:
         return "labellise"
-    elif visite:
+    if visite:
         return "visite"
-    else:
-        return "non_visite"
+    return "non_visite"
 
 
 # Formulaire pour créer un compte

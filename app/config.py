@@ -43,7 +43,7 @@ class TestConfig(Config):
     WTF_CSRF_ENABLED = False
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     SECRET_KEY = "test-secret-key-for-testing-purposes-only"
-    
+
     # Configuration des uploads pour les tests
     UPLOAD_FOLDER = "app/static/uploads"
     ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}

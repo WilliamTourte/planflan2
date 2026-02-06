@@ -5,9 +5,10 @@ de l'application, notamment pour le traitement de texte, la vérification CSRF,
 et le calcul de distances géographiques.
 """
 
-import requests
 import os
 from math import radians, sin, cos, sqrt, atan2
+
+import requests
 from flask import request, current_app
 from flask_wtf.csrf import validate_csrf
 
@@ -132,7 +133,7 @@ def calculer_distance(lat1, lon1, lat2, lon2):
     Returns:
         float: La distance en kilomètres entre les deux points
     """
-    R = 6371.0
+    earth_radius = 6371.0
     # Convertir toutes les valeurs en float avant de les convertir en radians
     lat1, lon1, lat2, lon2 = map(float, [lat1, lon1, lat2, lon2])
     lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
@@ -140,7 +141,7 @@ def calculer_distance(lat1, lon1, lat2, lon2):
     dlon = lon2 - lon1
     a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
     c = 2 * atan2(sqrt(a), sqrt(1 - a))
-    return R * c
+    return earth_radius * c
 
 
 def get_place_details(place_id, api_key):
@@ -184,7 +185,7 @@ def fetch_place_photos(etablissement_id, place_id, api_key, max_width=400):
     """
     # Importer les modules nécessaires localement pour éviter les imports circulaires
     from app.models import Photo, TypeCible
-    from app import db
+    from app.extensions import db
 
     current_app.logger.info(
         f"[FETCH_PHOTOS] Début pour établissement {etablissement_id}, place_id={place_id}"
@@ -280,8 +281,8 @@ def fetch_place_photos(etablissement_id, place_id, api_key, max_width=400):
             f"[FETCH_PHOTOS] ✗ Pas de permission d'écriture sur {upload_folder}"
         )
         return []
-    else:
-        current_app.logger.info(f"[FETCH_PHOTOS] ✓ Permission d'écriture OK sur {upload_folder}")
+
+    current_app.logger.info(f"[FETCH_PHOTOS] ✓ Permission d'écriture OK sur {upload_folder}")
 
     # Récupérer les photos depuis l'API
     photo_paths = []

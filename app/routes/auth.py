@@ -9,7 +9,7 @@ from flask_login import login_user, logout_user, login_required, current_user
 from flask_bcrypt import check_password_hash
 from urllib.parse import urlparse, urljoin
 
-from app import db, bcrypt
+from app.extensions import db, bcrypt
 from app.models import Utilisateur
 from app.forms import LoginForm, RegistrationForm
 from app.outils import verifier_csrf_token

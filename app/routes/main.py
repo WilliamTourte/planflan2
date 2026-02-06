@@ -35,7 +35,7 @@ from app.forms import (
 )
 from app.models import Etablissement, Flan, Evaluation, Utilisateur
 from app.models import Photo, TypeCible
-from app import db, bcrypt
+from app.extensions import db, bcrypt
 from app.outils import afficher_etablissements, calculer_distance, fetch_place_photos
 
 main_bp = Blueprint("main", __name__)

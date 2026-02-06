@@ -8,22 +8,25 @@ Il contient également les fonctions de sécurité et les filtres Jinja personna
 import os
 
 from flask import Flask
-from flask_bcrypt import Bcrypt
-from flask_login import LoginManager
-from flask_migrate import Migrate
-from flask_sqlalchemy import SQLAlchemy
-from flask_wtf.csrf import CSRFProtect
+from sqlalchemy import text
 
 from .config import Config  # Import relatif
 from .outils import enlever_accents
+from .extensions import db, migrate, login_manager, bcrypt, csrf
+from .security_headers import init_security_headers
+from .logging_config import (
+    configure_logging,
+    log_request_info,
+    configure_error_handling,
+)
+from .routes.auth import auth_bp
+from .routes.main import main_bp
+from .routes.maps import maps_bp
+from .routes.photos import photos_bp
 
-db = SQLAlchemy()
-migrate = Migrate()
-login_manager = LoginManager()
+# Configuration du login manager
 login_manager.login_view = "auth.login"
 login_manager.login_message = "Veuillez vous connecter pour accéder à cette page."
-bcrypt = Bcrypt()
-csrf = CSRFProtect()
 
 
 def create_app(config_class=None):
@@ -55,8 +58,6 @@ def create_app(config_class=None):
     bcrypt.init_app(app)
     csrf.init_app(app)
 
-    from sqlalchemy import text
-
     with app.app_context():
         try:
             db.session.execute(text("SELECT 1"))
@@ -79,7 +80,6 @@ def create_app(config_class=None):
             Utilisateur: L'objet utilisateur correspondant ou None si non trouvé
         """
         from .models import Utilisateur
-
         return db.session.get(Utilisateur, int(user_id))
 
     @app.template_filter("enlever_accents")
@@ -95,25 +95,12 @@ def create_app(config_class=None):
         return enlever_accents(text)
 
     # Initialiser les en-têtes de sécurité
-    from .security_headers import init_security_headers
-
     init_security_headers(app)
 
     # Configurer la journalisation
-    from .logging_config import (
-        configure_logging,
-        log_request_info,
-        configure_error_handling,
-    )
-
     configure_logging(app)
     log_request_info(app)
     configure_error_handling(app)
-
-    from .routes.auth import auth_bp
-    from .routes.main import main_bp
-    from .routes.maps import maps_bp
-    from .routes.photos import photos_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(main_bp)

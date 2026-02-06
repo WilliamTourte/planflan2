@@ -8,7 +8,8 @@ Il contient également les énumérations utilisées pour typer les données.
 from enum import Enum
 from flask_login import UserMixin
 from flask import url_for
-from app import db
+from sqlalchemy import event
+from app.extensions import db
 
 
 # Enumérations
@@ -157,9 +158,6 @@ class Utilisateur(db.Model, UserMixin):
         }
 
 
-from sqlalchemy import event
-
-
 class Etablissement(db.Model):
     """Modèle représentant un établissement.
 
@@ -169,9 +167,7 @@ class Etablissement(db.Model):
     """
 
     __tablename__ = "etablissements"
-    __table_args__ = (
-        db.UniqueConstraint('nom', 'adresse', name='uq_etablissement_nom_adresse'),
-    )
+    __table_args__ = (db.UniqueConstraint("nom", "adresse", name="uq_etablissement_nom_adresse"),)
     id_etab = db.Column(db.Integer, primary_key=True)
     type_etab = db.Column(db.Enum(TypeEtab), nullable=False, default=TypeEtab.BOULANGERIE)
     nom = db.Column(db.String(100), nullable=False)
@@ -256,7 +252,7 @@ class Etablissement(db.Model):
 @event.listens_for(Etablissement, "after_insert")
 @event.listens_for(Etablissement, "after_update")
 @event.listens_for(Etablissement, "after_delete")
-def invalidate_etablissements_cache(mapper, connection, target):
+def invalidate_etablissements_cache(_mapper, _connection, _target):
     """Invalide le cache de recherche des établissements après modification.
 
     Ce signal est déclenché après chaque insertion, mise à jour ou suppression
@@ -318,14 +314,21 @@ class Flan(db.Model):
 
         moyennes = []
 
-        for eval in self.evaluations:
+        for evaluation in self.evaluations:
             # Si l'évaluation a déjà une moyenne calculée, l'utiliser
-            if eval.moyenne is not None:
-                moyennes.append(float(eval.moyenne))
+            if evaluation.moyenne is not None:
+                moyennes.append(float(evaluation.moyenne))
             else:
                 # Calculer la moyenne à la volée si possible
                 valeurs = [
-                    v for v in [eval.visuel, eval.texture, eval.pate, eval.gout] if v is not None
+                    v
+                    for v in [
+                        evaluation.visuel,
+                        evaluation.texture,
+                        evaluation.pate,
+                        evaluation.gout,
+                    ]
+                    if v is not None
                 ]
                 if valeurs:  # Au moins un critère est rempli
                     moyenne_calculee = sum(float(v) for v in valeurs) / len(valeurs)
@@ -366,7 +369,9 @@ class Flan(db.Model):
             data["etablissement"] = self.etablissement.to_dict(include_flans=False)
 
         if include_evaluations:
-            data["evaluations"] = [eval.to_dict(include_flan=False) for eval in self.evaluations]
+            data["evaluations"] = [
+                evaluation.to_dict(include_flan=False) for evaluation in self.evaluations
+            ]
 
         if include_photos:
             data["photos"] = [photo.to_dict() for photo in self.photos]
@@ -486,12 +491,12 @@ class Photo(db.Model):
 
 # Event listeners pour nettoyer les photos orphelines
 @event.listens_for(Etablissement, "before_delete")
-def delete_etablissement_photos(mapper, connection, target):
+def delete_etablissement_photos(_mapper, _connection, target):
     """Supprime les fichiers photos d'un établissement avant sa suppression.
 
     Args:
-        mapper: Le mapper SQLAlchemy
-        connection: La connexion à la base de données
+        _mapper: Le mapper SQLAlchemy (non utilisé)
+        _connection: La connexion à la base de données (non utilisée)
         target: L'établissement en cours de suppression
     """
     import os
@@ -513,12 +518,12 @@ def delete_etablissement_photos(mapper, connection, target):
 
 
 @event.listens_for(Flan, "before_delete")
-def delete_flan_photos(mapper, connection, target):
+def delete_flan_photos(_mapper, _connection, target):
     """Supprime les fichiers photos d'un flan avant sa suppression.
 
     Args:
-        mapper: Le mapper SQLAlchemy
-        connection: La connexion à la base de données
+        _mapper: Le mapper SQLAlchemy (non utilisé)
+        _connection: La connexion à la base de données (non utilisée)
         target: Le flan en cours de suppression
     """
     import os

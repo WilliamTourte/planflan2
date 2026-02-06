@@ -28,7 +28,7 @@ from app.forms import (
     convertir_boolean_vers_statut,
 )
 from app.models import Etablissement, TypeEtab
-from app import db
+from app.extensions import db
 from app.outils import verifier_csrf_ou_renvoyer_erreur
 
 maps_bp = Blueprint("maps", __name__)
@@ -196,15 +196,19 @@ def ajouter_etablissement():
 
             # Vérification supplémentaire des doublons côté serveur
             etablissement_existant = Etablissement.query.filter_by(
-                nom=form_ajout.nom.data,
-                adresse=form_ajout.adresse.data
+                nom=form_ajout.nom.data, adresse=form_ajout.adresse.data
             ).first()
 
             if etablissement_existant:
-                current_app.logger.warning(f"⚠️ Tentative d'ajout d'un établissement déjà existant: {form_ajout.nom.data}")
+                current_app.logger.warning(
+                    f"⚠️ Tentative d'ajout d'un établissement déjà existant: {form_ajout.nom.data}"
+                )
                 flash("⚠️ Cet établissement existe déjà !", "warning")
-                return redirect(url_for("main.afficher_etablissement_unique",
-                                      id_etab=etablissement_existant.id_etab))
+                return redirect(
+                    url_for(
+                        "main.afficher_etablissement_unique", id_etab=etablissement_existant.id_etab
+                    )
+                )
 
             # Convertir la valeur du RadioField en boolean
             visite_value, label_value = convertir_statut_etablissement(
@@ -313,7 +317,9 @@ def ajouter_etablissement():
 
     # Pour une requête GET (ne devrait pas servir normalement)
     # Rediriger vers la page de proposition d'établissement
-    current_app.logger.warning("Requête GET reçue sur /ajouter_etablissement - redirection vers /proposer_etablissement")
+    current_app.logger.warning(
+        "Requête GET reçue sur /ajouter_etablissement - redirection vers /proposer_etablissement"
+    )
     return redirect(url_for("maps.proposer_etablissement"))
 
 

@@ -3,7 +3,7 @@
  * Attempts to go back in history, falls back to specified URL if not possible.
  * @param {string} fallbackUrl - The URL to fall back to if history navigation fails
  */
-function goBackOrRedirect(fallbackUrl) {
+export function goBackOrRedirect(fallbackUrl) {
     // Solution simple : utiliser le referrer pour décider
     var referrer = document.referrer;
     
@@ -31,7 +31,7 @@ window.goBackOrRedirect = goBackOrRedirect;
  * @param {number} timeout - Délai en millisecondes (par défaut: 300)
  * @returns {Function} Fonction enveloppée avec débounce
  */
-function debounce(func, timeout = 300) {
+export function debounce(func, timeout = 300) {
     let timer;
     return (...args) => {
         clearTimeout(timer);
@@ -45,7 +45,7 @@ function debounce(func, timeout = 300) {
  * Initialise l'autocomplétion pour la barre de recherche du header.
  * Permet de rechercher des établissements par nom ou ville.
  */
-function initHeaderAutocomplete() {
+export function initHeaderAutocomplete() {
     const searchInput = document.getElementById('search-input');
     const resultsContainer = document.getElementById('header-autocomplete-results');
     const searchForm = document.getElementById('header-search-form');
@@ -257,3 +257,4 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
