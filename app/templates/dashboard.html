@@ -38,7 +38,7 @@ content %}
             <label for="delete-password" class="form-label">
               Mot de passe actuel *
             </label>
-            <div class="input-group">
+            <div class="input-group password-input-group">
               <input
                 type="password"
                 name="password"
@@ -46,7 +46,7 @@ content %}
                 class="form-control"
                 required
               />
-              <button class="btn btn-outline-secondary" type="button" data-toggle-password data-target="delete-password">
+              <button class="btn btn-outline-secondary password-toggle-btn" type="button" data-toggle-password data-target="delete-password">
                   <i class="bi bi-eye"></i>
               </button>
             </div>
@@ -111,9 +111,9 @@ content %}
       </div>
       <div class="form-group">
         {{ profile_form.current_password.label(class="form-label") }}
-        <div class="input-group">
+        <div class="input-group password-input-group">
           {{ profile_form.current_password(size=20, class="form-control") }}
-          <button class="btn btn-outline-secondary" type="button" data-toggle-password data-target="{{ profile_form.current_password.id }}">
+          <button class="btn btn-outline-secondary password-toggle-btn" type="button" data-toggle-password data-target="{{ profile_form.current_password.id }}">
               <i class="bi bi-eye"></i>
           </button>
         </div>
@@ -123,9 +123,9 @@ content %}
       </div>
       <div class="form-group">
         {{ profile_form.new_password.label(class="form-label") }}
-        <div class="input-group">
+        <div class="input-group password-input-group">
           {{ profile_form.new_password(size=20, class="form-control") }}
-          <button class="btn btn-outline-secondary" type="button" data-toggle-password data-target="{{ profile_form.new_password.id }}">
+          <button class="btn btn-outline-secondary password-toggle-btn" type="button" data-toggle-password data-target="{{ profile_form.new_password.id }}">
               <i class="bi bi-eye"></i>
           </button>
         </div>
@@ -135,9 +135,9 @@ content %}
       </div>
       <div class="form-group">
         {{ profile_form.confirm_password.label(class="form-label") }}
-        <div class="input-group">
+        <div class="input-group password-input-group">
           {{ profile_form.confirm_password(size=20, class="form-control") }}
-          <button class="btn btn-outline-secondary" type="button" data-toggle-password data-target="{{ profile_form.confirm_password.id }}">
+          <button class="btn btn-outline-secondary password-toggle-btn" type="button" data-toggle-password data-target="{{ profile_form.confirm_password.id }}">
               <i class="bi bi-eye"></i>
           </button>
         </div>

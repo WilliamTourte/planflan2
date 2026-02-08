@@ -14,10 +14,10 @@
         </div>
         <div class="mb-4">
           {{ form.password.label(class="form-label fw-medium") }}
-          <div class="input-group">
+          <div class="input-group password-input-group">
             {{ form.password( class="form-control form-control-lg",
             placeholder="Votre mot de passe" ) }}
-            <button class="btn btn-outline-secondary" type="button" data-toggle-password data-target="{{ form.password.id }}">
+            <button class="btn btn-outline-secondary password-toggle-btn" type="button" data-toggle-password data-target="{{ form.password.id }}">
                 <i class="bi bi-eye"></i>
             </button>
           </div>

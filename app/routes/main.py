@@ -845,6 +845,10 @@ def evaluer_flan(id_flan):
         form.pate.data = str(evaluation.pate)
         form.gout.data = str(evaluation.gout)
         form.description.data = evaluation.description
+    
+    # Initialiser id_eval avec l'évaluation existante si elle existe
+    id_eval = evaluation.id_eval if evaluation else None
+    
     if form.validate_on_submit():
         # Vérifier si l'utilisateur a déjà une évaluation pour ce flan
         if evaluation:
@@ -853,6 +857,8 @@ def evaluer_flan(id_flan):
                 "Vous avez déjà évalué ce flan. Vous ne pouvez pas créer une nouvelle évaluation.",
                 "warning",
             )
+            # Utiliser l'id de l'évaluation existante
+            id_eval = evaluation.id_eval
         else:
             try:
                 # Créer une nouvelle évaluation directement
@@ -894,6 +900,10 @@ def evaluer_flan(id_flan):
                     "Vous avez déjà évalué ce flan. Vous ne pouvez pas créer une nouvelle évaluation.",
                     "warning",
                 )
+                # En cas d'erreur d'intégrité, essayer de récupérer l'évaluation existante
+                existing_eval = Evaluation.query.filter_by(id_flan=id_flan, id_user=current_user.id_user).first()
+                if existing_eval:
+                    id_eval = existing_eval.id_eval
             except Exception as e:
                 print("Error during form submission:", e)
                 flash(
@@ -907,6 +917,11 @@ def evaluer_flan(id_flan):
                 "Le formulaire n'a pas été validé correctement. Veuillez vérifier les erreurs.",
                 "danger",
             )
+    
+    # Si aucune évaluation n'existe et qu'on n'a pas créé de nouvelle évaluation, rediriger vers le flan
+    if id_eval is None:
+        return redirect(url_for("main.afficher_flan_unique", id_flan=id_flan))
+    
     return redirect(url_for("main.afficher_evaluation_unique", id_eval=id_eval))
 
 

@@ -265,6 +265,78 @@ input[type="submit"]:active {
     font-weight: bold !important;
 }
 
+/* Style pour les boutons outline-secondary (utilisés pour les boutons toggle) */
+.btn-outline-secondary {
+    background-color: transparent;
+    border: 1px solid var(--color-secondary);
+    color: var(--color-secondary);
+    transition: var(--transition);
+}
+
+.btn-outline-secondary:hover {
+    background-color: var(--color-secondary);
+    color: white;
+    border-color: var(--color-secondary);
+}
+
+.btn-outline-secondary:active {
+    background-color: var(--color-secondary);
+    color: white;
+    border-color: var(--color-secondary);
+    transform: translateY(0);
+}
+
+/* Style spécifique pour les boutons toggle mot de passe */
+.password-toggle-btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    padding: var(--padding-xs) var(--padding-sm);
+    min-width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Style pour l'icône eye-slash (mot de passe visible) */
+.password-toggle-btn .bi-eye-slash {
+    color: var(--color-primary);
+}
+
+/* Style pour l'input group contenant le champ + bouton */
+.password-input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* Style pour le champ de mot de passe dans l'input group */
+.password-input-group input[type="password"],
+.password-input-group input[type="text"] {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
+    padding-right: 40px; /* Espace pour le bouton */
+}
+
+/* Style pour le bouton dans l'input group */
+.password-input-group .btn {
+    position: absolute;
+    right: 0;
+    height: 100%;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+/* Animation subtile pour le toggle */
+.password-toggle-btn {
+    transition: all 0.2s ease;
+}
+
+.password-toggle-btn:active {
+    transform: scale(0.95);
+}
+
 /* Style pour les sous-filtres */
 .filter-group {
     display: flex;
