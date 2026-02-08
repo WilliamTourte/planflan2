@@ -885,6 +885,8 @@ def evaluer_flan(id_flan):
 
                 db.session.add(new_evaluation)
                 db.session.commit()
+
+                id_eval = new_evaluation.id_eval  # Récupérer l'id_eval généré automatiquement
                 flash("Votre évaluation a été créée avec succès!", "success")
             except IntegrityError:
                 db.session.rollback()
@@ -905,7 +907,7 @@ def evaluer_flan(id_flan):
                 "Le formulaire n'a pas été validé correctement. Veuillez vérifier les erreurs.",
                 "danger",
             )
-    return redirect(url_for("main.afficher_flan_unique", id_flan=id_flan))
+    return redirect(url_for("main.afficher_evaluation_unique", id_eval=id_eval))
 
 
 @main_bp.route("/evaluation/<int:id_eval>", methods=["GET"])
