@@ -226,6 +226,162 @@ describe('Autocomplete Module', () => {
         global.fetch.mockRestore();
       }
     });
+
+    it('should store GPS coordinates in hidden fields when city is selected', async () => {
+      // Configurer les mocks de fetch comme dans le test qui fonctionne
+      if (typeof fetchMock === 'function') {
+        fetchMock.mockResponseOnce(JSON.stringify(['Paris']), { status: 200 });
+        fetchMock.mockResponseOnce(JSON.stringify(['Paris|48.8566|2.3522']), { status: 200 });
+      } else if (typeof fetchMock === 'object' && fetchMock.mockResponseOnce) {
+        fetchMock.mockResponseOnce(JSON.stringify(['Paris']), { status: 200 });
+        fetchMock.mockResponseOnce(JSON.stringify(['Paris|48.8566|2.3522']), { status: 200 });
+      } else {
+        // Mock global fetch avec mockImplementationOnce pour simuler les deux appels
+        global.fetch = jest.fn()
+          .mockImplementationOnce(() =>
+            Promise.resolve({
+              ok: true,
+              json: () => Promise.resolve(['Paris'])
+            })
+          )
+          .mockImplementationOnce(() =>
+            Promise.resolve({
+              ok: true,
+              json: () => Promise.resolve(['Paris|48.8566|2.3522'])
+            })
+          );
+      }
+
+      // Mock pour empêcher la soumission du formulaire dans le test
+      const originalSubmit = HTMLFormElement.prototype.submit;
+      HTMLFormElement.prototype.submit = jest.fn(function() {
+        console.log('Form submission prevented in test');
+        return false;
+      });
+
+      // Reconfigurer le DOM pour inclure les champs cachés de coordonnées
+      document.body.innerHTML = `
+        <input id="ville-autocomplete">
+        <div id="autocomplete-results"></div>
+        <form>
+          <input name="ville" type="hidden">
+          <input name="latitude" type="hidden">
+          <input name="longitude" type="hidden">
+        </form>
+      `;
+
+      // Réinitialiser les références aux éléments
+      input = document.getElementById("ville-autocomplete");
+      resultsContainer = document.getElementById("autocomplete-results");
+
+      initAutocomplete();
+
+      // Simuler la saisie et la sélection
+      input.value = 'Paris';
+      input.dispatchEvent(new Event('input'));
+
+      // Attendre que la requête soit traitée (debounce est à 300ms par défaut)
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Vérifier que les résultats sont affichés
+      expect(resultsContainer.classList.contains('show')).toBe(true);
+      expect(resultsContainer.children.length).toBeGreaterThan(0);
+
+      // Cliquer sur le premier résultat
+      const firstResult = resultsContainer.firstChild;
+      expect(firstResult).toBeTruthy();
+      firstResult.dispatchEvent(new Event('click'));
+
+      // Attendre que le clic soit traité
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Vérifier que les coordonnées sont stockées dans les champs cachés
+      const latitudeField = document.querySelector('input[name="latitude"]');
+      const longitudeField = document.querySelector('input[name="longitude"]');
+
+      expect(latitudeField).toBeTruthy();
+      expect(longitudeField).toBeTruthy();
+      expect(latitudeField.value).toBe('48.8566');
+      expect(longitudeField.value).toBe('2.3522');
+
+      // Restaurer le submit original
+      if (originalSubmit) {
+        HTMLFormElement.prototype.submit = originalSubmit;
+      }
+
+      // Restaurer le fetch original
+      if (global.fetch && global.fetch.mockRestore) {
+        global.fetch.mockRestore();
+      }
+    });
+
+    it('should not call zoomToLocation on homepage when no map is available', async () => {
+      // Mock zoomToLocation pour vérifier qu'elle n'est pas appelée
+      const mockZoomToLocation = jest.fn();
+      window.zoomToLocation = mockZoomToLocation;
+
+      // Mock global fetch
+      global.fetch = jest.fn((url) => {
+        if (url.includes('/api/villes')) {
+          if (url.includes('with_gps=true')) {
+            return Promise.resolve({
+              ok: true,
+              json: () => Promise.resolve(['Paris|48.8566|2.3522'])
+            });
+          } else {
+            return Promise.resolve({
+              ok: true,
+              json: () => Promise.resolve(['Paris'])
+            });
+          }
+        }
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve([])
+        });
+      });
+
+      // Mock pour empêcher la soumission du formulaire
+      const originalSubmit = HTMLFormElement.prototype.submit;
+      HTMLFormElement.prototype.submit = jest.fn(function() {
+        return false;
+      });
+
+      initAutocomplete();
+
+      // Simuler la sélection d'une ville
+      input.value = 'Paris';
+      input.dispatchEvent(new Event('input'));
+
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Vérifier que les résultats sont affichés
+      expect(resultsContainer.classList.contains('show')).toBe(true);
+      expect(resultsContainer.children.length).toBeGreaterThan(0);
+
+      // Cliquer sur le premier résultat
+      const firstResult = resultsContainer.firstChild;
+      expect(firstResult).toBeTruthy();
+      firstResult.dispatchEvent(new Event('click'));
+
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Vérifier que zoomToLocation n'a pas été appelée
+      expect(mockZoomToLocation).not.toHaveBeenCalled();
+
+      // Nettoyage
+      delete window.zoomToLocation;
+
+      // Restaurer le submit original
+      if (originalSubmit) {
+        HTMLFormElement.prototype.submit = originalSubmit;
+      }
+
+      // Restaurer le fetch original
+      if (global.fetch && global.fetch.mockRestore) {
+        global.fetch.mockRestore();
+      }
+    });
   });
 
   describe('Keyboard navigation', () => {
