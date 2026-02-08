@@ -107,7 +107,12 @@ def upload_file():
             return redirect(url_for("photos.show_uploads"))
 
         filename = secure_filename(file.filename)
-        file.save(os.path.join(current_app.config["UPLOAD_FOLDER"], filename))
+        upload_path = os.path.join(current_app.config["UPLOAD_FOLDER"], filename)
+        
+        # Créer le dossier d'upload s'il n'existe pas
+        os.makedirs(current_app.config["UPLOAD_FOLDER"], exist_ok=True)
+        
+        file.save(upload_path)
         flash("Fichier téléversé avec succès!", "success")
         return redirect(url_for("photos.show_uploads"))
 

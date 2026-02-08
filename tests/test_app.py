@@ -8,7 +8,6 @@ basic application setup and configuration tests.
 # tests/test_app.py
 from app import create_app, db
 
-
 # Importer les fixtures depuis test_securite
 import pytest
 

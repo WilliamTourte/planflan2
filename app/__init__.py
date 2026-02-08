@@ -80,6 +80,7 @@ def create_app(config_class=None):
             Utilisateur: L'objet utilisateur correspondant ou None si non trouvé
         """
         from .models import Utilisateur
+
         return db.session.get(Utilisateur, int(user_id))
 
     @app.template_filter("enlever_accents")

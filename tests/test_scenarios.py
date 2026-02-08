@@ -6,7 +6,6 @@ import os
 from app.models import Etablissement, Flan, Evaluation, Utilisateur
 from app import db
 
-
 # Importer les fixtures depuis test_securite
 import pytest
 

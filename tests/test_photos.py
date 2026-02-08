@@ -11,7 +11,6 @@ from app import create_app, db
 from app.config import TestConfig
 from app.routes.photos import validate_file_signature
 
-
 # ============================================================================
 # Tests pour validate_file_signature
 # ============================================================================

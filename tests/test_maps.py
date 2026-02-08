@@ -8,7 +8,6 @@ geolocation, map display, and location-based features.
 from app import create_app, db
 from app.config import TestConfig
 
-
 # Importer les fixtures depuis test_securite
 import pytest
 from flask import get_flashed_messages
