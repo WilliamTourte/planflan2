@@ -70,6 +70,15 @@ def get_villes():
     search_term = request.args.get("q", "").lower()
     with_gps = request.args.get("with_gps", "").lower() in ("true", "1", "yes")
 
+    def normalize_ville_name(name):
+        """Normalise le nom d'une ville en remplaçant les espaces par des tirets et en supprimant les accents et apostrophes"""
+        import unicodedata
+        # Supprimer les accents
+        name = unicodedata.normalize('NFD', name)
+        name = name.encode('ascii', 'ignore').decode('ascii')
+        # Remplacer les espaces par des tirets et supprimer les apostrophes
+        return name.replace(" ", "-").replace("'", "")
+
     # Utiliser les données statiques directement
     try:
         import json
@@ -87,8 +96,10 @@ def get_villes():
 
         # Recherche ultra-rapide dans la liste statique
         if search_term:
+            normalized_search_term = normalize_ville_name(search_term)
             results = [
-                ville for ville in get_villes.villes_cache if search_term in ville["nom"].lower()
+                ville for ville in get_villes.villes_cache 
+                if normalized_search_term in normalize_ville_name(ville["nom"].lower())
             ]
         else:
             results = get_villes.villes_cache[:]  # Copier toutes les villes
@@ -756,8 +767,11 @@ def proposer_flan(id_etab):
         )
         db.session.add(flan)
         db.session.commit()
+        # Récupérer l'id_flan généré automatiquement
+        id_flan = flan.id_flan
+
         flash("Votre flan a été proposé avec succès !", "success")
-        return redirect(url_for("main.afficher_etablissement_unique", id_etab=id_etab))
+        return redirect(url_for("main.afficher_flan_unique", id_flan=id_flan))
     return render_template("page_etablissement.html", form=form, etablissement=etablissement)
 
 
@@ -842,6 +856,10 @@ def evaluer_flan(id_flan):
         form.pate.data = str(evaluation.pate)
         form.gout.data = str(evaluation.gout)
         form.description.data = evaluation.description
+    
+    # Initialiser id_eval avec l'évaluation existante si elle existe
+    id_eval = evaluation.id_eval if evaluation else None
+    
     if form.validate_on_submit():
         # Vérifier si l'utilisateur a déjà une évaluation pour ce flan
         if evaluation:
@@ -850,6 +868,8 @@ def evaluer_flan(id_flan):
                 "Vous avez déjà évalué ce flan. Vous ne pouvez pas créer une nouvelle évaluation.",
                 "warning",
             )
+            # Utiliser l'id de l'évaluation existante
+            id_eval = evaluation.id_eval
         else:
             try:
                 # Créer une nouvelle évaluation directement
@@ -882,6 +902,8 @@ def evaluer_flan(id_flan):
 
                 db.session.add(new_evaluation)
                 db.session.commit()
+
+                id_eval = new_evaluation.id_eval  # Récupérer l'id_eval généré automatiquement
                 flash("Votre évaluation a été créée avec succès!", "success")
             except IntegrityError:
                 db.session.rollback()
@@ -889,6 +911,10 @@ def evaluer_flan(id_flan):
                     "Vous avez déjà évalué ce flan. Vous ne pouvez pas créer une nouvelle évaluation.",
                     "warning",
                 )
+                # En cas d'erreur d'intégrité, essayer de récupérer l'évaluation existante
+                existing_eval = Evaluation.query.filter_by(id_flan=id_flan, id_user=current_user.id_user).first()
+                if existing_eval:
+                    id_eval = existing_eval.id_eval
             except Exception as e:
                 print("Error during form submission:", e)
                 flash(
@@ -902,7 +928,12 @@ def evaluer_flan(id_flan):
                 "Le formulaire n'a pas été validé correctement. Veuillez vérifier les erreurs.",
                 "danger",
             )
-    return redirect(url_for("main.afficher_flan_unique", id_flan=id_flan))
+    
+    # Si aucune évaluation n'existe et qu'on n'a pas créé de nouvelle évaluation, rediriger vers le flan
+    if id_eval is None:
+        return redirect(url_for("main.afficher_flan_unique", id_flan=id_flan))
+    
+    return redirect(url_for("main.afficher_evaluation_unique", id_eval=id_eval))
 
 
 @main_bp.route("/evaluation/<int:id_eval>", methods=["GET"])

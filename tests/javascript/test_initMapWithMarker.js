@@ -5,7 +5,7 @@
  * lorsqu'un établissement est sélectionné via l'autocomplete.
  */
 
-import { initMapWithMarker } from '../app/static/js/map.js';
+import { initMapWithMarker } from '../../app/static/js/map.js';
 
 describe('initMapWithMarker', () => {
     let mapContainer;

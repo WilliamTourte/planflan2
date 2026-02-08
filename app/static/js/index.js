@@ -67,7 +67,7 @@ function initAutocomplete() {
         if (villes.length === 0) {
             const noResults = document.createElement("div");
             noResults.className = "autocomplete-no-results";
-            noResults.textContent = "Aucun flan pour cette ville. \nProposer une adresse ?";
+            noResults.textContent = "Ville non trouvée";
             resultsContainer.appendChild(noResults);
             resultsContainer.classList.add("show");
             return;
@@ -241,7 +241,7 @@ function getUserLocationSimple() {
             (error) => reject(error),
             {
                 enableHighAccuracy: true,
-                timeout: 10000,
+                timeout: 15000,  // Aligné avec GeolocationHandler
                 maximumAge: 0
             }
         );

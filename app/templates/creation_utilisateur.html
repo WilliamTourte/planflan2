@@ -20,15 +20,25 @@
           {% endfor %}
         </div>
         <div class="form-group">
-          {{ form.password.label(class="form-label") }} {{
-          form.password(placeholder="Votre mot de passe") }} {% for error in
-          form.password.errors %}
+          {{ form.password.label(class="form-label") }}
+          <div class="input-group password-input-group">
+            {{ form.password(placeholder="Votre mot de passe") }}
+            <button class="btn btn-outline-secondary password-toggle-btn" type="button" data-toggle-password data-target="{{ form.password.id }}">
+                <i class="bi bi-eye"></i>
+            </button>
+          </div>
+          {% for error in form.password.errors %}
           <span class="error-message">{{ error }}</span>
           {% endfor %}
         </div>
         <div class="form-group">
-          {{ form.confirm_password.label(class="form-label") }} {{
-          form.confirm_password(placeholder="Confirmez votre mot de passe") }}
+          {{ form.confirm_password.label(class="form-label") }}
+          <div class="input-group password-input-group">
+            {{ form.confirm_password(placeholder="Confirmez votre mot de passe") }}
+            <button class="btn btn-outline-secondary password-toggle-btn" type="button" data-toggle-password data-target="{{ form.confirm_password.id }}">
+                <i class="bi bi-eye"></i>
+            </button>
+          </div>
           {% for error in form.confirm_password.errors %}
           <span class="error-message">{{ error }}</span>
           {% endfor %}

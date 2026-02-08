@@ -394,8 +394,17 @@ export function updateMapAndMarkers() {
     // Ajuste la vue de la carte pour inclure tous les marqueurs (si pas de position utilisateur)
     if (markers.length > 0 && !userLocation) {
         // Si une ville est sélectionnée, zoomer dessus
-        if (villeSelectionnee && zoomOnVille(villeSelectionnee)) {
-            console.log(`Zoom sur la ville: ${villeSelectionnee}`);
+        if (villeSelectionnee) {
+            if (zoomOnVille(villeSelectionnee)) {
+                console.log(`Zoom sur les établissements de la ville: ${villeSelectionnee}`);
+            } else if (userLocation) {
+                // Si la ville n'a pas d'établissements mais qu'on a des coordonnées, zoomer sur la ville
+                console.log(`Zoom sur la ville sans établissements: ${villeSelectionnee}`);
+                map.setView([userLocation.lat, userLocation.lon], 13);
+            } else {
+                // Sinon, afficher tous les établissements
+                map.fitBounds(bounds);
+            }
         } else {
             // Sinon, afficher tous les établissements
             map.fitBounds(bounds);

@@ -13,6 +13,7 @@ import * as autocomplete from './autocomplete.js';
 import * as api from './api.js';
 import * as macros from './macros.js';
 import { showDeleteAccountForm } from './dashboard.js';
+import { initializePasswordToggles } from './password-toggle.js';
 
 // Initialisation globale
 document.addEventListener('DOMContentLoaded', function() {
@@ -160,6 +161,9 @@ function initializeProposerEtablissementPage() {
 function initializeDashboardPage() {
     console.log("Initialisation de la page de tableau de bord");
     
+    // Initialiser les boutons toggle mot de passe
+    initializePasswordToggles();
+    
     // Vérifier si on vient d'une erreur de suppression de compte
     if (window.location.search.includes("error=")) {
         showDeleteAccountForm();
@@ -177,6 +181,7 @@ function initializeDefaultPage() {
     
     // Logique commune à toutes les pages
     setupCommonElements();
+    initializePasswordToggles();
 }
 
 /**

@@ -8,6 +8,7 @@ Usage:
     python build_sphinx_docs.py serve        # Build and serve
     python build_sphinx_docs.py strict       # Build with strict warnings
 """
+
 import subprocess
 import sys
 import os

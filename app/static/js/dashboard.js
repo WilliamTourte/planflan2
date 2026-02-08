@@ -119,7 +119,7 @@ function initDashboardEventListeners() {
     });
 }
 
-// Export for testing and global access
+// Export for testing and module access
 export { initDashboardEventListeners, showDeleteAccountForm, cancelDeleteAccount, toggleSection };
 
 // Make functions available globally for inline scripts

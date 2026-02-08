@@ -19,6 +19,9 @@ def app():
     app = create_app(TestConfig)
     app.config["TESTING"] = True
     app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+    app.config["SERVER_NAME"] = "localhost"
+    app.config["APPLICATION_ROOT"] = "/"
+    app.config["PREFERRED_URL_SCHEME"] = "http"
 
     with app.app_context():
         db.create_all()
