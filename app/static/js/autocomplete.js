@@ -81,16 +81,21 @@ export function initAutocomplete(options = {}) {
                                 const lat = parseFloat(parts[1]);
                                 const lng = parseFloat(parts[2]);
                                 
-                                // Zoomer sur la ville si la carte existe
-                                if (typeof zoomToLocation === 'function') {
-                                    zoomToLocation(lat, lng, ville);
-                                } else {
-                                    console.log("Fonction zoomToLocation non disponible, coordonnées GPS:", lat, lng);
+                                // Stocker les coordonnées dans les champs cachés
+                                const latitudeField = document.querySelector('input[name="latitude"]');
+                                const longitudeField = document.querySelector('input[name="longitude"]');
+                                if (latitudeField && longitudeField) {
+                                    latitudeField.value = lat;
+                                    longitudeField.value = lng;
+                                    console.log("Coordonnées GPS stockées:", lat, lng);
                                 }
+                                
+                                // Ne pas essayer de zoomer ici, la carte n'existe pas encore
+                                // La page de liste des établissements gérera le zoom
                             }
                         }
                         
-                        // Soumettre le formulaire après avoir mis à jour le champ caché
+                        // Soumettre le formulaire après avoir mis à jour les champs cachés
                         setTimeout(() => {
                             const form = document.querySelector('form');
                             if (form) {
