@@ -58,12 +58,11 @@ export class GeolocationHandler {
                 },
                 (error) => {
                     this._hideLoading();
-                    this._handleError(error);
-                    reject(error);
+                    this._handleErrorWithRetryOption(error, resolve, reject);
                 },
                 {
                     enableHighAccuracy: true,
-                    timeout: 10000,
+                    timeout: 15000,  // Augmenté à 15 secondes
                     maximumAge: 0
                 }
             );
@@ -164,10 +163,12 @@ export class GeolocationHandler {
     }
 
     /**
-     * Gère les erreurs de géolocalisation
+     * Gère les erreurs de géolocalisation avec option de réessai
      * @param {object} error - Objet d'erreur de géolocalisation
+     * @param {function} resolve - Fonction resolve de la promesse
+     * @param {function} reject - Fonction reject de la promesse
      */
-    _handleError(error) {
+    _handleErrorWithRetryOption(error, resolve, reject) {
         let message;
         switch(error.code) {
             case error.PERMISSION_DENIED:
@@ -177,13 +178,25 @@ export class GeolocationHandler {
                 message = "La position n'est pas disponible";
                 break;
             case error.TIMEOUT:
-                message = "La requête de géolocalisation a expiré";
-                break;
+                message = "La géolocalisation prend plus de temps que prévu";
+                // Ajouter un bouton de réessai dans le toast
+                showToast(message, 'info', {
+                    action: {
+                        text: "Réessayer",
+                        callback: () => {
+                            // Réessai manuel avec le même timeout
+                            this._showLoading();
+                            this.activate().then(resolve).catch(reject);
+                        }
+                    }
+                });
+                return; // Ne pas rejeter immédiatement pour le timeout
             default:
                 message = "Erreur inconnue de géolocalisation";
         }
-        
+
         this._showError(message);
+        reject(error);
         
         // Déclencher un événement d'erreur
         const event = new CustomEvent('userPositionError', {

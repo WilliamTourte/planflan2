@@ -241,7 +241,7 @@ function getUserLocationSimple() {
             (error) => reject(error),
             {
                 enableHighAccuracy: true,
-                timeout: 10000,
+                timeout: 15000,  // Aligné avec GeolocationHandler
                 maximumAge: 0
             }
         );
