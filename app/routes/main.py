@@ -756,8 +756,11 @@ def proposer_flan(id_etab):
         )
         db.session.add(flan)
         db.session.commit()
+        # Récupérer l'id_flan généré automatiquement
+        id_flan = flan.id_flan
+
         flash("Votre flan a été proposé avec succès !", "success")
-        return redirect(url_for("main.afficher_etablissement_unique", id_etab=id_etab))
+        return redirect(url_for("main.afficher_flan_unique", id_flan=id_flan))
     return render_template("page_etablissement.html", form=form, etablissement=etablissement)
 
 
