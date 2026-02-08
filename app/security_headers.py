@@ -53,7 +53,7 @@ def add_security_headers(response):
         "cdn.jsdelivr.net unpkg.com "
         "*.tile.openstreetmap.org; "  # Wildcard pour tous les subdomains OpenStreetMap
         "font-src 'self' https://fonts.gstatic.com "
-        "cdn.jsdelivr.net unpkg.com; "
+        "cdn.jsdelivr.net unpkg.com https://cdn.jsdelivr.net; "
         "connect-src 'self' "
         "https://maps.googleapis.com https://*.googleapis.com "
         "https://maps.gstatic.com https://*.gstatic.com "

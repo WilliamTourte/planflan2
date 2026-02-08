@@ -38,13 +38,18 @@ content %}
             <label for="delete-password" class="form-label">
               Mot de passe actuel *
             </label>
-            <input
-              type="password"
-              name="password"
-              id="delete-password"
-              class="form-control"
-              required
-            />
+            <div class="input-group">
+              <input
+                type="password"
+                name="password"
+                id="delete-password"
+                class="form-control"
+                required
+              />
+              <button class="btn btn-outline-secondary" type="button" data-toggle-password data-target="delete-password">
+                  <i class="bi bi-eye"></i>
+              </button>
+            </div>
             {% if request.args.get('error') == 'password' %}
             <span class="error-message">Mot de passe incorrect</span>
             {% elif request.args.get('error') == 'csrf' %}
@@ -105,23 +110,38 @@ content %}
         {% endfor %}
       </div>
       <div class="form-group">
-        {{ profile_form.current_password.label(class="form-label") }} {{
-        profile_form.current_password(size=20, class="form-control") }} {% for
-        error in profile_form.current_password.errors %}
+        {{ profile_form.current_password.label(class="form-label") }}
+        <div class="input-group">
+          {{ profile_form.current_password(size=20, class="form-control") }}
+          <button class="btn btn-outline-secondary" type="button" data-toggle-password data-target="{{ profile_form.current_password.id }}">
+              <i class="bi bi-eye"></i>
+          </button>
+        </div>
+        {% for error in profile_form.current_password.errors %}
         <span class="error-message">[{{ error }}]</span>
         {% endfor %}
       </div>
       <div class="form-group">
-        {{ profile_form.new_password.label(class="form-label") }} {{
-        profile_form.new_password(size=20, class="form-control") }} {% for error
-        in profile_form.new_password.errors %}
+        {{ profile_form.new_password.label(class="form-label") }}
+        <div class="input-group">
+          {{ profile_form.new_password(size=20, class="form-control") }}
+          <button class="btn btn-outline-secondary" type="button" data-toggle-password data-target="{{ profile_form.new_password.id }}">
+              <i class="bi bi-eye"></i>
+          </button>
+        </div>
+        {% for error in profile_form.new_password.errors %}
         <span class="error-message">[{{ error }}]</span>
         {% endfor %}
       </div>
       <div class="form-group">
-        {{ profile_form.confirm_password.label(class="form-label") }} {{
-        profile_form.confirm_password(size=20, class="form-control") }} {% for
-        error in profile_form.confirm_password.errors %}
+        {{ profile_form.confirm_password.label(class="form-label") }}
+        <div class="input-group">
+          {{ profile_form.confirm_password(size=20, class="form-control") }}
+          <button class="btn btn-outline-secondary" type="button" data-toggle-password data-target="{{ profile_form.confirm_password.id }}">
+              <i class="bi bi-eye"></i>
+          </button>
+        </div>
+        {% for error in profile_form.confirm_password.errors %}
         <span class="error-message">[{{ error }}]</span>
         {% endfor %}
       </div>

@@ -103,8 +103,23 @@ main.container {
 
 @font-face {
   font-family: 'bootstrap-icons';
-  src: url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.woff2');
+  src: url('https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/fonts/bootstrap-icons.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
   font-display: swap;
+}
+
+/* Solution de secours si la police ne se charge pas */
+.bi::before {
+  font-family: 'bootstrap-icons' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 h1, h2, h3, h4, h5, h6 {
