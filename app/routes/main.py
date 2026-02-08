@@ -70,6 +70,15 @@ def get_villes():
     search_term = request.args.get("q", "").lower()
     with_gps = request.args.get("with_gps", "").lower() in ("true", "1", "yes")
 
+    def normalize_ville_name(name):
+        """Normalise le nom d'une ville en remplaçant les espaces par des tirets et en supprimant les accents et apostrophes"""
+        import unicodedata
+        # Supprimer les accents
+        name = unicodedata.normalize('NFD', name)
+        name = name.encode('ascii', 'ignore').decode('ascii')
+        # Remplacer les espaces par des tirets et supprimer les apostrophes
+        return name.replace(" ", "-").replace("'", "")
+
     # Utiliser les données statiques directement
     try:
         import json
@@ -87,8 +96,10 @@ def get_villes():
 
         # Recherche ultra-rapide dans la liste statique
         if search_term:
+            normalized_search_term = normalize_ville_name(search_term)
             results = [
-                ville for ville in get_villes.villes_cache if search_term in ville["nom"].lower()
+                ville for ville in get_villes.villes_cache 
+                if normalized_search_term in normalize_ville_name(ville["nom"].lower())
             ]
         else:
             results = get_villes.villes_cache[:]  # Copier toutes les villes
