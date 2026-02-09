@@ -1,6 +1,5 @@
 // Export for testing and module access
-// export { initDashboardEventListeners, showDeleteAccountForm, cancelDeleteAccount, toggleSection };
-
+// Les fonctions seront exportées à la fin du fichier après leur définition
 
 /**
  * Show the delete account form and focus on the password field.
@@ -171,6 +170,9 @@ if (typeof window !== 'undefined') {
         toggleSection
     };
 }
+
+// Export for testing and module access
+export { initDashboardEventListeners, showDeleteAccountForm, cancelDeleteAccount, toggleSection };
 
 // Initialize when DOM is loaded
 document.addEventListener("DOMContentLoaded", initDashboardEventListeners);

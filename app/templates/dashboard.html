@@ -1,6 +1,7 @@
 {% extends "base.html" %} {% block page_type %}dashboard{% endblock %} {% block
 content %}
 <div class="dashboard-content" data-is-admin="{{ current_user.is_admin }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard-tables.css') }}">
   <h1>Tableau de bord</h1>
   <!-- Section Infos Utilisateur -->
 
@@ -249,7 +250,7 @@ content %}
         </div>
 
         <div class="table-section">
-            <h2 class="section-title" id="dernieres-evaluations-title">Dernières évaluations</h2>
+            <h2 class="section-title" id="dernieres-evaluations-title">Dernieres évaluations</h2>
             <div class="section-content" id="dernieres-evaluations">
                 <table class="dashboard-table">
                     <thead>
