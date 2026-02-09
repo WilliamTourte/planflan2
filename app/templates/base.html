@@ -89,9 +89,6 @@ afficher_objet %} {% from "macros.html" import afficher_bouton_ajout %}
           <a class="btn btn-icon" href="{{ url_for('main.dashboard') }}">
             <i class="bi bi-person-square"></i>
           </a>
-          <a class="btn btn-icon" href="{{ url_for('auth.logout') }}">
-            <i class="bi bi-box-arrow-right"></i>
-          </a>
           {% else %}
           <a class="btn btn-icon" href="{{ url_for('auth.login') }}">
             <i class="bi bi-person-fill"></i>
