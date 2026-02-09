@@ -47,7 +47,6 @@ async function loadUserFlans() {
                         <td>${escapeHtml(flan.etablissement ? flan.etablissement.nom : 'N/A')}</td>
                         <td>${flan.type_saveur || 'N/A'}</td>
                         <td>${flan.prix ? flan.prix + '€' : 'N/A'}</td>
-                        <td>${flan.statut}</td>
                         <td>${new Date().toLocaleDateString()}</td>
                     </tr>
                 `).join('');
@@ -109,12 +108,11 @@ async function loadRecentEtablissements() {
                         <td>${escapeHtml(etab.nom)}</td>
                         <td>${escapeHtml(etab.ville)}</td>
                         <td>${etab.type_etab}</td>
-                        <td>${etab.id_user}</td>
-                        <td>${etab.statut}</td>
+
                     </tr>
                 `).join('');
             } else {
-                tbody.innerHTML = '<tr><td colspan="5">Aucun établissement récent</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="3">Aucun établissement récent</td></tr>';
             }
         }
     } catch (error) {
@@ -140,12 +138,11 @@ async function loadRecentFlans() {
                         <td>${escapeHtml(flan.nom)}</td>
                         <td>${escapeHtml(flan.etablissement ? flan.etablissement.nom : 'N/A')}</td>
                         <td>${flan.type_saveur || 'N/A'}</td>
-                        <td>${flan.id_user}</td>
-                        <td>${flan.statut}</td>
+
                     </tr>
                 `).join('');
             } else {
-                tbody.innerHTML = '<tr><td colspan="5">Aucun flan récent</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="3">Aucun flan récent</td></tr>';
             }
         }
     } catch (error) {
