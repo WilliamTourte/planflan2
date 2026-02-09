@@ -1,5 +1,5 @@
 // Export for testing and module access
-export { initDashboardEventListeners, showDeleteAccountForm, cancelDeleteAccount, toggleSection };
+// export { initDashboardEventListeners, showDeleteAccountForm, cancelDeleteAccount, toggleSection };
 
 
 /**
@@ -108,30 +108,58 @@ function initDashboardEventListeners() {
     }
     
     // Titres cliquables pour basculer les sections
-    const sectionTitles = [
-        { id: 'mes-evaluations-title', section: 'mes-evaluations' },
-        { id: 'evaluations-a-valider-title', section: 'evaluations-a-valider' },
-        { id: 'flans-a-valider-title', section: 'flans-a-valider' },
-        { id: 'etablissements-a-valider-title', section: 'etablissements-a-valider' }
-    ];
+const sectionTitles = [
+    { id: 'mes-evaluations-title', section: 'mes-evaluations' },
+    { id: 'evaluations-a-valider-title', section: 'evaluations-a-valider' },
+    { id: 'flans-a-valider-title', section: 'flans-a-valider' },
+    { id: 'etablissements-a-valider-title', section: 'etablissements-a-valider' }
+];
+
+sectionTitles.forEach(function(title) {
+    const element = document.getElementById(title.id);
     
-    sectionTitles.forEach(function(title) {
-        const element = document.getElementById(title.id);
-        const sectionElement = document.getElementById(title.section);
+    if (element) {
+        // Trouver la section correspondante de manière robuste
+        let sectionElement = document.getElementById(title.section);
         
-        // Seule la section "Mes evaluations" est toujours disponible
-        // Les sections admin ne sont disponibles que pour les administrateurs
-        // On vérifie aussi que la section existe réellement dans le DOM
-        if (element && sectionElement) {
-            element.addEventListener('click', function(event) {
-                event.stopPropagation();
-                // On bascule uniquement la section correspondante
-                toggleSection(title.section);
-            });
-            // Ajouter le curseur pointer pour indiquer que c'est cliquable
-            element.style.cursor = 'pointer';
+        // Si la section n'est pas trouvée directement, utiliser une approche plus robuste
+        if (!sectionElement) {
+            // Essayer de trouver la section en regardant les éléments suivants
+            let current = element.nextElementSibling;
+            while (current) {
+                // Vérifier si c'est un élément DIV avec la bonne classe
+                if (current.tagName === 'DIV' && current.classList.contains('section-content')) {
+                    sectionElement = current;
+                    break;
+                }
+                // Sinon, passer à l'élément suivant
+                current = current.nextElementSibling;
+            }
         }
-    });
+
+        if (sectionElement) {
+            element.addEventListener('click', function(event) {
+                // Empêcher TOUTE propagation
+                event.preventDefault();
+                event.stopPropagation();
+                event.stopImmediatePropagation();
+
+                // Toggle UNIQUEMENT cette section
+                const currentDisplay = window.getComputedStyle(sectionElement).display;
+                sectionElement.style.display = (currentDisplay === "none") ? "block" : "none";
+
+                console.log(`Toggled ${title.section}:`, sectionElement.style.display);
+
+                return false;
+            });
+
+            element.style.cursor = 'pointer';
+            element.style.userSelect = 'none'; // Empêcher la sélection du texte
+        } else {
+            console.warn(`Section not found for title: ${title.id}`);
+        }
+    }
+});
 }
 
 // Make functions available globally for inline scripts
@@ -143,6 +171,9 @@ if (typeof window !== 'undefined') {
         toggleSection
     };
 }
+
+// Initialize when DOM is loaded
+document.addEventListener("DOMContentLoaded", initDashboardEventListeners);
 
 // Initialize when DOM is loaded
 document.addEventListener("DOMContentLoaded", initDashboardEventListeners);

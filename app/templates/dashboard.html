@@ -1,6 +1,6 @@
 {% extends "base.html" %} {% block page_type %}dashboard{% endblock %} {% block
 content %}
-<div class="container">
+<div class="dashboard-content" data-is-admin="{{ current_user.is_admin }}">
   <h1>Tableau de bord</h1>
   <!-- Section Infos Utilisateur -->
 
@@ -162,22 +162,27 @@ content %}
     </form>
   </div>
 
-  <!-- Section Mes Évaluations -->
+  <!-- Sections - Titres toujours visibles, contenu conditionnel -->
   <!-- DEBUG: Début section Mes evaluations -->
+  {% if true %}  <!-- Condition toujours vraie pour normaliser la structure -->
   <h2 class="section-title" id="mes-evaluations-title">Mes evaluations</h2>
   <div id="mes-evaluations" class="section-content" {% if current_user.evaluations|length > 0 %}style="display: block"{% else %}style="display: none"{% endif %}>
-    {{ afficher_grille('evaluation', current_user.evaluations, current_user) }}
+    <div class="grille">
+      {{ afficher_grille('evaluation', current_user.evaluations, current_user) }}
+    </div>
   </div>
+  {% endif %}
   <!-- DEBUG: Fin section Mes evaluations -->
 
-  <!-- Sections Admin - Titres toujours visibles, contenu conditionnel -->
   <!-- DEBUG: Début sections admin -->
   {% if current_user.is_admin %}
   <h2 class="section-title" id="evaluations-a-valider-title">
     Evaluations en attente de validation
   </h2>
   <div id="evaluations-a-valider" class="section-content" {% if pending_evaluations|length > 0 %}style="display: block"{% else %}style="display: none"{% endif %}>
-    {{ afficher_grille('evaluation', pending_evaluations, current_user) }}
+    <div class="grille">
+      {{ afficher_grille('evaluation', pending_evaluations, current_user) }}
+    </div>
   </div>
   {% endif %}
   <!-- DEBUG: Fin section evaluations-a-valider -->
@@ -188,7 +193,9 @@ content %}
     Flans en attente de validation
   </h2>
   <div id="flans-a-valider" class="section-content" {% if pending_flans|length > 0 %}style="display: block"{% else %}style="display: none"{% endif %}>
-    {{ afficher_grille('flan', pending_flans, current_user) }}
+    <div class="grille">
+      {{ afficher_grille('flan', pending_flans, current_user) }}
+    </div>
   </div>
   {% endif %}
   <!-- DEBUG: Fin section flans-a-valider -->
@@ -203,15 +210,14 @@ content %}
     class="section-content"
     {% if pending_etablissements|length > 0 %}style="display: block"{% else %}style="display: none"{% endif %}
   >
-    {{ afficher_grille('flan', pending_etablissements, current_user) }}
+    <div class="grille">
+      {{ afficher_grille('flan', pending_etablissements, current_user) }}
+    </div>
   </div>
   {% endif %}
   <!-- DEBUG: Fin section etablissements-a-valider -->
 
 </div>
 
-<script
-  src="{{ url_for('static', filename='js/dashboard.js') }}"
-  nonce="{{ csp_nonce }}"
-></script>
+<script type="module" src="{{ url_for('static', filename='js/dashboard.js') }}" nonce="{{ csp_nonce }}"></script>
 {% endblock %}

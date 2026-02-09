@@ -525,15 +525,13 @@
 
 
 {% macro afficher_grille(objet_type, objets, current_user=None, form_edit=None, form_ajout=None, etablissement=None, flan=None, delete_form=None, validate_form=None, current_page='', user_evaluation=None) %}
-    <div class="grille">
-        {% for objet in objets %}
-            <div class="carte">
-                {{ afficher_objet(objet_type, objet, current_user, form_edit, current_page, delete_form, validate_form) }}
-            </div>
-        {% endfor %}
-        <!-- Bouton ou formulaire d'ajout -->
-        {{ afficher_bouton_ajout(objet_type, current_user, etablissement, form_ajout, flan, user_evaluation) }}
-    </div>
+    {% for objet in objets %}
+        <div class="carte">
+            {{ afficher_objet(objet_type, objet, current_user, form_edit, current_page, delete_form, validate_form) }}
+        </div>
+    {% endfor %}
+    <!-- Bouton ou formulaire d'ajout -->
+    {{ afficher_bouton_ajout(objet_type, current_user, etablissement, form_ajout, flan, user_evaluation) }}
 {% endmacro %}
 
 
