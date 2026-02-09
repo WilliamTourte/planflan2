@@ -163,39 +163,51 @@ content %}
   </div>
 
   <!-- Section Mes Évaluations -->
+  <!-- DEBUG: Début section Mes evaluations -->
   <h2 class="section-title" id="mes-evaluations-title">Mes evaluations</h2>
-  <div id="mes-evaluations" class="section-content" style="display: none">
+  <div id="mes-evaluations" class="section-content" {% if current_user.evaluations|length > 0 %}style="display: block"{% else %}style="display: none"{% endif %}>
     {{ afficher_grille('evaluation', current_user.evaluations, current_user) }}
   </div>
-  <!-- Sections Admin -->
-  {% if current_user.is_admin %}
+  <!-- DEBUG: Fin section Mes evaluations -->
 
+  <!-- Sections Admin - Titres toujours visibles, contenu conditionnel -->
+  <!-- DEBUG: Début sections admin -->
+  {% if current_user.is_admin %}
   <h2 class="section-title" id="evaluations-a-valider-title">
     Evaluations en attente de validation
   </h2>
-  <div id="evaluations-a-valider" class="section-content" style="display: none">
+  <div id="evaluations-a-valider" class="section-content" {% if pending_evaluations|length > 0 %}style="display: block"{% else %}style="display: none"{% endif %}>
     {{ afficher_grille('evaluation', pending_evaluations, current_user) }}
   </div>
+  {% endif %}
+  <!-- DEBUG: Fin section evaluations-a-valider -->
 
+  <!-- DEBUG: Début section flans-a-valider -->
+  {% if current_user.is_admin %}
   <h2 class="section-title" id="flans-a-valider-title">
     Flans en attente de validation
   </h2>
-  <div id="flans-a-valider" class="section-content" style="display: none">
+  <div id="flans-a-valider" class="section-content" {% if pending_flans|length > 0 %}style="display: block"{% else %}style="display: none"{% endif %}>
     {{ afficher_grille('flan', pending_flans, current_user) }}
   </div>
+  {% endif %}
+  <!-- DEBUG: Fin section flans-a-valider -->
 
+  <!-- DEBUG: Début section etablissements-a-valider -->
+  {% if current_user.is_admin %}
   <h2 class="section-title" id="etablissements-a-valider-title">
     Etablissements en attente de validation
   </h2>
   <div
     id="etablissements-a-valider"
     class="section-content"
-    style="display: none"
+    {% if pending_etablissements|length > 0 %}style="display: block"{% else %}style="display: none"{% endif %}
   >
     {{ afficher_grille('flan', pending_etablissements, current_user) }}
   </div>
-
   {% endif %}
+  <!-- DEBUG: Fin section etablissements-a-valider -->
+
 </div>
 
 <script

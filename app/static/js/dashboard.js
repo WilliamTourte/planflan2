@@ -1,3 +1,7 @@
+// Export for testing and module access
+export { initDashboardEventListeners, showDeleteAccountForm, cancelDeleteAccount, toggleSection };
+
+
 /**
  * Show the delete account form and focus on the password field.
  */
@@ -42,14 +46,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
 /**
  * Toggle the visibility of a section by its ID.
+ * Only affects the clicked section, other sections remain in their current state.
  * @param {string} sectionId - The ID of the section to toggle
  */
 function toggleSection(sectionId) {
     const section = document.getElementById(sectionId);
-    if (section.style.display === "none") {
-        section.style.display = "block";
-    } else {
-        section.style.display = "none";
+    if (section) {
+        if (section.style.display === "none") {
+            section.style.display = "block";
+        } else {
+            section.style.display = "none";
+        }
     }
 }
 
@@ -109,7 +116,11 @@ function initDashboardEventListeners() {
     
     sectionTitles.forEach(function(title) {
         const element = document.getElementById(title.id);
-        if (element) {
+        const sectionElement = document.getElementById(title.section);
+        
+        // Seule la section "Mes evaluations" est toujours disponible
+        // Les sections admin ne sont disponibles que pour les administrateurs
+        if (element && (title.section === 'mes-evaluations' || sectionElement)) {
             element.addEventListener('click', function() {
                 toggleSection(title.section);
             });
@@ -118,9 +129,6 @@ function initDashboardEventListeners() {
         }
     });
 }
-
-// Export for testing and module access
-export { initDashboardEventListeners, showDeleteAccountForm, cancelDeleteAccount, toggleSection };
 
 // Make functions available globally for inline scripts
 if (typeof window !== 'undefined') {

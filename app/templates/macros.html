@@ -170,31 +170,29 @@
 
     {% else %}
         <!-- Layout existant pour la grille -->
-        <div class="carte">
-            <div class="carte-image-container">
-                {{ afficher_image_ou_placeholder(etablissement, 'carte-image', photo_paths, is_google_photo=(photo_paths is not none)) }}
-                {{ afficher_badge_type_etab(etablissement) }}
-                {{ afficher_badge_etablissement(etablissement) }}
+        <div class="carte-image-container">
+            {{ afficher_image_ou_placeholder(etablissement, 'carte-image', photo_paths, is_google_photo=(photo_paths is not none)) }}
+            {{ afficher_badge_type_etab(etablissement) }}
+            {{ afficher_badge_etablissement(etablissement) }}
+        </div>
+        <div>
+            <div class="carte-header">
+                <h2 id="etablissement-{{ etablissement.id_etab }}-nom">{{ etablissement.nom | enlever_accents }}</h2>
             </div>
-            <div>
-                <div class="carte-header">
-                    <h2 id="etablissement-{{ etablissement.id_etab }}-nom">{{ etablissement.nom | enlever_accents }}</h2>
-                </div>
-                <div id="etablissement-{{ etablissement.id_etab }}-display">
-                    <p class="adresse"
-                       id="etablissement-{{ etablissement.id_etab }}-adresse">{{ etablissement.adresse }}, {{ etablissement.ville }}</p>
-                    {% if etablissement.flans %}
-                        <p class="flans-count">
-                            {{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}
-                        </p>
-                    {% endif %}
-                    {{ afficher_boutons_actions(etablissement, current_user, 'id_etab',
-                    'maps.modifier_etablissement', 'maps.supprimer_etablissement', 'maps.valider_etablissement', 'etablissement', current_page,
-                            delete_form, validate_form) }}
-                </div>
-                {{ afficher_formulaire_edition_etablissement(etablissement, form_edit, current_user) }}
-                <!--<a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}" class="btn btn-success">Voir plus</a>-->
+            <div id="etablissement-{{ etablissement.id_etab }}-display">
+                <p class="adresse"
+                   id="etablissement-{{ etablissement.id_etab }}-adresse">{{ etablissement.adresse }}, {{ etablissement.ville }}</p>
+                {% if etablissement.flans %}
+                    <p class="flans-count">
+                        {{ etablissement.flans|length }} flan{{ 's' if etablissement.flans|length > 1 else '' }}
+                    </p>
+                {% endif %}
+                {{ afficher_boutons_actions(etablissement, current_user, 'id_etab',
+                'maps.modifier_etablissement', 'maps.supprimer_etablissement', 'maps.valider_etablissement', 'etablissement', current_page,
+                        delete_form, validate_form) }}
             </div>
+            {{ afficher_formulaire_edition_etablissement(etablissement, form_edit, current_user) }}
+            <!--<a href="{{ url_for('main.afficher_etablissement_unique', id_etab=etablissement.id_etab) }}" class="btn btn-success">Voir plus</a>-->
         </div>
     {% endif %}
 
@@ -314,7 +312,6 @@
         </div>
     {% else %}
         <!-- Layout existant pour la grille -->
-        <div class="carte">
         <a href="{{ url_for('main.afficher_flan_unique', id_flan=flan.id_flan) }}" class="carte-link">
             <div class="carte-image-container">
                 {{ afficher_image_ou_placeholder(flan) }}
@@ -355,7 +352,6 @@
             </div>
         </a>
         {{ afficher_formulaire_edition_flan(flan, form) }}
-    </div>
     {% endif %}
 {% endmacro %}
 
@@ -434,27 +430,27 @@
     {% else %}
         <!-- Layout existant pour la grille -->
         <div class="carte">
-            <div id="evaluation-{{ evaluation.id_eval }}-display">
-                <!-- Partie cliquable (lien vers la page de détail) -->
-                <a href="{{ url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval) }}" class="carte-link">
-                    <div class="carte-header">
-                        <h2>{{ evaluation.flan.etablissement.nom | enlever_accents }}</h2>
-                        <h3>{{ evaluation.flan.nom | enlever_accents }}</h3>
-                        {{ afficher_badge_statut(evaluation, current_user) }}
-                    </div>
-                    <div class="evaluation-date-container">
-                        <small class="evaluation-date">
-                            {{ evaluation.date_creation.strftime('%d/%m/%Y') }}
-                        </small>
-                    </div>
-                    {{ afficher_criteres_evaluation(evaluation) }}
-                </a>
-                <!-- Boutons d'action -->
-                {{ afficher_boutons_actions(evaluation, current_user,
-                    'id_eval', 'main.modifier_evaluation', 'main.supprimer_evaluation', 'main.dashboard',
-                    'evaluation', current_page, delete_form, validate_form) }}
-            </div>
-            {{ afficher_formulaire_edition_evaluation(evaluation, form) }}
+        <div id="evaluation-{{ evaluation.id_eval }}-display">
+            <!-- Partie cliquable (lien vers la page de détail) -->
+            <a href="{{ url_for('main.afficher_evaluation_unique', id_eval=evaluation.id_eval) }}" class="carte-link">
+                <div class="carte-header">
+                    <h2>{{ evaluation.flan.etablissement.nom | enlever_accents }}</h2>
+                    <h3>{{ evaluation.flan.nom | enlever_accents }}</h3>
+                    {{ afficher_badge_statut(evaluation, current_user) }}
+                </div>
+                <div class="evaluation-date-container">
+                    <small class="evaluation-date">
+                        {{ evaluation.date_creation.strftime('%d/%m/%Y') }}
+                    </small>
+                </div>
+                {{ afficher_criteres_evaluation(evaluation) }}
+            </a>
+            <!-- Boutons d'action -->
+            {{ afficher_boutons_actions(evaluation, current_user,
+                'id_eval', 'main.modifier_evaluation', 'main.supprimer_evaluation', 'main.dashboard',
+                'evaluation', current_page, delete_form, validate_form) }}
+        </div>
+        {{ afficher_formulaire_edition_evaluation(evaluation, form) }}
         </div>
     {% endif %}
 {% endmacro %}
