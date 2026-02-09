@@ -1,0 +1,182 @@
+/* =============================================
+   STYLES POUR LES TABLEAUX DU DASHBOARD
+   Intégration avec le style existant de PlanFlan
+   ============================================= */
+
+/* Styles de base pour les tableaux du dashboard */
+.dashboard-tables-container {
+    margin-top: var(--margin-lg);
+    width: 100%;
+}
+
+.table-section {
+    margin-bottom: var(--margin-lg);
+    background: white;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: var(--box-shadow);
+    transition: var(--transition);
+}
+
+.table-section:hover {
+    box-shadow: var(--box-shadow-hover);
+}
+
+.section-title {
+    padding: var(--padding-md) var(--padding-lg);
+    margin: 0;
+    background-color: var(--color-primary);
+    color: var(--color-text);
+    border-bottom: 2px solid var(--color-secondary);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    user-select: none;
+    font-weight: bold;
+    transition: var(--transition);
+}
+
+.section-title:hover {
+    background-color: #e6b836;
+}
+
+.section-title::after {
+    content: "▼";
+    font-size: 0.8em;
+    transition: transform 0.2s;
+    color: var(--color-text);
+}
+
+.section-content {
+    padding: var(--padding-sm) var(--padding-lg) var(--padding-lg);
+    display: block;
+}
+
+/* Styles des tableaux */
+.dashboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--font-size-sm);
+    min-width: 100%;
+}
+
+.dashboard-table thead {
+    background-color: var(--color-primary);
+    color: var(--color-text);
+}
+
+.dashboard-table th,
+.dashboard-table td {
+    padding: var(--padding-sm) var(--padding-md);
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.dashboard-table th {
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+}
+
+.dashboard-table tbody tr {
+    transition: var(--transition);
+}
+
+.dashboard-table tbody tr:nth-of-type(even) {
+    background-color: var(--color-light);
+}
+
+.dashboard-table tbody tr:hover {
+    background-color: #f8f9fa;
+    cursor: pointer;
+}
+
+.dashboard-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+/* Styles pour les messages "Aucune donnée" et "Chargement" */
+.dashboard-table tbody tr td[colspan] {
+    text-align: center;
+    padding: var(--padding-lg) !important;
+    font-style: italic;
+    color: var(--color-text-light);
+}
+
+/* Styles pour les statuts */
+.status-EN_ATTENTE {
+    color: #ffc107;
+    font-weight: bold;
+}
+
+.status-VALIDE {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.status-SUPPRIME {
+    color: var(--color-danger);
+    font-weight: bold;
+}
+
+/* Responsive - Mobile first */
+@media (max-width: 767px) {
+    .dashboard-table {
+        font-size: var(--font-size-xs);
+    }
+
+    .dashboard-table th,
+    .dashboard-table td {
+        padding: var(--padding-xs) var(--padding-sm);
+    }
+
+    /* Pour les très petits écrans, on peut réduire encore */
+    @media (max-width: 479px) {
+        .dashboard-table {
+            font-size: 0.7rem;
+        }
+
+        .dashboard-table th,
+        .dashboard-table td {
+            padding: 4px 6px;
+        }
+    }
+}
+
+/* Responsive - Tablettes et desktop */
+@media (min-width: 768px) {
+    .dashboard-table {
+        font-size: var(--font-size-sm);
+    }
+
+    .dashboard-table th,
+    .dashboard-table td {
+        padding: var(--padding-sm) var(--padding-md);
+    }
+}
+
+@media (min-width: 1024px) {
+    .dashboard-table {
+        font-size: var(--font-size-md);
+    }
+
+    .dashboard-table th,
+    .dashboard-table td {
+        padding: var(--padding-md) var(--padding-lg);
+    }
+}
+
+/* Animation pour le chargement */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.loading {
+    animation: pulse 2s ease-in-out infinite;
+}

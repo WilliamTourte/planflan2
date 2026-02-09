@@ -199,7 +199,8 @@ export function initMacroEventListeners() {
         const editButtons = document.querySelectorAll('.macro-edit-btn');
         
         editButtons.forEach(button => {
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function(event) {
+                event.stopPropagation();
                 const objectType = this.getAttribute('data-object-type');
                 const objectId = this.getAttribute('data-object-id');
                 
@@ -223,7 +224,8 @@ export function initMacroEventListeners() {
         // Setup cancel buttons event listeners
         const cancelButtons = document.querySelectorAll('.btn-canceledit');
         cancelButtons.forEach(button => {
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function(event) {
+                event.stopPropagation();
                 const objectType = this.getAttribute('data-object-type');
                 const objectId = this.getAttribute('data-object-id');
                 
