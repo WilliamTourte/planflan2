@@ -52,7 +52,8 @@ document.addEventListener("DOMContentLoaded", function () {
 function toggleSection(sectionId) {
     const section = document.getElementById(sectionId);
     if (section) {
-        if (section.style.display === "none") {
+        const currentDisplay = window.getComputedStyle(section).display;
+        if (currentDisplay === "none") {
             section.style.display = "block";
         } else {
             section.style.display = "none";
@@ -120,8 +121,11 @@ function initDashboardEventListeners() {
         
         // Seule la section "Mes evaluations" est toujours disponible
         // Les sections admin ne sont disponibles que pour les administrateurs
-        if (element && (title.section === 'mes-evaluations' || sectionElement)) {
-            element.addEventListener('click', function() {
+        // On vérifie aussi que la section existe réellement dans le DOM
+        if (element && sectionElement) {
+            element.addEventListener('click', function(event) {
+                event.stopPropagation();
+                // On bascule uniquement la section correspondante
                 toggleSection(title.section);
             });
             // Ajouter le curseur pointer pour indiquer que c'est cliquable
