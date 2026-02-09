@@ -174,6 +174,3 @@ if (typeof window !== 'undefined') {
 
 // Initialize when DOM is loaded
 document.addEventListener("DOMContentLoaded", initDashboardEventListeners);
-
-// Initialize when DOM is loaded
-document.addEventListener("DOMContentLoaded", initDashboardEventListeners);
