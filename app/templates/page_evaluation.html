@@ -30,5 +30,28 @@ delete_form, validate_form) }}
   document.getElementById("back-button").addEventListener("click", function () {
     goBackOrRedirect(this.getAttribute("data-fallback"))
   })
+
+  // Vérifier si on doit afficher automatiquement le formulaire d'édition
+  document.addEventListener('DOMContentLoaded', function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const editMode = urlParams.get('edit');
+    
+    if (editMode === 'true') {
+      // Récupérer l'ID de l'évaluation depuis l'URL
+      const evaluationId = {{ evaluation.id_eval }};
+      
+      // Masquer l'affichage et montrer le formulaire d'édition
+      const displayElement = document.getElementById('evaluation-' + evaluationId + '-display');
+      const editElement = document.getElementById('evaluation-' + evaluationId + '-edit');
+      
+      if (displayElement && editElement) {
+        displayElement.style.display = 'none';
+        editElement.style.display = 'block';
+        
+        // Faire défiler jusqu'au formulaire pour une meilleure expérience utilisateur
+        editElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  });
 </script>
 {% endblock %}

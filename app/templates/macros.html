@@ -568,15 +568,12 @@
         </div>
     {% elif objet_type == 'evaluation' and flan %}
         <div>
-
             {% if current_user.is_authenticated %}
                 {% if user_evaluation %}
-                    <div class="alert alert-info">
-                        Vous avez déjà une évaluation pour ce flan.
-                        <a href="{{ url_for('main.afficher_evaluation_unique', id_eval=user_evaluation.id_eval) }}" class="btn btn-primary btn-sm">
-                            Modifier votre évaluation
+                        <a href="{{ url_for('main.afficher_evaluation_unique', id_eval=user_evaluation.id_eval, edit='true') }}" 
+                           class="btn btn-success btn-sm" title="Modifier votre évaluation">
+                            <i class="bi bi-pencil"></i>
                         </a>
-                    </div>
                 {% else %}
                     {{ proposer_evaluation(form_ajout, url_for('main.evaluer_flan', id_flan=flan.id_flan)) }}
                 {% endif %}
