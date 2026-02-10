@@ -411,7 +411,6 @@
                 <div class="carte-header">
                     <h2>{{ evaluation.flan.etablissement.nom | enlever_accents }}</h2>
                     <h3>{{ evaluation.flan.nom | enlever_accents }}</h3>
-                    {{ afficher_badge_statut(evaluation, current_user) }}
                 </div>
                 <div id="evaluation-{{ evaluation.id_eval }}-display">
                     <div class="evaluation-date-container">
@@ -436,7 +435,6 @@
                 <div class="carte-header">
                     <h2>{{ evaluation.flan.etablissement.nom | enlever_accents }}</h2>
                     <h3>{{ evaluation.flan.nom | enlever_accents }}</h3>
-                    {{ afficher_badge_statut(evaluation, current_user) }}
                 </div>
                 <div class="evaluation-date-container">
                     <small class="evaluation-date">

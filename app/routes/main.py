@@ -73,9 +73,10 @@ def get_villes():
     def normalize_ville_name(name):
         """Normalise le nom d'une ville en remplaçant les espaces par des tirets et en supprimant les accents et apostrophes"""
         import unicodedata
+
         # Supprimer les accents
-        name = unicodedata.normalize('NFD', name)
-        name = name.encode('ascii', 'ignore').decode('ascii')
+        name = unicodedata.normalize("NFD", name)
+        name = name.encode("ascii", "ignore").decode("ascii")
         # Remplacer les espaces par des tirets et supprimer les apostrophes
         return name.replace(" ", "-").replace("'", "")
 
@@ -98,7 +99,8 @@ def get_villes():
         if search_term:
             normalized_search_term = normalize_ville_name(search_term)
             results = [
-                ville for ville in get_villes.villes_cache 
+                ville
+                for ville in get_villes.villes_cache
                 if normalized_search_term in normalize_ville_name(ville["nom"].lower())
             ]
         else:
@@ -783,9 +785,6 @@ def proposer_flan(id_etab):
     return render_template("page_etablissement.html", form=form, etablissement=etablissement)
 
 
-
-
-
 @main_bp.route("/modifier_flan/<int:id_flan>", methods=["POST"])
 @login_required
 def modifier_flan(id_flan):
@@ -846,10 +845,10 @@ def evaluer_flan(id_flan):
         form.pate.data = str(evaluation.pate)
         form.gout.data = str(evaluation.gout)
         form.description.data = evaluation.description
-    
+
     # Initialiser id_eval avec l'évaluation existante si elle existe
     id_eval = evaluation.id_eval if evaluation else None
-    
+
     if form.validate_on_submit():
         # Vérifier si l'utilisateur a déjà une évaluation pour ce flan
         if evaluation:
@@ -902,7 +901,9 @@ def evaluer_flan(id_flan):
                     "warning",
                 )
                 # En cas d'erreur d'intégrité, essayer de récupérer l'évaluation existante
-                existing_eval = Evaluation.query.filter_by(id_flan=id_flan, id_user=current_user.id_user).first()
+                existing_eval = Evaluation.query.filter_by(
+                    id_flan=id_flan, id_user=current_user.id_user
+                ).first()
                 if existing_eval:
                     id_eval = existing_eval.id_eval
             except Exception as e:
@@ -918,11 +919,11 @@ def evaluer_flan(id_flan):
                 "Le formulaire n'a pas été validé correctement. Veuillez vérifier les erreurs.",
                 "danger",
             )
-    
+
     # Si aucune évaluation n'existe et qu'on n'a pas créé de nouvelle évaluation, rediriger vers le flan
     if id_eval is None:
         return redirect(url_for("main.afficher_flan_unique", id_flan=id_flan))
-    
+
     return redirect(url_for("main.afficher_evaluation_unique", id_eval=id_eval))
 
 
@@ -1019,9 +1020,6 @@ def modifier_evaluation(id_eval):
     else:
         flash("Le formulaire n'a pas été validé. Veuillez vérifier les erreurs.", "danger")
     return redirect(url_for("main.afficher_evaluation_unique", id_eval=id_eval))
-
-
-
 
 
 @main_bp.route("/supprimer_evaluation/<int:id_eval>", methods=["POST"])
