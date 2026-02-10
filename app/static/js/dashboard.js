@@ -1,3 +1,6 @@
+// Export for testing and module access
+// Les fonctions seront exportées à la fin du fichier après leur définition
+
 /**
  * Show the delete account form and focus on the password field.
  */
@@ -42,14 +45,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
 /**
  * Toggle the visibility of a section by its ID.
+ * Only affects the clicked section, other sections remain in their current state.
  * @param {string} sectionId - The ID of the section to toggle
  */
 function toggleSection(sectionId) {
     const section = document.getElementById(sectionId);
-    if (section.style.display === "none") {
-        section.style.display = "block";
-    } else {
-        section.style.display = "none";
+    if (section) {
+        const currentDisplay = window.getComputedStyle(section).display;
+        if (currentDisplay === "none") {
+            section.style.display = "block";
+        } else {
+            section.style.display = "none";
+        }
     }
 }
 
@@ -100,27 +107,59 @@ function initDashboardEventListeners() {
     }
     
     // Titres cliquables pour basculer les sections
-    const sectionTitles = [
-        { id: 'mes-evaluations-title', section: 'mes-evaluations' },
-        { id: 'evaluations-a-valider-title', section: 'evaluations-a-valider' },
-        { id: 'flans-a-valider-title', section: 'flans-a-valider' },
-        { id: 'etablissements-a-valider-title', section: 'etablissements-a-valider' }
-    ];
-    
-    sectionTitles.forEach(function(title) {
-        const element = document.getElementById(title.id);
-        if (element) {
-            element.addEventListener('click', function() {
-                toggleSection(title.section);
-            });
-            // Ajouter le curseur pointer pour indiquer que c'est cliquable
-            element.style.cursor = 'pointer';
-        }
-    });
-}
+const sectionTitles = [
+    { id: 'mes-evaluations-title', section: 'mes-evaluations' },
+    { id: 'evaluations-a-valider-title', section: 'evaluations-a-valider' },
+    { id: 'flans-a-valider-title', section: 'flans-a-valider' },
+    { id: 'etablissements-a-valider-title', section: 'etablissements-a-valider' }
+];
 
-// Export for testing and module access
-export { initDashboardEventListeners, showDeleteAccountForm, cancelDeleteAccount, toggleSection };
+sectionTitles.forEach(function(title) {
+    const element = document.getElementById(title.id);
+    
+    if (element) {
+        // Trouver la section correspondante de manière robuste
+        let sectionElement = document.getElementById(title.section);
+        
+        // Si la section n'est pas trouvée directement, utiliser une approche plus robuste
+        if (!sectionElement) {
+            // Essayer de trouver la section en regardant les éléments suivants
+            let current = element.nextElementSibling;
+            while (current) {
+                // Vérifier si c'est un élément DIV avec la bonne classe
+                if (current.tagName === 'DIV' && current.classList.contains('section-content')) {
+                    sectionElement = current;
+                    break;
+                }
+                // Sinon, passer à l'élément suivant
+                current = current.nextElementSibling;
+            }
+        }
+
+        if (sectionElement) {
+            element.addEventListener('click', function(event) {
+                // Empêcher TOUTE propagation
+                event.preventDefault();
+                event.stopPropagation();
+                event.stopImmediatePropagation();
+
+                // Toggle UNIQUEMENT cette section
+                const currentDisplay = window.getComputedStyle(sectionElement).display;
+                sectionElement.style.display = (currentDisplay === "none") ? "block" : "none";
+
+                console.log(`Toggled ${title.section}:`, sectionElement.style.display);
+
+                return false;
+            });
+
+            element.style.cursor = 'pointer';
+            element.style.userSelect = 'none'; // Empêcher la sélection du texte
+        } else {
+            console.warn(`Section not found for title: ${title.id}`);
+        }
+    }
+});
+}
 
 // Make functions available globally for inline scripts
 if (typeof window !== 'undefined') {
@@ -131,6 +170,9 @@ if (typeof window !== 'undefined') {
         toggleSection
     };
 }
+
+// Export for testing and module access
+export { initDashboardEventListeners, showDeleteAccountForm, cancelDeleteAccount, toggleSection };
 
 // Initialize when DOM is loaded
 document.addEventListener("DOMContentLoaded", initDashboardEventListeners);

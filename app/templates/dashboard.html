@@ -1,6 +1,7 @@
 {% extends "base.html" %} {% block page_type %}dashboard{% endblock %} {% block
 content %}
-<div class="container">
+<div class="dashboard-content" data-is-admin="{{ current_user.is_admin }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard-tables.css') }}">
   <h1>Tableau de bord</h1>
   <!-- Section Infos Utilisateur -->
 
@@ -164,45 +165,115 @@ content %}
       </div>
     </form>
   </div>
+      <!-- Fin du Formulaire d'édition du profil (masqué par défaut) -->
 
-  <!-- Section Mes Évaluations -->
-  <h2 class="section-title" id="mes-evaluations-title">Mes evaluations</h2>
-  <div id="mes-evaluations" class="section-content" style="display: none">
-    {{ afficher_grille('evaluation', current_user.evaluations, current_user) }}
-  </div>
-  <!-- Sections Admin -->
-  {% if current_user.is_admin %}
 
-  <h2 class="section-title" id="evaluations-a-valider-title">
-    Evaluations en attente de validation
-  </h2>
-  <div id="evaluations-a-valider" class="section-content" style="display: none">
-    {{ afficher_grille('evaluation', pending_evaluations, current_user) }}
-  </div>
 
-  <h2 class="section-title" id="flans-a-valider-title">
-    Flans en attente de validation
-  </h2>
-  <div id="flans-a-valider" class="section-content" style="display: none">
-    {{ afficher_grille('flan', pending_flans, current_user) }}
-  </div>
+<!-- Ajouter les tableaux du dashboard -->
+<div class="dashboard-tables-container">
+    <!-- Tableaux pour tous les utilisateurs -->
+    <div class="table-section">
+        <h2 class="section-title" id="mes-flans-title">Mes flans proposes</h2>
+        <div class="section-content" id="mes-flans">
+            <table class="dashboard-table">
+                <thead>
+                    <tr>
+                        <th>Nom</th>
+                        <th>Établissement</th>
+                        <th>Type</th>
+                        <th>Prix</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="mes-flans-body">
+                    <tr><td colspan="6">Chargement...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-  <h2 class="section-title" id="etablissements-a-valider-title">
-    Etablissements en attente de validation
-  </h2>
-  <div
-    id="etablissements-a-valider"
-    class="section-content"
-    style="display: none"
-  >
-    {{ afficher_grille('flan', pending_etablissements, current_user) }}
-  </div>
+    <div class="table-section">
+        <h2 class="section-title" id="mes-evaluations-title">Mes evaluations</h2>
+        <div class="section-content" id="mes-evaluations">
+            <table class="dashboard-table">
+                <thead>
+                    <tr>
+                        <th>Flan</th>
+                        <th>Établissement</th>
+                        <th>Note</th>
+                        <th>Description</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+                <tbody id="mes-evaluations-body">
+                    <tr><td colspan="5">Chargement...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-  {% endif %}
+    <!-- Tableaux admin (masqués par défaut) -->
+    <div class="admin-tables" style="display: none;">
+        <div class="table-section">
+            <h2 class="section-title" id="derniers-etablissements-title">Derniers établissements</h2>
+            <div class="section-content" id="derniers-etablissements">
+                <table class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Ville</th>
+                            <th>Type</th>
+
+                        </tr>
+                    </thead>
+                    <tbody id="derniers-etablissements-body">
+                        <tr><td colspan="3">Chargement...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="table-section">
+            <h2 class="section-title" id="derniers-flans-title">Derniers flans</h2>
+            <div class="section-content" id="derniers-flans">
+                <table class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Établissement</th>
+                            <th>Type</th>
+
+                        </tr>
+                    </thead>
+                    <tbody id="derniers-flans-body">
+                        <tr><td colspan="3">Chargement...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="table-section">
+            <h2 class="section-title" id="dernieres-evaluations-title">Dernieres évaluations</h2>
+            <div class="section-content" id="dernieres-evaluations">
+                <table class="dashboard-table">
+                    <thead>
+                        <tr>
+                            <th>Flan</th>
+                            <th>Établissement</th>
+                            <th>Utilisateur</th>
+                            <th>Note</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dernieres-evaluations-body">
+                        <tr><td colspan="5">Chargement...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
-<script
-  src="{{ url_for('static', filename='js/dashboard.js') }}"
-  nonce="{{ csp_nonce }}"
-></script>
+<script type="module" src="{{ url_for('static', filename='js/dashboard.js') }}" nonce="{{ csp_nonce }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/dashboard-tables.js') }}" nonce="{{ csp_nonce }}"></script>
 {% endblock %}
