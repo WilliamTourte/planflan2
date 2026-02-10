@@ -77,7 +77,6 @@ async function loadUserEvaluations() {
                         <td>${escapeHtml(evaluation.flan ? evaluation.flan.nom : 'N/A')}</td>
                         <td>${escapeHtml(evaluation.flan && evaluation.flan.etablissement ? evaluation.flan.etablissement.nom : 'N/A')}</td>
                         <td>${evaluation.moyenne || 'N/A'}</td>
-                        <td>${escapeHtml(evaluation.description || '').substring(0, 50)}${evaluation.description && evaluation.description.length > 50 ? '...' : ''}</td>
                         <td>${new Date(evaluation.date_creation).toLocaleDateString()}</td>
                     </tr>
                 `).join('');
