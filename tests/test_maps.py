@@ -136,14 +136,14 @@ def test_verifier_etablissement_route(client):
     user = client.application.config["TEST_USER"]
 
     with client.application.app_context():
-        # Créer un établissement non validé
+        # Créer un établissement (tous les établissements sont maintenant VALIDE par défaut)
         etab = Etablissement(
             nom="Etablissement à vérifier",
             adresse="1 rue de Test",
             code_postal="69001",
             ville="Lyon",
             id_user=user.id_user,
-            statut="EN_ATTENTE",
+            statut="VALIDE",
         )
         db.session.add(etab)
         db.session.commit()
@@ -294,38 +294,6 @@ def test_modifier_etablissement_route(client):
         updated_etab = db.session.get(Etablissement, etab_id)
         assert updated_etab.nom == "Etablissement Modifié", "Le nom n'a pas été modifié"
         assert updated_etab.adresse == "2 rue Modifiée", "L'adresse n'a pas été modifiée"
-
-
-@pytest.mark.maps
-def test_valider_etablissement_route(client):
-    """Test de la route /valider_etablissement (admin seulement)"""
-    user = client.application.config["TEST_USER"]
-    assert user.is_admin, "L'utilisateur doit être admin pour ce test"
-
-    with client.application.app_context():
-        # Créer un établissement non validé
-        etab = Etablissement(
-            nom="Etablissement à valider",
-            adresse="1 rue de Validation",
-            code_postal="69001",
-            ville="Lyon",
-            id_user=user.id_user,
-            statut="EN_ATTENTE",
-        )
-        db.session.add(etab)
-        db.session.commit()
-        etab_id = etab.id_etab
-
-    # Envoyer la requête de validation
-    response = client.post(f"/valider_etablissement/{etab_id}")
-    assert response.status_code == 302  # Redirection
-
-    # Vérifier que l'établissement a été validé
-    with client.application.app_context():
-        updated_etab = db.session.get(Etablissement, etab_id)
-        assert (
-            updated_etab.statut.value == "VALIDE"
-        ), f"L'établissement n'a pas été validé. Statut: {updated_etab.statut.value}"
 
 
 @pytest.mark.maps

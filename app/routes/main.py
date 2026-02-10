@@ -73,9 +73,10 @@ def get_villes():
     def normalize_ville_name(name):
         """Normalise le nom d'une ville en remplaçant les espaces par des tirets et en supprimant les accents et apostrophes"""
         import unicodedata
+
         # Supprimer les accents
-        name = unicodedata.normalize('NFD', name)
-        name = name.encode('ascii', 'ignore').decode('ascii')
+        name = unicodedata.normalize("NFD", name)
+        name = name.encode("ascii", "ignore").decode("ascii")
         # Remplacer les espaces par des tirets et supprimer les apostrophes
         return name.replace(" ", "-").replace("'", "")
 
@@ -98,7 +99,8 @@ def get_villes():
         if search_term:
             normalized_search_term = normalize_ville_name(search_term)
             results = [
-                ville for ville in get_villes.villes_cache 
+                ville
+                for ville in get_villes.villes_cache
                 if normalized_search_term in normalize_ville_name(ville["nom"].lower())
             ]
         else:
@@ -553,23 +555,31 @@ def dashboard():
     form_ajout = EtabForm()  # Instancie le formulaire
     profile_form = UpdateProfileForm(prefix="profile")
     eval_form = EvalForm(prefix="dashboard-eval")
-    pending_evaluations = []
-    pending_flans = []
-    pending_etablissements = []
+    # Pour la modération a posteriori, afficher les derniers contenus créés
+    recent_evaluations = []
+    recent_flans = []
+    recent_etablissements = []
     if current_user.is_admin:
-        pending_evaluations = (
+        # Afficher les 20 derniers contenus créés pour modération a posteriori
+        recent_evaluations = (
             Evaluation.query.join(Utilisateur)
-            .filter(Evaluation.statut == "EN_ATTENTE", Utilisateur.is_admin == False)
+            .filter(Utilisateur.is_admin == False)
+            .order_by(Evaluation.date_creation.desc())
+            .limit(20)
             .all()
         )
-        pending_flans = (
+        recent_flans = (
             Flan.query.join(Utilisateur)
-            .filter(Flan.statut == "EN_ATTENTE", Utilisateur.is_admin == False)
+            .filter(Utilisateur.is_admin == False)
+            .order_by(Flan.id_flan.desc())
+            .limit(20)
             .all()
         )
-        pending_etablissements = (
+        recent_etablissements = (
             Etablissement.query.join(Utilisateur)
-            .filter(Etablissement.statut == "EN_ATTENTE", Utilisateur.is_admin == False)
+            .filter(Utilisateur.is_admin == False)
+            .order_by(Etablissement.id_etab.desc())
+            .limit(20)
             .all()
         )
 
@@ -610,9 +620,9 @@ def dashboard():
         form_ajout=form_ajout,
         profile_form=profile_form,
         eval_form=eval_form,
-        pending_evaluations=pending_evaluations,
-        pending_flans=pending_flans,
-        pending_etablissements=pending_etablissements,
+        recent_evaluations=recent_evaluations,
+        recent_flans=recent_flans,
+        recent_etablissements=recent_etablissements,
     )
 
 
@@ -775,27 +785,6 @@ def proposer_flan(id_etab):
     return render_template("page_etablissement.html", form=form, etablissement=etablissement)
 
 
-@main_bp.route("/valider_flan/<int:id_flan>", methods=["POST"])
-@login_required
-def valider_flan(id_flan):
-    if not current_user.is_admin:
-        flash("Vous n'avez pas le droit d'accéder à cette page.", "danger")
-        return redirect(url_for("main.dashboard"))
-    flan = db.session.get(Flan, id_flan)
-    if flan is None:
-        from flask import abort
-
-        abort(404)
-    flan.statut = "VALIDE"
-    try:
-        db.session.commit()
-        flash("Le flan a été validé avec succès!", "success")
-    except IntegrityError:
-        db.session.rollback()
-        flash("Une erreur est survenue lors de la validation du flan.", "danger")
-    return redirect(url_for("main.afficher_flan_unique", id_flan=id_flan))
-
-
 @main_bp.route("/modifier_flan/<int:id_flan>", methods=["POST"])
 @login_required
 def modifier_flan(id_flan):
@@ -856,10 +845,10 @@ def evaluer_flan(id_flan):
         form.pate.data = str(evaluation.pate)
         form.gout.data = str(evaluation.gout)
         form.description.data = evaluation.description
-    
+
     # Initialiser id_eval avec l'évaluation existante si elle existe
     id_eval = evaluation.id_eval if evaluation else None
-    
+
     if form.validate_on_submit():
         # Vérifier si l'utilisateur a déjà une évaluation pour ce flan
         if evaluation:
@@ -881,7 +870,7 @@ def evaluer_flan(id_flan):
                     description=form.description.data,
                     id_flan=id_flan,
                     id_user=current_user.id_user,
-                    statut="EN_ATTENTE" if not current_user.is_admin else "VALIDE",
+                    statut="VALIDE",
                 )
 
                 # Calculer la moyenne
@@ -912,7 +901,9 @@ def evaluer_flan(id_flan):
                     "warning",
                 )
                 # En cas d'erreur d'intégrité, essayer de récupérer l'évaluation existante
-                existing_eval = Evaluation.query.filter_by(id_flan=id_flan, id_user=current_user.id_user).first()
+                existing_eval = Evaluation.query.filter_by(
+                    id_flan=id_flan, id_user=current_user.id_user
+                ).first()
                 if existing_eval:
                     id_eval = existing_eval.id_eval
             except Exception as e:
@@ -928,11 +919,11 @@ def evaluer_flan(id_flan):
                 "Le formulaire n'a pas été validé correctement. Veuillez vérifier les erreurs.",
                 "danger",
             )
-    
+
     # Si aucune évaluation n'existe et qu'on n'a pas créé de nouvelle évaluation, rediriger vers le flan
     if id_eval is None:
         return redirect(url_for("main.afficher_flan_unique", id_flan=id_flan))
-    
+
     return redirect(url_for("main.afficher_evaluation_unique", id_eval=id_eval))
 
 
@@ -1024,35 +1015,11 @@ def modifier_evaluation(id_eval):
         else:
             evaluation.moyenne = 0
 
-        if current_user.is_admin:
-            evaluation.statut = "VALIDE"
-
         db.session.commit()
         flash("L'évaluation a été mise à jour avec succès!", "success")
     else:
         flash("Le formulaire n'a pas été validé. Veuillez vérifier les erreurs.", "danger")
     return redirect(url_for("main.afficher_evaluation_unique", id_eval=id_eval))
-
-
-@main_bp.route("/valider_evaluation/<int:id_eval>", methods=["POST"])
-@login_required
-def valider_evaluation(id_eval):
-    if not current_user.is_admin:
-        flash("Vous n'avez pas le droit d'accéder à cette page.", "danger")
-        return redirect(url_for("main.dashboard"))
-    evaluation = db.session.get(Evaluation, id_eval)
-    if evaluation is None:
-        from flask import abort
-
-        abort(404)
-    evaluation.statut = "VALIDE"
-    try:
-        db.session.commit()
-        flash("L'évaluation a été validée avec succès!", "success")
-    except IntegrityError:
-        db.session.rollback()
-        flash("Une erreur est survenue lors de la validation de l'évaluation.", "danger")
-    return redirect(url_for("main.dashboard"))
 
 
 @main_bp.route("/supprimer_evaluation/<int:id_eval>", methods=["POST"])

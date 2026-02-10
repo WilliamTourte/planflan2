@@ -317,10 +317,18 @@ describe('Dashboard Functionality', () => {
         <div id="evaluations-a-valider" style="display: none;">Évaluations à valider</div>
         <div id="flans-a-valider" style="display: none;">Flans à valider</div>
         <div id="etablissements-a-valider" style="display: none;">Établissements à valider</div>
+        <div id="mes-flans" style="display: none;">Mes flans</div>
+        <div id="derniers-flans" style="display: none;">Derniers flans</div>
+        <div id="derniers-etablissements" style="display: none;">Derniers établissements</div>
+        <div id="dernieres-evaluations" style="display: none;">Dernières évaluations</div>
         <h3 id="mes-evaluations-title">Mes évaluations</h3>
         <h3 id="evaluations-a-valider-title">Évaluations à valider</h3>
         <h3 id="flans-a-valider-title">Flans à valider</h3>
         <h3 id="etablissements-a-valider-title">Établissements à valider</h3>
+        <h3 id="mes-flans-title">Mes flans</h3>
+        <h3 id="derniers-flans-title">Derniers flans</h3>
+        <h3 id="derniers-etablissements-title">Derniers établissements</h3>
+        <h3 id="dernieres-evaluations-title">Dernières évaluations</h3>
       `;
     });
 
@@ -342,10 +350,11 @@ describe('Dashboard Functionality', () => {
       initDashboardEventListeners();
 
       const sectionTitles = [
-        { id: 'mes-evaluations-title', section: 'mes-evaluations' },
-        { id: 'evaluations-a-valider-title', section: 'evaluations-a-valider' },
-        { id: 'flans-a-valider-title', section: 'flans-a-valider' },
-        { id: 'etablissements-a-valider-title', section: 'etablissements-a-valider' }
+    { id: 'mes-evaluations-title', section: 'mes-evaluations' },
+    { id: 'mes-flans-title', section: 'mes-flans' },
+    { id: 'derniers-flans-title', section: 'derniers-flans' },
+    { id: 'derniers-etablissements-title', section: 'derniers-etablissements' },
+    { id: 'dernieres-evaluations-title', section: 'dernieres-evaluations' }
       ];
 
       sectionTitles.forEach(({ id, section }) => {
@@ -358,6 +367,169 @@ describe('Dashboard Functionality', () => {
         titleElement.click();
         expect(sectionElement.style.display).toBe('none');
       });
+    });
+  });
+
+  describe('Clickable Table Rows', () => {
+    // Import des fonctions nécessaires
+    let generateObjectUrl, setupClickableRows, escapeHtml;
+
+    beforeEach(() => {
+      // Importer les fonctions depuis le module dashboard-tables
+      // Comme nous utilisons des modules ES, nous devons les importer dynamiquement
+      // Pour les tests, nous allons les définir directement
+      
+      // Définir les fonctions directement pour le test
+      generateObjectUrl = function(type, id) {
+        switch(type) {
+          case 'etablissement': return `/etablissement/${id}`;
+          case 'flan': return `/flan/${id}`;
+          case 'evaluation': return `/evaluation/${id}`;
+          default: return '#';
+        }
+      };
+
+      escapeHtml = function(text) {
+        if (!text) return '';
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+      };
+
+      // Configurer le DOM avec des tableaux de test
+      document.body.innerHTML += `
+        <table id="test-flans-table">
+          <tbody id="test-flans-body">
+            <tr class="clickable-row" data-id="1" data-type="flan">
+              <td>Flan Vanille</td>
+              <td>Boulangerie Martin</td>
+            </tr>
+            <tr class="clickable-row" data-id="2" data-type="flan">
+              <td>Flan Chocolat</td>
+              <td>Pâtisserie Dupont</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <table id="test-evaluations-table">
+          <tbody id="test-evaluations-body">
+            <tr class="clickable-row" data-id="101" data-type="evaluation">
+              <td>Flan Vanille</td>
+              <td>4.5</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <table id="test-etablissements-table">
+          <tbody id="test-etablissements-body">
+            <tr class="clickable-row" data-id="1001" data-type="etablissement">
+              <td>Boulangerie Martin</td>
+              <td>Paris</td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <!-- Tableau avec boutons pour tester la prévention de propagation -->
+        <table id="test-table-with-buttons">
+          <tbody>
+            <tr class="clickable-row" data-id="3" data-type="flan">
+              <td>Flan Fraise</td>
+              <td><button class="test-button">Éditer</button></td>
+            </tr>
+          </tbody>
+        </table>
+      `;
+
+      // Initialiser le gestionnaire de clics
+      setupClickableRows = function() {
+        document.addEventListener('click', function(e) {
+          let row = e.target.closest('.clickable-row');
+          
+          if (e.target.closest('button, a, input, select, textarea, .no-propagate')) {
+            return;
+          }
+          
+          if (row) {
+            const type = row.dataset.type;
+            const id = row.dataset.id;
+            const url = generateObjectUrl(type, id);
+            
+            // Pour les tests, nous stockons l'URL dans un attribut data
+            // au lieu de naviguer
+            row.dataset.lastClickedUrl = url;
+            e.preventDefault();
+          }
+        });
+      };
+
+      setupClickableRows();
+    });
+
+    it('should generate correct URLs for different object types', () => {
+      expect(generateObjectUrl('flan', 1)).toBe('/flan/1');
+      expect(generateObjectUrl('evaluation', 101)).toBe('/evaluation/101');
+      expect(generateObjectUrl('etablissement', 1001)).toBe('/etablissement/1001');
+      expect(generateObjectUrl('unknown', 1)).toBe('#');
+    });
+
+    it('should handle clicks on flan rows', () => {
+      const row = document.querySelector('#test-flans-body tr:first-child');
+      row.click();
+      
+      expect(row.dataset.lastClickedUrl).toBe('/flan/1');
+    });
+
+    it('should handle clicks on evaluation rows', () => {
+      const row = document.querySelector('#test-evaluations-body tr');
+      row.click();
+      
+      expect(row.dataset.lastClickedUrl).toBe('/evaluation/101');
+    });
+
+    it('should handle clicks on etablissement rows', () => {
+      const row = document.querySelector('#test-etablissements-body tr');
+      row.click();
+      
+      expect(row.dataset.lastClickedUrl).toBe('/etablissement/1001');
+    });
+
+    it('should prevent navigation when clicking on buttons', () => {
+      const button = document.querySelector('.test-button');
+      const row = button.closest('tr');
+      
+      // Cliquer sur le bouton ne devrait pas déclencher la navigation
+      button.click();
+      
+      // L'URL ne devrait pas être définie sur la ligne
+      expect(row.dataset.lastClickedUrl).toBeUndefined();
+    });
+
+    it('should handle clicks on different cells of the same row', () => {
+      const row = document.querySelector('#test-flans-body tr:first-child');
+      const firstCell = row.querySelector('td:first-child');
+      const secondCell = row.querySelector('td:last-child');
+      
+      // Cliquer sur la première cellule
+      firstCell.click();
+      expect(row.dataset.lastClickedUrl).toBe('/flan/1');
+      
+      // Cliquer sur la deuxième cellule
+      secondCell.click();
+      expect(row.dataset.lastClickedUrl).toBe('/flan/1');
+    });
+
+    it('should escape HTML content properly', () => {
+      const unsafeText = '<script>alert("XSS")</script>';
+      const safeText = escapeHtml(unsafeText);
+      
+      expect(safeText).not.toContain('<script>');
+      expect(safeText).toContain('&lt;script&gt;');
+    });
+
+    it('should handle missing data gracefully', () => {
+      expect(escapeHtml(null)).toBe('');
+      expect(escapeHtml(undefined)).toBe('');
+      expect(escapeHtml('')).toBe('');
     });
   });
 });

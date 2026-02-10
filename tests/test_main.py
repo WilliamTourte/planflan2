@@ -153,45 +153,6 @@ def test_proposer_flan(client):
 
 
 @pytest.mark.main
-def test_valider_flan(client):
-    """Test validating a flan as admin."""
-    # Récupérer l'utilisateur admin créé dans la fixture
-    user = client.application.config["TEST_USER"]
-    assert user.is_admin, "L'utilisateur doit être admin pour valider les flans"
-
-    # Créer un établissement et un flan de test
-    with client.application.app_context():
-        etab = Etablissement(
-            nom="Test Etablissement",
-            adresse="Test Adresse",
-            code_postal="69001",
-            ville="Test Ville",
-            id_user=user.id_user,
-        )
-        db.session.add(etab)
-        db.session.commit()
-
-        flan = Flan(nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user)
-        db.session.add(flan)
-        db.session.commit()
-
-        # Stocker l'ID du flan pour l'utiliser après la requête
-        flan_id = flan.id_flan
-
-    # Envoyer la requête de validation
-    response = client.post(f"/valider_flan/{flan_id}")
-    assert response.status_code == 302  # Redirection
-
-    # Vérifier que le flan a été validé
-    with client.application.app_context():
-        updated_flan = db.session.get(Flan, flan_id)
-        # Vérifier que le statut n'est plus 'EN_ATTENTE'
-        # (la route devrait le mettre à 'VALIDE' mais il y a un bug connu avec 'valide' vs 'VALIDE')
-        assert (
-            updated_flan.statut.value != "EN_ATTENTE"
-        ), f"Le statut du flan n'a pas été mis à jour. Statut actuel: {updated_flan.statut.value}"
-
-
 @pytest.mark.main
 def test_modifier_flan(client):
     """Test modifying a flan."""
@@ -460,53 +421,6 @@ def test_afficher_evaluation_unique(client):
     # La description n'est plus affichée sur la page
     # Vérifier que les critères d'évaluation sont affichés
     assert b"Visuel" in response.data or b"visuel" in response.data.lower()
-
-
-def test_valider_evaluation(client):
-    """Test validating an evaluation as admin."""
-    # Récupérer l'utilisateur admin créé dans la fixture
-    user = client.application.config["TEST_USER"]
-    assert user.is_admin, "L'utilisateur doit être admin pour valider les évaluations"
-
-    # Créer un établissement, un flan et une évaluation de test
-    with client.application.app_context():
-        etab = Etablissement(
-            nom="Test Etablissement",
-            adresse="Test Adresse",
-            code_postal="69001",
-            ville="Test Ville",
-            id_user=user.id_user,
-        )
-        db.session.add(etab)
-        db.session.commit()
-
-        flan = Flan(nom="Test Flan", prix=2.5, id_etab=etab.id_etab, id_user=user.id_user)
-        db.session.add(flan)
-        db.session.commit()
-
-        eval = Evaluation(
-            visuel=5,
-            texture=5,
-            pate=5,
-            gout=5,
-            description="Test Description",
-            id_flan=flan.id_flan,
-            id_user=user.id_user,
-        )
-        db.session.add(eval)
-        db.session.commit()
-        eval_id = eval.id_eval
-
-    # Envoyer la requête de validation
-    response = client.post(f"/valider_evaluation/{eval_id}")
-    assert response.status_code == 302  # Redirection
-
-    # Vérifier que l'évaluation a été validée
-    with client.application.app_context():
-        updated_eval = db.session.get(Evaluation, eval_id)
-        assert (
-            updated_eval.statut.value == "VALIDE"
-        ), f"Le statut de l'évaluation n'a pas été mis à jour. Statut actuel: {updated_eval.statut.value}"
 
 
 def test_supprimer_evaluation(client):

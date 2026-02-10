@@ -18,7 +18,6 @@ form_eval, None, flan, None, None, '', user_evaluation) }}
     data-fallback="{{ url_for('main.afficher_etablissement_unique', id_etab=flan.etablissement.id_etab) }}"
   >
     <i class="bi bi-arrow-return-left"></i>
-    Retour
   </button>
   <a
     href="{{ url_for('main.afficher_etablissement_unique', id_etab=flan.etablissement.id_etab) }}"
@@ -26,7 +25,6 @@ form_eval, None, flan, None, None, '', user_evaluation) }}
     title="Retour à l'établissement"
   >
     <i class="bi bi-house"></i>
-    Établissement
   </a>
 </div>
 <script nonce="{{ csp_nonce }}">

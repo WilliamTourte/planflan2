@@ -22,6 +22,9 @@ content %}
       >
         <i class="bi bi-pencil"></i>
       </button>
+	    <a class="btn btn-icon" href="{{ url_for('auth.logout') }}">
+            <i class="bi bi-box-arrow-right"></i>
+	    </a>
       <!-- Formulaire de suppression de compte (masqué par défaut) -->
       <div id="delete-account-section" style="display: none; margin-top: 20px">
         <h3>Supprimer mon compte</h3>
@@ -164,8 +167,6 @@ content %}
   </div>
       <!-- Fin du Formulaire d'édition du profil (masqué par défaut) -->
 
-
-
 <!-- Ajouter les tableaux du dashboard -->
 <div class="dashboard-tables-container">
     <!-- Tableaux pour tous les utilisateurs -->
@@ -183,7 +184,7 @@ content %}
                     </tr>
                 </thead>
                 <tbody id="mes-flans-body">
-                    <tr><td colspan="6">Chargement...</td></tr>
+                    <tr><td colspan="5">Chargement...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -198,12 +199,11 @@ content %}
                         <th>Flan</th>
                         <th>Établissement</th>
                         <th>Note</th>
-                        <th>Description</th>
                         <th>Date</th>
                     </tr>
                 </thead>
                 <tbody id="mes-evaluations-body">
-                    <tr><td colspan="5">Chargement...</td></tr>
+                    <tr><td colspan="4">Chargement...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -212,7 +212,7 @@ content %}
     <!-- Tableaux admin (masqués par défaut) -->
     <div class="admin-tables" style="display: none;">
         <div class="table-section">
-            <h2 class="section-title" id="derniers-etablissements-title">Derniers établissements</h2>
+            <h2 class="section-title" id="derniers-etablissements-title">Derniers etablissements</h2>
             <div class="section-content" id="derniers-etablissements">
                 <table class="dashboard-table">
                     <thead>
@@ -220,7 +220,6 @@ content %}
                             <th>Nom</th>
                             <th>Ville</th>
                             <th>Type</th>
-
                         </tr>
                     </thead>
                     <tbody id="derniers-etablissements-body">
@@ -250,7 +249,7 @@ content %}
         </div>
 
         <div class="table-section">
-            <h2 class="section-title" id="dernieres-evaluations-title">Dernieres évaluations</h2>
+            <h2 class="section-title" id="dernieres-evaluations-title">Dernieres evaluations</h2>
             <div class="section-content" id="dernieres-evaluations">
                 <table class="dashboard-table">
                     <thead>

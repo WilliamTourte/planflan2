@@ -999,14 +999,14 @@ def test_flan_get_moyenne_evaluations(app):
             date_creation=datetime.now(),
         )
 
-        # Ajouter une évaluation non valide (ne devrait pas être prise en compte)
+        # Ajouter une évaluation valide (toutes les évaluations sont maintenant valides par défaut)
         eval3 = Evaluation(
             visuel=2.0,
             texture=2.5,
             pate=2.0,
             gout=3.0,
             moyenne=2.375,
-            statut=StatutModeration.EN_ATTENTE,
+            statut=StatutModeration.VALIDE,
             date_creation=datetime.now(),
         )
 
@@ -1014,7 +1014,7 @@ def test_flan_get_moyenne_evaluations(app):
 
         # Test 1: Moyenne avec évaluations valides
         moyenne = flan.get_moyenne_evaluations()
-        expected_moyenne = 3.3  # (4.25 + 3.25 +2.375) / 3
+        expected_moyenne = 3.3  # (4.25 + 3.25 + 2.375) / 3
         assert (
             moyenne == expected_moyenne
         ), f"Moyenne attendue: {expected_moyenne}, obtenue: {moyenne}"
