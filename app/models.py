@@ -33,7 +33,6 @@ class StatutModeration(Enum):
     un établissement dans le processus de modération.
     """
 
-    EN_ATTENTE = "EN_ATTENTE"
     VALIDE = "VALIDE"
     SUPPRIME = "SUPPRIME"
 
@@ -182,7 +181,7 @@ class Etablissement(db.Model):
     label = db.Column(db.Boolean, nullable=True, default=False)
     visite = db.Column(db.Boolean, nullable=True, default=False)
     google_place_id = db.Column(db.String(255), nullable=True)
-    statut = db.Column(db.Enum(StatutModeration), nullable=False, server_default="EN_ATTENTE")
+    statut = db.Column(db.Enum(StatutModeration), nullable=False, server_default="VALIDE")
 
     # Clé étrangère pour l'utilisateur
     id_user = db.Column(
@@ -284,7 +283,7 @@ class Flan(db.Model):
     type_saveur = db.Column(db.Enum(TypeSaveur), nullable=True)
     type_pate = db.Column(db.Enum(TypePate), nullable=True)
     type_texture = db.Column(db.Enum(TypeTexture), nullable=True)
-    statut = db.Column(db.Enum(StatutModeration), nullable=False, server_default="EN_ATTENTE")
+    statut = db.Column(db.Enum(StatutModeration), nullable=False, server_default="VALIDE")
 
     # Clé étrangère pour l'utilisateur
     id_user = db.Column(
@@ -399,7 +398,7 @@ class Evaluation(db.Model):
     gout = db.Column(db.Numeric(2, 1), nullable=False)
     description = db.Column(db.Text, nullable=True)
     photo = db.Column(db.String(255), nullable=True)
-    statut = db.Column(db.Enum(StatutModeration), nullable=False, server_default="EN_ATTENTE")
+    statut = db.Column(db.Enum(StatutModeration), nullable=False, server_default="VALIDE")
     date_creation = db.Column(
         db.DateTime, nullable=False, server_default=db.func.current_timestamp()
     )
