@@ -4,6 +4,22 @@
  */
 
 /**
+ * Génère l'URL pour un objet donné
+ * @param {string} type - Type d'objet ('etablissement', 'flan', 'evaluation')
+ * @param {number} id - ID de l'objet
+ * @returns {string} URL complète
+ */
+function generateObjectUrl(type, id) {
+    const baseUrl = window.location.origin;
+    switch(type) {
+        case 'etablissement': return `${baseUrl}/etablissement/${id}`;
+        case 'flan': return `${baseUrl}/flan/${id}`;
+        case 'evaluation': return `${baseUrl}/evaluation/${id}`;
+        default: return '#';
+    }
+}
+
+/**
  * Charge les données pour les tableaux du dashboard
  */
 async function loadDashboardTables() {
@@ -42,7 +58,10 @@ async function loadUserFlans() {
         if (tbody) {
             if (data.data && data.data.length > 0) {
                 tbody.innerHTML = data.data.map(flan => `
-                    <tr>
+                    <tr class="clickable-row"
+                        data-id="${flan.id_flan}"
+                        data-type="flan"
+                        style="cursor: pointer;">
                         <td>${escapeHtml(flan.nom)}</td>
                         <td>${escapeHtml(flan.etablissement ? flan.etablissement.nom : 'N/A')}</td>
                         <td>${flan.type_saveur || 'N/A'}</td>
@@ -73,7 +92,10 @@ async function loadUserEvaluations() {
         if (tbody) {
             if (data.data && data.data.length > 0) {
                 tbody.innerHTML = data.data.map(evaluation => `
-                    <tr>
+                    <tr class="clickable-row"
+                        data-id="${evaluation.id_eval}"
+                        data-type="evaluation"
+                        style="cursor: pointer;">
                         <td>${escapeHtml(evaluation.flan ? evaluation.flan.nom : 'N/A')}</td>
                         <td>${escapeHtml(evaluation.flan && evaluation.flan.etablissement ? evaluation.flan.etablissement.nom : 'N/A')}</td>
                         <td>${evaluation.moyenne || 'N/A'}</td>
@@ -103,7 +125,10 @@ async function loadRecentEtablissements() {
         if (tbody) {
             if (data.data && data.data.length > 0) {
                 tbody.innerHTML = data.data.map(etab => `
-                    <tr>
+                    <tr class="clickable-row"
+                        data-id="${etab.id_etab}"
+                        data-type="etablissement"
+                        style="cursor: pointer;">
                         <td>${escapeHtml(etab.nom)}</td>
                         <td>${escapeHtml(etab.ville)}</td>
                         <td>${etab.type_etab}</td>
@@ -133,7 +158,10 @@ async function loadRecentFlans() {
         if (tbody) {
             if (data.data && data.data.length > 0) {
                 tbody.innerHTML = data.data.map(flan => `
-                    <tr>
+                    <tr class="clickable-row"
+                        data-id="${flan.id_flan}"
+                        data-type="flan"
+                        style="cursor: pointer;">
                         <td>${escapeHtml(flan.nom)}</td>
                         <td>${escapeHtml(flan.etablissement ? flan.etablissement.nom : 'N/A')}</td>
                         <td>${flan.type_saveur || 'N/A'}</td>
@@ -163,7 +191,10 @@ async function loadRecentEvaluations() {
         if (tbody) {
             if (data.data && data.data.length > 0) {
                 tbody.innerHTML = data.data.map(evaluation => `
-                    <tr>
+                    <tr class="clickable-row"
+                        data-id="${evaluation.id_eval}"
+                        data-type="evaluation"
+                        style="cursor: pointer;">
                         <td>${escapeHtml(evaluation.flan ? evaluation.flan.nom : 'N/A')}</td>
                         <td>${escapeHtml(evaluation.flan && evaluation.flan.etablissement ? evaluation.flan.etablissement.nom : 'N/A')}</td>
                         <td>${escapeHtml(evaluation.utilisateur ? evaluation.utilisateur.pseudo : evaluation.id_user)}</td>
@@ -190,5 +221,33 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+/**
+ * Gestionnaire de clic pour les lignes cliquables
+ */
+function setupClickableRows() {
+    document.addEventListener('click', function(e) {
+        // Vérifier si le clic provient d'une ligne cliquable
+        let row = e.target.closest('.clickable-row');
+
+        // Si on a cliqué sur un bouton ou un élément interactif, ne pas naviguer
+        if (e.target.closest('button, a, input, select, textarea, .no-propagate')) {
+            return;
+        }
+
+        // Si c'est bien une ligne cliquable
+        if (row) {
+            const type = row.dataset.type;
+            const id = row.dataset.id;
+            const url = generateObjectUrl(type, id);
+
+            // Navigation vers l'URL
+            window.location.href = url;
+        }
+    });
+}
+
 // Initialisation au chargement de la page
-document.addEventListener("DOMContentLoaded", loadDashboardTables);
+document.addEventListener("DOMContentLoaded", function() {
+    loadDashboardTables();
+    setupClickableRows();
+});
