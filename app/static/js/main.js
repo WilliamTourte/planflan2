@@ -140,19 +140,143 @@ function initializeProposerEtablissementPage() {
     }
     const googleMapsApiKey = googleMapsApiKeyElement.getAttribute('data-api-key');
     
-    // Initialiser l'autocomplete Google Places
-    autocomplete.initGooglePlacesAutocomplete('search', googleMapsApiKey)
-        .then(autocompleteInstance => {
-            console.log("Google Places Autocomplete initialisé avec succès");
-            window.autocompleteInstance = autocompleteInstance;
+    // Initialiser l'autocomplete pour les villes (uniquement pour le champ ville)
+    const villeAutocompleteInitialized = autocomplete.initAutocomplete();
+    if (villeAutocompleteInitialized) {
+        console.log("Autocomplete pour les villes initialisé avec succès");
+        
+        // Ajouter un écouteur pour le champ ville
+        const villeInput = document.getElementById('ville-autocomplete');
+        if (villeInput) {
+            villeInput.addEventListener('villeSelected', function(e) {
+                const selectedVille = e.detail.ville;
+                console.log("Ville sélectionnée:", selectedVille);
+                
+                // Mettre à jour le champ caché ville
+                const hiddenVilleField = document.getElementById('ajout-etab-ville');
+                if (hiddenVilleField) {
+                    hiddenVilleField.value = selectedVille;
+                }
+                
+                // Réinitialiser le champ de recherche d'établissement
+                const searchInput = document.getElementById('search');
+                if (searchInput) {
+                    searchInput.value = '';
+                    searchInput.focus();
+                }
+                
+                // Recharger l'autocomplete Google Places avec restriction à la ville sélectionnée
+                if (selectedVille) {
+                    console.log("DEBUG: Ville sélectionnée dans main.js:", selectedVille);
+                    
+                    // Nettoyer le feedback précédent
+                    autocomplete.clearCityRestrictionFeedback();
+                    
+                    // Initialiser avec restriction à la ville
+                    autocomplete.initGooglePlacesAutocompleteWithCity('search', googleMapsApiKey, selectedVille)
+                        .then(autocompleteInstance => {
+                            console.log("DEBUG: Google Places Autocomplete initialisé avec restriction à la ville:", selectedVille);
+                            window.autocompleteInstance = autocompleteInstance;
+                            utils.showToast('Recherche restreinte à ' + selectedVille, 'info');
+                        })
+                        .catch(error => {
+                            console.error("DEBUG: Erreur lors de l'initialisation de Google Places Autocomplete:", error);
+                            utils.showToast(error.message, 'error');
+                        });
+                }
+            });
+        }
+    }
+    
+    // Initialiser l'autocomplete Google Places par défaut (sans ville)
+    // Mais seulement si aucune ville n'est déjà sélectionnée
+    const villeInput = document.getElementById('ville-autocomplete');
+    if (!villeInput || villeInput.value === '') {
+        autocomplete.initGooglePlacesAutocomplete('search', googleMapsApiKey)
+            .then(autocompleteInstance => {
+                console.log("Google Places Autocomplete initialisé avec succès (mode global)");
+                window.autocompleteInstance = autocompleteInstance;
+            })
+            .catch(error => {
+                console.error("Erreur lors de l'initialisation de Google Places Autocomplete:", error);
+                utils.showToast(error.message, 'error');
+            });
+    }
+    
+    // Gestion du bouton de réinitialisation de la ville
+    const clearVilleBtn = document.getElementById('clear-ville-btn');
+    if (clearVilleBtn) {
+        clearVilleBtn.addEventListener('click', function() {
+            // Réinitialiser les champs
+            const villeInput = document.getElementById('ville-autocomplete');
+            const hiddenVilleField = document.getElementById('ajout-etab-ville');
+            const searchInput = document.getElementById('search');
             
-            // Le reste de l'initialisation est géré directement dans initGooglePlacesAutocomplete
-            // Pas besoin d'appeler initProposerEtablissementAutocomplete qui n'existe pas
-        })
-        .catch(error => {
-            console.error("Erreur lors de l'initialisation de Google Places Autocomplete:", error);
-            showToast(error.message, 'error');
+            if (villeInput) villeInput.value = '';
+            if (hiddenVilleField) hiddenVilleField.value = '';
+            if (searchInput) {
+                searchInput.value = '';
+                searchInput.focus();
+            }
+            
+            // Nettoyer le feedback visuel
+            autocomplete.clearCityRestrictionFeedback();
+            
+            // Réinitialiser l'autocomplete des établissements en mode global
+            autocomplete.initGooglePlacesAutocomplete('search', googleMapsApiKey)
+                .then(autocompleteInstance => {
+                    console.log("Autocomplete réinitialisé pour la recherche globale");
+                    window.autocompleteInstance = autocompleteInstance;
+                    utils.showToast('Recherche réinitialisée pour tous les établissements', 'info');
+                })
+                .catch(error => {
+                    console.error("Erreur lors de la réinitialisation:", error);
+                    utils.showToast(error.message, 'error');
+                });
         });
+    }
+}
+
+/**
+ * Configure l'autocomplete personnalisé pour les établissements dans une ville spécifique
+ */
+function setupCustomEtablissementAutocomplete(inputId, villeName) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    
+    // Supprimer les écouteurs existants
+    const newInput = input.cloneNode(true);
+    input.parentNode.replaceChild(newInput, input);
+    
+    // Ajouter un écouteur pour rechercher des établissements dans la ville
+    newInput.addEventListener('input', utils.debounce(function() {
+        if (this.value.length > 2) { // Attendre au moins 3 caractères
+            autocomplete.searchEtablissementsByVille(villeName, this.value)
+                .then(results => {
+                    autocomplete.showEtablissementResults(results, inputId);
+                })
+                .catch(error => {
+                    console.error("Erreur de recherche:", error);
+                    utils.showToast(error.message, 'error');
+                });
+        } else {
+            // Masquer les résultats si la requête est trop courte
+            const resultsContainer = document.getElementById(`${inputId}-results`);
+            if (resultsContainer) {
+                resultsContainer.style.display = 'none';
+            }
+        }
+    }, 300));
+    
+    // Gestion du clic en dehors pour fermer les résultats
+    document.addEventListener('click', function(e) {
+        if (e.target !== newInput) {
+            const resultsContainer = document.getElementById(`${inputId}-results`);
+            if (resultsContainer) {
+                resultsContainer.style.display = 'none';
+            }
+        }
+    });
 }
 
 /**

@@ -21,6 +21,27 @@
 <div class="form-container">
   <form method="POST" action="{{ action_url }}" class="form-container">
     {{ form.hidden_tag() }}
+    <!-- Champ de sélection de ville -->
+    <div class="form-group">
+      <label for="ville-autocomplete" class="form-check-label">
+        Ville
+      </label>
+      <div class="input-group">
+        <input
+          type="text"
+          id="ville-autocomplete"
+          class="form-control"
+          placeholder="Sélectionner une ville"
+          autocomplete="off"
+        />
+        <button class="btn btn-outline-secondary" type="button" id="clear-ville-btn" title="Réinitialiser la sélection de ville">
+          ×
+        </button>
+      </div>
+      <!-- Déplacer le conteneur des résultats ici, après le bouton -->
+      <div id="autocomplete-results" class="autocomplete-results"></div>
+    </div>
+
     <!-- Champ de recherche pour l'autocomplete Google Maps -->
     <div class="form-group">
       <label for="search" class="form-check-label">

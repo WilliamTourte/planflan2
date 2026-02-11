@@ -110,7 +110,9 @@ def create_app(config_class=None):
 
     # Enregistrer le blueprint API du dashboard
     from .routes.api.dashboard import dashboard_api_bp
+    from .routes.api.etablissements import etablissements_api_bp
 
     app.register_blueprint(dashboard_api_bp)
+    app.register_blueprint(etablissements_api_bp)
 
     return app
