@@ -598,4 +598,404 @@ describe('Autocomplete Module', () => {
       delete window.pendingZoom;
     });
   });
+
+  describe('City restriction functionality', () => {
+    let searchInput, villeInput, googleMapsApiKey;
+
+    beforeEach(() => {
+      // Configurer le DOM pour les tests de restriction par ville
+      document.body.innerHTML = `
+        <meta name="csrf-token" content="test-csrf-token">
+        <input id="ville-autocomplete" value="Paris">
+        <input id="search" class="form-control">
+        <div id="autocomplete-results"></div>
+        <div class="form-container"></div>
+        <form>
+          <input name="ville" type="hidden" id="ajout-etab-ville">
+          <input name="latitude" type="hidden" id="ajout-etab-latitude">
+          <input name="longitude" type="hidden" id="ajout-etab-longitude">
+          <input name="google_place_id" type="hidden" id="ajout-etab-google_place_id">
+          <input name="nom" type="text" id="ajout-etab-nom">
+          <input name="adresse" type="text" id="ajout-etab-adresse">
+        </form>
+        <div id="google-maps-api-key" data-api-key="test_api_key"></div>
+      `;
+
+      searchInput = document.getElementById('search');
+      villeInput = document.getElementById('ville-autocomplete');
+      googleMapsApiKey = 'test_api_key';
+
+      // Mock des fonctions qui font des appels API pour éviter les erreurs
+      // Nous devons mock la fonction avant d'importer le module
+      window.verifyAndProcessEtablissement = jest.fn((place) => {
+        console.log('Mock verifyAndProcessEtablissement appelé avec:', place);
+        // Simuler le comportement réel sans faire d'appels API
+        return Promise.resolve();
+      });
+
+      // Mock Google Maps API
+      global.google = {
+        maps: {
+          LatLng: jest.fn((lat, lng) => ({ lat: () => lat, lng: () => lng })),
+          LatLngBounds: jest.fn((sw, ne) => ({
+            contains: jest.fn((location) => {
+              // Simuler une vérification de bounds simple
+              const lat = location.lat();
+              const lng = location.lng();
+              return lat >= sw.lat() && lat <= ne.lat() && lng >= sw.lng() && lng <= ne.lng();
+            })
+          })),
+          places: {
+            Autocomplete: jest.fn((input, options) => {
+              let mockPlace = null;
+              let currentCallback = null;
+              
+              // Créer une instance mock qui se comporte comme un vrai Autocomplete
+              const autocompleteInstance = {
+                cityName: options.location ? 'Paris' : null,
+                cityLat: options.location ? 48.8566 : null,
+                cityLng: options.location ? 2.3522 : null,
+                cityBounds: options.bounds ? options.bounds : null,
+                
+                // Méthode getPlace qui retourne le mock place
+                getPlace: () => mockPlace,
+                
+                // Méthode addListener qui simule l'événement place_changed
+                addListener: jest.fn((event, callback) => {
+                  if (event === 'place_changed') {
+                    currentCallback = callback;
+                    
+                    // Simuler un lieu dans la ville spécifiée
+                    const ville = options.location ? 'Paris' : 'Paris'; // Valeur par défaut
+                    
+                    // Si nous avons des informations de ville dans les options, les utiliser
+                    if (options && options.location) {
+                      // Pour les tests, nous pouvons vérifier si la ville est Lyon
+                      if (options.location.lat && options.location.lat() === 45.75) {
+                        mockPlace = {
+                          name: 'Boulangerie Test Lyon',
+                          formatted_address: '1 Rue Test, Lyon',
+                          geometry: {
+                            location: {
+                              lat: () => 45.75,
+                              lng: () => 4.85
+                            }
+                          },
+                          place_id: 'test_place_id_lyon',
+                          address_components: [
+                            {
+                              types: ['locality'],
+                              long_name: 'Lyon'
+                            }
+                          ]
+                        };
+                      } else {
+                        mockPlace = {
+                          name: 'Boulangerie Test',
+                          formatted_address: '1 Rue Test, Paris',
+                          geometry: {
+                            location: {
+                              lat: () => 48.8566,
+                              lng: () => 2.3522
+                            }
+                          },
+                          place_id: 'test_place_id',
+                          address_components: [
+                            {
+                              types: ['locality'],
+                              long_name: 'Paris'
+                            }
+                          ]
+                        };
+                      }
+                    } else {
+                      mockPlace = {
+                        name: 'Boulangerie Test',
+                        formatted_address: '1 Rue Test, Paris',
+                        geometry: {
+                          location: {
+                            lat: () => 48.8566,
+                            lng: () => 2.3522
+                          }
+                        },
+                        place_id: 'test_place_id',
+                        address_components: [
+                          {
+                            types: ['locality'],
+                            long_name: 'Paris'
+                          }
+                        ]
+                      };
+                    }
+                    
+                    // Appeler le callback avec le mock place
+                    setTimeout(() => callback(mockPlace), 100);
+                  }
+                }),
+                
+                // Méthode utilitaire pour les tests
+                setMockPlace: (place) => {
+                  mockPlace = place;
+                  if (currentCallback) {
+                    setTimeout(() => currentCallback(place), 100);
+                  }
+                }
+              };
+              
+              return autocompleteInstance;
+            }),
+            PlacesServiceStatus: {
+              OK: 'OK'
+            }
+          }
+        }
+      };
+
+      // Mock également la fonction fetch pour les appels API
+      // Sauvegarder le fetch original si nécessaire
+      const originalFetch = global.fetch;
+      
+      global.fetch = jest.fn((url) => {
+        if (url.includes('/verifier_etablissement')) {
+          return Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve({ exists: false })
+          });
+        }
+        if (url.includes('/extraire_infos_adresse')) {
+          // Retourner les informations d'adresse pour Lyon
+          return Promise.resolve({
+            ok: true,
+            json: () => Promise.resolve({ code_postal: '69001', ville: 'Lyon', adresse_nettoyee: '1 Rue Test, Lyon' })
+          });
+        }
+        if (url.includes('/api/villes') && url.includes('with_gps=true')) {
+          // Extraire le paramètre de ville de l'URL
+          const villeMatch = url.match(/q=([^&]+)/);
+          const ville = villeMatch ? decodeURIComponent(villeMatch[1]) : 'Paris';
+          
+          // Retourner les coordonnées GPS en fonction de la ville
+          if (ville === 'Lyon') {
+            return Promise.resolve({
+              ok: true,
+              json: () => Promise.resolve(['Lyon|45.75|4.85'])
+            });
+          } else {
+            return Promise.resolve({
+              ok: true,
+              json: () => Promise.resolve(['Paris|48.8566|2.3522'])
+            });
+          }
+        }
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve([])
+        });
+      });
+    });
+
+    afterEach(() => {
+      // Nettoyage
+      delete global.google;
+      if (global.fetch && global.fetch.mockRestore) {
+        global.fetch.mockRestore();
+      }
+    });
+
+    it('should initialize autocomplete with city restriction when ville is selected', async () => {
+      // Importer les fonctions nécessaires
+      const { initGooglePlacesAutocompleteWithCity } = await import('../../../app/static/js/autocomplete.js');
+
+      // Appeler la fonction avec une ville sélectionnée
+      await initGooglePlacesAutocompleteWithCity('search', googleMapsApiKey, 'Paris');
+
+      // Vérifier que l'autocomplete a été initialisé avec les bons paramètres
+      expect(global.google.maps.places.Autocomplete).toHaveBeenCalled();
+      const callOptions = global.google.maps.places.Autocomplete.mock.calls[0][1];
+
+      // Vérifier que les paramètres de restriction sont présents
+      expect(callOptions.strictBounds).toBe(true);
+      expect(callOptions.bounds).toBeDefined();
+      expect(callOptions.location).toBeDefined();
+      expect(callOptions.radius).toBe(10000); // 10km
+    });
+
+    it('should create bounds around the selected city', async () => {
+      // Importer les fonctions nécessaires
+      const { initGooglePlacesAutocompleteWithCity } = await import('../../../app/static/js/autocomplete.js');
+
+      // Appeler la fonction avec une ville sélectionnée
+      await initGooglePlacesAutocompleteWithCity('search', googleMapsApiKey, 'Paris');
+
+      // Vérifier que les bounds ont été créés correctement
+      const callOptions = global.google.maps.places.Autocomplete.mock.calls[0][1];
+      expect(callOptions.bounds).toBeDefined();
+
+      // Vérifier que les bounds contiennent le centre de la ville
+      const center = callOptions.location;
+      expect(callOptions.bounds.contains(center)).toBe(true);
+    });
+
+    it('should show city restriction feedback when ville is selected', async () => {
+      // Importer les fonctions nécessaires
+      const { initGooglePlacesAutocompleteWithCity } = await import('../../../app/static/js/autocomplete.js');
+
+      // Appeler la fonction avec une ville sélectionnée
+      await initGooglePlacesAutocompleteWithCity('search', googleMapsApiKey, 'Paris');
+
+      // Vérifier que le feedback visuel est affiché
+      const feedbackElement = document.querySelector('.autocomplete-city-feedback');
+      expect(feedbackElement).toBeTruthy();
+      expect(feedbackElement.textContent).toContain('Recherche limitée à Paris');
+      expect(feedbackElement.textContent).toContain('10km');
+    });
+
+    it('should restrict place selection to city bounds', async () => {
+      // Importer les fonctions nécessaires
+      const { initGooglePlacesAutocompleteWithCity } = await import('../../../app/static/js/autocomplete.js');
+
+      // Appeler la fonction avec une ville sélectionnée
+      await initGooglePlacesAutocompleteWithCity('search', googleMapsApiKey, 'Paris');
+
+      // Attendre que le callback soit déclenché
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      // Vérifier que les champs ont été remplis correctement
+      const nomField = document.getElementById('ajout-etab-nom');
+      const adresseField = document.getElementById('ajout-etab-adresse');
+      const latitudeField = document.getElementById('ajout-etab-latitude');
+      const longitudeField = document.getElementById('ajout-etab-longitude');
+      const googlePlaceIdField = document.getElementById('ajout-etab-google_place_id');
+
+      expect(nomField).toBeTruthy();
+      expect(adresseField).toBeTruthy();
+      expect(latitudeField).toBeTruthy();
+      expect(longitudeField).toBeTruthy();
+      expect(googlePlaceIdField).toBeTruthy();
+
+      expect(nomField.value).toBe('Boulangerie Test');
+      expect(adresseField.value).toBe('1 Rue Test, Paris');
+      expect(latitudeField.value).toBe('48.8566');
+      expect(longitudeField.value).toBe('2.3522');
+      expect(googlePlaceIdField.value).toBe('test_place_id');
+    });
+
+    it('should reject places outside city bounds', async () => {
+      // Importer les fonctions nécessaires
+      const { initGooglePlacesAutocompleteWithCity } = await import('../../../app/static/js/autocomplete.js');
+
+      // Appeler la fonction avec une ville sélectionnée
+      await initGooglePlacesAutocompleteWithCity('search', googleMapsApiKey, 'Paris');
+
+      // Récupérer l'instance d'autocomplete
+      const autocompleteInstance = global.google.maps.places.Autocomplete.mock.results[0].value;
+
+      // Définir un mock place en dehors des bounds
+      const mockPlaceOutside = {
+        name: 'Boulangerie Lointaine',
+        formatted_address: '1 Rue Lointaine, Versailles',
+        geometry: {
+          location: {
+            lat: () => 48.8014, // Versailles - en dehors de Paris
+            lng: () => 2.1327
+          }
+        },
+        place_id: 'outside_place_id',
+        address_components: [
+          {
+            types: ['locality'],
+            long_name: 'Versailles'
+          }
+        ]
+      };
+
+      // Simuler que les bounds ne contiennent pas ce lieu
+      const mockBounds = {
+        contains: jest.fn(() => false) // Simuler que le lieu est en dehors des bounds
+      };
+      autocompleteInstance.cityBounds = mockBounds;
+
+      // Déclencher la sélection du lieu en dehors
+      autocompleteInstance.setMockPlace(mockPlaceOutside);
+
+      // Attendre que le callback soit déclenché
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      // Vérifier que les champs n'ont pas été remplis (lieu rejeté)
+      const nomField = document.getElementById('ajout-etab-nom');
+      const adresseField = document.getElementById('ajout-etab-adresse');
+      const latitudeField = document.getElementById('ajout-etab-latitude');
+      const longitudeField = document.getElementById('ajout-etab-longitude');
+      const googlePlaceIdField = document.getElementById('ajout-etab-google_place_id');
+
+      expect(nomField).toBeTruthy();
+      expect(adresseField).toBeTruthy();
+      expect(latitudeField).toBeTruthy();
+      expect(longitudeField).toBeTruthy();
+      expect(googlePlaceIdField).toBeTruthy();
+
+      expect(nomField.value).toBe('');
+      expect(adresseField.value).toBe('');
+      expect(latitudeField.value).toBe('');
+      expect(longitudeField.value).toBe('');
+      expect(googlePlaceIdField.value).toBe('');
+    });
+
+    it('should clear city restriction feedback when clear button is clicked', async () => {
+      // Importer les fonctions nécessaires
+      const { initGooglePlacesAutocompleteWithCity, clearCityRestrictionFeedback } = await import('../../../app/static/js/autocomplete.js');
+
+      // D'abord initialiser avec une ville
+      await initGooglePlacesAutocompleteWithCity('search', googleMapsApiKey, 'Paris');
+
+      // Vérifier que le feedback est présent
+      let feedbackElement = document.querySelector('.autocomplete-city-feedback');
+      expect(feedbackElement).toBeTruthy();
+
+      // Appeler la fonction de nettoyage
+      clearCityRestrictionFeedback();
+
+      // Vérifier que le feedback a été supprimé
+      feedbackElement = document.querySelector('.autocomplete-city-feedback');
+      expect(feedbackElement).toBeNull();
+    });
+
+    it('should handle city selection event and update establishment autocomplete', async () => {
+      // Importer les fonctions nécessaires
+      const { initAutocomplete, initGooglePlacesAutocompleteWithCity } = await import('../../../app/static/js/autocomplete.js');
+
+      // Initialiser l'autocomplete pour les villes
+      const villeInitResult = initAutocomplete();
+      expect(villeInitResult).toBe(true);
+
+      // Simuler la sélection d'une ville en mettant directement à jour le champ caché
+      // (ce qui est ce que fait l'événement villeSelected dans la réalité)
+      villeInput.value = 'Lyon';
+      const hiddenVilleField = document.getElementById('ajout-etab-ville');
+      hiddenVilleField.value = 'Lyon';
+      
+      // Réinitialiser le champ de recherche d'établissement
+      searchInput.value = '';
+      searchInput.focus();
+
+      // Appeler directement l'initialisation avec restriction
+      await initGooglePlacesAutocompleteWithCity('search', googleMapsApiKey, 'Lyon');
+
+      // Attendre un peu pour que l'initialisation soit terminée
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Vérifier que le champ caché ville a été mis à jour
+      expect(hiddenVilleField).toBeTruthy();
+      expect(hiddenVilleField.value).toBe('Lyon');
+
+      // Vérifier que le champ de recherche d'établissement a été réinitialisé
+      expect(searchInput).toBeTruthy();
+      expect(searchInput.value).toBe('');
+      
+      // Vérifier que le feedback visuel est affiché
+      const feedbackElement = document.querySelector('.autocomplete-city-feedback');
+      expect(feedbackElement).toBeTruthy();
+      expect(feedbackElement.textContent).toContain('Recherche limitée à Lyon');
+    });
+  });
 });

@@ -104,7 +104,11 @@ function initDashboardEventListeners() {
         { id: 'mes-evaluations-title', section: 'mes-evaluations' },
         { id: 'evaluations-a-valider-title', section: 'evaluations-a-valider' },
         { id: 'flans-a-valider-title', section: 'flans-a-valider' },
-        { id: 'etablissements-a-valider-title', section: 'etablissements-a-valider' }
+        { id: 'etablissements-a-valider-title', section: 'etablissements-a-valider' },
+        { id: 'mes-flans-title', section: 'mes-flans' },
+        { id: 'derniers-flans-title', section: 'derniers-flans' },
+        { id: 'derniers-etablissements-title', section: 'derniers-etablissements' },
+        { id: 'dernieres-evaluations-title', section: 'dernieres-evaluations' }
     ];
     
     sectionTitles.forEach(function(title) {

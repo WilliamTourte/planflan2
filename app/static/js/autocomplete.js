@@ -700,7 +700,7 @@ function initializeAutocompleteWithCity(input, apiKey, lat, lng, villeName, reso
             }
 
             // Vérifier si le lieu est déjà dans la liste
-            verifyAndProcessEtablissement(place);
+            window.verifyAndProcessEtablissement(place);
         });
 
         console.log("DEBUG: Autocomplete initialisé avec succès pour la ville:", villeName);
@@ -782,7 +782,7 @@ function setupCustomAutocomplete(input, inputId, villeName) {
             }
             
             // Vérifier si le lieu est déjà dans la liste
-            verifyAndProcessEtablissement(place);
+            window.verifyAndProcessEtablissement(place);
         });
     }
 }
@@ -830,7 +830,7 @@ function setupGooglePlacesAutocomplete(input, apiKey, resolve, reject) {
             }
 
             // Vérifier si le lieu est déjà dans la liste
-            verifyAndProcessEtablissement(place);
+            window.verifyAndProcessEtablissement(place);
         });
 
         resolve(autocomplete);
@@ -844,7 +844,8 @@ function setupGooglePlacesAutocomplete(input, apiKey, resolve, reject) {
 /**
  * Vérifie si l'établissement existe et traite les données
  */
-function verifyAndProcessEtablissement(place) {
+// Définir la fonction sur l'objet window pour qu'elle soit mockable dans les tests
+window.verifyAndProcessEtablissement = function verifyAndProcessEtablissement(place) {
     fetch("/verifier_etablissement", {
         method: "POST",
         headers: {
