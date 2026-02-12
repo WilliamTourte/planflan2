@@ -5,7 +5,6 @@
  */
 
 import { debounce, showLoading, hideLoading, showToast } from './utils.js';
-import { initMapWithMarker } from './map.js';
 
 /**
  * Initialise le système d'autocomplétion pour la recherche de villes.
@@ -865,7 +864,8 @@ window.verifyAndProcessEtablissement = function verifyAndProcessEtablissement(pl
         if (data.error) {
             console.error("Erreur:", data.error);
             showToast(data.error, 'error');
-            return;
+            // Retourner une promesse résolue pour éviter les erreurs de chaîne
+            return Promise.resolve(null);
         }
         
         if (data.exists) {
@@ -882,16 +882,39 @@ window.verifyAndProcessEtablissement = function verifyAndProcessEtablissement(pl
             document.getElementById("ajout-etab-adresse").value = data.adresse_nettoyee || "";
             
             // Initialiser la carte avec le marqueur de l'établissement
-            initMapWithMarker(
-                place.geometry.location.lat(),
-                place.geometry.location.lng(),
-                place.name
-            );
+            // Utiliser setTimeout pour éviter les problèmes de timing
+            setTimeout(() => {
+                try {
+                    // Vérifier que la fonction est disponible dans le scope global
+                    if (typeof window.initMapWithInfowindow === 'function') {
+                        // Vérifier aussi que la carte est prête avant d'appeler
+                        if (window.map && window.map.addLayer && typeof window.map.addLayer === 'function') {
+                            window.initMapWithInfowindow(); // Appeler la fonction globale
+                        } else {
+                            console.warn("La carte n'est pas encore prête, initialisation reportée");
+                            // Réessayer après un délai plus long
+                            setTimeout(() => {
+                                if (typeof window.initMapWithInfowindow === 'function') {
+                                    window.initMapWithInfowindow();
+                                }
+                            }, 500);
+                        }
+                    } else {
+                        console.error("La fonction initMapWithInfowindow n'est pas disponible");
+                        showToast("Erreur d'initialisation de la carte", 'error');
+                    }
+                } catch (e) {
+                    console.error("Erreur détaillée lors de l'initialisation de la carte:", e);
+                    showToast("Erreur carte: " + e.message, 'error');
+                }
+            }, 100);
         }
     })
     .catch((error) => {
         console.error("Erreur:", error);
         showToast(error.message, 'error');
+        // Retourner une promesse résolue pour éviter les erreurs non capturées
+        return Promise.resolve();
     });
 }
 

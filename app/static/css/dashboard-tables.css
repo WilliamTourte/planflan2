@@ -118,11 +118,7 @@
     color: var(--color-text-light);
 }
 
-/* Styles pour les statuts */
-.status-EN_ATTENTE {
-    color: #ffc107;
-    font-weight: bold;
-}
+
 
 .status-VALIDE {
     color: #28a745;

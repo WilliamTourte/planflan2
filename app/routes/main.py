@@ -527,13 +527,27 @@ def api_etablissements():
 @main_bp.route("/get_infowindow_content")
 def get_infowindow_content():
     id_etab = request.args.get("id_etab", type=int)
-    etablissement = db.session.get(Etablissement, id_etab)
-    if not etablissement:
-        return "Détails non disponibles", 404
+    context = request.args.get("context", "existing")
 
-    details_url = url_for("main.afficher_etablissement_unique", id_etab=etablissement.id_etab)
+    if context == "existing" and id_etab:
+        etablissement = db.session.get(Etablissement, id_etab)
+        if not etablissement:
+            return "Détails non disponibles", 404
+        details_url = url_for("main.afficher_etablissement_unique", id_etab=etablissement.id_etab)
+    else:
+        # Pour les propositions, créer un objet mock
+        etablissement = {
+            "nom": request.args.get("nom", "Nouvel établissement"),
+            "adresse": request.args.get("adresse", ""),
+            "ville": request.args.get("ville", ""),
+            "type_etab": request.args.get("type_etab", "BOULANGERIE"),
+            "label": False,
+            "flans": []
+        }
+        details_url = None
+
     return render_template(
-        "infowindow_template.html", etablissement=etablissement, details_url=details_url
+        "infowindow_template.html", etablissement=etablissement, details_url=details_url, context=context
     )
 
 
@@ -774,6 +788,7 @@ def proposer_flan(id_etab):
             type_texture=form.type_texture.data,
             id_etab=id_etab,
             id_user=current_user.id_user,
+            statut="VALIDE",
         )
         db.session.add(flan)
         db.session.commit()

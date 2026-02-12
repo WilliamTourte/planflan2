@@ -20,7 +20,30 @@ class Config:
     """
 
     SECRET_KEY = os.getenv("SECRET_KEY")
-    SQLALCHEMY_DATABASE_URI = os.getenv("DATABASE_URL")
+    
+    # Utiliser SQLite par défaut si DATABASE_URL n'est pas défini ou si MySQL n'est pas disponible
+    db_url = os.getenv("DATABASE_URL")
+    if not db_url or db_url.startswith("mysql://"):
+        # Vérifier si nous pouvons nous connecter à MySQL, sinon utiliser SQLite
+        try:
+            import pymysql
+            from sqlalchemy import create_engine
+            try:
+                # Tester la connexion MySQL
+                test_url = db_url or "mysql+pymysql://root:@localhost/planflan_db"
+                engine = create_engine(test_url)
+                with engine.connect() as conn:
+                    pass  # Si on arrive ici, la connexion fonctionne
+                SQLALCHEMY_DATABASE_URI = test_url
+            except Exception:
+                print("MySQL non disponible, utilisation de SQLite...")
+                SQLALCHEMY_DATABASE_URI = "sqlite:///planflan.db"
+        except ImportError:
+            print("PyMySQL non installé, utilisation de SQLite...")
+            SQLALCHEMY_DATABASE_URI = "sqlite:///planflan.db"
+    else:
+        SQLALCHEMY_DATABASE_URI = db_url
+    
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = True  # Active le logging des requêtes SQL
     SESSION_COOKIE_SECURE = True

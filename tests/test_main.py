@@ -71,7 +71,7 @@ def test_afficher_flan_unique(client):
         id_etab="1",
     )
     db.session.add(etab)
-    flan = Flan(nom="Test Flan", prix=2.5, id_etab=etab.id_etab)
+    flan = Flan(nom="Test Flan", prix=2.5, id_etab=etab.id_etab, statut="VALIDE")
     db.session.add(flan)
     db.session.commit()
     response = client.get(f"/flan/{flan.id_flan}")

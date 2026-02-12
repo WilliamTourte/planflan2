@@ -59,10 +59,15 @@
     {% endif %}
 {% endmacro %}
 
-{% macro afficher_infowindow(etablissement, details_url) %}
+{% macro afficher_infowindow(etablissement, details_url=None, context='existing') %}
     <div class="infowindow-content">
         <!-- Lien cliquable pour la partie supérieure -->
+        {% if context == 'existing' and details_url %}
         <a href="{{ details_url }}" class="infowindow-link">
+        {% else %}
+        <div class="infowindow-link">
+        {% endif %}
+
             <div class="infowindow-badges">
                 {{ afficher_badge_etablissement(etablissement) }}
                 {{ afficher_badge_type_etab(etablissement) }}
@@ -74,17 +79,26 @@
                 </p>
             </div>
 
+        {% if context == 'existing' and details_url %}
         </a>
+        {% else %}
+        </div>
+        {% endif %}
+
         <!-- Partie non cliquable avec la liste des flans -->
         <div class="flans-list">
-            {% if etablissement.flans %}
-                {% for flan in etablissement.flans %}
-                    <div class="flan-item">
-                        {{ afficher_objet('flan', flan) }}
-                    </div>
-                {% endfor %}
+            {% if context == 'existing' %}
+                {% if etablissement.flans %}
+                    {% for flan in etablissement.flans %}
+                        <div class="flan-item">
+                            {{ afficher_objet('flan', flan) }}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="no-flans">Aucun flan proposé.</p>
+                {% endif %}
             {% else %}
-                <p class="no-flans">Aucun flan proposé.</p>
+                <p class="no-flans">Établissement en cours de proposition</p>
             {% endif %}
         </div>
     </div>

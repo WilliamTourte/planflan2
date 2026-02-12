@@ -44,17 +44,61 @@ export function createEmojiIcon(emoji, className) {
  * Crée un marqueur avec un popup asynchrone pour un établissement donné.
  * @param {object} map - Instance de la carte Leaflet
  * @param {object} etablissement - Données de l'établissement
+ * @param {string} context - Contexte ('existing' ou 'proposition')
  * @param {string} baseUrl - URL de base pour les liens (par défaut: origine du site)
  * @returns {object} Marqueur Leaflet créé
  */
-export function createEtablissementMarker(map, etablissement, baseUrl = window.location.origin) {
-    let icon = createEmojiIcon('🏠', 'default-icon');
-    if (etablissement.label) {
-        icon = createEmojiIcon('❤️', 'label-icon');
-    } else if (etablissement.visite) {
-        icon = createEmojiIcon('✅', 'visited-icon');
+export function createInfowindowMarker(map, etablissement, context = 'existing', baseUrl = window.location.origin) {
+    console.log('createInfowindowMarker appelé avec:', {
+        mapExists: !!map,
+        mapType: typeof map,
+        hasAddLayer: !!map?.addLayer,
+        addLayerIsFunction: typeof map?.addLayer === 'function',
+        mapObject: map,
+        etablissement: etablissement
+    });
+    
+    // Validation de la carte
+    if (!map || !map.addLayer || typeof map.addLayer !== 'function') {
+        console.error('createInfowindowMarker: map parameter is not a valid Leaflet map object', map);
+        throw new Error('Invalid map object provided to createInfowindowMarker');
+    }
+    
+    // Validation supplémentaire: vérifier que la carte est bien une instance Leaflet
+    try {
+        // Tester quelques propriétés et méthodes essentielles
+        const isValidLeafletMap = 
+            typeof map.getCenter === 'function' &&
+            typeof map.setView === 'function' &&
+            typeof map.removeLayer === 'function' &&
+            typeof map.addLayer === 'function';
+        
+        if (!isValidLeafletMap) {
+            console.error('createInfowindowMarker: map object is not a valid Leaflet map instance', {
+                hasGetCenter: typeof map.getCenter === 'function',
+                hasSetView: typeof map.setView === 'function',
+                hasRemoveLayer: typeof map.removeLayer === 'function',
+                hasAddLayer: typeof map.addLayer === 'function'
+            });
+            throw new Error('Invalid Leaflet map instance provided to createInfowindowMarker');
+        }
+    } catch (e) {
+        console.error('createInfowindowMarker: error validating map instance', e);
+        throw new Error('Error validating map instance in createInfowindowMarker');
+    }
+
+    // Déterminer l'icône en fonction du contexte
+    let icon;
+    if (context === 'existing') {
+        if (etablissement.label) {
+            icon = createEmojiIcon('❤️', 'label-icon');
+        } else if (etablissement.visite) {
+            icon = createEmojiIcon('✅', 'visited-icon');
+        } else {
+            icon = createEmojiIcon('👋', 'unvisited-icon');
+        }
     } else {
-        icon = createEmojiIcon('👋', 'unvisited-icon');
+        icon = createEmojiIcon('🏠', 'proposition-icon');
     }
 
     const marker = L.marker(
@@ -91,7 +135,19 @@ export function createEtablissementMarker(map, etablissement, baseUrl = window.l
             map.panTo(marker.getLatLng());
         }, 100);
 
-        fetch(`/get_infowindow_content?id_etab=${etablissement.id_etab}`)
+        // Construction de l'URL en fonction du contexte
+        let url;
+        if (context === 'existing') {
+            url = `/get_infowindow_content?id_etab=${etablissement.id_etab}&context=existing`;
+        } else {
+            url = `/get_infowindow_content?context=proposition&` +
+                 `nom=${encodeURIComponent(etablissement.nom)}&` +
+                 `adresse=${encodeURIComponent(etablissement.adresse)}&` +
+                 `ville=${encodeURIComponent(etablissement.ville)}&` +
+                 `type_etab=${etablissement.type_etab}`;
+        }
+
+        fetch(url)
             .then(response => response.text())
             .then(content => {
                 popupContainer.innerHTML = content;
@@ -108,7 +164,10 @@ export function createEtablissementMarker(map, etablissement, baseUrl = window.l
                 console.error('Erreur lors du chargement du popup:', error);
                 let popupContent = `<div class="infowindow-content"><h4>${etablissement.nom}</h4>`;
                 popupContent += `<p>${etablissement.adresse}, ${etablissement.ville}</p>`;
-                popupContent += `<a href="${baseUrl}/etablissement/${etablissement.id_etab}" class="btn btn-success">Voir plus</a></div>`;
+                if (context === 'existing') {
+                    popupContent += `<a href="${baseUrl}/etablissement/${etablissement.id_etab}" class="btn btn-success">Voir plus</a>`;
+                }
+                popupContent += `</div>`;
                 popupContainer.innerHTML = popupContent;
                 marker._popup.update();
                 // Forcer le recalcul de position même en cas d'erreur
@@ -123,6 +182,11 @@ export function createEtablissementMarker(map, etablissement, baseUrl = window.l
 
     marker.options.etablissement = etablissement;
     return marker;
+}
+
+// Conserver l'ancienne fonction pour la compatibilité
+function createEtablissementMarker(map, etablissement, baseUrl) {
+    return createInfowindowMarker(map, etablissement, 'existing', baseUrl);
 }
 
 /**
