@@ -185,7 +185,7 @@ export function createInfowindowMarker(map, etablissement, context = 'existing',
 }
 
 // Conserver l'ancienne fonction pour la compatibilité
-function createEtablissementMarker(map, etablissement, baseUrl) {
+export function createEtablissementMarker(map, etablissement, baseUrl) {
     return createInfowindowMarker(map, etablissement, 'existing', baseUrl);
 }
 

@@ -542,12 +542,15 @@ def get_infowindow_content():
             "ville": request.args.get("ville", ""),
             "type_etab": request.args.get("type_etab", "BOULANGERIE"),
             "label": False,
-            "flans": []
+            "flans": [],
         }
         details_url = None
 
     return render_template(
-        "infowindow_template.html", etablissement=etablissement, details_url=details_url, context=context
+        "infowindow_template.html",
+        etablissement=etablissement,
+        details_url=details_url,
+        context=context,
     )
 
 

@@ -15,6 +15,7 @@ const leaflet = {
     fitBounds: jest.fn().mockReturnThis(),
     eachLayer: jest.fn(),
     removeLayer: jest.fn().mockReturnThis(),
+    addLayer: jest.fn().mockReturnThis(),
     options: {},
   })),
 

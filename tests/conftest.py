@@ -139,7 +139,13 @@ def setup_full_data(app):
         db.session.commit()
 
         # Créer des flans
-        flan_user = Flan(nom="Flan User", prix=3.5, id_etab=etab_user.id_etab, id_user=user.id_user, statut="VALIDE")
+        flan_user = Flan(
+            nom="Flan User",
+            prix=3.5,
+            id_etab=etab_user.id_etab,
+            id_user=user.id_user,
+            statut="VALIDE",
+        )
 
         flan_admin = Flan(
             nom="Flan Admin",

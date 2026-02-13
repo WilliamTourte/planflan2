@@ -46,30 +46,9 @@ skip_gitignore = true
 known_first_party = ["app"]
 
 [tool.pytest.ini_options]
+# Configuration minimale - pytest.ini est utilisé en priorité
 testpaths = ["tests"]
 python_files = ["test_*.py"]
-addopts = "-v --tb=short"
-markers = [
-    "auth: tests d'authentification",
-    "admin: tests d'administration",
-    "main: tests des routes principales",
-    "forms: tests de validation des formulaires",
-    "utils: tests des fonctions utilitaires",
-    "maps: tests des fonctionnalités de carte",
-    "scenarios: tests de scénarios complexes",
-    "unitary: tests unitaires",
-    "app: tests d'application",
-    "slow: tests lents",
-    "critical: tests critiques",
-    "performance: tests de performance",
-    "csrf: tests de protection CSRF",
-    "integration: tests d'intégration complets",
-    "smoke: tests smoke",
-    "routes: tests des routes",
-    "api: tests des API",
-    "regression: tests de régression",
-    "deployment: tests de déploiement",
-]
 
 [tool.coverage.run]
 source = ["app"]
@@ -79,16 +58,19 @@ omit = [
     "*/__init__.py",
     "*/__pycache__/*",
     "app/config_prod.py",
+    "app/configprod.py",
+    "*/conftest.py",
 ]
 
 [tool.coverage.report]
 exclude_lines = [
     "pragma: no cover",
     "def __repr__",
-    "raise AssertionError",
     "raise NotImplementedError",
     "if __name__ == .__main__.:",
     "if TYPE_CHECKING:",
-    "class .*\\bProtocol\\):",
-    "@(abc\\.)?abstractmethod",
+    "@abstractmethod",
+    "except ImportError:",
+    "pass",
+    "return NotImplemented",
 ]
