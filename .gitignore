@@ -29,8 +29,7 @@ Desktop.ini
 *.log
 *.swp
 
-# Dossier de migrations
-migrations/
+
 
 # Fichiers de build
 dist/
