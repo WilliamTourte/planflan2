@@ -38,7 +38,6 @@ Thumbs.db
 
 # Spécifique au projet
 docker-db/
-migrations/
 logs/
 letsencrypt/
 

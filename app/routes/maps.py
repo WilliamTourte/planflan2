@@ -120,11 +120,11 @@ def proposer_etablissement():
 def verifier_etablissement():
     # Vérification CSRF plus tolérante pour les requêtes AJAX
     csrf_token = request.headers.get("X-CSRFToken") or request.form.get("csrf_token")
-    
+
     # Pour les requêtes AJAX, le token peut être dans un en-tête personnalisé
     if not csrf_token:
         csrf_token = request.headers.get("X-CSRF-Token")  # Variante avec tiret
-    
+
     # Si nous sommes en environnement de développement ou si le token est manquant pour cette route spécifique,
     # nous pouvons être plus tolérants car c'est une vérification avant création
     if not current_app.config.get("TESTING", False):

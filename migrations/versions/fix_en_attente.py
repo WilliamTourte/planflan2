@@ -5,13 +5,13 @@ Revises: fd3cb8773fda
 Create Date: 2026-02-13 00:00:00.000000
 
 """
+
 from alembic import op
 import sqlalchemy as sa
 
-
 # revision identifiers, used by Alembic.
-revision = 'fix_en_attente'
-down_revision = 'fd3cb8773fda'
+revision = "fix_en_attente"
+down_revision = "fd3cb8773fda"
 branch_labels = None
 depends_on = None
 
