@@ -90,22 +90,14 @@ function initAutocomplete() {
                 resultsContainer.classList.remove("show");
                 
                 // Récupérer les coordonnées GPS pour zoomer sur la carte
-                console.log("DEBUG: Fetching GPS coordinates for ville:", ville);
                 fetch(`/api/villes?q=${encodeURIComponent(ville)}&with_gps=true`)
-                    .then(response => {
-                        console.log("DEBUG: API response status:", response.status);
-                        return response.json();
-                    })
+                    .then(response => response.json())
                     .then(data => {
-                        console.log("DEBUG: API response data:", data);
                         if (data.length > 0) {
                             const parts = data[0].split('|');
-                            console.log("DEBUG: Parsed parts:", parts);
                             if (parts.length === 3) {
                                 const lat = parseFloat(parts[1]);
                                 const lng = parseFloat(parts[2]);
-                                
-                                console.log("DEBUG: Extracted coordinates - lat:", lat, "lng:", lng);
                                 
                                 // Stocker les coordonnées dans les champs cachés
                                 const latitudeField = document.querySelector('input[name="latitude"]');
@@ -113,7 +105,6 @@ function initAutocomplete() {
                                 if (latitudeField && longitudeField) {
                                     latitudeField.value = lat;
                                     longitudeField.value = lng;
-                                    console.log("DEBUG: Updated hidden fields with coordinates");
                                 }
                                 
                                 // Rediriger vers la page de liste avec les coordonnées
@@ -123,13 +114,11 @@ function initAutocomplete() {
                                 url.searchParams.append("longitude", lng);
                                 url.searchParams.append("from_ville_selection", "true");
                                 
-                                console.log("DEBUG: Redirecting to URL:", url.toString());
                                 window.location.href = url.toString();
                                 return;
                             }
                         }
                         
-                        console.log("DEBUG: No coordinates found, submitting form normally");
                         // Si pas de coordonnées trouvées, soumettre le formulaire normalement
                         const form = document.querySelector('form');
                         if (form) {

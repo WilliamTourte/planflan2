@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Ville Selection Debug</title>
+    <script>
+        // Simulate the URL parameters that would be present after ville selection
+        const testUrl = new URL('http://localhost:5000/liste_etablissements?ville=Paris&latitude=48.8566&longitude=2.3522&from_ville_selection=true');
+        const urlParams = new URLSearchParams(testUrl.search);
+        
+        console.log("Test URL:", testUrl.toString());
+        console.log("URL Parameters:", Object.fromEntries(urlParams.entries()));
+        
+        // Test the logic that should be executed
+        const fromVilleSelection = urlParams.get('from_ville_selection') === 'true';
+        console.log("fromVilleSelection:", fromVilleSelection);
+        
+        if (fromVilleSelection) {
+            console.log("DEBUG: URL parameters:", Object.fromEntries(urlParams.entries()));
+            
+            // Extract coordinates from URL parameters for city selection
+            const villeLat = parseFloat(urlParams.get('latitude'));
+            const villeLon = parseFloat(urlParams.get('longitude'));
+            
+            console.log("DEBUG: villeLat =", villeLat, "villeLon =", villeLon);
+            console.log("DEBUG: isNaN(villeLat) =", isNaN(villeLat), "isNaN(villeLon) =", isNaN(villeLon));
+
+            if (!isNaN(villeLat) && !isNaN(villeLon)) {
+                console.log("DEBUG: Zooming to city coordinates:", villeLat, villeLon);
+                console.log("DEBUG: Would call mapModule.setView([" + villeLat + ", " + villeLon + "], 13)");
+            } else {
+                console.log("DEBUG: Invalid coordinates, cannot zoom");
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Test Ville Selection Debug</h1>
+    <p>Check the browser console for debug output.</p>
+    <p>This simulates what should happen when coming from ville selection.</p>
+</body>
+</html>

@@ -17,19 +17,17 @@ import { initializePasswordToggles } from './password-toggle.js';
 
 // Initialisation globale
 document.addEventListener('DOMContentLoaded', function() {
-    console.log("DEBUG: Initialisation de l'application PlanFlan...");
+    console.log("Initialisation de l'application PlanFlan...");
     
     // Initialisation selon la page
     const pageType = document.body.getAttribute('data-page-type');
-    console.log("DEBUG: Type de page détecté:", pageType);
-    console.log("DEBUG: All body attributes:", Array.from(document.body.attributes).map(attr => `${attr.name}="${attr.value}"`).join(", "));
+    console.log("Type de page détecté:", pageType);
     
     switch(pageType) {
         case 'home':
             initializeHomePage();
             break;
         case 'liste_etablissements':
-            console.log("DEBUG: Calling initializeListeEtablissementsPage()");
             initializeListeEtablissementsPage();
             break;
         case 'proposer_etablissement':
@@ -67,7 +65,7 @@ function initializeHomePage() {
  * Initialisation pour la page de liste des établissements
  */
 function initializeListeEtablissementsPage() {
-    console.log("DEBUG: Initialisation de la page de liste des établissements");
+    console.log("Initialisation de la page de liste des établissements");
     
     // Récupérer les données des établissements
     const etablissementsDataElement = document.getElementById('etablissements-data');
@@ -98,9 +96,7 @@ function initializeListeEtablissementsPage() {
     }
 
     // Initialiser la carte et les filtres
-    console.log("DEBUG: Initializing map...");
     mapModule.initMap();
-    console.log("DEBUG: Map initialized, window.map =", window.map);
     mapModule.updateMapAndMarkers();
     filters.setupFilterButtons();
     
@@ -123,27 +119,15 @@ function initializeListeEtablissementsPage() {
     }
     
     // Si on vient d'une sélection de ville, centrer la carte sur les coordonnées
-    console.log("DEBUG: fromVilleSelection =", fromVilleSelection);
     if (fromVilleSelection) {
-        console.log("DEBUG: URL parameters:", Object.fromEntries(urlParams.entries()));
-        
         // Extract coordinates from URL parameters for city selection
         const villeLat = parseFloat(urlParams.get('latitude'));
         const villeLon = parseFloat(urlParams.get('longitude'));
-        
-        console.log("DEBUG: villeLat =", villeLat, "villeLon =", villeLon);
-        console.log("DEBUG: isNaN(villeLat) =", isNaN(villeLat), "isNaN(villeLon) =", isNaN(villeLon));
 
         if (!isNaN(villeLat) && !isNaN(villeLon)) {
-            console.log("DEBUG: Zooming to city coordinates:", villeLat, villeLon);
             if (window.map && typeof window.map.setView === 'function') {
-                console.log("DEBUG: Calling window.map.setView([" + villeLat + ", " + villeLon + "], 13)");
                 window.map.setView([villeLat, villeLon], 13);
-            } else {
-                console.log("DEBUG: window.map not available or setView not a function");
             }
-        } else {
-            console.log("DEBUG: Invalid coordinates, cannot zoom");
         }
     }
     
@@ -201,7 +185,6 @@ function initializeProposerEtablissementPage() {
                         .then(autocompleteInstance => {
                             console.log("DEBUG: Google Places Autocomplete initialisé avec restriction à la ville:", selectedVille);
                             window.autocompleteInstance = autocompleteInstance;
-                            utils.showToast('Recherche restreinte à ' + selectedVille, 'info');
                         })
                         .catch(error => {
                             console.error("DEBUG: Erreur lors de l'initialisation de Google Places Autocomplete:", error);

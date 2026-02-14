@@ -26,9 +26,6 @@ export function initAutocomplete(options = {}) {
     const pageType = document.body.getAttribute('data-page-type');
     const isIndexPage = pageType === 'home';
     const isProposerPage = pageType === 'proposer_etablissement';
-    
-    console.log("DEBUG: Autocomplete initialized on page type:", pageType, 
-                "(isIndexPage:", isIndexPage, ", isProposerPage:", isProposerPage, ")");
 
     // Si le conteneur des résultats n'existe pas, le créer
     if (!resultsContainer) {
@@ -71,7 +68,6 @@ export function initAutocomplete(options = {}) {
     function syncWithHiddenField() {
         // Sur la page d'accueil, pas besoin de synchronisation avec un champ caché
         if (isIndexPage) {
-            console.log("DEBUG: On index page, skipping hidden field sync");
             return;
         }
         
@@ -103,10 +99,7 @@ export function initAutocomplete(options = {}) {
         }
         
         if (hiddenField) {
-            console.log("DEBUG: Syncing hidden field with:", input.value);
             hiddenField.value = input.value;
-        } else {
-            console.log("DEBUG: Hidden ville field not found on", pageType, "page");
         }
     }
 
@@ -204,7 +197,6 @@ export function initAutocomplete(options = {}) {
                 
                 // Comportement différent selon la page
                 if (isIndexPage) {
-                    console.log("DEBUG: Index page - fetching GPS and redirecting to liste_etablissements");
                     // Récupérer les coordonnées GPS pour zoomer sur la carte
                     fetch(`/api/villes?q=${encodeURIComponent(ville)}&with_gps=true`)
                         .then(response => response.json())
@@ -215,7 +207,6 @@ export function initAutocomplete(options = {}) {
                                     const lat = parseFloat(parts[1]);
                                     const lng = parseFloat(parts[2]);
                                     
-                                    console.log("DEBUG: Redirecting to liste_etablissements with coordinates:", lat, lng);
                                     // Rediriger vers la page de liste avec les coordonnées
                                     const url = new URL(window.location.origin + '/liste_etablissements');
                                     url.searchParams.append("ville", ville);
@@ -229,14 +220,13 @@ export function initAutocomplete(options = {}) {
                             }
                             
                             // Si pas de coordonnées trouvées, soumettre le formulaire normalement
-                            console.log("DEBUG: No coordinates found, submitting form normally");
                             const form = document.querySelector('form');
                             if (form) {
                                 form.submit();
                             }
                         })
                         .catch(error => {
-                            console.error("DEBUG: Erreur lors de la récupération des coordonnées GPS:", error);
+                            console.error("Erreur lors de la récupération des coordonnées GPS:", error);
                             // Soumettre le formulaire en cas d'erreur
                             const form = document.querySelector('form');
                             if (form) {
@@ -244,7 +234,6 @@ export function initAutocomplete(options = {}) {
                             }
                         });
                 } else if (isProposerPage) {
-                    console.log("DEBUG: Proposer page - updating hidden fields with GPS coordinates");
                     // Récupérer les coordonnées GPS pour zoomer sur la carte
                     fetch(`/api/villes?q=${encodeURIComponent(ville)}&with_gps=true`)
                         .then(response => response.json())
@@ -261,16 +250,13 @@ export function initAutocomplete(options = {}) {
                                     if (latitudeField && longitudeField) {
                                         latitudeField.value = lat;
                                         longitudeField.value = lng;
-                                        console.log("DEBUG: Updated hidden GPS fields:", lat, lng);
                                     }
                                 }
                             }
                         })
                         .catch(error => {
-                            console.error("DEBUG: Erreur lors de la récupération des coordonnées GPS:", error);
+                            console.error("Erreur lors de la récupération des coordonnées GPS:", error);
                         });
-                } else {
-                    console.log("DEBUG: Unknown page type, using default behavior");
                 }
             });
             resultsContainer.appendChild(div);
@@ -338,7 +324,6 @@ export function initAutocomplete(options = {}) {
     // Synchroniser avec le champ caché lors de la saisie (uniquement sur la page de proposition)
     if (!isIndexPage) {
         input.addEventListener("input", function (e) {
-            console.log("DEBUG: Syncing with hidden field:", e.target.value);
             syncWithHiddenField();
         });
     }
@@ -346,9 +331,7 @@ export function initAutocomplete(options = {}) {
     // Synchroniser avec le champ caché lors de la sélection avec le clavier (uniquement sur la page de proposition)
     if (!isIndexPage) {
         input.addEventListener("keydown", function (e) {
-            console.log("DEBUG: Key down event:", e.key);
             if (e.key === "Enter") {
-                console.log("DEBUG: Enter key pressed, syncing with hidden field");
                 syncWithHiddenField();
             }
         });
