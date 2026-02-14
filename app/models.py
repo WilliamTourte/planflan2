@@ -32,7 +32,7 @@ class StatutModeration(Enum):
     Cette énumération définit les différents statuts que peut avoir
     un établissement dans le processus de modération.
     """
-
+    EN_ATTENTE = "EN_ATTENTE"
     VALIDE = "VALIDE"
     SUPPRIME = "SUPPRIME"
 
