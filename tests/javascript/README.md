@@ -1,177 +1,154 @@
-# Tests JavaScript pour PlanFlan
+# JavaScript Tests for PlanFlan Autocomplete
 
-Ce dossier contient les tests pour le code JavaScript de l'application PlanFlan.
+This directory contains JavaScript tests for the autocomplete functionality using Jest.
 
-## Structure
+## Test Structure
 
-```
-tests/javascript/
-├── __mocks__/          # Mocks pour les requêtes API et autres dépendances
-├── unit/              # Tests unitaires pour les modules individuels
-├── integration/       # Tests d'intégration pour les interactions entre modules
-├── setupTests.js      # Configuration globale pour Jest
-└── README.md          # Ce fichier
-```
+The tests are organized to verify the different behaviors of the autocomplete system:
 
-## Prérequis
+1. **Page Type Detection**: Tests that the system correctly identifies whether it's on the index page or proposer page
+2. **Index Page Behavior**: Tests the redirect behavior when a city is selected on the home page
+3. **Proposer Page Behavior**: Tests the hidden field synchronization when a city is selected on the proposer page
+4. **URL Parameter Handling**: Tests that URL parameters are correctly set and parsed
 
-- Node.js (version 14 ou supérieure)
-- npm (version 6 ou supérieure)
+## Setup Instructions
 
-## Installation
+To run these tests, you'll need to set up a JavaScript testing environment:
 
-1. Installer les dépendances :
+### 1. Install Node.js and npm
+
+Make sure you have Node.js (v14+) and npm installed:
 
 ```bash
-npm install
+node -v
+npm -v
 ```
 
-## Exécution des tests
-
-### Tous les tests
+### 2. Install Jest and related dependencies
 
 ```bash
-npm test
+npm install --save-dev jest @babel/core @babel/preset-env babel-jest
 ```
 
-### Tests unitaires uniquement
+### 3. Configure Babel
 
-```bash
-npm run test:unit
-```
-
-### Tests d'intégration uniquement
-
-```bash
-npm run test:integration
-```
-
-### Mode watch (développement)
-
-```bash
-npm run test:watch
-```
-
-## Configuration
-
-Les tests utilisent les outils suivants :
-
-- **Jest** : Framework de test
-- **jsdom** : Environnement DOM pour les tests
-- **fetch-mock** : Mock des requêtes HTTP
-- **MSW (Mock Service Worker)** : Mock des API
-- **Babel** : Transpilation du code ES6
-
-## Écriture de nouveaux tests
-
-### Tests unitaires
-
-Les tests unitaires doivent :
-
-1. Tester une fonction/méthode spécifique
-2. Être isolés (utiliser des mocks)
-3. Être rapides à exécuter
-4. Couvrir les cas nominaux et les cas d'erreur
-
-Exemple :
+Create a `babel.config.js` file in the project root:
 
 ```javascript
-describe('maFonction', () => {
-  it('should do something', () => {
-    // Setup
-    const result = maFonction(arg1, arg2);
-    
-    // Assertion
-    expect(result).toBe(expected);
-  });
-
-  it('should handle errors', () => {
-    // Setup avec mock d'erreur
-    const mockFn = jest.fn().mockRejectedValue(new Error('test'));
-    
-    // Assertion d'erreur
-    await expect(maFonction(mockFn)).rejects.toThrow('test');
-  });
-});
+module.exports = {
+  presets: [
+    ['@babel/preset-env', {
+      targets: {
+        node: 'current'
+      }
+    }]
+  ]
+};
 ```
 
-### Tests d'intégration
+### 4. Configure Jest
 
-Les tests d'intégration doivent :
-
-1. Tester l'interaction entre plusieurs modules
-2. Utiliser un DOM simulé (jsdom)
-3. Vérifier les flux complets
-4. Être plus réalistes que les tests unitaires
-
-Exemple :
+Create a `jest.config.js` file in the project root:
 
 ```javascript
-describe('Feature: Autocomplete et API', () => {
-  beforeEach(() => {
-    // Configurer le DOM
-    document.body.innerHTML = `
-      <input id="ville-autocomplete">
-      <div id="autocomplete-results"></div>
-    `;
-  });
-
-  it('should show results when typing', async () => {
-    // Mock de l'API
-    fetchMock.get('/api/villes?q=Par', ['Paris', 'Paris 1er']);
-    
-    // Initialiser le module
-    initAutocomplete();
-    
-    // Simuler la saisie utilisateur
-    const input = document.getElementById('ville-autocomplete');
-    input.value = 'Par';
-    input.dispatchEvent(new Event('input'));
-    
-    // Attendre et vérifier
-    await new Promise(resolve => setTimeout(resolve, 100));
-    expect(document.getElementById('autocomplete-results').children.length).toBe(2);
-  });
-});
+module.exports = {
+  testEnvironment: 'jsdom',
+  moduleFileExtensions: ['js', 'json'],
+  transform: {
+    '^.+\.js$': 'babel-jest'
+  },
+  testMatch: ['**/tests/javascript/**/*.test.js'],
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/app/static/js/$1'
+  },
+  setupFilesAfterEnv: ['<rootDir>/tests/javascript/setupTests.js']
+};
 ```
 
-## Bonnes pratiques
+### 5. Create setup file
 
-1. **Noms de tests clairs** : Utiliser `should` pour décrire le comportement attendu
-2. **Isolation** : Nettoyer les mocks et le DOM après chaque test
-3. **Performance** : Éviter les attentes inutiles (`setTimeout`)
-4. **Coverage** : Viser 80%+ de couverture de code
-5. **Maintenabilité** : Garder les tests simples et lisibles
+Create `tests/javascript/setupTests.js`:
 
-## Intégration CI/CD
+```javascript
+// Mock browser APIs as needed
+global.URL = class URL {
+  constructor(base, path) {
+    this.searchParams = new URLSearchParams();
+  }
+};
 
-Les tests JavaScript sont automatiquement exécutés dans le pipeline CI/CD via GitHub Actions. Voir `.github/workflows/ci.yml` pour la configuration.
+// Add other global mocks as needed
+```
 
-## Dépannage
+### 6. Update package.json
 
-### Erreur : "Cannot find module"
+Add test scripts to your `package.json`:
+
+```json
+"scripts": {
+  "test:js": "jest",
+  "test:js:watch": "jest --watch",
+  "test:js:coverage": "jest --coverage"
+}
+```
+
+## Running the Tests
+
+### Run all tests
 
 ```bash
-npm install
+npm run test:js
 ```
 
-### Erreur : "Jest not found"
+### Run tests in watch mode
 
 ```bash
-npm install --save-dev jest
+npm run test:js:watch
 ```
 
-### Problèmes de cache
+### Run tests with coverage
 
 ```bash
-npm cache clean --force
-rm -rf node_modules/
-npm install
+npm run test:js:coverage
 ```
 
-## Ressources
+## Test Implementation Notes
 
-- [Documentation Jest](https://jestjs.io/)
-- [Documentation jsdom](https://github.com/jsdom/jsdom)
-- [Documentation fetch-mock](https://www.wheresrhys.co.uk/fetch-mock/)
-- [Documentation MSW](https://mswjs.io/)
+The current test file (`autocomplete.test.js`) contains the test structure but would need to be adapted to work with the actual implementation:
+
+1. **Module Import**: The tests assume ES6 module imports. You may need to adjust based on how your JavaScript is bundled.
+
+2. **DOM Mocking**: The tests use Jest's mocking capabilities to simulate DOM elements and browser APIs.
+
+3. **Fetch Mocking**: The `fetch` API is mocked to simulate API responses.
+
+4. **Event Simulation**: The tests would need to simulate user interactions like clicking on autocomplete results.
+
+## Alternative Approach: Integration Testing
+
+If setting up Jest proves complex, consider:
+
+1. **Cypress or Playwright**: For end-to-end testing that simulates real user interactions
+2. **Python + Selenium**: Use Python's unittest framework with Selenium for browser automation
+3. **Manual Testing Guide**: Document the expected behavior for manual QA testing
+
+## Current Test Status
+
+The test file provided is a **template** showing the intended test structure. To make it fully functional:
+
+1. Uncomment and adapt the test implementations
+2. Set up proper module mocking for the autocomplete.js file
+3. Adjust the mocks to match the actual DOM structure
+4. Add error case testing
+5. Implement edge case scenarios
+
+## Testing the Specific Fix
+
+The tests should verify that:
+
+1. **On index.html**: City selection redirects to liste_etablissements with proper URL parameters
+2. **On proposer_etablissement.html**: City selection updates hidden form fields
+3. **No cross-contamination**: Index page doesn't try to sync hidden fields, proposer page doesn't redirect
+4. **URL parameter handling**: liste_etablissements correctly extracts and uses the coordinates
+
+This ensures the fix for the lost zoom functionality works correctly while maintaining the proposer page functionality.

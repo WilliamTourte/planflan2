@@ -119,8 +119,16 @@ function initializeListeEtablissementsPage() {
     }
     
     // Si on vient d'une sélection de ville, centrer la carte sur les coordonnées
-    if (fromVilleSelection && userLat && userLon) {
-        mapModule.setView([userLat, userLon], 13);
+    if (fromVilleSelection) {
+        // Extract coordinates from URL parameters for city selection
+        const villeLat = parseFloat(urlParams.get('latitude'));
+        const villeLon = parseFloat(urlParams.get('longitude'));
+
+        if (!isNaN(villeLat) && !isNaN(villeLon)) {
+            if (window.map && typeof window.map.setView === 'function') {
+                window.map.setView([villeLat, villeLon], 13);
+            }
+        }
     }
     
     // Sauvegarder l'état initial
@@ -177,7 +185,6 @@ function initializeProposerEtablissementPage() {
                         .then(autocompleteInstance => {
                             console.log("DEBUG: Google Places Autocomplete initialisé avec restriction à la ville:", selectedVille);
                             window.autocompleteInstance = autocompleteInstance;
-                            utils.showToast('Recherche restreinte à ' + selectedVille, 'info');
                         })
                         .catch(error => {
                             console.error("DEBUG: Erreur lors de l'initialisation de Google Places Autocomplete:", error);

@@ -22,6 +22,11 @@ export function initAutocomplete(options = {}) {
         return false;
     }
 
+    // Détecter le type de page pour adapter le comportement
+    const pageType = document.body.getAttribute('data-page-type');
+    const isIndexPage = pageType === 'home';
+    const isProposerPage = pageType === 'proposer_etablissement';
+
     // Si le conteneur des résultats n'existe pas, le créer
     if (!resultsContainer) {
         resultsContainer = document.createElement("div");
@@ -58,15 +63,21 @@ export function initAutocomplete(options = {}) {
 
     /**
      * Synchronise la valeur du champ de recherche avec le champ caché du formulaire.
+     * Uniquement utilisé sur la page de proposition d'établissement.
      */
     function syncWithHiddenField() {
+        // Sur la page d'accueil, pas besoin de synchronisation avec un champ caché
+        if (isIndexPage) {
+            return;
+        }
+        
         // Essayer plusieurs façons de trouver le champ ville
         let hiddenField = null;
         
         // 1. Essayer l'ID pour la page de proposition d'établissement
         hiddenField = document.getElementById('ajout-etab-ville');
         
-        // 2. Si non trouvé, essayer le name pour la page d'accueil
+        // 2. Si non trouvé, essayer le name pour la page d'accueil (compatibilité)
         if (!hiddenField) {
             hiddenField = document.querySelector('input[name="ville"]');
         }
@@ -75,23 +86,20 @@ export function initAutocomplete(options = {}) {
         if (!hiddenField) {
             const allInputs = document.querySelectorAll('input');
             for (let i = 0; i < allInputs.length; i++) {
-                const input = allInputs[i];
-                if (input.id && input.id.toLowerCase().includes('ville')) {
-                    hiddenField = input;
+                const inputEl = allInputs[i];
+                if (inputEl.id && inputEl.id.toLowerCase().includes('ville')) {
+                    hiddenField = inputEl;
                     break;
                 }
-                if (input.name && input.name.toLowerCase().includes('ville')) {
-                    hiddenField = input;
+                if (inputEl.name && inputEl.name.toLowerCase().includes('ville')) {
+                    hiddenField = inputEl;
                     break;
                 }
             }
         }
         
         if (hiddenField) {
-            console.log("Syncing hidden field with:", input.value);
             hiddenField.value = input.value;
-        } else {
-            console.warn("Hidden ville field not found. Available inputs:", document.querySelectorAll('input'));
         }
     }
 
@@ -187,29 +195,69 @@ export function initAutocomplete(options = {}) {
                 // Masquer les résultats après sélection
                 resultsContainer.classList.remove("show");
                 
-                // Récupérer les coordonnées GPS pour zoomer sur la carte
-                fetch(`/api/villes?q=${encodeURIComponent(ville)}&with_gps=true`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.length > 0) {
-                            const parts = data[0].split('|');
-                            if (parts.length === 3) {
-                                const lat = parseFloat(parts[1]);
-                                const lng = parseFloat(parts[2]);
-                                
-                                // Stocker les coordonnées dans les champs cachés
-                                const latitudeField = document.querySelector('input[name="latitude"]');
-                                const longitudeField = document.querySelector('input[name="longitude"]');
-                                if (latitudeField && longitudeField) {
-                                    latitudeField.value = lat;
-                                    longitudeField.value = lng;
+                // Comportement différent selon la page
+                if (isIndexPage) {
+                    // Récupérer les coordonnées GPS pour zoomer sur la carte
+                    fetch(`/api/villes?q=${encodeURIComponent(ville)}&with_gps=true`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.length > 0) {
+                                const parts = data[0].split('|');
+                                if (parts.length === 3) {
+                                    const lat = parseFloat(parts[1]);
+                                    const lng = parseFloat(parts[2]);
+                                    
+                                    // Rediriger vers la page de liste avec les coordonnées
+                                    const url = new URL(window.location.origin + '/liste_etablissements');
+                                    url.searchParams.append("ville", ville);
+                                    url.searchParams.append("latitude", lat);
+                                    url.searchParams.append("longitude", lng);
+                                    url.searchParams.append("from_ville_selection", "true");
+                                    
+                                    window.location.href = url.toString();
+                                    return;
                                 }
                             }
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Erreur lors de la récupération des coordonnées GPS:", error);
-                    });
+                            
+                            // Si pas de coordonnées trouvées, soumettre le formulaire normalement
+                            const form = document.querySelector('form');
+                            if (form) {
+                                form.submit();
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Erreur lors de la récupération des coordonnées GPS:", error);
+                            // Soumettre le formulaire en cas d'erreur
+                            const form = document.querySelector('form');
+                            if (form) {
+                                form.submit();
+                            }
+                        });
+                } else if (isProposerPage) {
+                    // Récupérer les coordonnées GPS pour zoomer sur la carte
+                    fetch(`/api/villes?q=${encodeURIComponent(ville)}&with_gps=true`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.length > 0) {
+                                const parts = data[0].split('|');
+                                if (parts.length === 3) {
+                                    const lat = parseFloat(parts[1]);
+                                    const lng = parseFloat(parts[2]);
+                                    
+                                    // Stocker les coordonnées dans les champs cachés
+                                    const latitudeField = document.querySelector('input[name="latitude"]');
+                                    const longitudeField = document.querySelector('input[name="longitude"]');
+                                    if (latitudeField && longitudeField) {
+                                        latitudeField.value = lat;
+                                        longitudeField.value = lng;
+                                    }
+                                }
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Erreur lors de la récupération des coordonnées GPS:", error);
+                        });
+                }
             });
             resultsContainer.appendChild(div);
         });
@@ -273,20 +321,21 @@ export function initAutocomplete(options = {}) {
         debouncedFetch(e.target.value);
     });
 
-    // Synchroniser avec le champ caché lors de la saisie
-    input.addEventListener("input", function (e) {
-        console.log("Syncing with hidden field:", e.target.value);
-        syncWithHiddenField();
-    });
-
-    // Synchroniser avec le champ caché lors de la sélection avec le clavier
-    input.addEventListener("keydown", function (e) {
-        console.log("Key down event:", e.key);
-        if (e.key === "Enter") {
-            console.log("Enter key pressed, syncing with hidden field");
+    // Synchroniser avec le champ caché lors de la saisie (uniquement sur la page de proposition)
+    if (!isIndexPage) {
+        input.addEventListener("input", function (e) {
             syncWithHiddenField();
-        }
-    });
+        });
+    }
+
+    // Synchroniser avec le champ caché lors de la sélection avec le clavier (uniquement sur la page de proposition)
+    if (!isIndexPage) {
+        input.addEventListener("keydown", function (e) {
+            if (e.key === "Enter") {
+                syncWithHiddenField();
+            }
+        });
+    }
 
     // Gestion du clic en dehors pour fermer les résultats
     document.addEventListener("click", function (e) {
