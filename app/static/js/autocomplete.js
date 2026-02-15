@@ -124,21 +124,9 @@ export function initAutocomplete(options = {}) {
             resultsContainer.appendChild(noResults);
             resultsContainer.classList.add("show");
             
-            // Debug temporaire
-            console.log("No results - container should be visible");
-            console.log("Container style:", resultsContainer.style);
-            console.log("Container classes:", resultsContainer.className);
-            return;
+
         }
-        
-        // Debug temporaire
-        console.log("Showing results for", villes.length, "villes");
-        console.log("Container position:", window.getComputedStyle(resultsContainer).position);
-        console.log("Container display:", window.getComputedStyle(resultsContainer).display);
-        
-        // Ajouter un style très visible pour le débogage
-        resultsContainer.style.border = '3px solid red';
-        resultsContainer.style.boxShadow = '0 0 10px rgba(255, 0, 0, 0.5)';
+
 
         villes.forEach((ville) => {
             const div = document.createElement("div");
@@ -531,11 +519,11 @@ function initializeAutocomplete(inputId, apiKey, resolve, reject) {
  */
 export function initGooglePlacesAutocompleteWithCity(inputId, apiKey, villeName) {
     return new Promise((resolve, reject) => {
-        console.log("DEBUG: initGooglePlacesAutocompleteWithCity appelé avec villeName:", villeName);
+
         
         // Si aucune ville n'est spécifiée, utiliser l'initialisation standard
         if (!villeName) {
-            console.log("DEBUG: Aucune ville spécifiée, utilisation du mode standard");
+
             return initGooglePlacesAutocomplete(inputId, apiKey).then(resolve).catch(reject);
         }
         
@@ -547,34 +535,34 @@ export function initGooglePlacesAutocompleteWithCity(inputId, apiKey, villeName)
             input.parentNode.replaceChild(newInput, input);
         }
 
-        console.log("DEBUG: Récupération des coordonnées GPS pour:", villeName);
+
         // Obtenir les coordonnées GPS de la ville (uniquement pour la restriction)
         fetch(`/api/villes?q=${encodeURIComponent(villeName)}&with_gps=true`)
             .then(response => {
-                console.log("DEBUG: Réponse API villes reçue, status:", response.status);
+
                 return response.json();
             })
             .then(data => {
-                console.log("DEBUG: Données API villes reçues:", data);
+
                 if (data.length > 0) {
                     const parts = data[0].split('|');
-                    console.log("DEBUG: Parts analysées:", parts);
+
                     if (parts.length === 3) {
                         const lat = parseFloat(parts[1]);
                         const lng = parseFloat(parts[2]);
-                        console.log("DEBUG: Coordonnées GPS obtenues - Lat:", lat, "Lng:", lng);
+
 
                         // Initialiser avec restriction géographique (mais nous n'affichons pas les coordonnées)
                         setupAutocompleteWithCityRestriction(inputId, apiKey, lat, lng, villeName, resolve, reject);
                         return;
                     }
                 }
-                console.log("DEBUG: Coordonnées GPS non trouvées, utilisation du mode standard");
+
                 // Si on ne trouve pas les coordonnées, utiliser l'initialisation standard
                 initGooglePlacesAutocomplete(inputId, apiKey).then(resolve).catch(reject);
             })
             .catch(error => {
-                console.error("DEBUG: Erreur lors de la récupération des coordonnées GPS:", error);
+
                 initGooglePlacesAutocomplete(inputId, apiKey).then(resolve).catch(reject);
             });
     });
@@ -602,15 +590,15 @@ function setupAutocompleteWithCityRestriction(inputId, apiKey, lat, lng, villeNa
 
             // Callback global
             window.initPlacesWithCityCallback = () => {
-                console.log("DEBUG: Callback initPlacesWithCityCallback appelé");
+
                 initializeAutocompleteWithCity(input, apiKey, lat, lng, villeName, resolve, reject);
             };
         } else {
-            console.log("DEBUG: API Google déjà chargée, initialisation directe");
+
             initializeAutocompleteWithCity(input, apiKey, lat, lng, villeName, resolve, reject);
         }
     } catch (error) {
-        console.error("DEBUG: Erreur lors de l'initialisation de l'autocomplete:", error);
+
         showToast(error.message, 'error');
         reject(error);
     }
@@ -645,7 +633,7 @@ function calculerDistance(lat1, lon1, lat2, lon2) {
  */
 function initializeAutocompleteWithCity(input, apiKey, lat, lng, villeName, resolve, reject) {
     try {
-        console.log("DEBUG: initializeAutocompleteWithCity appelé avec Lat:", lat, "Lng:", lng, "Ville:", villeName);
+
         
         const center = new google.maps.LatLng(lat, lng);
         console.log("DEBUG: Centre créé:", center);
@@ -711,7 +699,7 @@ function initializeAutocompleteWithCity(input, apiKey, lat, lng, villeName, reso
             // Vérifier si le lieu est dans les bounds
             const isInBounds = bounds.contains(placeLocation);
 
-            console.log("DEBUG: Vérification des bounds - Dans la zone:", isInBounds);
+
 
             if (!isInBounds) {
                 // Calculer la distance pour le message
@@ -751,7 +739,7 @@ function initializeAutocompleteWithCity(input, apiKey, lat, lng, villeName, reso
             window.verifyAndProcessEtablissement(place);
         });
 
-        console.log("DEBUG: Autocomplete initialisé avec succès pour la ville:", villeName);
+
         
         // Ajouter un feedback visuel pour montrer la zone de recherche
         const villeInput = document.getElementById('ville-autocomplete');
