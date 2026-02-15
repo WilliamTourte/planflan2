@@ -915,7 +915,14 @@ input[type="submit"]:active {
 .leaflet-popup-close-button {
     font-size: 18px;
     top: 5px;
-    right: 5px;
+    right: 25px; /* Décalage vers la gauche pour éviter la barre de défilement */
+    background-color: rgba(255, 255, 255, 0.8) !important;
+    border-radius: 50% !important;
+    width: 25px !important;
+    height: 25px !important;
+    line-height: 25px !important;
+    text-align: center !important;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.2) !important;
 }
 
 /* Positionnement de la pointe du popup */

@@ -128,6 +128,26 @@ export function createInfowindowMarker(map, etablissement, context = 'existing',
         });
 
         const popupContainer = L.DomUtil.create('div', 'custom-popup-container');
+        
+        // Ajouter un bouton de fermeture personnalisé pour s'assurer qu'il est visible
+        const closeButton = L.DomUtil.create('button', 'custom-close-button', popupContainer);
+        closeButton.innerHTML = '×';
+        closeButton.style.position = 'absolute';
+        closeButton.style.top = '5px';
+        closeButton.style.right = '25px';
+        closeButton.style.zIndex = '1000';
+        closeButton.style.fontSize = '20px';
+        closeButton.style.background = 'none';
+        closeButton.style.border = 'none';
+        closeButton.style.cursor = 'pointer';
+        closeButton.style.padding = '0';
+        closeButton.style.width = '25px';
+        closeButton.style.height = '25px';
+        
+        closeButton.onclick = function(e) {
+            e.stopPropagation();
+            map.closePopup(popup);
+        };
         popup.setContent(popupContainer);
         marker.bindPopup(popup).openPopup();
 
