@@ -124,7 +124,7 @@ export function createInfowindowMarker(map, etablissement, context = 'existing',
             autoPan: true,
             autoPanPadding: [50, 50], // Marge pour éviter que le popup soit collé aux bords
             keepInView: true,
-            closeButton: false,
+            closeButton: true,
         });
 
         const popupContainer = L.DomUtil.create('div', 'custom-popup-container');
