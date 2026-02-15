@@ -18,6 +18,9 @@ describe('Autocomplete Module', () => {
       </form>
     `;
     
+    // Set page type for proposer page tests
+    document.body.setAttribute('data-page-type', 'proposer_etablissement');
+    
     input = document.getElementById("ville-autocomplete");
     resultsContainer = document.getElementById("autocomplete-results");
     
@@ -269,6 +272,9 @@ describe('Autocomplete Module', () => {
           <input name="longitude" type="hidden">
         </form>
       `;
+
+      // Set page type to proposer_etablissement to enable GPS coordinate handling
+      document.body.setAttribute('data-page-type', 'proposer_etablissement');
 
       // Réinitialiser les références aux éléments
       input = document.getElementById("ville-autocomplete");
