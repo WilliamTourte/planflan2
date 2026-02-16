@@ -23,7 +23,7 @@ from typing import List, Dict
 
 def load_villes_data(file_path: str) -> Dict:
     """Charge les données des villes depuis un fichier local."""
-    print(f"📥 Chargement des données des villes depuis {file_path}...")
+    print(f"Chargement des donnees des villes depuis {file_path}...")
     try:
         with open(file_path, "r", encoding="utf-8") as f:
             return json.load(f)
@@ -34,7 +34,7 @@ def load_villes_data(file_path: str) -> Dict:
 
 def extract_relevant_data(raw_data: Dict) -> List[Dict]:
     """Extrait les informations pertinentes des données brutes."""
-    print("🔍 Extraction des données pertinentes...")
+    print("Extraction des donnees pertinentes...")
     villes = []
 
     # Les données sont dans raw_data['data']
@@ -55,25 +55,32 @@ def extract_relevant_data(raw_data: Dict) -> List[Dict]:
 
         # Extraire la population
         population = commune.get("population")
+        
+        # Extraire le code postal
+        code_postal = commune.get("code_postal")
 
         # Filtrer les données incomplètes
         if nom and latitude is not None and longitude is not None and population is not None:
-            villes.append(
-                {
-                    "nom": nom,
-                    "latitude": latitude,
-                    "longitude": longitude,
-                    "population": population,
-                }
-            )
+            ville_data = {
+                "nom": nom,
+                "latitude": latitude,
+                "longitude": longitude,
+                "population": population,
+            }
+            
+            # Ajouter le code postal s'il est disponible
+            if code_postal is not None:
+                ville_data["code_postal"] = code_postal
+            
+            villes.append(ville_data)
 
-    print(f"✅ {len(villes)} villes extraites")
+    print(f"{len(villes)} villes extraites")
     return villes
 
 
 def save_data(villes: List[Dict], output_dir: str):
     """Sauvegarde les données dans des fichiers."""
-    print(f"💾 Sauvegarde des données dans {output_dir}...")
+    print(f"Sauvegarde des donnees dans {output_dir}...")
 
     os.makedirs(output_dir, exist_ok=True)
 
@@ -82,7 +89,7 @@ def save_data(villes: List[Dict], output_dir: str):
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(villes, f, ensure_ascii=False, indent=2)
 
-    print(f"✅ Fichier sauvegardé: {output_path}")
+    print(f"Fichier sauvegarde: {output_path}")
 
 
 def main():
@@ -95,7 +102,7 @@ def main():
 
     args = parser.parse_args()
 
-    print("🚀 Début du traitement des données des villes")
+    print("Debut du traitement des donnees des villes")
     print("=" * 60)
 
     try:
@@ -111,16 +118,16 @@ def main():
         # Limiter si demandé
         if args.limit:
             villes = villes[: args.limit]
-            print(f"📏 Traitement limité à {args.limit} villes")
+            print(f"Traitement limite a {args.limit} villes")
 
         # Étape 3: Sauvegarde
         save_data(villes, args.output)
 
-        print("\n✅ Traitement terminé avec succès!")
-        print(f"📁 Fichiers sauvegardés dans {args.output}")
+        print("\nTraitement termine avec succes!")
+        print(f"Fichiers sauvegardes dans {args.output}")
 
     except Exception as e:
-        print(f"\n❌ Erreur: {e}")
+        print(f"\nErreur: {e}")
         import traceback
 
         traceback.print_exc()

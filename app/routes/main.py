@@ -121,8 +121,11 @@ def get_villes():
 
             return jsonify(formatted_results)
         else:
-            # Retourner seulement les noms (pour la compatibilité)
-            simple_results = [ville["nom"] for ville in results]
+            # Retourner les noms avec les codes postaux (format: "NomVille (CODEPOSTAL)")
+            simple_results = [
+                f"{ville['nom']} ({ville.get('code_postal', '')})" if ville.get('code_postal') else ville['nom']
+                for ville in results
+            ]
 
             return jsonify(simple_results)
 

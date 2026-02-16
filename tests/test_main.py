@@ -1601,12 +1601,12 @@ def test_api_villes_sans_parametre(client):
     assert isinstance(data, list)
     # L'API retourne les 20 villes les plus peuplées de France (données statiques)
     assert len(data) == 20
-    # Vérifier que les grandes villes sont présentes
-    assert "Paris" in data
-    assert "Marseille" in data
-    assert "Lyon" in data
-    assert "Toulouse" in data
-    assert "Nice" in data
+    # Vérifier que les grandes villes sont présentes (avec leurs codes postaux)
+    assert any("Paris" in ville for ville in data)
+    assert any("Marseille" in ville for ville in data)
+    assert any("Lyon" in ville for ville in data)
+    assert any("Toulouse" in ville for ville in data)
+    assert any("Nice" in ville for ville in data)
 
 
 @pytest.mark.api
@@ -1619,15 +1619,15 @@ def test_api_villes_avec_parametre(client):
 
     data = response.get_json()
     assert isinstance(data, list)
-    assert "Lyon" in data
-    assert "Marseille" not in data  # Ne devrait pas être dans les résultats
+    assert any("Lyon" in ville for ville in data)
+    assert not any("Marseille" in ville for ville in data)  # Ne devrait pas être dans les résultats
 
     # Test avec un autre paramètre
     response = client.get("/api/villes?q=par")
     assert response.status_code == 200
     data = response.get_json()
-    assert "Paris" in data
-    assert "Lyon" not in data
+    assert any("Paris" in ville for ville in data)
+    assert not any("Lyon" in ville for ville in data)
 
 
 @pytest.mark.api

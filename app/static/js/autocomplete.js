@@ -131,15 +131,41 @@ export function initAutocomplete(options = {}) {
         villes.forEach((ville) => {
             const div = document.createElement("div");
             div.className = "autocomplete-item";
-            div.textContent = ville;
+            
+            // Extraire le nom de la ville et le code postal si présent
+            let villeName = ville;
+            let codePostal = "";
+            
+            // Vérifier si la ville contient un code postal (format "NomVille (CODEPOSTAL)")
+            const match = ville.match(/^(.+?)\s*\((\d{5})\)/);
+            if (match) {
+                villeName = match[1].trim();
+                codePostal = match[2];
+            }
+            
+            // Afficher le nom de la ville et le code postal
+            if (codePostal) {
+                div.innerHTML = `${villeName} <span class="autocomplete-code-postal">(${codePostal})</span>`;
+            } else {
+                div.textContent = ville;
+            }
             
             // Style temporaire pour les éléments
             div.style.padding = '12px 15px';
             div.style.borderBottom = '1px solid #eee';
             div.style.backgroundColor = '#f8f9fa';
             
+            // Style pour le code postal
+            const postalSpan = div.querySelector('.autocomplete-code-postal');
+            if (postalSpan) {
+                postalSpan.style.color = '#666';
+                postalSpan.style.fontSize = '0.9em';
+                postalSpan.style.marginLeft = '5px';
+            }
+            
             div.addEventListener("click", function () {
-                input.value = ville;
+                // Utiliser uniquement le nom de la ville sans le code postal pour la valeur du champ
+                input.value = villeName;
                 
                 // Essayer plusieurs façons de trouver le champ ville
                 let hiddenField = null;
@@ -169,13 +195,13 @@ export function initAutocomplete(options = {}) {
                 }
                 
                 if (hiddenField) {
-                    hiddenField.value = ville;
+                    hiddenField.value = villeName;
                 }
                 resultsContainer.classList.remove("show");
                 
                 // Déclencher un événement personnalisé pour indiquer qu'une ville a été sélectionnée
                 const villeSelectedEvent = new CustomEvent('villeSelected', {
-                    detail: { ville: ville },
+                    detail: { ville: villeName, code_postal: codePostal },
                     bubbles: true
                 });
                 input.dispatchEvent(villeSelectedEvent);
@@ -186,7 +212,7 @@ export function initAutocomplete(options = {}) {
                 // Comportement différent selon la page
                 if (isIndexPage) {
                     // Récupérer les coordonnées GPS pour zoomer sur la carte
-                    fetch(`/api/villes?q=${encodeURIComponent(ville)}&with_gps=true`)
+                    fetch(`/api/villes?q=${encodeURIComponent(villeName)}&with_gps=true`)
                         .then(response => response.json())
                         .then(data => {
                             if (data.length > 0) {
@@ -197,7 +223,7 @@ export function initAutocomplete(options = {}) {
                                     
                                     // Rediriger vers la page de liste avec les coordonnées
                                     const url = new URL(window.location.origin + '/liste_etablissements');
-                                    url.searchParams.append("ville", ville);
+                                    url.searchParams.append("ville", villeName);
                                     url.searchParams.append("latitude", lat);
                                     url.searchParams.append("longitude", lng);
                                     url.searchParams.append("from_ville_selection", "true");
@@ -223,7 +249,7 @@ export function initAutocomplete(options = {}) {
                         });
                 } else if (isProposerPage) {
                     // Récupérer les coordonnées GPS pour zoomer sur la carte
-                    fetch(`/api/villes?q=${encodeURIComponent(ville)}&with_gps=true`)
+                    fetch(`/api/villes?q=${encodeURIComponent(villeName)}&with_gps=true`)
                         .then(response => response.json())
                         .then(data => {
                             if (data.length > 0) {
