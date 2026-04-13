@@ -72,10 +72,14 @@ services:
     volumes:
       - letsencrypt:/etc/letsencrypt
       - certbot-www:/var/www/certbot
-    depends_on:
-      - nginx
+    # Pour le mode standalone, nous exposons le port 80 temporairement
+    # Note: ce service n'est pas démarré automatiquement, il est utilisé avec "docker compose run"
+    ports:
+      - "80:80"
     networks:
       - frontend-network
+    # Ne pas démarrer automatiquement ce service
+    profiles: ["tools"]
 
 volumes:
   mysql_data:
